@@ -1,3 +1,23 @@
 {
-  "extends": "next/core-web-vitals"
+  "plugins": [
+    "@typescript-eslint",
+    "jest",
+    "jsx-a11y"
+  ],
+  "extends": [
+    "next",
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:jest/recommended",
+    "plugin:jest/style"
+    //"plugin:jsx-a11y/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "no-unexpected-multiline": "error"
+  },
+  "env": {
+    "jest/globals": true
+  }
 }
