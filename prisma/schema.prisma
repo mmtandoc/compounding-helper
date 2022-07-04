@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Chemical {
+    id        Int       @id @default(autoincrement())
+    name      String
+    synonyms  String[]
+    casNumber String    @unique
+    products  Product[]
+
+    nioshList NioshList[]
+    @@map("chemicals")
+}
+
+model Product {
+    id         Int      @id @default(autoincrement())
+    name       String
+    chemical   Chemical @relation(fields: [chemicalId], references: [id])
+    chemicalId Int
+    vendor     Vendor   @relation(fields: [vendorId], references: [id])
+    vendorId   Int
+    sds        SDS[]
+
+    @@map("products")
+}
+
+model Vendor {
+    id       Int       @id @default(autoincrement())
+    name     String
+    products Product[]
+
+    @@map("vendors")
+}
+
+model SDS {
+    id                 Int              @id @default(autoincrement())
+    product            Product          @relation(fields: [productId], references: [id])
+    productId          Int
+    revisionDate       DateTime
+    hmisHealthHazard   Int
+    requireVentilation Boolean
+    healthHazards      HazardCategory[] @relation("hazard_category_to_sds")
+    filename           String
+
+    @@unique([productId, revisionDate])
+    @@map("safety_data_sheets")
+}
+
+model HazardClass {
+    id               Int              @id @default(autoincrement())
+    name             String
+    description      String?
+    hazardCategories HazardCategory[]
+
+    @@map("hazard_classes")
+}
+
+model HazardCategory {
+    id               Int              @id @default(autoincrement())
+    hazardClass      HazardClass      @relation(fields: [hazardClassId], references: [id])
+    hazardClassId    Int
+    parentCategory   HazardCategory?  @relation(name: "hazard_subcategories", fields: [hazardClassId, parentLevel], references: [hazardClassId, level])
+    parentLevel      String?
+    subcategories    HazardCategory[] @relation(name: "hazard_subcategories")
+    level            String
+    description      String
+    safetyDataSheets SDS[]            @relation("hazard_category_to_sds")
+
+    @@unique([hazardClassId, level])
+    @@map(name: "hazard_categories")
+}
+
+model NioshList {
+    chemical     Chemical @relation(fields: [chemicalId], references: [id])
+    chemicalId   Int
+    table        Int
+    revisionYear Int
+
+    @@id([chemicalId, table])
+    @@map(name: "niosh_list")
+}
