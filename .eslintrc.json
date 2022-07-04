@@ -8,9 +8,9 @@
     "next",
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
     "plugin:jest/recommended",
-    "plugin:jest/style"
+    "plugin:jest/style",
+    "prettier"
     //"plugin:jsx-a11y/recommended"
   ],
   "rules": {
