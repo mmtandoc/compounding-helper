@@ -13,7 +13,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@prisma/client": "^3.15.2",
+    "@prisma/client": "^4.1.0",
     "axios": "^0.27.2",
     "lodash.debounce": "^4.0.8",
     "next": "^12.1.6",
@@ -37,7 +37,7 @@
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "prettier": "^2.7.1",
-    "prisma": "^3.15.2",
+    "prisma": "^4.1.0",
     "typescript": "^4.7.4"
   }
 }
