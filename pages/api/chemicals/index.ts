@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
-import { Chemical, NioshList, Prisma } from "@prisma/client"
+import { Chemical, Prisma } from "@prisma/client"
 import { ApiBody } from "types/common"
-import { ChemicalWithNiosh } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiBody<ChemicalWithNiosh[]>>,
+  res: NextApiResponse<ApiBody<Chemical[]>>,
 ) {
   const { query: queryValues, method } = req
 
@@ -48,26 +47,7 @@ export default async function handler(
         return
       }
 
-      const nioshList: NioshList[] | false = await prisma.nioshList
-        .findMany({ where: { chemicalId: { in: chemicals.map((c) => c.id) } } })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return false
-        })
-
-      if (!nioshList) {
-        return
-      }
-
-      const chemicalsWithNiosh: ChemicalWithNiosh[] = chemicals.map((c) =>
-        Object.assign(c, {
-          nioshList: nioshList.filter((n) => n.chemicalId === c.id),
-        }),
-      )
-
-      res.status(200).json(chemicalsWithNiosh)
+      res.status(200).json(chemicals)
       return
     }
     default:

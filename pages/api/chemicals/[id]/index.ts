@@ -17,7 +17,6 @@ export default async function handler(
         .findUnique({
           where: { id: parseInt(id as string) },
           include: {
-            nioshList: true,
             products: {
               include: {
                 sds: {

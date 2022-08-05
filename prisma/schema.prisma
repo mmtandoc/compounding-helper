@@ -8,12 +8,13 @@ generator client {
 }
 
 model Chemical {
-  id        Int         @id @default(autoincrement())
-  name      String
-  casNumber String      @unique
-  synonyms  String[]
-  products  Product[]
-  nioshList NioshList[]
+  id                Int       @id @default(autoincrement())
+  name              String
+  casNumber         String    @unique
+  synonyms          String[]
+  products          Product[]
+  nioshTable        Int?
+  nioshRevisionDate DateTime?
 
   @@map("chemicals")
 }
@@ -74,14 +75,4 @@ model HazardCategory {
 
   @@unique([hazardClassId, level])
   @@map("hazard_categories")
-}
-
-model NioshList {
-  chemical     Chemical @relation(fields: [chemicalId], references: [id])
-  chemicalId   Int
-  table        Int
-  revisionYear Int
-
-  @@id([chemicalId, table])
-  @@map("niosh_list")
 }
