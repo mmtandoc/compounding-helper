@@ -13,7 +13,7 @@ model Chemical {
   casNumber         String    @unique
   synonyms          String[]
   products          Product[]
-  nioshTable        Int?
+  nioshTable        Int       @default(-1)
   nioshRevisionDate DateTime?
 
   @@map("chemicals")
