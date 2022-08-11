@@ -40,13 +40,13 @@ model Vendor {
 }
 
 model SDS {
-  id                 Int              @id @default(autoincrement())
-  product            Product          @relation(fields: [productId], references: [id])
+  id                 Int                   @id @default(autoincrement())
+  product            Product               @relation(fields: [productId], references: [id])
   productId          Int
   revisionDate       DateTime
   hmisHealthHazard   Int
   requireVentilation Boolean
-  healthHazards      HazardCategory[] @relation("hazard_category_to_sds")
+  healthHazards      HazardCategoryToSDS[]
   filename           String
 
   @@unique([productId, revisionDate])
@@ -63,16 +63,28 @@ model HazardClass {
 }
 
 model HazardCategory {
-  id               Int              @id @default(autoincrement())
-  hazardClass      HazardClass      @relation(fields: [hazardClassId], references: [id])
+  id               Int                   @id @default(autoincrement())
+  hazardClass      HazardClass           @relation(fields: [hazardClassId], references: [id])
   hazardClassId    Int
-  parentCategory   HazardCategory?  @relation("hazard_subcategories", fields: [hazardClassId, parentLevel], references: [hazardClassId, level])
+  parentCategory   HazardCategory?       @relation("hazard_subcategories", fields: [hazardClassId, parentLevel], references: [hazardClassId, level])
   parentLevel      String?
-  subcategories    HazardCategory[] @relation("hazard_subcategories")
+  subcategories    HazardCategory[]      @relation("hazard_subcategories")
   level            String
   description      String
-  safetyDataSheets SDS[]            @relation("hazard_category_to_sds")
+  safetyDataSheets HazardCategoryToSDS[]
 
   @@unique([hazardClassId, level])
   @@map("hazard_categories")
+}
+
+model HazardCategoryToSDS {
+  id               Int            @id @default(autoincrement())
+  sds              SDS            @relation(fields: [sdsId], references: [id])
+  sdsId            Int
+  hazardCategory   HazardCategory @relation(fields: [hazardCategoryId], references: [id])
+  hazardCategoryId Int
+  additionalInfo   String?
+
+  @@unique([sdsId, hazardCategoryId, additionalInfo])
+  @@map("hazard_category_to_sds")
 }

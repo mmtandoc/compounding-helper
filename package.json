@@ -12,6 +12,9 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
+  "prisma": {
+    "seed": "bash prisma/seed.sh"
+  },
   "dependencies": {
     "@prisma/client": "^4.1.0",
     "axios": "^0.27.2",
