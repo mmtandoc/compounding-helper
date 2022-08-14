@@ -15,6 +15,7 @@ model Chemical {
   products          Product[]
   nioshTable        Int       @default(-1)
   nioshRevisionDate DateTime?
+  updatedAt         DateTime  @default(now()) @updatedAt
 
   @@map("chemicals")
 }
@@ -27,6 +28,7 @@ model Product {
   vendor     Vendor   @relation(fields: [vendorId], references: [id])
   vendorId   Int
   sds        SDS[]
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("products")
 }
@@ -48,6 +50,7 @@ model SDS {
   requireVentilation Boolean
   healthHazards      HazardCategoryToSDS[]
   filename           String
+  updatedAt          DateTime              @default(now()) @updatedAt
 
   @@unique([productId, revisionDate])
   @@map("safety_data_sheets")
