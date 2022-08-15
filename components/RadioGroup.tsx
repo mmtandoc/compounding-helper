@@ -16,15 +16,7 @@ interface Props<T> {
   className?: string
 }
 export const RadioGroup = <T extends FieldValues>(props: Props<T>) => {
-  const {
-    name,
-    id: mainId,
-    options,
-    register,
-    radioOptions,
-    readOnly,
-    className,
-  } = props
+  const { name, options, register, radioOptions, readOnly, className } = props
 
   return (
     <div className={`radio-group row ${className ?? ""}`}>
