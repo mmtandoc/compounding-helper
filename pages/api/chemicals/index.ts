@@ -16,23 +16,22 @@ export default async function handler(
       ? queryValues.query
       : queryValues.query?.[0]
 
-  //TODO: Improve text search
-
   switch (method) {
     case "GET": {
-      const where = Prisma.sql`WHERE (
-        0 < (
-          SELECT COUNT(*) 
-          FROM unnest(synonyms) AS synonym
-          WHERE synonym ILIKE ${`%${queryString}%`}
-        ) OR name ILIKE ${`%${queryString}%`}
-      )`
+      const where =
+        queryString !== undefined
+          ? Prisma.sql`WHERE (
+            0 < (
+              SELECT COUNT(*) 
+              FROM unnest(synonyms) AS synonym
+              WHERE synonym ILIKE ${`${queryString?.replaceAll("*", "%")}%`}
+            ) OR name ILIKE ${`${queryString?.replaceAll("*", "%")}%`}
+          )`
+          : Prisma.empty
 
       const chemicals: Chemical[] | false = await prisma
         .$queryRaw<Chemical[]>(
-          Prisma.sql`SELECT * FROM public.chemicals ${
-            queryString !== undefined ? where : Prisma.empty
-          } ORDER BY id ASC;`,
+          Prisma.sql`SELECT * FROM public.chemicals ${where} ORDER BY id ASC;`,
         )
         .catch((reason) => {
           //TODO: HANDLE ERROR
