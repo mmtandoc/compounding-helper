@@ -2,8 +2,11 @@ import React, { useEffect } from "react"
 import {
   FieldError,
   FieldValues,
+  Path,
+  PathValue,
   useController,
   UseControllerProps,
+  Validate,
 } from "react-hook-form"
 
 interface Props<T> extends UseControllerProps<T> {
@@ -25,10 +28,42 @@ export const BooleanRadioButtons = <T extends FieldValues>({
   className,
   direction = "row",
 }: Props<T>) => {
+  let customValidate:
+    | Validate<PathValue<T, Path<T>>>
+    | Record<string, Validate<PathValue<T, Path<T>>>>
+    | undefined
+
+  // If rules.required is true, then create custom validate function for workaround
+  //https://github.com/react-hook-form/react-hook-form/issues/6757#issuecomment-939429340
+  if (rules?.required) {
+    customValidate = {
+      required: (value: unknown) => {
+        return typeof value === "boolean"
+      },
+    }
+
+    if (rules?.validate !== undefined) {
+      switch (typeof rules.validate) {
+        case "function":
+          customValidate.custom = rules.validate
+          break
+        case "object":
+          customValidate = { ...customValidate, ...rules.validate }
+          break
+        default:
+          break
+      }
+    }
+  }
+
   const { field } = useController({
     control,
     name,
-    rules,
+    rules: {
+      ...rules,
+      validate: customValidate ?? rules?.validate,
+      required: false,
+    },
   })
 
   const options = [
@@ -57,11 +92,13 @@ export const BooleanRadioButtons = <T extends FieldValues>({
         <div key={index}>
           <label className={disabled ? "disabled" : ""}>
             <input
-              name={name}
+              name={field.name}
               onChange={(e) => {
                 setValue(e.target.value)
                 field.onChange(e.target.value === "yes")
               }}
+              ref={field.ref}
+              onBlur={field.onBlur}
               type="radio"
               checked={option.stringValue === value}
               value={option.stringValue}
