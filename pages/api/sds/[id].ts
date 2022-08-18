@@ -13,8 +13,10 @@ export default async function handler(
   //TODO: Implement other User methods
   switch (method) {
     case "GET": {
-      const sds = await prisma.sDS
-        .findUnique({
+      let sds
+
+      try {
+        sds = await prisma.sDS.findUnique({
           where: { id: parseInt(id as string) },
           include: {
             product: {
@@ -34,12 +36,14 @@ export default async function handler(
             },
           },
         })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
+        return
+      }
 
       res.status(200).json({ ...sds })
       return

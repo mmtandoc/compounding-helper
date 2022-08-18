@@ -44,8 +44,10 @@ export default async function handler(
         }
       }
 
-      const safetyDatasheets = await prisma.sDS
-        .findMany({
+      let safetyDatasheets
+
+      try {
+        safetyDatasheets = await prisma.sDS.findMany({
           where: filters,
           orderBy: { revisionDate: "desc" },
           include: {
@@ -65,12 +67,15 @@ export default async function handler(
             },
           },
         })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
+        return
+      }
+
       res.status(200).json(safetyDatasheets)
       return
     }

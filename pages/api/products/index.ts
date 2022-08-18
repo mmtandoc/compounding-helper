@@ -49,18 +49,23 @@ export default async function handler(
         }
       }
 
-      const products = await prisma.product
-        .findMany({
+      let products
+
+      try {
+        products = await prisma.product.findMany({
           where: filters,
           include: includes,
           orderBy: { id: "asc" },
         })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
+        return
+      }
+
       res.status(200).json(products)
       return
     }

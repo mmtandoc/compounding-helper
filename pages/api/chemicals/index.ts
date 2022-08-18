@@ -29,20 +29,18 @@ export default async function handler(
           )`
           : Prisma.empty
 
-      const chemicals: Chemical[] | false = await prisma
-        .$queryRaw<Chemical[]>(
+      let chemicals
+
+      try {
+        chemicals = await prisma.$queryRaw<Chemical[]>(
           Prisma.sql`SELECT * FROM public.chemicals ${where} ORDER BY id ASC;`,
         )
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return false
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
-
-      console.dir(chemicals)
-
-      if (!chemicals) {
         return
       }
 

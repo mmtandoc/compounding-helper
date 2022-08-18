@@ -9,8 +9,9 @@ export default async function handler(
 
   switch (method) {
     case "GET": {
-      const hazards = await prisma.hazardClass
-        .findMany({
+      let hazards
+      try {
+        hazards = await prisma.hazardClass.findMany({
           include: {
             hazardCategories: {
               orderBy: { level: "desc" },
@@ -20,12 +21,15 @@ export default async function handler(
           },
           orderBy: { id: "asc" },
         })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
+        return
+      }
+
       res.status(200).json(hazards)
       return
     }

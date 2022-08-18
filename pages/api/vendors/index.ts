@@ -12,19 +12,24 @@ export default async function handler(
   //TODO: Implement filtering
   switch (method) {
     case "GET": {
-      const vendors = await prisma.vendor
-        .findMany({
+      let vendors
+
+      try {
+        vendors = await prisma.vendor.findMany({
           orderBy: { id: "asc" },
           include: {
             products: true,
           },
         })
-        .catch((reason) => {
-          //TODO: HANDLE ERROR
-          console.log(reason)
-          res.status(404).json({ error: reason })
-          return
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
         })
+        return
+      }
+
       res.status(200).json(vendors)
       return
     }
