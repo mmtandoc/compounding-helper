@@ -2,10 +2,8 @@ import React from "react"
 import {
   FieldPath,
   FieldValues,
-  RegisterOptions,
-  UseControllerProps,
   useController,
-  UseFormRegister,
+  UseControllerProps,
 } from "react-hook-form"
 
 interface RHFRadioGroupProps<T>
