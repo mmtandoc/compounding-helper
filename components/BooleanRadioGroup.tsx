@@ -9,7 +9,7 @@ import {
   Validate,
 } from "react-hook-form"
 
-interface Props<T> extends UseControllerProps<T> {
+interface RHFBooleanRadioGroupProps<T> extends UseControllerProps<T> {
   id?: string
   error?: FieldError
   readOnly?: boolean
@@ -18,16 +18,15 @@ interface Props<T> extends UseControllerProps<T> {
   direction?: "row" | "col"
 }
 
-export const BooleanRadioButtons = <T extends FieldValues>({
+export const RHFBooleanRadioGroup = <T extends FieldValues>({
   control,
   name,
-  id,
   rules,
   readOnly = false,
   disabled = false,
   className,
   direction = "row",
-}: Props<T>) => {
+}: RHFBooleanRadioGroupProps<T>) => {
   let customValidate:
     | Validate<PathValue<T, Path<T>>>
     | Record<string, Validate<PathValue<T, Path<T>>>>
@@ -66,25 +65,61 @@ export const BooleanRadioButtons = <T extends FieldValues>({
     },
   })
 
-  const options = [
-    { label: "Yes", stringValue: "yes", value: true },
-    { label: "No", stringValue: "no", value: false },
-  ]
+  const [value, setValue] = React.useState<boolean | undefined>(field.value)
 
-  const valueString =
-    field.value === undefined
-      ? undefined
-      : field.value === true
-      ? options[0].stringValue
-      : options[1].stringValue
-
-  const [value, setValue] = React.useState<string | undefined>(valueString)
-
+  /*
   useEffect(() => {
     if (value !== valueString) {
       setValue(valueString)
     }
   }, [value, valueString])
+  */
+
+  return (
+    <BooleanRadioGroup
+      onChange={(e) => {
+        setValue(e.target.value === "yes")
+        field.onChange(e.target.value === "yes")
+      }}
+      inputRef={field.ref}
+      onBlur={field.onBlur}
+      name={field.name}
+      direction={direction}
+      className={className}
+      disabled={disabled}
+      selectedValue={value}
+      readOnly={readOnly}
+    />
+  )
+}
+
+type BooleanRadioGroupProps = {
+  name?: string
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  onBlur?: React.FocusEventHandler<HTMLInputElement>
+  inputRef?: React.LegacyRef<HTMLInputElement>
+  direction: string
+  className: string | undefined
+  disabled: boolean
+  selectedValue: boolean | undefined
+  readOnly: boolean
+}
+
+export const BooleanRadioGroup = ({
+  name,
+  onChange,
+  onBlur,
+  inputRef: ref,
+  direction,
+  className,
+  disabled,
+  selectedValue,
+  readOnly,
+}: BooleanRadioGroupProps) => {
+  const options = [
+    { label: "Yes", stringValue: "yes", value: true },
+    { label: "No", stringValue: "no", value: false },
+  ]
 
   return (
     <div className={`boolean-radio-group ${direction} ${className ?? ""}`}>
@@ -92,15 +127,12 @@ export const BooleanRadioButtons = <T extends FieldValues>({
         <div key={index}>
           <label className={disabled ? "disabled" : ""}>
             <input
-              name={field.name}
-              onChange={(e) => {
-                setValue(e.target.value)
-                field.onChange(e.target.value === "yes")
-              }}
-              ref={field.ref}
-              onBlur={field.onBlur}
+              name={name}
+              onChange={onChange}
+              ref={ref}
+              onBlur={onBlur}
               type="radio"
-              checked={option.stringValue === value}
+              checked={option.value === selectedValue}
               value={option.stringValue}
               readOnly={readOnly}
               disabled={disabled}
