@@ -98,11 +98,11 @@ type BooleanRadioGroupProps = {
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   inputRef?: React.LegacyRef<HTMLInputElement>
-  direction: string
-  className: string | undefined
-  disabled: boolean
-  selectedValue: boolean | undefined
-  readOnly: boolean
+  direction?: string
+  className?: string
+  disabled?: boolean
+  selectedValue?: boolean
+  readOnly?: boolean
 }
 
 export const BooleanRadioGroup = ({
@@ -110,11 +110,11 @@ export const BooleanRadioGroup = ({
   onChange,
   onBlur,
   inputRef: ref,
-  direction,
+  direction = "row",
   className,
-  disabled,
+  disabled = false,
   selectedValue,
-  readOnly,
+  readOnly = false,
 }: BooleanRadioGroupProps) => {
   const options = [
     { label: "Yes", stringValue: "yes", value: true },
