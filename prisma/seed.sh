@@ -8,4 +8,6 @@ set -ex
 
 # Seeding command
 
-psql seed.sql
+#psql -h localhost -p 5432 -U postgres -W -f seed.sql
+echo $DATABASE_URL
+psql -d $DATABASE_URL -f ./prisma/seed.sql
