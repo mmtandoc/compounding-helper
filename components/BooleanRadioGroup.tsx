@@ -65,20 +65,9 @@ export const RHFBooleanRadioGroup = <T extends FieldValues>({
     },
   })
 
-  const [value, setValue] = React.useState<boolean | undefined>(field.value)
-
-  /*
-  useEffect(() => {
-    if (value !== valueString) {
-      setValue(valueString)
-    }
-  }, [value, valueString])
-  */
-
   return (
     <BooleanRadioGroup
       onChange={(e) => {
-        setValue(e.target.value === "yes")
         field.onChange(e.target.value === "yes")
       }}
       inputRef={field.ref}
@@ -87,7 +76,7 @@ export const RHFBooleanRadioGroup = <T extends FieldValues>({
       direction={direction}
       className={className}
       disabled={disabled}
-      selectedValue={value}
+      selectedValue={field.value}
       readOnly={readOnly}
     />
   )
@@ -101,7 +90,7 @@ type BooleanRadioGroupProps = {
   direction?: string
   className?: string
   disabled?: boolean
-  selectedValue?: boolean
+  selectedValue?: boolean | null
   readOnly?: boolean
 }
 
@@ -125,7 +114,11 @@ export const BooleanRadioGroup = ({
     <div className={`boolean-radio-group ${direction} ${className ?? ""}`}>
       {options.map((option, index) => (
         <div key={index}>
-          <label className={disabled ? "disabled" : ""}>
+          <label
+            className={`${disabled ? "disabled" : ""} ${
+              readOnly ? "readOnly" : ""
+            }`}
+          >
             <input
               name={name}
               onChange={onChange}
