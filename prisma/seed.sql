@@ -2,47 +2,60 @@
 -- PostgreSQL database dump
 --
 
+-- USE compounding_helper
+
 -- Dumped from database version 14.3 (Ubuntu 14.3-1.pgdg20.04+1)
 -- Dumped by pg_dump version 14.4
 
--- Started on 2022-08-09 21:52:09
+-- Started on 2022-08-18 18:31:48
 
-/* SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off; */
+-- SET statement_timeout = 0;
+-- SET lock_timeout = 0;
+-- SET idle_in_transaction_session_timeout = 0;
+-- SET client_encoding = 'UTF8';
+-- SET standard_conforming_strings = on;
+-- SELECT pg_catalog.set_config('search_path', '', false);
+-- SET check_function_bodies = false;
+-- SET xmloption = content;
+-- SET client_min_messages = warning;
+-- SET row_security = off;
 
 --
--- TOC entry 3336 (class 0 OID 65563)
+-- TOC entry 3389 (class 0 OID 65563)
 -- Dependencies: 209
 -- Data for Name: _prisma_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 -- INSERT INTO public._prisma_migrations (id, checksum, finished_at, migration_name, logs, rolled_back_at, started_at, applied_steps_count) VALUES ('bf879f2b-c25a-4b65-9fb0-e841d862422d', '63803f0eb30bdd341f7a7d1353b8cadcd44621bfced2177942485457cc4df771', '2022-08-09 21:25:28.505251-04', '20220810012528_initial', NULL, NULL, '2022-08-09 21:25:28.397627-04', 1);
+-- INSERT INTO public._prisma_migrations (id, checksum, finished_at, migration_name, logs, rolled_back_at, started_at, applied_steps_count) VALUES ('d7efc1b8-dfb3-477d-8b3b-a93a428a9a30', '5acb8bfbc91e0b1a4251f47e908ea8cae46429a5a85a51403dafd54255eabdef', '2022-08-14 14:11:31.554547-04', '20220814181131_add_updated_at_fields', NULL, NULL, '2022-08-14 14:11:31.518532-04', 1);
 
 
 --
--- TOC entry 3338 (class 0 OID 65575)
+-- TOC entry 3395 (class 0 OID 65594)
+-- Dependencies: 215
+-- Data for Name: vendors; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.vendors (id, name) VALUES (1, 'Medisca');
+INSERT INTO public.vendors (id, name) VALUES (2, 'Xenex');
+
+
+--
+-- TOC entry 3391 (class 0 OID 65575)
 -- Dependencies: 211
 -- Data for Name: chemicals; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (1, 'tetracycline hydrochloride', '64-75-5', '{tetracycline,"tetracycline HCl"}', -1, NULL);
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (2, 'Aspirin', '50-78-2', '{"acetylsalicylic acid",ASA}', -1, NULL);
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (4, 'clindamycin hydrochloride', '21462-39-5', '{clindamycin,"clindamycin HCl"}', -1, NULL);
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (3, 'Mitomycin', '50-07-7', '{Mitomycin-C}', 1, NULL);
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (5, 'hydrocortisone', '50-23-7', '{HC}', -1, NULL);
-INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate") VALUES (6, 'clotrimazole', '23593-75-1', '{}', -1, NULL);
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (1, 'tetracycline hydrochloride', '64-75-5', '{tetracycline,"tetracycline HCl"}', -1, NULL, '2022-08-14 14:11:31.531');
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (2, 'Aspirin', '50-78-2', '{"acetylsalicylic acid",ASA}', -1, NULL, '2022-08-14 14:11:31.531');
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (4, 'clindamycin hydrochloride', '21462-39-5', '{clindamycin,"clindamycin HCl"}', -1, NULL, '2022-08-14 14:11:31.531');
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (3, 'Mitomycin', '50-07-7', '{Mitomycin-C}', 1, NULL, '2022-08-14 14:11:31.531');
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (5, 'hydrocortisone', '50-23-7', '{HC}', -1, NULL, '2022-08-14 14:11:31.531');
+INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (6, 'clotrimazole', '23593-75-1', '{}', -1, NULL, '2022-08-14 14:11:31.531');
 
 
 --
--- TOC entry 3346 (class 0 OID 65612)
+-- TOC entry 3399 (class 0 OID 65612)
 -- Dependencies: 219
 -- Data for Name: hazard_classes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -63,7 +76,7 @@ INSERT INTO public.hazard_classes (id, name, description) VALUES (13, 'Aspiratio
 
 
 --
--- TOC entry 3348 (class 0 OID 65621)
+-- TOC entry 3401 (class 0 OID 65621)
 -- Dependencies: 221
 -- Data for Name: hazard_categories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -121,49 +134,44 @@ INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level,
 INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level, description) VALUES (51, 13, NULL, '2', 'Substance which causes concern owing to the presumtion that they cause human aspiration toxicity hazard.');
 
 
---
--- TOC entry 3342 (class 0 OID 65594)
--- Dependencies: 215
--- Data for Name: vendors; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-INSERT INTO public.vendors (id, name) VALUES (1, 'Medisca');
-INSERT INTO public.vendors (id, name) VALUES (2, 'Xenex');
-
 
 --
--- TOC entry 3340 (class 0 OID 65585)
+-- TOC entry 3393 (class 0 OID 65585)
 -- Dependencies: 213
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (1, 'TETRACYCLINE HYDROCHLORIDE, USP', 1, 1);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (2, 'ACETYL SALICYLIC ACID, USP', 2, 1);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (3, 'MITOMYCIN, USP', 3, 1);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (4, 'CLINDAMYCIN HYDROCHLORIDE, USP', 4, 1);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (5, 'CLINDAMYCIN HYDROCHLORIDE CRYSTALLINE POWDER USP', 4, 2);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (6, 'HYDROCORTISONE, USP/EP (Micronized)', 5, 1);
-INSERT INTO public.products (id, name, "chemicalId", "vendorId") VALUES (7, 'CLOTRIMAZOLE, USP', 6, 1);
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (1, 'TETRACYCLINE HYDROCHLORIDE, USP', 1, 1, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (2, 'ACETYL SALICYLIC ACID, USP', 2, 1, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (3, 'MITOMYCIN, USP', 3, 1, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (4, 'CLINDAMYCIN HYDROCHLORIDE, USP', 4, 1, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (5, 'CLINDAMYCIN HYDROCHLORIDE CRYSTALLINE POWDER USP', 4, 2, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (6, 'HYDROCORTISONE, USP/EP (Micronized)', 5, 1, '2022-08-14 14:11:31.531');
+INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (7, 'CLOTRIMAZOLE, USP', 6, 1, '2022-08-14 14:11:31.531');
+
+
 
 
 --
--- TOC entry 3344 (class 0 OID 65603)
+-- TOC entry 3397 (class 0 OID 65603)
 -- Dependencies: 217
 -- Data for Name: safety_data_sheets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (1, 1, '2021-04-01 00:00:00', 2, true, 'medisca_0053_04-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (2, 2, '2021-04-01 00:00:00', 2, true, 'medisca_0955_04-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (3, 3, '2021-03-01 00:00:00', 4, true, 'medisca_0553_03-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (4, 4, '2021-04-01 00:00:00', 1, true, 'medisca_0005_04-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (5, 5, '2021-09-21 00:00:00', 2, true, 'xenex_CL100X_09-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (6, 4, '1970-01-01 00:00:00', 3, false, 'medisca_0005_01-1970_test.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (7, 6, '2021-05-01 00:00:00', 2, false, 'medisca_0009_05-2021.pdf');
-INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename) VALUES (8, 7, '2021-04-01 00:00:00', 2, false, 'medisca_0019_04-2021.pdf');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (1, 1, '2021-04-01 00:00:00', 2, true, 'medisca_0053_04-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (2, 2, '2021-04-01 00:00:00', 2, true, 'medisca_0955_04-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (3, 3, '2021-03-01 00:00:00', 4, true, 'medisca_0553_03-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (4, 4, '2021-04-01 00:00:00', 1, true, 'medisca_0005_04-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (5, 5, '2021-09-21 00:00:00', 2, true, 'xenex_CL100X_09-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (6, 4, '1970-01-01 00:00:00', 3, false, 'medisca_0005_01-1970_test.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (7, 6, '2021-05-01 00:00:00', 2, false, 'medisca_0009_05-2021.pdf', '2022-08-14 14:11:31.531');
+INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (8, 7, '2021-04-01 00:00:00', 2, false, 'medisca_0019_04-2021.pdf', '2022-08-14 14:11:31.531');
+
+
 
 
 --
--- TOC entry 3350 (class 0 OID 65630)
+-- TOC entry 3403 (class 0 OID 65630)
 -- Dependencies: 223
 -- Data for Name: hazard_category_to_sds; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -194,13 +202,29 @@ INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "add
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (24, 7, 26, NULL);
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (25, 7, 29, NULL);
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (26, 7, 43, NULL);
-INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (27, 7, 49, 'endocrine system');
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (28, 8, 7, NULL);
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (29, 8, 24, NULL);
+INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (27, 7, 49, 'endocrine system');
+
+--
+-- TOC entry 3405 (class 0 OID 74518)
+-- Dependencies: 225
+-- Data for Name: risk_assessments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparationFrequency", "isPreparedOccasionally", "isConcentrationHealthRisk", "requireSpecialEducation", "hasVerificationSteps", "haveAppropriateFacilities", "requireVentilation", "isWorkflowUninterrupted", "workflowStandardsProcess", "microbialContaminationRisk", "crossContaminationRisk", "sdsSkinExposureRisk", "sdsEyeExposureRisk", "sdsInhalationExposureRisk", "sdsOralExposureRisk", "sdsOtherExposureRisk", "sdsOtherExposureRiskDescription", "pmSkinExposureRisk", "pmEyeExposureRisk", "pmInhalationExposureRisk", "pmOtherExposureRisk", "pmOtherExposureRiskDescription", "ppeGlovesRequired", "ppeGlovesType", "ppeCoatRequired", "ppeCoatType", "ppeMaskRequired", "ppeMaskType", "ppeEyeProtectionRequired", "ppeOther", "requireEyeWashStation", "requireSafetyShower", "riskLevel", "automaticRationale", "additionalRationale", "dateAssessed", "updatedAt", "averagePreparationAmountQuantity", "averagePreparationAmountUnit", "isSmallQuantity", "pmOralExposureRisk") VALUES (1, 'test compound', 'Moderate', 'monthly', true, false, false, false, true, false, true, NULL, false, false, true, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, true, 'regular', false, NULL, false, NULL, false, '', false, false, 'A', '{"Do not have appropriate facilities.","Compounding complexity is moderate.","Ingredient # is a cream."}', '{"Additional 1","Additional 2"}', '2022-08-17', '2022-08-17 22:58:39.125', 12, 'g', false, NULL);
+
+--
+-- TOC entry 3407 (class 0 OID 74528)
+-- Dependencies: 227
+-- Data for Name: ingredients; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (1, 1, 2, 'cream', NULL, NULL, NULL, NULL);
 
 
 --
--- TOC entry 3356 (class 0 OID 0)
+-- TOC entry 3422 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: chemicals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -209,7 +233,7 @@ SELECT pg_catalog.setval('public.chemicals_id_seq', 1, false);
 
 
 --
--- TOC entry 3357 (class 0 OID 0)
+-- TOC entry 3423 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: hazard_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -218,7 +242,7 @@ SELECT pg_catalog.setval('public.hazard_categories_id_seq', 1, false);
 
 
 --
--- TOC entry 3358 (class 0 OID 0)
+-- TOC entry 3424 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: hazard_category_to_sds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -227,7 +251,7 @@ SELECT pg_catalog.setval('public.hazard_category_to_sds_id_seq', 1, false);
 
 
 --
--- TOC entry 3359 (class 0 OID 0)
+-- TOC entry 3425 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: hazard_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -236,7 +260,16 @@ SELECT pg_catalog.setval('public.hazard_classes_id_seq', 1, false);
 
 
 --
--- TOC entry 3360 (class 0 OID 0)
+-- TOC entry 3426 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: ingredients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ingredients_id_seq', 1, true);
+
+
+--
+-- TOC entry 3427 (class 0 OID 0)
 -- Dependencies: 212
 -- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -245,7 +278,16 @@ SELECT pg_catalog.setval('public.products_id_seq', 1, false);
 
 
 --
--- TOC entry 3361 (class 0 OID 0)
+-- TOC entry 3428 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: risk_assessments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.risk_assessments_id_seq', 1, true);
+
+
+--
+-- TOC entry 3429 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: safety_data_sheets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -254,7 +296,7 @@ SELECT pg_catalog.setval('public.safety_data_sheets_id_seq', 1, false);
 
 
 --
--- TOC entry 3362 (class 0 OID 0)
+-- TOC entry 3430 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -262,7 +304,7 @@ SELECT pg_catalog.setval('public.safety_data_sheets_id_seq', 1, false);
 SELECT pg_catalog.setval('public.vendors_id_seq', 1, false);
 
 
--- Completed on 2022-08-09 21:52:09
+-- Completed on 2022-08-18 18:31:48
 
 --
 -- PostgreSQL database dump complete

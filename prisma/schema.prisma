@@ -16,6 +16,7 @@ model Chemical {
   nioshTable        Int       @default(-1)
   nioshRevisionDate DateTime?
   updatedAt         DateTime  @default(now()) @updatedAt
+  //ingredients       Ingredient[]
 
   @@map("chemicals")
 }
@@ -29,6 +30,7 @@ model Product {
   vendorId   Int
   sds        SDS[]
   updatedAt  DateTime @default(now()) @updatedAt
+  //ingredients Ingredient[]
 
   @@map("products")
 }
@@ -51,6 +53,7 @@ model SDS {
   healthHazards      HazardCategoryToSDS[]
   filename           String
   updatedAt          DateTime              @default(now()) @updatedAt
+  ingredients        Ingredient[]
 
   @@unique([productId, revisionDate])
   @@map("safety_data_sheets")
@@ -90,4 +93,124 @@ model HazardCategoryToSDS {
 
   @@unique([sdsId, hazardCategoryId, additionalInfo])
   @@map("hazard_category_to_sds")
+}
+
+model RiskAssessment {
+  id                     Int                  @id @default(autoincrement())
+  compoundName           String
+  ingredients            Ingredient[]
+  complexity             Complexity
+  isPreparedOccasionally Boolean
+  preparationFrequency   PreparationFrequency
+  isSmallQuantity        Boolean
+
+  averagePreparationAmountQuantity Float?
+  averagePreparationAmountUnit     Unit?
+
+  isConcentrationHealthRisk  Boolean
+  requireSpecialEducation    Boolean
+  hasVerificationSteps       Boolean
+  haveAppropriateFacilities  Boolean
+  requireVentilation         Boolean
+  isWorkflowUninterrupted    Boolean
+  workflowStandardsProcess   String?
+  microbialContaminationRisk Boolean
+  crossContaminationRisk     Boolean
+
+  //SDS exposure risks
+  sdsSkinExposureRisk             Boolean
+  sdsEyeExposureRisk              Boolean
+  sdsInhalationExposureRisk       Boolean
+  sdsOralExposureRisk             Boolean
+  sdsOtherExposureRisk            Boolean
+  sdsOtherExposureRiskDescription String?
+
+  //Product monograph exposure risks
+  pmSkinExposureRisk             Boolean?
+  pmEyeExposureRisk              Boolean?
+  pmInhalationExposureRisk       Boolean?
+  pmOralExposureRisk             Boolean?
+  pmOtherExposureRisk            Boolean?
+  pmOtherExposureRiskDescription String?
+
+  //PPE
+  ppeGlovesRequired        Boolean
+  ppeGlovesType            GlovesType?
+  ppeCoatRequired          Boolean
+  ppeCoatType              CoatType?
+  ppeMaskRequired          Boolean
+  ppeMaskType              String?
+  ppeEyeProtectionRequired Boolean
+  ppeOther                 String?
+
+  requireEyeWashStation Boolean
+  requireSafetyShower   Boolean
+  riskLevel             RiskLevel
+  automaticRationale    String[]
+  additionalRationale   String[]
+  dateAssessed          DateTime  @db.Date
+  updatedAt             DateTime  @default(now()) @updatedAt
+
+  @@map("risk_assessments")
+}
+
+enum RiskLevel {
+  A
+  B
+  C
+}
+
+enum GlovesType {
+  regular
+  chemotherapy
+  double
+}
+
+enum CoatType {
+  designated
+  disposable
+}
+
+enum Unit {
+  g
+  ml
+}
+
+enum Complexity {
+  simple   @map("Simple")
+  moderate @map("Moderate")
+  complex  @map("Complex")
+}
+
+enum PreparationFrequency {
+  daily
+  weekly
+  monthly
+}
+
+model Ingredient {
+  id                          Int            @id @default(autoincrement())
+  riskAssessment              RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
+  riskAssessmentId            Int
+  //chemical                    Chemical       @relation(fields: [chemicalId], references: [id])
+  //chemicalId                  Int            
+  //product                     Product        @relation(fields: [productId], references: [id])
+  //productId                   Int            
+  safetyDataSheet             SDS            @relation(fields: [safetyDataSheetId], references: [id])
+  safetyDataSheetId           Int
+  physicalForm                PhysicalForm
+  commercialProductName       String?
+  commercialProductDin        Int?
+  hasProductMonographConcerns Boolean?
+  concernsDescription         String?
+
+  @@map("ingredients")
+}
+
+enum PhysicalForm {
+  cream
+  ointment
+  powder
+  liquid
+  solid
 }
