@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { FocusEventHandler, useEffect, useState } from "react"
 import SuggestionItem from "./SuggestionItem"
 import SuggestionsList from "./SuggestionsList"
 
@@ -15,10 +15,13 @@ export type AutocompleteProps<T> = {
   width?: string | number
   minLength: number
   readOnly?: boolean
+  onFocus?: FocusEventHandler<HTMLInputElement>
+  onBlur?: FocusEventHandler<HTMLInputElement>
+  inputRef?: React.LegacyRef<HTMLInputElement>
 }
 
 const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
-  const { getItemValue, item, items } = props
+  const { getItemValue, item, items, inputRef, onBlur, onFocus } = props
 
   const [inputQuery, setInputQuery] = useState(getItemValue(item))
 
@@ -120,8 +123,15 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
           onChange={handleInputQueryChange}
           onKeyDown={handleKeyDown}
           readOnly={props.readOnly}
-          onFocus={() => console.log("onFocus")}
-          onBlur={() => setSuggestionsVisible(false)}
+          onFocus={onFocus}
+          onBlur={(e) => {
+            onBlur?.(e)
+            setSuggestionsVisible(false)
+          }}
+          ref={inputRef}
+          size={
+            typeof props.width === "string" ? Number(props.width) : props.width
+          }
         />
       </div>
       {displaySuggestionsList && (
