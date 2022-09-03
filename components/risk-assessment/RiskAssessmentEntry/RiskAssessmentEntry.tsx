@@ -1,8 +1,7 @@
-import axios from "axios"
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RHFRadioGroup } from "components/RadioGroup"
-import { useEffect, useState } from "react"
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
+import { useEffect } from "react"
+import { useFieldArray, UseFormReturn } from "react-hook-form"
 import { RiskAssessmentFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
@@ -15,82 +14,18 @@ export type NullPartialRiskAssessmentFields =
 
 type Props = {
   values?: NullPartialRiskAssessmentFields
+  formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
 }
 
 const RiskAssessmentEntry = (props: Props) => {
-  const defaultValues: NullPartialRiskAssessmentFields = {
-    compoundName: null,
-    ingredients: [
-      {
-        chemicalId: null,
-        physicalForm: null,
-        productId: null,
-        sdsId: null,
-        commercialProduct: {
-          isCommercialProduct: null,
-          name: null,
-          din: null,
-          hasProductMonographConcerns: null,
-          concernsDescription: null,
-        },
-      },
-    ],
-    complexity: null,
-    averagePreparationAmount: null,
-    crossContaminationRisk: null,
-    hasVerificationSteps: null,
-    haveAppropriateFacilities: null,
-    isConcentrationHealthRisk: null,
-    isPreparedOccasionally: null,
-    isSmallQuantity: null,
-    isWorkflowUninterrupted: null,
-    workflowStandardsProcess: null,
-    microbialContaminationRisk: null,
-    requireEyeWashStation: null,
-    requireSafetyShower: null,
-    requireSpecialEducation: null,
-    requireVentilation: null,
-    riskLevel: null,
-    exposureRisks: {
-      sds: {
-        eye: null,
-        oral: null,
-        inhalation: null,
-        skin: null,
-        other: null,
-        otherDescription: null,
-      },
-      productMonograph: {
-        eye: null,
-        oral: null,
-        inhalation: null,
-        skin: null,
-        other: null,
-        otherDescription: null,
-      },
-    },
-    ppe: {
-      mask: { required: null, type: null },
-      coat: { required: null, type: null },
-      gloves: { required: null, type: null },
-      eyeProtection: { required: null },
-    },
-    preparationFrequency: null,
-    rationaleList: {
-      automatic: [],
-      additional: [],
-    },
-    dateAssessed: new Date().toLocaleDateString(),
-  }
+  const { values, formMethods } = props
 
-  const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
+  const { register, reset, control, watch, setValue, getValues } = formMethods
 
-  const formMethods = useForm<NullPartialRiskAssessmentFields>({
-    defaultValues,
-  })
-
-  const { register, reset, control, handleSubmit, watch, setValue, getValues } =
-    formMethods
+  useEffect(() => {
+    reset(values)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reset, JSON.stringify(values)])
 
   const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
     watch([
@@ -137,26 +72,6 @@ const RiskAssessmentEntry = (props: Props) => {
     }
   }, [ingredientFields, ingredientsArrayMethods])
 
-  /*    //TODO: Handle error
-    const { data: chemicalsData, error: chemicalError } = useSWR<
-    ChemicalAll[],
-    JsonError
-  >(
-    !ingredients || ingredients.length === 0
-      ? null
-      : [
-          ingredients?.map((ingredient) =>
-            ingredient?.chemicalId
-              ? `/api/chemicals/${ingredient.chemicalId}`
-              : null,
-          ),
-        ],
-  )
-
-  if (chemicalError) {
-    console.log(chemicalError)
-  } */
-
   useClearDisabledField({
     clearConditional: coatRequired !== true,
     names: ["ppe.coat.type"],
@@ -178,123 +93,8 @@ const RiskAssessmentEntry = (props: Props) => {
     setValue,
   })
 
-  const onSubmit: SubmitHandler<NullPartialRiskAssessmentFields> = async (
-    data,
-  ) => {
-    await axios
-      .post("/api/risk-assessments", data)
-      .then((res) => {
-        setSaveSuccessful(true)
-      })
-      .catch((reason) => {
-        //TODO: Handle error
-        console.log(JSON.stringify(reason))
-        setSaveSuccessful(false)
-      })
-  }
-
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, (data) => {
-        setSaveSuccessful(false)
-      })}
-      autoComplete="off"
-    >
-      <button
-        type="button"
-        onClick={() => {
-          const testValues: RiskAssessmentFields = {
-            compoundName: "TEST COMPOUND",
-            ingredients: [
-              {
-                chemicalId: 1,
-                productId: 1,
-                sdsId: 1,
-                physicalForm: "cream",
-                commercialProduct: {
-                  isCommercialProduct: true,
-                  name: "TEST COMMERICAL PRODUCT",
-                  din: 123456,
-                  hasProductMonographConcerns: true,
-                  concernsDescription: "TEST PRODUCT MONOGRAPH CONCERNS",
-                },
-              },
-              {
-                chemicalId: 2,
-                productId: 2,
-                sdsId: 2,
-                physicalForm: "cream",
-                commercialProduct: {
-                  isCommercialProduct: false,
-                  name: null,
-                  din: null,
-                  hasProductMonographConcerns: null,
-                  concernsDescription: null,
-                },
-              },
-            ],
-            complexity: "complex",
-            averagePreparationAmount: {
-              quantity: 5,
-              unit: "g",
-            },
-            crossContaminationRisk: false,
-            hasVerificationSteps: false,
-            haveAppropriateFacilities: true,
-            isConcentrationHealthRisk: false,
-            isPreparedOccasionally: true,
-            isSmallQuantity: true,
-            isWorkflowUninterrupted: false,
-            workflowStandardsProcess:
-              "TEST WORKFLOW INTERRUPTION MITIGATION STANDARDS DESCRIPTION",
-            microbialContaminationRisk: false,
-            requireEyeWashStation: false,
-            requireSafetyShower: false,
-            requireSpecialEducation: false,
-            requireVentilation: true,
-            riskLevel: "A",
-            exposureRisks: {
-              sds: {
-                eye: true,
-                oral: false,
-                inhalation: true,
-                skin: true,
-                other: false,
-                otherDescription: null,
-              },
-              productMonograph: {
-                eye: true,
-                oral: false,
-                inhalation: false,
-                skin: true,
-                other: false,
-                otherDescription: null,
-              },
-            },
-            ppe: {
-              mask: { required: true, type: "Disposable" },
-              coat: { required: true, type: "designated" },
-              gloves: { required: false, type: null },
-              eyeProtection: { required: true },
-            },
-            preparationFrequency: "monthly",
-            rationaleList: {
-              automatic: [],
-              additional: [
-                "TEST ADDITIONAL RATIONALE 1",
-                "TEST ADDITIONAL RATIONALE 2",
-              ],
-            },
-            dateAssessed: new Date().toLocaleDateString(),
-          }
-          reset(testValues, { keepDefaultValues: true })
-        }}
-      >
-        FILL WITH TEST
-      </button>
-      <button type="button" onClick={() => reset()}>
-        Reset
-      </button>
+    <>
       <div className="form-group">
         <label htmlFor="compound-name">Compound name:</label>
         <input
@@ -737,14 +537,6 @@ const RiskAssessmentEntry = (props: Props) => {
           />
         </div>
       </fieldset>
-      <div>
-        <button type="submit">Submit</button>
-        {saveSuccessful !== undefined && (
-          <p color={saveSuccessful ? "green" : "red"}>
-            {saveSuccessful ? "Saved" : "Error"}
-          </p>
-        )}
-      </div>
       <style jsx global>{`
         legend {
           font-weight: 600;
@@ -817,12 +609,6 @@ const RiskAssessmentEntry = (props: Props) => {
       `}</style>
 
       <style jsx>{`
-        form {
-          width: 90%;
-          margin-bottom: 5rem;
-          align-self: center;
-        }
-
         #risk-level-select {
           width: min-content;
         }
@@ -831,7 +617,7 @@ const RiskAssessmentEntry = (props: Props) => {
           width: fit-content;
         }
       `}</style>
-    </form>
+    </>
   )
 }
 
