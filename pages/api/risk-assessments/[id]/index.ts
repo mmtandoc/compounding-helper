@@ -23,7 +23,7 @@ export default async function handler(
     case "GET": {
       let riskAssessment
       try {
-        riskAssessment = await getRiskAssessment(
+        riskAssessment = await getRiskAssessmentById(
           parseInt(typeof id === "string" ? id : id[0]),
         )
       } catch (error) {
@@ -53,7 +53,8 @@ export default async function handler(
       break
   }
 }
-export async function getRiskAssessment(id: number) {
+
+export async function getRiskAssessmentById(id: number) {
   return await prisma.riskAssessment.findUnique({
     where: {
       id,
