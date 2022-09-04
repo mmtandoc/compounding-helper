@@ -88,7 +88,9 @@ const mapIngredientsFieldToCreateManyData = (
     return {
       safetyDataSheetId: ingredient.sdsId,
       physicalForm: ingredient.physicalForm,
-      commercialProductDin: ingredient?.commercialProduct?.din ?? null,
+      commercialProductDin: ingredient?.commercialProduct?.din
+        ? Number(ingredient.commercialProduct.din)
+        : null,
       commercialProductName: ingredient?.commercialProduct?.name ?? null,
       hasProductMonographConcerns:
         ingredient.commercialProduct?.hasProductMonographConcerns ?? null,
