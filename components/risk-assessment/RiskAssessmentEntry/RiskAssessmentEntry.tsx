@@ -2,6 +2,7 @@ import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RHFRadioGroup } from "components/RadioGroup"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
+import { form } from "styles"
 import { RiskAssessmentFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
@@ -538,73 +539,11 @@ const RiskAssessmentEntry = (props: Props) => {
         </div>
       </fieldset>
       <style jsx global>{`
-        legend {
-          font-weight: 600;
-        }
-
-        form > .form-group {
-          padding-inline: 0.75em;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          margin-inline: 2px;
-          /*padding-block: 0.35em 0.625em;*/
-          padding-block: 0.1rem 0.1rem;
-          //margin-right: 1.5rem;
-          min-inline-size: min-content;
-        }
+        ${form}
 
         .form-group textarea {
           resize: vertical;
           width: 100%;
-        }
-
-        .form-group > label {
-          font-weight: 600;
-          display: block;
-          width: fit-content;
-        }
-
-        form-group:not(.row) > label {
-          margin-bottom: 0.3rem;
-        }
-
-        .label {
-          font-weight: 600;
-          //display: inline-block;
-          //margin-right: 0.5rem;
-        }
-
-        label.disabled {
-          color: dimgray;
-        }
-
-        .form-group input,
-        .form-group select {
-          width: fit-content;
-        }
-
-        .row {
-          display: flex;
-          flex-direction: row !important;
-          gap: 0.7rem;
-          //padding: 0;
-        }
-
-        .row.grow > * {
-          //flex: 1;
-          flex-grow: 1;
-        }
-
-        .row > * {
-          //margin: 0;
-        }
-
-        .col {
-          display: flex;
-          flex-direction: column !important;
         }
       `}</style>
 
