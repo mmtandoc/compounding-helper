@@ -213,7 +213,9 @@ const IngredientFieldset = ({
                   className="is-commercial-product"
                 />
               </div>
-              <div className="form-group">
+              <div
+                className={`form-group ${!isCommercialProduct ? "hidden" : ""}`}
+              >
                 <label
                   htmlFor={`i${index}-has-product-monograph-concerns`}
                   className={!isCommercialProduct ? "disabled" : ""}
@@ -232,7 +234,7 @@ const IngredientFieldset = ({
                 />
               </div>
             </div>
-            <div className="col">
+            <div className={`col ${!isCommercialProduct ? "hidden" : ""}`}>
               <div className="form-group">
                 <label
                   htmlFor={`i${index}-commercial-product`}
@@ -246,7 +248,6 @@ const IngredientFieldset = ({
                     {
                       required: !!isCommercialProduct,
                       disabled: !isCommercialProduct,
-                      //deps: `ingredients.${index}.commercialProduct.isCommercialProduct`,
                       setValueAs: (value) => {
                         return value === "" || !value ? null : value
                       },
@@ -254,7 +255,6 @@ const IngredientFieldset = ({
                   )}
                   type="text"
                   readOnly={!isCommercialProduct}
-                  //defaultValue={field.commercialProduct?.name ?? undefined}
                   size={25}
                   id={`i${index}-commercial-product`}
                 />
@@ -272,20 +272,20 @@ const IngredientFieldset = ({
                     {
                       required: !!isCommercialProduct,
                       disabled: !isCommercialProduct,
-                      //deps: `ingredients.${index}.commercialProduct.isCommercialProduct`,
-                      //setValueAs: (value) => value === "" || !value ? null : value
                     },
                   )}
+                  inputMode="numeric"
                   type="text"
                   readOnly={!isCommercialProduct}
                   size={7}
                   id={`i${index}-commercial-product-din`}
-                  //defaultValue={field.commercialProduct?.din ?? undefined}
                 />
               </div>
             </div>
           </div>
-          <div className="row">
+          <div
+            className={`row ${!hasProductMonographConcerns ? "hidden" : ""}`}
+          >
             <div
               className={`form-group ${
                 !hasProductMonographConcerns ? "hidden" : ""
