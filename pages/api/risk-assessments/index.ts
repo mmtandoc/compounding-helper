@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { mapRiskAssessmentFieldsToCreateData } from "lib/RiskAssessmentUtil"
+import { riskAssessmentAll } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,38 +15,8 @@ export default async function handler(
       let riskAssessments
 
       try {
-        riskAssessments = await prisma.riskAssessment.findMany({
-          orderBy: { id: "asc" },
-          include: {
-            ingredients: {
-              include: {
-                safetyDataSheet: {
-                  include: {
-                    product: {
-                      include: {
-                        chemical: true,
-                        vendor: true,
-                      },
-                    },
-                    healthHazards: {
-                      include: {
-                        hazardCategory: {
-                          include: {
-                            hazardClass: true,
-                            parentCategory: true,
-                            subcategories: true,
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        })
+        riskAssessments = await getRiskAssessments()
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         res.status(500).json({
           error: { code: 500, message: "Encountered error with database." },
@@ -77,4 +48,11 @@ export default async function handler(
         .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
       break
   }
+}
+
+export const getRiskAssessments = async () => {
+  return await prisma.riskAssessment.findMany({
+    orderBy: { id: "asc" },
+    ...riskAssessmentAll,
+  })
 }
