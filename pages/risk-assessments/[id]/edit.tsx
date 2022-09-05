@@ -20,9 +20,9 @@ const mapIngredientModelsToFieldValues = (
   return ingredientsData.map((ingredientData: IngredientAll) => {
     const values: IngredientFields = {
       id: ingredientData.id,
-      sdsId: ingredientData.safetyDataSheetId,
-      chemicalId: ingredientData.safetyDataSheet.product.chemicalId,
-      productId: ingredientData.safetyDataSheet.productId,
+      sdsId: ingredientData?.safetyDataSheetId ?? null,
+      chemicalId: ingredientData?.safetyDataSheet?.product.chemicalId ?? null,
+      productId: ingredientData?.safetyDataSheet?.productId ?? null,
       physicalForm: ingredientData.physicalForm,
       commercialProduct: {
         isCommercialProduct: !!ingredientData?.commercialProductName,

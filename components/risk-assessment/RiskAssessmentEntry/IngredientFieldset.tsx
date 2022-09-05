@@ -155,7 +155,7 @@ const IngredientFieldset = ({
                   id={`i${index}-chemical-search`}
                   name={`ingredients.${index}.chemicalId`}
                   control={control}
-                  rules={{ required: true }}
+                  rules={{ required: !isCommercialProduct }}
                 />
 
                 <button type="button" disabled={!ingredient?.chemicalId}>
@@ -197,6 +197,7 @@ const IngredientFieldset = ({
                   ingredientIndex={index}
                   register={register}
                   disabled={!ingredient?.chemicalId}
+                  required={!isCommercialProduct}
                 />
                 <button type="button" disabled={!ingredient?.sdsId}>
                   ...
@@ -425,6 +426,7 @@ type SdsSelectProps = {
   register: UseFormRegister<NullPartialRiskAssessmentFields>
   ingredientIndex: number
   disabled?: boolean
+  required?: boolean
 }
 
 const SdsSelect = ({
@@ -435,6 +437,7 @@ const SdsSelect = ({
   register,
   ingredientIndex,
   disabled = true,
+  required = true,
 }: SdsSelectProps) => {
   const sdsProductMap = new Map<number, SdsWithRelations[]>()
   if (sdses !== undefined) {
@@ -452,7 +455,7 @@ const SdsSelect = ({
     <select
       {...register(`ingredients.${ingredientIndex}.sdsId`, {
         setValueAs: (val) => (val !== null ? parseInt(val) : null),
-        required: true,
+        required: required,
         //deps: `ingredients.${ingredientIndex}.chemicalId`,
         disabled: disabled,
       })}

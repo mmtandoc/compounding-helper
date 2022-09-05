@@ -192,12 +192,8 @@ model Ingredient {
   id                          Int            @id @default(autoincrement())
   riskAssessment              RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
   riskAssessmentId            Int
-  //chemical                    Chemical       @relation(fields: [chemicalId], references: [id])
-  //chemicalId                  Int            
-  //product                     Product        @relation(fields: [productId], references: [id])
-  //productId                   Int            
-  safetyDataSheet             SDS            @relation(fields: [safetyDataSheetId], references: [id])
-  safetyDataSheetId           Int
+  safetyDataSheet             SDS?           @relation(fields: [safetyDataSheetId], references: [id])
+  safetyDataSheetId           Int?
   physicalForm                PhysicalForm
   commercialProductName       String?
   commercialProductDin        Int?
