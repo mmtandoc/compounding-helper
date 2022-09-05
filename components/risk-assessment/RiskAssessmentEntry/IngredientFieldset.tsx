@@ -142,6 +142,10 @@ const IngredientFieldset = ({
       <div className="row">
         <div className="col">
           <div className="row">
+            <input
+              type="hidden"
+              {...register(`ingredients.${index}.id`, { valueAsNumber: true })}
+            />
             <div className="form-group">
               <label htmlFor={`i${index}-chemical-search`}>
                 Chemical name:{" "}

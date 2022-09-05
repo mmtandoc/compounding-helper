@@ -57,6 +57,7 @@ const RiskAssessmentEntry = (props: Props) => {
       ingredientFields.length === 0
     ) {
       ingredientsArrayMethods.append({
+        id: null,
         chemicalId: null,
         physicalForm: null,
         productId: null,

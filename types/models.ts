@@ -64,9 +64,7 @@ const chemicalAll = Prisma.validator<Prisma.ChemicalArgs>()({
 
 export type ChemicalAll = Prisma.ChemicalGetPayload<typeof chemicalAll>
 
-const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
-  include: {
-    ingredients: {
+const ingredientAll = Prisma.validator<Prisma.IngredientArgs>()({
       include: {
         safetyDataSheet: {
           include: {
@@ -90,7 +88,13 @@ const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
           },
         },
       },
-    },
+})
+
+export type IngredientAll = Prisma.IngredientGetPayload<typeof ingredientAll>
+
+const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
+  include: {
+    ingredients: ingredientAll,
   },
 })
 

@@ -1,6 +1,7 @@
 import Layout from "components/Layout"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { NextPage, NextPageContext } from "next"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import React, { useRef } from "react"
@@ -54,12 +55,20 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
           </h1>
           <PrintableRiskAssessmentDetails data={data} />
         </div>
-        <div>
+        <div className="row">
           <button type="button" onClick={handlePrint}>
             Print
           </button>
+          <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
+            <button type="button">Edit</button>
+          </Link>
         </div>
       </div>
+      <style jsx>{`
+        .page {
+          margin-bottom: 5rem;
+        }
+      `}</style>
       <style jsx global>{`
         @media print {
           html {

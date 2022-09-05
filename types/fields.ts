@@ -8,6 +8,7 @@ export type ExposureRisksFields = {
 }
 
 export type IngredientFields = {
+  id: number | null
   chemicalId: number
   productId: number
   sdsId: number

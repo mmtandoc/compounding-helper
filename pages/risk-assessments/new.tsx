@@ -12,6 +12,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
   compoundName: null,
   ingredients: [
     {
+      id: null,
       chemicalId: null,
       physicalForm: null,
       productId: null,
@@ -119,6 +120,7 @@ const NewRiskAssessment: NextPage = () => {
                     compoundName: "TEST COMPOUND",
                     ingredients: [
                       {
+                        id: null,
                         chemicalId: 1,
                         productId: 1,
                         sdsId: 1,
@@ -133,6 +135,7 @@ const NewRiskAssessment: NextPage = () => {
                         },
                       },
                       {
+                        id: null,
                         chemicalId: 2,
                         productId: 2,
                         sdsId: 2,
