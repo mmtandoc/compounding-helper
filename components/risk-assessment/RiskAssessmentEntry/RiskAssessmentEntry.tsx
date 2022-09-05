@@ -1,5 +1,6 @@
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RHFRadioGroup } from "components/RadioGroup"
+import { replace } from "lodash"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import { form } from "styles"
@@ -23,11 +24,6 @@ const RiskAssessmentEntry = (props: Props) => {
 
   const { register, reset, control, watch, setValue, getValues } = formMethods
 
-  useEffect(() => {
-    reset(values)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reset, JSON.stringify(values)])
-
   const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
     watch([
       "isWorkflowUninterrupted",
@@ -35,12 +31,6 @@ const RiskAssessmentEntry = (props: Props) => {
       "ppe.coat.required",
       "ppe.mask.required",
     ])
-
-  useEffect(() => {
-    if (props.values) {
-      reset(props.values)
-    }
-  }, [props.values, reset])
 
   const { fields: ingredientFields, ...ingredientsArrayMethods } =
     useFieldArray({
@@ -51,12 +41,21 @@ const RiskAssessmentEntry = (props: Props) => {
 
   const ingredients = watch("ingredients")
 
+  useEffect(() => {
+    reset(values)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reset, JSON.stringify(values)])
+
   const usesCommercialProduct = ingredients?.some(
     (i) => i?.commercialProduct?.isCommercialProduct === true,
   )
 
   useEffect(() => {
-    if (ingredientFields.length === 0) {
+    if (
+      ingredients &&
+      ingredients.length === 0 &&
+      ingredientFields.length === 0
+    ) {
       ingredientsArrayMethods.append({
         chemicalId: null,
         physicalForm: null,
@@ -71,24 +70,24 @@ const RiskAssessmentEntry = (props: Props) => {
         },
       })
     }
-  }, [ingredientFields, ingredientsArrayMethods])
+  }, [ingredients, ingredientFields, ingredientsArrayMethods])
 
   useClearDisabledField({
-    clearConditional: coatRequired !== true,
+    clearConditional: coatRequired === false || coatRequired === null,
     names: ["ppe.coat.type"],
     register,
     setValue,
   })
 
   useClearDisabledField({
-    clearConditional: glovesRequired !== true,
+    clearConditional: glovesRequired === false || glovesRequired === null,
     names: ["ppe.gloves.type"],
     register,
     setValue,
   })
 
   useClearDisabledField({
-    clearConditional: maskRequired !== true,
+    clearConditional: maskRequired === false || maskRequired === null,
     names: ["ppe.mask.type"],
     register,
     setValue,
