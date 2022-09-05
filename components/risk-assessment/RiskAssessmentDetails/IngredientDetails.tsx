@@ -1,60 +1,17 @@
-import { Chemical, Ingredient, Product, Vendor } from "@prisma/client"
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import Link from "next/link"
-import useSWR from "swr"
-import { JsonError } from "types/common"
-import { SdsWithHazards } from "types/models"
+import { IngredientAll } from "types/models"
 
 interface IngredientDetailsProps {
-  ingredient: Ingredient
+  ingredient: IngredientAll
 }
 
 export const IngredientDetails = (props: IngredientDetailsProps) => {
   const { ingredient } = props
 
-  const { data: sdsData, error: sdsError } = useSWR<SdsWithHazards, JsonError>(
-    !ingredient ? null : `/api/sds/${ingredient.safetyDataSheetId}`,
-  )
+  const sds = ingredient?.safetyDataSheet
 
-  const { data: productData, error: productError } = useSWR<Product, JsonError>(
-    !sdsData ? null : `/api/products/${sdsData.productId}`,
-  )
-
-  const { data: vendorsData, error: vendorsError } = useSWR<
-    Vendor[],
-    JsonError
-  >(`/api/vendors`)
-
-  const { data: chemicalData, error: chemicalError } = useSWR<
-    Chemical,
-    JsonError
-  >(!productData ? null : `/api/chemicals/${productData.chemicalId}`)
-
-  //TODO: Handle error
-  if (sdsError) {
-    console.log(sdsError)
-  }
-  if (productError) {
-    console.log(vendorsError)
-  }
-  if (vendorsError) {
-    console.log(vendorsError)
-  }
-  if (chemicalError) {
-    console.log(chemicalError)
-  }
-
-  //TODO: Handle loading better
-
-  const isLoading = !chemicalData || !sdsData || !vendorsData || !productData
-
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  const vendor = vendorsData.find(
-    (v) => v.id === productData.vendorId,
-  ) as Vendor
+  const chemical = sds?.product.chemical
 
   const isCommercialProduct = !!ingredient.commercialProductDin
 
@@ -65,10 +22,13 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
           <div className="row">
             <div>
               <span className="label">Chemical name: </span>
-              <Link href={`/chemicals/${chemicalData.id}`}>
-                <a style={{ whiteSpace: "pre" }}>{chemicalData.name}</a>
-              </Link>
-              {/* <button type="button">...</button> */}
+              {chemical ? (
+                <Link href={`/chemicals/${chemical?.id}`}>
+                  <a style={{ whiteSpace: "pre" }}>{chemical?.name}</a>
+                </Link>
+              ) : (
+                "N/A"
+              )}
             </div>
             <div>
               <span className="label">Physical form: </span>
@@ -78,12 +38,16 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
           <div className="row">
             <div>
               <span className="label">SDS: </span>
-              <Link href={`/sds/${sdsData.id}`}>
-                <a style={{ whiteSpace: "pre" }}>
-                  {productData.name} - {vendor.name} -{" "}
-                  {sdsData.revisionDate.toLocaleDateString()}
-                </a>
-              </Link>
+              {sds ? (
+                <Link href={`/sds/${sds.id}`}>
+                  <a style={{ whiteSpace: "pre" }}>
+                    {sds.product.name} - {sds.product.vendor.name} -{" "}
+                    {sds.revisionDate.toLocaleDateString("en-CA")}
+                  </a>
+                </Link>
+              ) : (
+                "N/A"
+              )}
             </div>
           </div>
           <div className="row">
@@ -165,29 +129,33 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               <span className="label" style={{ marginRight: "0.5rem" }}>
                 Niosh Table:{" "}
               </span>
-              {chemicalData?.nioshTable === undefined
+              {chemical?.nioshTable === undefined
                 ? "N/A"
-                : chemicalData?.nioshTable === -1
+                : chemical?.nioshTable === -1
                 ? "No"
-                : `Table ${chemicalData?.nioshTable}`}
+                : `Table ${chemical?.nioshTable}`}
             </div>
             <div>
               <span className="label" style={{ marginRight: "0.5rem" }}>
                 SDS HMIS health hazard level:{" "}
               </span>
-              <span>{sdsData?.hmisHealthHazard ?? "N/A"}</span>
+              <span>{sds?.hmisHealthHazard ?? "N/A"}</span>
             </div>
             <div>
               <span className="label">SDS health hazards:</span>
-              <ul className="health-hazard-list">
-                {sdsData.healthHazards.map((h, i) => (
-                  <li key={i}>{`${
-                    h.hazardCategory.hazardClass.name
-                  } - Category ${h.hazardCategory.level}${
-                    !h.additionalInfo ? "" : ` (${h.additionalInfo})`
-                  }`}</li>
-                ))}
-              </ul>
+              {sds ? (
+                <ul className="health-hazard-list">
+                  {sds.healthHazards.map((h, i) => (
+                    <li key={i}>{`${
+                      h.hazardCategory.hazardClass.name
+                    } - Category ${h.hazardCategory.level}${
+                      !h.additionalInfo ? "" : ` (${h.additionalInfo})`
+                    }`}</li>
+                  ))}
+                </ul>
+              ) : (
+                "N/A"
+              )}
             </div>
           </fieldset>
         </div>
