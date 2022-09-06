@@ -13,7 +13,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
 
   const chemical = sds?.product.chemical
 
-  const isCommercialProduct = !!ingredient.commercialProductDin
+  const isCommercialProduct = !!ingredient.commercialProductName
 
   return (
     <fieldset className="ingredient-fieldset">
@@ -97,7 +97,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
                   >
                     Product DIN:
                   </span>
-                  <span>{ingredient.commercialProductDin}</span>
+                  <span>{ingredient.commercialProductDin ?? "N/A"}</span>
                 </div>
               </div>
             )}

@@ -17,6 +17,7 @@ export type IngredientFields = {
     isCommercialProduct: boolean
     name: string | null
     din: number | null
+    hasNoDin: boolean | null
     hasProductMonographConcerns: boolean | null
     concernsDescription: string | null
   } | null

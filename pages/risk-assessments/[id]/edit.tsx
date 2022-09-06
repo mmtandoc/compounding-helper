@@ -28,6 +28,9 @@ const mapIngredientModelsToFieldValues = (
         isCommercialProduct: !!ingredientData?.commercialProductName,
         din: ingredientData.commercialProductDin ?? null,
         name: ingredientData?.commercialProductName ?? null,
+        hasNoDin:
+          !!ingredientData?.commercialProductName &&
+          !ingredientData?.commercialProductDin,
         hasProductMonographConcerns:
           ingredientData.hasProductMonographConcerns ?? null,
         concernsDescription: ingredientData.concernsDescription ?? null,

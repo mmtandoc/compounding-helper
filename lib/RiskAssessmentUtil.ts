@@ -11,18 +11,18 @@ export const mapIngredientsFieldToData = (
   ingredients: IngredientFields[],
 ): SetOptional<Ingredient, "riskAssessmentId" | "id">[] => {
   return ingredients.map((ingredient) => {
+    const commercialProduct = ingredient?.commercialProduct
     return {
       id: ingredient.id ? ingredient.id : undefined,
       safetyDataSheetId: ingredient.sdsId,
       physicalForm: ingredient.physicalForm,
-      commercialProductDin: ingredient?.commercialProduct?.din
-        ? Number(ingredient.commercialProduct.din)
+      commercialProductDin: commercialProduct?.din
+        ? Number(commercialProduct.din)
         : null,
-      commercialProductName: ingredient?.commercialProduct?.name ?? null,
+      commercialProductName: commercialProduct?.name ?? null,
       hasProductMonographConcerns:
-        ingredient.commercialProduct?.hasProductMonographConcerns ?? null,
-      concernsDescription:
-        ingredient.commercialProduct?.concernsDescription ?? null,
+        commercialProduct?.hasProductMonographConcerns ?? null,
+      concernsDescription: commercialProduct?.concernsDescription ?? null,
     }
   })
 }

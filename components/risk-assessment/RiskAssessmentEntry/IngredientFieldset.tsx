@@ -264,27 +264,41 @@ const IngredientFieldset = ({
                   id={`i${index}-commercial-product`}
                 />
               </div>
-              <div className="form-group">
+              <div className="form-group row">
                 <label
-                  htmlFor={`i${index}-commercial-product-din`}
-                  className={!isCommercialProduct ? "disabled" : ""}
+                  className={`col ${!isCommercialProduct ? "disabled" : ""}`}
                 >
-                  Commerical product DIN:
-                </label>
+                  <span>Commerical product DIN:</span>
+                  <div className="row">
                 <input
                   {...register(
                     `ingredients.${index}.commercialProduct.din` as const,
                     {
-                      required: !!isCommercialProduct,
-                      disabled: !isCommercialProduct,
+                          required:
+                            !!isCommercialProduct &&
+                            !ingredient?.commercialProduct?.hasNoDin,
+                          disabled:
+                            !isCommercialProduct ||
+                            !!ingredient?.commercialProduct?.hasNoDin,
                     },
                   )}
                   inputMode="numeric"
                   type="text"
                   readOnly={!isCommercialProduct}
                   size={7}
-                  id={`i${index}-commercial-product-din`}
                 />
+                    <label>
+                      <input
+                        type="checkbox"
+                        {...register(
+                          `ingredients.${index}.commercialProduct.hasNoDin`,
+                          { disabled: !isCommercialProduct },
+                        )}
+                      />
+                      <span>No DIN</span>
+                    </label>
+                  </div>
+                </label>
               </div>
             </div>
           </div>

@@ -1,6 +1,5 @@
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RHFRadioGroup } from "components/RadioGroup"
-import { replace } from "lodash"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import { form } from "styles"
@@ -66,6 +65,7 @@ const RiskAssessmentEntry = (props: Props) => {
           isCommercialProduct: null,
           name: null,
           din: null,
+          hasNoDin: null,
           hasProductMonographConcerns: null,
           concernsDescription: null,
         },
@@ -132,6 +132,7 @@ const RiskAssessmentEntry = (props: Props) => {
                     isCommercialProduct: null,
                     name: null,
                     din: null,
+                    hasNoDin: null,
                     hasProductMonographConcerns: null,
                     concernsDescription: null,
                   },

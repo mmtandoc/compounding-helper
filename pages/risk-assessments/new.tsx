@@ -21,6 +21,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
         isCommercialProduct: null,
         name: null,
         din: null,
+        hasNoDin: null,
         hasProductMonographConcerns: null,
         concernsDescription: null,
       },
@@ -129,6 +130,7 @@ const NewRiskAssessment: NextPage = () => {
                           isCommercialProduct: true,
                           name: "TEST COMMERICAL PRODUCT",
                           din: 123456,
+                          hasNoDin: false,
                           hasProductMonographConcerns: true,
                           concernsDescription:
                             "TEST PRODUCT MONOGRAPH CONCERNS",
@@ -144,6 +146,7 @@ const NewRiskAssessment: NextPage = () => {
                           isCommercialProduct: false,
                           name: null,
                           din: null,
+                          hasNoDin: null,
                           hasProductMonographConcerns: null,
                           concernsDescription: null,
                         },
