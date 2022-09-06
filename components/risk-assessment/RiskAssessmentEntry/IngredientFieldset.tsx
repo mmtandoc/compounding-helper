@@ -170,13 +170,9 @@ const IngredientFieldset = ({
                   required: true,
                   setValueAs: (val) => (!val ? undefined : val),
                 })}
-                defaultValue={undefined}
                 id={`i${index}-physical-form`}
                 className="physical-form"
               >
-                <option disabled selected value={undefined}>
-                  --Select an option--
-                </option>
                 <option value="cream">Cream</option>
                 <option value="ointment">Ointment</option>
                 <option value="powder">Powder</option>
@@ -270,23 +266,23 @@ const IngredientFieldset = ({
                 >
                   <span>Commerical product DIN:</span>
                   <div className="row">
-                <input
-                  {...register(
-                    `ingredients.${index}.commercialProduct.din` as const,
-                    {
+                    <input
+                      {...register(
+                        `ingredients.${index}.commercialProduct.din` as const,
+                        {
                           required:
                             !!isCommercialProduct &&
                             !ingredient?.commercialProduct?.hasNoDin,
                           disabled:
                             !isCommercialProduct ||
                             !!ingredient?.commercialProduct?.hasNoDin,
-                    },
-                  )}
-                  inputMode="numeric"
-                  type="text"
-                  readOnly={!isCommercialProduct}
-                  size={7}
-                />
+                        },
+                      )}
+                      inputMode="numeric"
+                      type="text"
+                      readOnly={!isCommercialProduct}
+                      size={7}
+                    />
                     <label>
                       <input
                         type="checkbox"

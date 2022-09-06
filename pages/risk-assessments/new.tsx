@@ -72,7 +72,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
     automatic: [],
     additional: [],
   },
-  dateAssessed: new Date().toLocaleDateString(),
+  dateAssessed: new Date().toLocaleDateString("en-CA"),
 }
 
 const NewRiskAssessment: NextPage = () => {
@@ -204,7 +204,7 @@ const NewRiskAssessment: NextPage = () => {
                         "TEST ADDITIONAL RATIONALE 2",
                       ],
                     },
-                    dateAssessed: new Date().toLocaleDateString(),
+                    dateAssessed: new Date().toLocaleDateString("en-CA"),
                   }
                   reset(testValues, { keepDefaultValues: true })
                 }}
@@ -216,7 +216,7 @@ const NewRiskAssessment: NextPage = () => {
               </button>
             </div>
             {saveSuccessful !== undefined && (
-              <p color={saveSuccessful ? "green" : "red"}>
+              <p style={{ color: saveSuccessful ? "green" : "red" }}>
                 {saveSuccessful ? "Saved" : "Error"}
               </p>
             )}
