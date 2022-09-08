@@ -1,6 +1,6 @@
 import css from "styled-jsx/css"
 
-export const form = css.global`
+const form = css.global`
   legend {
     font-weight: 600;
   }
@@ -41,6 +41,11 @@ export const form = css.global`
     //margin-right: 0.5rem;
   }
 
+  label > input[type="checkbox"] + span,
+  label > input[type="radio"] + span {
+    font-weight: normal;
+  }
+
   label.disabled {
     color: dimgray;
   }
@@ -61,3 +66,5 @@ export const form = css.global`
     flex-direction: column !important;
   }
 `
+
+export default form

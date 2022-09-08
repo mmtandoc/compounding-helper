@@ -2,7 +2,7 @@ import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RadioGroup } from "components/RadioGroup"
 import { IngredientDetails } from "components/risk-assessment/RiskAssessmentDetails/IngredientDetails"
 import React from "react"
-import { form } from "styles"
+import form from "styles/form"
 import { RiskAssessmentAll } from "types/models"
 
 type Props = {
