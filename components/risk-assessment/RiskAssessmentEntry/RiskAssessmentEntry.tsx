@@ -147,7 +147,23 @@ const RiskAssessmentEntry = (props: Props) => {
             type="button"
             className="add-button"
             value="add"
-            onClick={() => ingredientsArrayMethods.append(null)}
+            onClick={() =>
+              ingredientsArrayMethods.append({
+                id: null,
+                chemicalId: null,
+                physicalForm: null,
+                productId: null,
+                sdsId: null,
+                commercialProduct: {
+                  isCommercialProduct: null,
+                  name: null,
+                  din: null,
+                  hasNoDin: null,
+                  hasProductMonographConcerns: null,
+                  concernsDescription: null,
+                },
+              })
+            }
           >
             Add Ingredient
           </button>
