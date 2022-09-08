@@ -7,7 +7,7 @@ import { RiskAssessmentFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import { useClearDisabledField } from "./helpers"
-import IngredientFieldset from "./IngredientFieldset"
+import IngredientFieldset from "./ingredient/IngredientFieldset"
 import RationaleList from "./RationaleList"
 
 export type NullPartialRiskAssessmentFields =

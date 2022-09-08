@@ -1,4 +1,4 @@
-import ChemicalSearch from "components/risk-assessment/RiskAssessmentEntry/ChemicalSearch"
+import ChemicalSearch from "./ChemicalSearch"
 import React, { useEffect } from "react"
 import {
   Control,
@@ -15,7 +15,7 @@ import { SetRequired } from "type-fest"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import { NullPartialRiskAssessmentFields } from "."
+import { NullPartialRiskAssessmentFields } from ".."
 import { Vendor } from "@prisma/client"
 import { useClearDisabledField } from "components/risk-assessment/RiskAssessmentEntry/helpers"
 
@@ -164,21 +164,25 @@ const IngredientFieldset = ({
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
-              <select
-                {...register(`ingredients.${index}.physicalForm` as const, {
-                  required: true,
-                  setValueAs: (val) => (!val ? undefined : val),
-                })}
-                id={`i${index}-physical-form`}
-                className="physical-form"
-              >
-                <option value="cream">Cream</option>
-                <option value="ointment">Ointment</option>
-                <option value="powder">Powder</option>
-                <option value="liquid">Liquid</option>
-                <option value="solid">Solid</option>
-              </select>
+              <label>
+                <span>Strength(s):</span>
+                <Controller
+                  control={control}
+                  name={`ingredients.${index}.strengths`}
+                  render={({
+                    field: { onChange, onBlur, value, ref },
+                    formState,
+                    fieldState,
+                  }) => (
+                    <StrengthListInput
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      values={value?.map((v) => v.toString()) ?? []}
+                      ref={ref}
+                    />
+                  )}
+                />
+              </label>
             </div>
           </div>
           <div className="row">
@@ -199,6 +203,23 @@ const IngredientFieldset = ({
                   ...
                 </button>
               </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
+              <select
+                {...register(`ingredients.${index}.physicalForm` as const, {
+                  required: true,
+                  setValueAs: (val) => (!val ? undefined : val),
+                })}
+                id={`i${index}-physical-form`}
+                className="physical-form"
+              >
+                <option value="cream">Cream</option>
+                <option value="ointment">Ointment</option>
+                <option value="powder">Powder</option>
+                <option value="liquid">Liquid</option>
+                <option value="solid">Solid</option>
+              </select>
             </div>
           </div>
           <div className="row">
