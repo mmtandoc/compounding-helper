@@ -163,27 +163,6 @@ const IngredientFieldset = ({
                 </button>
               </div>
             </div>
-            <div className="form-group">
-              <label>
-                <span>Strength(s):</span>
-                <Controller
-                  control={control}
-                  name={`ingredients.${index}.strengths`}
-                  render={({
-                    field: { onChange, onBlur, value, ref },
-                    formState,
-                    fieldState,
-                  }) => (
-                    <StrengthListInput
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      values={value?.map((v) => v.toString()) ?? []}
-                      ref={ref}
-                    />
-                  )}
-                />
-              </label>
-            </div>
           </div>
           <div className="row">
             <div className="form-group">
