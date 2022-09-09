@@ -9,7 +9,8 @@ import {
   Validate,
 } from "react-hook-form"
 
-interface RHFBooleanRadioGroupProps<T> extends UseControllerProps<T> {
+interface RHFBooleanRadioGroupProps<T extends FieldValues>
+  extends UseControllerProps<T> {
   id?: string
   error?: FieldError
   readOnly?: boolean

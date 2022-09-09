@@ -6,7 +6,7 @@ import {
   UseControllerProps,
 } from "react-hook-form"
 
-interface RHFRadioGroupProps<T>
+interface RHFRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
     Omit<RadioGroupProps, "onChange" | "onBlur" | "ref"> {
   name: FieldPath<T>
