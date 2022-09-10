@@ -11,7 +11,7 @@ import { RiskAssessmentAll } from "types/models"
 const PrintableRiskAssessmentDetails = React.forwardRef(
   function PrintableRiskAssessmentDetails(
     props: React.ComponentPropsWithRef<typeof RiskAssessmentDetails>,
-    ref: any,
+    ref: React.Ref<HTMLDivElement>,
   ) {
     return (
       <div ref={ref}>
@@ -38,7 +38,8 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
     content: () => printableRef.current,
     documentTitle: `Risk Assessment - ${
       data?.compoundName ?? "UNKNOWN COMPOUND"
-    }`,
+    } - ${data?.dateAssessed.toLocaleDateString("en-CA")}`,
+
     copyStyles: true,
   })
 
@@ -48,20 +49,20 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
 
   return (
     <Layout>
-      <div className="page">
-        <div ref={printableRef}>
-          <h1 style={{ marginTop: "0px" }}>
-            Risk Assessment: {data.compoundName}
-          </h1>
+      <div className="page" ref={printableRef}>
+        <h1 style={{ marginTop: "0px" }}>
+          Risk Assessment: {data.compoundName}
+        </h1>
+        <div className="risk-assessment-container">
           <PrintableRiskAssessmentDetails data={data} />
-        </div>
-        <div className="row">
-          <button type="button" onClick={handlePrint}>
-            Print
-          </button>
-          <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
-            <button type="button">Edit</button>
-          </Link>
+          <div className="row print-hide">
+            <button type="button" onClick={handlePrint}>
+              Print
+            </button>
+            <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
+              <button type="button">Edit</button>
+            </Link>
+          </div>
         </div>
       </div>
       <style jsx>{`
@@ -70,6 +71,12 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
         }
       `}</style>
       <style jsx global>{`
+        @media not print {
+          .risk-assessment-container {
+            width: 90%;
+            align-self: center;
+          }
+        }
         @media print {
           html {
             font-size: 55%;
@@ -102,6 +109,10 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
             text-decoration: none !important;
             text-decoration-line: none;
             outline: none !important;
+          }
+
+          .print-hide {
+            display: none;
           }
         }
         @page {
