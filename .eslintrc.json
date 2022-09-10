@@ -14,8 +14,7 @@
   ],
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-unexpected-multiline": "error",
-    "react/no-unknown-property": ["warn", { "ignore": ["key", "jsx", "global"] }]
+    "no-unexpected-multiline": "error"
   },
   "env": {
     "jest/globals": true
