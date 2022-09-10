@@ -384,6 +384,9 @@ const RiskAssessmentEntry = (props: Props) => {
           category="From SDS"
           register={register}
           control={control}
+          sdsIds={ingredients
+            ?.map((ing) => ing.sdsId)
+            .filter<number>((id): id is number => typeof id === "number")}
         />
         {usesCommercialProduct && (
           <ExposureRisksInputs
