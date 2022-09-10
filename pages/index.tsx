@@ -11,7 +11,7 @@ const Home: NextPage = () => {
         <h2 style={{ marginBottom: "0" }}>Risk Assessments:</h2>
         <ul style={{ marginTop: "0" }}>
           <li>
-            <Link href="/risk-assessments/new">
+            <Link href="/risk-assessments">
               <a>View Risk Assessments</a>
             </Link>
           </li>
