@@ -319,9 +319,10 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           <span>{data.dateAssessed.toLocaleDateString("en-CA")}</span>
         </div>
       </fieldset>
+      <style jsx global>
+        {form}
+      </style>
       <style jsx global>{`
-        ${form}
-
         textarea:read-only {
           outline: none;
           resize: none;

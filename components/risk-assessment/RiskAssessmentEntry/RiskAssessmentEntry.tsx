@@ -555,9 +555,10 @@ const RiskAssessmentEntry = (props: Props) => {
           />
         </div>
       </fieldset>
+      <style jsx global>
+        {form}
+      </style>
       <style jsx global>{`
-        ${form}
-
         .form-group textarea {
           resize: vertical;
           width: 100%;
