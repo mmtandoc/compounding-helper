@@ -33,7 +33,7 @@ const Header = () => {
         .left {
           display: flex;
           flex-direction: row;
-          gap: 1.5rem;
+          column-gap: 1.5rem;
         }
 
         .left > a,

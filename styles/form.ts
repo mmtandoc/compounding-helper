@@ -10,18 +10,23 @@ const form = css.global`
   }
 
   .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-inline: 2px;
-    /*padding-block: 0.35em 0.625em;*/
+    margin-inline: 0.2rem;
     padding-block: 0.1rem 0.1rem;
-    //margin-right: 1.5rem;
     min-inline-size: min-content;
   }
 
-  .form-group input,
+  .form-group:not(.row) > * {
+    display: block;
+  }
+
+  .form-group input:not([type="radio", type="checkbox"]),
   .form-group select {
     width: fit-content;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    width: 100%;
   }
 
   .form-group > label {
@@ -35,14 +40,18 @@ const form = css.global`
     margin-bottom: 0;
   }
 
-  .label {
+  .form-group:not(.row) label > span:first-child {
     font-weight: 600;
-    //display: inline-block;
-    //margin-right: 0.5rem;
+    display: block;
+    width: fit-content;
+    margin-bottom: 0.3rem;
   }
 
-  label > input[type="checkbox"] + span,
-  label > input[type="radio"] + span {
+  .label {
+    font-weight: 600;
+  }
+
+  label > input:where([type="checkbox"], [type="radio"]) + span {
     font-weight: normal;
   }
 
@@ -51,19 +60,13 @@ const form = css.global`
   }
 
   .row {
-    display: flex;
+    display: flex !important;
     flex-direction: row !important;
-    gap: 0.7rem;
+    column-gap: 0.7rem;
   }
 
   .row.grow > * {
     flex: 1;
-    //flex-grow: 1;
-  }
-
-  .col {
-    display: flex;
-    flex-direction: column !important;
   }
 `
 

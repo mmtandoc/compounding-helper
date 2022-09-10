@@ -18,8 +18,6 @@ const Layout = (props: Props) => (
         align-items: stretch;
       }
       .page {
-        display: flex;
-        flex-direction: column;
         align-self: stretch;
         max-width: 1264px;
         margin: 0 auto;

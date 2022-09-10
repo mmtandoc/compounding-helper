@@ -81,6 +81,9 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
           html {
             font-size: 55%;
           }
+          .page {
+            margin: 0;
+          }
           button {
             display: none;
           }
@@ -99,9 +102,10 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
           body {
             background-color: white !important;
           }
-          fieldset,
-          .form-group {
-            break-inside: avoid-page;
+          .risk-assessment-details > fieldset,
+          .risk-assessment-details .form-group {
+            page-break-inside: avoid;
+            display: block;
           }
 
           a {

@@ -18,7 +18,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
   return (
     <fieldset className="ingredient-fieldset">
       <div className="row" style={{ alignItems: "stretch" }}>
-        <div className="col">
+        <div>
           <div className="row">
             <div>
               <span className="label">Chemical name: </span>
@@ -51,7 +51,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
             </div>
           </div>
           <div className="row">
-            <div className="col">
+            <div>
               <div className="form-group">
                 <span className="label">Is a commercial product?</span>
                 <BooleanRadioGroup
@@ -78,7 +78,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               )}
             </div>
             {isCommercialProduct && (
-              <div className="col">
+              <div>
                 <div className="form-group">
                   <span
                     className={`label ${
@@ -122,7 +122,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
             </div>
           )}
         </div>
-        <div className="col" style={{ minWidth: "30%", marginLeft: "auto" }}>
+        <div style={{ minWidth: "30%", marginLeft: "auto" }}>
           <fieldset className="safety-info">
             <legend>Safety Information:</legend>
             <div>
@@ -174,9 +174,6 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
 
         .safety-info {
           height: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 0.6rem;
         }
       `}</style>
     </fieldset>

@@ -141,27 +141,27 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           readOnly={true}
           selectedValue={data.isWorkflowUninterrupted}
         />
-      </fieldset>
-      {data.isWorkflowUninterrupted === false && (
-        <div
-          className={`form-group ${
-            data.isWorkflowUninterrupted !== false ? "hidden" : ""
-          }`}
-        >
-          <label
-            htmlFor="interrupted-workflow-process"
-            className={data.isWorkflowUninterrupted ? "disabled" : ""}
+        {data.isWorkflowUninterrupted === false && (
+          <div
+            className={`form-group ${
+              data.isWorkflowUninterrupted !== false ? "hidden" : ""
+            }`}
           >
-            If no, describe your processes to address the situation in order to
-            meet standards:
-          </label>
-          <textarea
-            value={data.workflowStandardsProcess ?? ""}
-            readOnly={true}
-            cols={20}
-          />
-        </div>
-      )}
+            <label
+              htmlFor="interrupted-workflow-process"
+              className={data.isWorkflowUninterrupted ? "disabled" : ""}
+            >
+              If no, describe your processes to address the situation in order
+              to meet standards:
+            </label>
+            <textarea
+              value={data.workflowStandardsProcess ?? ""}
+              readOnly={true}
+              cols={20}
+            />
+          </div>
+        )}
+      </fieldset>
       <fieldset>
         <legend>Is there a risk of microbial contamination?</legend>
         <BooleanRadioGroup
@@ -178,107 +178,111 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           selectedValue={data.crossContaminationRisk}
         />
       </fieldset>
-      <fieldset className="row grow">
+      <fieldset>
         <legend>
           Exposure risk to compounding personnel (as per section 2 of the SDS or
           product monograph)
         </legend>
-        <ExposureRisksDisplay
-          category="From SDS"
-          values={{
-            skin: data.sdsSkinExposureRisk as boolean,
-            eye: data.sdsEyeExposureRisk as boolean,
-            oral: data.sdsEyeExposureRisk as boolean,
-            inhalation: data.sdsInhalationExposureRisk as boolean,
-            other: data.sdsOtherExposureRiskDescription,
-          }}
-        />
-        {data.ingredients.some(
-          (e) => e.commercialProductDin && e.commercialProductName,
-        ) && (
+        <div className="row grow">
           <ExposureRisksDisplay
-            category="From Product Monograph"
+            category="From SDS"
             values={{
-              skin: data.pmSkinExposureRisk as boolean,
-              eye: data.pmEyeExposureRisk as boolean,
-              oral: data.pmEyeExposureRisk as boolean,
-              inhalation: data.pmInhalationExposureRisk as boolean,
-              other: data.pmOtherExposureRiskDescription,
+              skin: data.sdsSkinExposureRisk as boolean,
+              eye: data.sdsEyeExposureRisk as boolean,
+              oral: data.sdsEyeExposureRisk as boolean,
+              inhalation: data.sdsInhalationExposureRisk as boolean,
+              other: data.sdsOtherExposureRiskDescription,
             }}
           />
-        )}
+          {data.ingredients.some(
+            (e) => e.commercialProductDin && e.commercialProductName,
+          ) && (
+            <ExposureRisksDisplay
+              category="From Product Monograph"
+              values={{
+                skin: data.pmSkinExposureRisk as boolean,
+                eye: data.pmEyeExposureRisk as boolean,
+                oral: data.pmEyeExposureRisk as boolean,
+                inhalation: data.pmInhalationExposureRisk as boolean,
+                other: data.pmOtherExposureRiskDescription,
+              }}
+            />
+          )}
+        </div>
       </fieldset>
-      <fieldset className="row grow">
+      <fieldset>
         <legend>
           PPE deemed necessary (as per SDS, product monograph) and assessment of
           risk:
         </legend>
-        <fieldset className="col">
-          <legend>Gloves:</legend>
-          <div className="form-group">
-            <label>Required?</label>
-            <BooleanRadioGroup
-              readOnly={true}
-              name="ppe.gloves.required"
-              selectedValue={data.ppeGlovesRequired}
-            />
-          </div>
-          {data.ppeGlovesRequired && (
+        <div className="row grow">
+          <fieldset>
+            <legend>Gloves:</legend>
             <div className="form-group">
-              <span className="label">Type:</span>
-              <span>{data.ppeGlovesType} gloves</span>
+              <label>Required?</label>
+              <BooleanRadioGroup
+                readOnly={true}
+                name="ppe.gloves.required"
+                selectedValue={data.ppeGlovesRequired}
+              />
             </div>
-          )}
-        </fieldset>
-        <fieldset className="col">
-          <legend>Coat:</legend>
-          <div className="form-group">
-            <span className="label">Required?</span>
-            <BooleanRadioGroup
-              readOnly={true}
-              name="ppe.coat.required"
-              selectedValue={data.ppeCoatRequired}
-            />
-          </div>
-          {data.ppeCoatRequired && (
-            <div className="form-group row">
-              <span className="label">Type:</span>
-              <span>{data.ppeCoatType} coat</span>
+            {data.ppeGlovesRequired && (
+              <div className="form-group row">
+                <span className="label">Type:</span>
+                <span>{data.ppeGlovesType} gloves</span>
+              </div>
+            )}
+          </fieldset>
+          <fieldset>
+            <legend>Coat:</legend>
+            <div className="form-group">
+              <span className="label">Required?</span>
+              <BooleanRadioGroup
+                readOnly={true}
+                name="ppe.coat.required"
+                selectedValue={data.ppeCoatRequired}
+              />
             </div>
-          )}
-        </fieldset>
-        <fieldset className="col">
-          <legend>Mask:</legend>
-          <div className="form-group">
-            <span className="label">Required?</span>
-            <BooleanRadioGroup
-              readOnly={true}
-              name="ppe.mask.required"
-              selectedValue={data.ppeMaskRequired}
-            />
-          </div>
-          {data.ppeMaskRequired && (
-            <div className="form-group row">
-              <span className="label">Type:</span>
-              <span>{data.ppeMaskType}</span>
+            {data.ppeCoatRequired && (
+              <div className="form-group row">
+                <span className="label">Type:</span>
+                <span>{data.ppeCoatType} coat</span>
+              </div>
+            )}
+          </fieldset>
+          <fieldset>
+            <legend>Mask:</legend>
+            <div className="form-group">
+              <span className="label">Required?</span>
+              <BooleanRadioGroup
+                readOnly={true}
+                name="ppe.mask.required"
+                selectedValue={data.ppeMaskRequired}
+              />
             </div>
-          )}
-        </fieldset>
-        <fieldset className="row">
-          <legend>Eye Protection:</legend>
-          <div className="form-group">
-            <label>Required?</label>
-            <BooleanRadioGroup
-              readOnly={true}
-              name="ppe.eyeProtection.required"
-              selectedValue={data.ppeEyeProtectionRequired}
-            />
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>Other:</legend>
-          <span>{data.ppeOther ? data.ppeOther : "N/A"}</span>
-        </fieldset>
+            {data.ppeMaskRequired && (
+              <div className="form-group row">
+                <span className="label">Type:</span>
+                <span>{data.ppeMaskType}</span>
+              </div>
+            )}
+          </fieldset>
+          <fieldset className="row">
+            <legend>Eye Protection:</legend>
+            <div className="form-group">
+              <label>Required?</label>
+              <BooleanRadioGroup
+                readOnly={true}
+                name="ppe.eyeProtection.required"
+                selectedValue={data.ppeEyeProtectionRequired}
+              />
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Other:</legend>
+            <span>{data.ppeOther ? data.ppeOther : "N/A"}</span>
+          </fieldset>
+        </div>
       </fieldset>
       <fieldset>
         <legend>Is an eye wash station required?</legend>
@@ -323,6 +327,10 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         {form}
       </style>
       <style jsx global>{`
+        .risk-assessment-details > .form-group {
+          padding-left: 1.2rem;
+        }
+
         textarea:read-only {
           outline: none;
           resize: none;
@@ -339,7 +347,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         }
 
         :root {
-          --radio-background-color: #dbdbdbdb;
+          --radio-background-color: #dbdbdb;
           --radio-color: black;
           --radio-border-color: black;
           --radio-size: 1.3rem;
@@ -388,7 +396,7 @@ const ExposureRisksDisplay = ({
   values,
 }: ExposureRisksInputsProps) => {
   return (
-    <fieldset className="col">
+    <fieldset>
       <legend>{category}:</legend>
       <div className="form-group">
         <label>Skin:</label>

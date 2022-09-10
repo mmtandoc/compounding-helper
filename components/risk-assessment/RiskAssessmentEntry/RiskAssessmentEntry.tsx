@@ -561,20 +561,9 @@ const RiskAssessmentEntry = (props: Props) => {
       <style jsx global>
         {form}
       </style>
-      <style jsx global>{`
-        .form-group textarea {
-          resize: vertical;
-          width: 100%;
-        }
-      `}</style>
-
       <style jsx>{`
         #risk-level-select {
           width: min-content;
-        }
-
-        input[type="date"] {
-          width: fit-content;
         }
       `}</style>
     </>

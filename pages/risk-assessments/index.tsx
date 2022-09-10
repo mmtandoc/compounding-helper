@@ -24,7 +24,7 @@ const RiskAssessments: NextPage<Props> = (props: Props) => {
           margin-top: 0.5rem;
           margin-bottom: 0.5rem;
           display: flex;
-          gap: 0.5rem;
+          column-gap: 0.5rem;
         }
       `}</style>
     </div>

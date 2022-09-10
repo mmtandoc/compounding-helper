@@ -140,7 +140,7 @@ const IngredientFieldset = ({
   return (
     <fieldset className="ingredient-fieldset">
       <div className="row">
-        <div className="col">
+        <div>
           <div className="row">
             <input
               type="hidden"
@@ -202,7 +202,7 @@ const IngredientFieldset = ({
             </div>
           </div>
           <div className="row">
-            <div className="col">
+            <div>
               <div className="form-group">
                 <label htmlFor={`i${index}-is-commercial-product`}>
                   Is a commercial product?
@@ -335,7 +335,7 @@ const IngredientFieldset = ({
             </div>
           </div>
         </div>
-        <div className="col" style={{ minWidth: "30%", marginLeft: "auto" }}>
+        <div style={{ minWidth: "30%", marginLeft: "auto" }}>
           <fieldset className="safety-info">
             <legend>Safety Information:</legend>
             <div>
