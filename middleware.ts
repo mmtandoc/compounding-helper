@@ -1,17 +1,16 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextMiddleware, NextRequest, NextResponse } from "next/server"
 
-export const config = {
-  matcher: ["/", "/index"],
-}
-
-export function middleware(req: NextRequest) {
+export const middleware: NextMiddleware = (req: NextRequest) => {
   const basicAuth = req.headers.get("authorization")
   const url = req.nextUrl
 
-  if (basicAuth) {
+  const basicAuthCredentials = process.env.BASIC_AUTH_CREDENTIALS
+
+  if (basicAuth && basicAuthCredentials) {
     const authValue = basicAuth.split(" ")[1]
     const [user, pwd] = atob(authValue).split(":")
-    if (user === "mmtandoc" && pwd === "mXi~9e++Q$>w4qF[rn@l") {
+    const [correctUser, correctPwd] = basicAuthCredentials.split(":")
+    if (user === correctUser && pwd === correctPwd) {
       return NextResponse.next()
     }
   }
