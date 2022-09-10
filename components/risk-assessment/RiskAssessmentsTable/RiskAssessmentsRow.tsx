@@ -1,13 +1,15 @@
+import _ from "lodash"
 import Link from "next/link"
 import React from "react"
 import { RiskAssessmentAll } from "types/models"
 
 type RiskAssessmentsRowProps = {
   data: RiskAssessmentAll
+  ingredientColSpan: number
 }
 
 const RiskAssessmentsRow = (props: RiskAssessmentsRowProps) => {
-  const { data } = props
+  const { data, ingredientColSpan } = props
   return (
     <tr>
       <td>{data.id}</td>
@@ -38,6 +40,9 @@ const RiskAssessmentsRow = (props: RiskAssessmentsRowProps) => {
           </td>
         )
       })}
+      {_.range(ingredientColSpan - data.ingredients.length).map((i) => (
+        <td key={i}></td>
+      ))}
     </tr>
   )
 }

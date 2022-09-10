@@ -14,7 +14,7 @@ const RiskAssessmentsTable = (props: Props) => {
   )
 
   return (
-    <table>
+    <table className="risk-assessments-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -24,7 +24,11 @@ const RiskAssessmentsTable = (props: Props) => {
       </thead>
       <tbody>
         {data.map((ra, i) => (
-          <RiskAssessmentsRow data={ra} key={i} />
+          <RiskAssessmentsRow
+            data={ra}
+            key={i}
+            ingredientColSpan={maxIngredientCount}
+          />
         ))}
       </tbody>
       <style jsx>{`
@@ -35,6 +39,15 @@ const RiskAssessmentsTable = (props: Props) => {
         th,
         :global(td) {
           border: black solid 1px;
+        }
+
+        thead {
+          background-color: lightgray;
+        }
+
+        th,
+        td {
+          padding: 0, 1rem;
         }
       `}</style>
     </table>
