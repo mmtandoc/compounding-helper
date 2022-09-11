@@ -176,7 +176,7 @@ const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
       </div>
       <style jsx>{`
         form {
-          width: 90%;
+          //width: 90%;
           align-self: center;
         }
         .page {

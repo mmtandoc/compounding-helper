@@ -73,7 +73,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
       <style jsx global>{`
         @media not print {
           .risk-assessment-container {
-            width: 90%;
+            //width: 90%;
             align-self: center;
           }
         }

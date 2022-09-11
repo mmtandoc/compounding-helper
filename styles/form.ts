@@ -10,7 +10,6 @@ const form = css.global`
   }
 
   .form-group {
-    margin-inline: 0.2rem;
     padding-block: 0.1rem 0.1rem;
     min-inline-size: min-content;
   }
