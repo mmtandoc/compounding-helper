@@ -19,16 +19,6 @@ const Header = () => {
           Home
         </a>
       </Link>
-      <Link href="/risk-assessments">
-        <a className="bold" data-active={isActive("/risk-assessments")}>
-          View Risk Assessments
-        </a>
-      </Link>
-      <Link href="/risk-assessments/new">
-        <a className="bold" data-active={isActive("/risk-assessments/new")}>
-          New Risk Assessment
-        </a>
-      </Link>
       <Dropdown>
         <DropdownToggle>
           <Link href="/risk-assessments">
