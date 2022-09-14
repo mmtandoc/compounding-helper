@@ -1,3 +1,4 @@
+import axios from "axios"
 import Layout from "components/Layout"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { NextPage, NextPageContext } from "next"
@@ -43,6 +44,19 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
     copyStyles: true,
   })
 
+  const handleDelete = () => {
+    //TODO: Display confirmation modal
+    axios.delete(`/api/risk-assessments/${riskAssessmentId}`).then(
+      () => {
+        router.push("/risk-assessments")
+      },
+      (reason) => {
+        //TODO: Handle errors
+        console.log({ error: reason })
+      },
+    )
+  }
+
   if (!data) {
     return <div>Risk assessment with ID {riskAssessmentId} not found</div>
   }
@@ -62,6 +76,9 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
             <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
               <button type="button">Edit</button>
             </Link>
+            <button type="button" onClick={handleDelete}>
+              Delete
+            </button>
           </div>
         </div>
       </div>

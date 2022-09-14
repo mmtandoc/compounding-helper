@@ -73,9 +73,23 @@ export default async function handler(
       res.status(200).json(riskAssessment)
       return
     }
+    case "DELETE": {
+      try {
+        await deleteRiskAssessmentById(id)
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
+        })
+        return
+      }
+
+      res.status(200).send(`Risk assessment ${id} deleted.`)
+      return
+    }
     default:
       res
-        .setHeader("Allow", ["GET", "PUT"])
+        .setHeader("Allow", ["GET", "PUT", "DELETE"])
         .status(405)
         .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
       break
@@ -154,4 +168,11 @@ export const getRiskAssessmentById = async (id: number) => {
       },
     },
   })
+}
+
+export const deleteRiskAssessmentById = async (id: number) => {
+  return await prisma.$transaction([
+    prisma.ingredient.deleteMany({ where: { riskAssessmentId: id } }),
+    prisma.riskAssessment.delete({ where: { id } }),
+  ])
 }
