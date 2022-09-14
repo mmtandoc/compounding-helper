@@ -250,7 +250,7 @@ const IngredientFieldset = ({
                   htmlFor={`i${index}-commercial-product`}
                   className={!isCommercialProduct ? "disabled" : ""}
                 >
-                  Commerical product name:
+                  Product name:
                 </label>
                 <input
                   {...register(
@@ -273,7 +273,7 @@ const IngredientFieldset = ({
                 <label
                   className={`col ${!isCommercialProduct ? "disabled" : ""}`}
                 >
-                  <span>Commerical product DIN:</span>
+                  <span>Product DIN:</span>
                   <div className="row">
                     <input
                       {...register(
@@ -337,7 +337,7 @@ const IngredientFieldset = ({
                       return value === "" ? undefined : value
                     },
                     /* deps: [
-                      `ingredients.${index}.isCommericalProduct`,
+                      `ingredients.${index}.isCommercialProduct`,
                       `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
                     ], */
                   },

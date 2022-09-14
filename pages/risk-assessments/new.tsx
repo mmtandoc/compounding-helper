@@ -128,7 +128,7 @@ const NewRiskAssessment: NextPage = () => {
                         physicalForm: "cream",
                         commercialProduct: {
                           isCommercialProduct: true,
-                          name: "TEST COMMERICAL PRODUCT",
+                          name: "TEST COMMERCIAL PRODUCT",
                           din: 123456,
                           hasNoDin: false,
                           hasProductMonographConcerns: true,
