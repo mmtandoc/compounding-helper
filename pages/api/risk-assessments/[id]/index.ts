@@ -7,17 +7,15 @@ import { mapRiskAssessmentFieldsToUpdateData } from "lib/RiskAssessmentUtil"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiBody<RiskAssessmentAll>>,
+  res: NextApiResponse<ApiBody<RiskAssessmentAll> | string>,
 ) {
-  const {
-    query: { id },
-    body,
-    method,
-  } = req
+  const { query, body, method } = req
 
-  if (id === undefined) {
-    res.status(404).json({
-      error: { code: 404, message: "Missing required query parameter 'id'." },
+  const id = parseInt(query.id as string)
+
+  if (isNaN(id)) {
+    res.status(500).json({
+      error: { code: 400, message: "Risk assessment ID must be integer." },
     })
     return
   }
@@ -26,9 +24,7 @@ export default async function handler(
     case "GET": {
       let riskAssessment
       try {
-        riskAssessment = await getRiskAssessmentById(
-          parseInt(typeof id === "string" ? id : id[0]),
-        )
+        riskAssessment = await getRiskAssessmentById(id)
       } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -47,12 +43,11 @@ export default async function handler(
       res.status(200).json(riskAssessment)
       return
     }
-    //TODO: Implement PUT
     case "PUT": {
       let riskAssessment
       try {
         riskAssessment = await updateRiskAssessmentById(
-          parseInt(typeof id === "string" ? id : id[0]),
+          id,
           mapRiskAssessmentFieldsToUpdateData(body),
         )
       } catch (error) {
