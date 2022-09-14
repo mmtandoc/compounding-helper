@@ -94,7 +94,9 @@ const IngredientFieldset = ({
 
   const isCommercialProduct = watch(
     `ingredients.${index}.commercialProduct.isCommercialProduct`,
-  )
+  ) as boolean
+
+  const hasNoDin = watch(`ingredients.${index}.commercialProduct.hasNoDin`)
 
   const hasProductMonographConcerns = watch(
     `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
@@ -107,6 +109,13 @@ const IngredientFieldset = ({
       `ingredients.${index}.commercialProduct.name`,
       `ingredients.${index}.commercialProduct.din`,
     ],
+    register,
+    setValue,
+  })
+
+  useClearDisabledField({
+    clearConditional: hasNoDin === true,
+    names: [`ingredients.${index}.commercialProduct.din`],
     register,
     setValue,
   })
@@ -230,7 +239,7 @@ const IngredientFieldset = ({
                   disabled={!isCommercialProduct}
                   className="has-product-monograph-concerns"
                   rules={{
-                    required: !!isCommercialProduct,
+                    required: isCommercialProduct,
                   }}
                 />
               </div>
@@ -247,7 +256,7 @@ const IngredientFieldset = ({
                   {...register(
                     `ingredients.${index}.commercialProduct.name` as const,
                     {
-                      required: !!isCommercialProduct,
+                      required: isCommercialProduct,
                       disabled: !isCommercialProduct,
                       setValueAs: (value) => {
                         return value === "" || !value ? null : value
@@ -288,7 +297,12 @@ const IngredientFieldset = ({
                         type="checkbox"
                         {...register(
                           `ingredients.${index}.commercialProduct.hasNoDin`,
-                          { disabled: !isCommercialProduct },
+                              {
+                                disabled: !isCommercialProduct,
+                                deps: [
+                                  `ingredients.${index}.commercialProduct.din`,
+                                ],
+                              },
                         )}
                       />
                       <span>No DIN</span>
