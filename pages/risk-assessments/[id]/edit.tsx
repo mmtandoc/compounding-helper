@@ -189,13 +189,20 @@ const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const riskAssessmentId = parseInt(context.query.id as string)
-  const data: RiskAssessmentAll | null = await getRiskAssessmentById(
-    riskAssessmentId,
-  )
+
+  if (isNaN(riskAssessmentId)) {
+    return { notFound: true }
+  }
+
+  const data = await getRiskAssessmentById(riskAssessmentId)
+
+  if (data === null) {
+    return { notFound: true }
+  }
 
   return {
     props: {
-      values: data ? mapRiskAssessmentModelToFieldValues(data) : undefined,
+      values: mapRiskAssessmentModelToFieldValues(data),
     },
   }
 }

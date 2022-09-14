@@ -1,7 +1,7 @@
 import axios from "axios"
 import Layout from "components/Layout"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
-import { NextPage, NextPageContext } from "next"
+import { GetServerSideProps, NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
@@ -23,7 +23,7 @@ const PrintableRiskAssessmentDetails = React.forwardRef(
 )
 
 type RiskAssessmentProps = {
-  data: RiskAssessmentAll | null
+  data: RiskAssessmentAll
 }
 
 const RiskAssessment: NextPage<RiskAssessmentProps> = (
@@ -55,10 +55,6 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
         console.log({ error: reason })
       },
     )
-  }
-
-  if (!data) {
-    return <div>Risk assessment with ID {riskAssessmentId} not found</div>
   }
 
   return (
@@ -153,11 +149,18 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
   )
 }
 
-export async function getServerSideProps(context: NextPageContext) {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const riskAssessmentId = parseInt(context.query.id as string)
-  const data: RiskAssessmentAll | null = await getRiskAssessmentById(
-    riskAssessmentId,
-  )
+
+  if (isNaN(riskAssessmentId)) {
+    return { notFound: true }
+  }
+
+  const data = await getRiskAssessmentById(riskAssessmentId)
+
+  if (data === null) {
+    return { notFound: true }
+  }
 
   return { props: { data } }
 }
