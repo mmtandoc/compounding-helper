@@ -18,6 +18,22 @@ type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
 }
 
+const emptyIngredientValues = {
+  id: null,
+  chemicalId: null,
+  physicalForm: null,
+  productId: null,
+  sdsId: null,
+  commercialProduct: {
+    isCommercialProduct: null,
+    name: null,
+    din: null,
+    hasNoDin: null,
+    hasProductMonographConcerns: null,
+    concernsDescription: null,
+  },
+}
+
 const RiskAssessmentEntry = (props: Props) => {
   const { values, formMethods } = props
 
@@ -55,21 +71,7 @@ const RiskAssessmentEntry = (props: Props) => {
       ingredients.length === 0 &&
       ingredientFields.length === 0
     ) {
-      ingredientsArrayMethods.append({
-        id: null,
-        chemicalId: null,
-        physicalForm: null,
-        productId: null,
-        sdsId: null,
-        commercialProduct: {
-          isCommercialProduct: null,
-          name: null,
-          din: null,
-          hasNoDin: null,
-          hasProductMonographConcerns: null,
-          concernsDescription: null,
-        },
-      })
+      ingredientsArrayMethods.append(emptyIngredientValues)
     }
   }, [ingredients, ingredientFields, ingredientsArrayMethods])
 
@@ -123,20 +125,7 @@ const RiskAssessmentEntry = (props: Props) => {
             move={ingredientsArrayMethods.move}
             reset={() => {
               formMethods.resetField(`ingredients.${index}`, {
-                defaultValue: {
-                  chemicalId: null,
-                  physicalForm: null,
-                  productId: null,
-                  sdsId: null,
-                  commercialProduct: {
-                    isCommercialProduct: null,
-                    name: null,
-                    din: null,
-                    hasNoDin: null,
-                    hasProductMonographConcerns: null,
-                    concernsDescription: null,
-                  },
-                },
+                defaultValue: emptyIngredientValues,
               })
             }}
             watch={watch}
@@ -148,21 +137,7 @@ const RiskAssessmentEntry = (props: Props) => {
             className="add-button"
             value="add"
             onClick={() =>
-              ingredientsArrayMethods.append({
-                id: null,
-                chemicalId: null,
-                physicalForm: null,
-                productId: null,
-                sdsId: null,
-                commercialProduct: {
-                  isCommercialProduct: null,
-                  name: null,
-                  din: null,
-                  hasNoDin: null,
-                  hasProductMonographConcerns: null,
-                  concernsDescription: null,
-                },
-              })
+              ingredientsArrayMethods.append(emptyIngredientValues)
             }
           >
             Add Ingredient
