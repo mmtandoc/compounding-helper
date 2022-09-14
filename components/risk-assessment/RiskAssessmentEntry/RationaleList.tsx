@@ -160,15 +160,36 @@ const autoRationalesFunctions: ((
       return null
     }
 
-    if (
-      !values.ingredients.every((ingredient) =>
-        ["cream", "ointment"].includes(ingredient?.physicalForm ?? ""),
-      )
-    ) {
+    const [creamCount, ointmentCount] = values.ingredients.reduce(
+      (counts, ing) => {
+        if (ing.physicalForm === "cream") {
+          counts[0]++
+        } else if (ing.physicalForm === "ointment") {
+          counts[1]++
+        }
+        return counts
+      },
+      [0, 0],
+    )
+
+    if (creamCount === 0 && ointmentCount === 0) {
       return null
     }
 
-    return "Health hazards minimized by cream/ointment formulation"
+    const forms = []
+    if (creamCount > 0) {
+      forms.push("cream")
+    }
+
+    if (ointmentCount > 0) {
+      forms.push("ointment")
+    }
+
+    if (creamCount + ointmentCount === values.ingredients.length) {
+      return `Health hazards minimized by ${forms.join("/")} formulation`
+    }
+
+    return `Health hazards minimized by use of commercial ${forms.join("/")}`
   },
   (values) => {
     const requiredPPE: string[] = []
