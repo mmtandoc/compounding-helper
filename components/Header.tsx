@@ -2,6 +2,10 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import Dropdown, {
+  DropdownToggle,
+  DropdownMenu,
+} from "components/common/Dropdown"
 
 const Header = () => {
   const router = useRouter()
@@ -25,6 +29,27 @@ const Header = () => {
           New Risk Assessment
         </a>
       </Link>
+      <Dropdown>
+        <DropdownToggle>
+          <Link href="/risk-assessments">
+            <a className="bold" data-active={isActive("/risk-assessments")}>
+              Risk Assessments
+            </a>
+          </Link>
+        </DropdownToggle>
+        <DropdownMenu>
+          <Link href="/risk-assessments">
+            <a className="bold" data-active={isActive("/risk-assessments")}>
+              View Risk Assessments
+            </a>
+          </Link>
+          <Link href="/risk-assessments/new">
+            <a className="bold" data-active={isActive("/risk-assessments/new")}>
+              Create New Risk Assessment
+            </a>
+          </Link>
+        </DropdownMenu>
+      </Dropdown>
       <style jsx>{`
         .bold {
           font-weight: bold;
