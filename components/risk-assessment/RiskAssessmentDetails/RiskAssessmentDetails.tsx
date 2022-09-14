@@ -1,6 +1,7 @@
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RadioGroup } from "components/RadioGroup"
 import { IngredientDetails } from "components/risk-assessment/RiskAssessmentDetails/IngredientDetails"
+import { capitalize } from "lib/utils"
 import React from "react"
 import form from "styles/form"
 import { RiskAssessmentAll } from "types/models"
@@ -215,7 +216,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           PPE deemed necessary (as per SDS, product monograph) and assessment of
           risk:
         </legend>
-        <div className="row grow">
+        <div className="row grow wrap">
           <fieldset>
             <legend>Gloves:</legend>
             <div className="form-group">
@@ -227,9 +228,9 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               />
             </div>
             {data.ppeGlovesRequired && (
-              <div className="form-group row">
+              <div className="form-group row wrap">
                 <span className="label">Type:</span>
-                <span>{data.ppeGlovesType} gloves</span>
+                <span>{capitalize(data.ppeGlovesType as string)} gloves</span>
               </div>
             )}
           </fieldset>
@@ -244,9 +245,9 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               />
             </div>
             {data.ppeCoatRequired && (
-              <div className="form-group row">
+              <div className="form-group row wrap">
                 <span className="label">Type:</span>
-                <span>{data.ppeCoatType} coat</span>
+                <span>{capitalize(data.ppeCoatType as string)} coat</span>
               </div>
             )}
           </fieldset>
@@ -261,9 +262,9 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               />
             </div>
             {data.ppeMaskRequired && (
-              <div className="form-group row">
+              <div className="form-group row wrap">
                 <span className="label">Type:</span>
-                <span>{data.ppeMaskType}</span>
+                <span>{capitalize(data.ppeMaskType as string)}</span>
               </div>
             )}
           </fieldset>
@@ -347,10 +348,10 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         }
 
         :root {
-          --radio-background-color: #dbdbdb;
+          --radio-background-color: #f3f3f3;
           --radio-color: black;
           --radio-border-color: black;
-          --radio-size: 1.3rem;
+          --radio-size: 1.2rem;
         }
 
         input[type="radio"] {
@@ -365,8 +366,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           transition: 0.2s all linear;
           margin-right: 0.5rem;
           background-color: var(--radio-background-color);
-
-          position: relative;
         }
 
         input[type="radio"]:checked {
@@ -396,23 +395,28 @@ const ExposureRisksDisplay = ({
   values,
 }: ExposureRisksInputsProps) => {
   return (
-    <fieldset>
+    <fieldset className="exposure-risks-container">
       <legend>{category}:</legend>
-      <div className="form-group">
-        <label>Skin:</label>
-        <BooleanRadioGroup selectedValue={values.skin} readOnly={true} />
-      </div>
-      <div className="form-group">
-        <label>Eye:</label>
-        <BooleanRadioGroup selectedValue={values.eye} readOnly={true} />
-      </div>
-      <div className="form-group">
-        <label>Inhalation:</label>
-        <BooleanRadioGroup selectedValue={values.inhalation} readOnly={true} />
-      </div>
-      <div className="form-group">
-        <label>Oral:</label>
-        <BooleanRadioGroup selectedValue={values.oral} readOnly={true} />
+      <div className="exposure-risks-row">
+        <div className="form-group">
+          <label>Skin:</label>
+          <BooleanRadioGroup selectedValue={values.skin} readOnly={true} />
+        </div>
+        <div className="form-group">
+          <label>Eye:</label>
+          <BooleanRadioGroup selectedValue={values.eye} readOnly={true} />
+        </div>
+        <div className="form-group">
+          <label>Inhalation:</label>
+          <BooleanRadioGroup
+            selectedValue={values.inhalation}
+            readOnly={true}
+          />
+        </div>
+        <div className="form-group">
+          <label>Oral:</label>
+          <BooleanRadioGroup selectedValue={values.oral} readOnly={true} />
+        </div>
       </div>
       <div className="row">
         <div className="form-group">
@@ -434,6 +438,21 @@ const ExposureRisksDisplay = ({
           />
         </div>
       </div>
+      <style jsx>{`
+        .exposure-risks-row {
+          display: flex;
+          column-gap: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        .exposure-risks-row > div {
+          flex: 1;
+        }
+
+        .exposure-risks-row > div:not(:last-child) {
+          border-right: 1px solid black;
+        }
+      `}</style>
     </fieldset>
   )
 }

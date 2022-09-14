@@ -33,12 +33,17 @@ const RiskAssessments: NextPage<Props> = (props: Props) => {
     <Layout>
       <div className="page">
         <h1 style={{ marginTop: "0px" }}>Risk Assessments</h1>
-        {actionBar}
         <div>
+          {actionBar}
           <RiskAssessmentsTable data={data} />
+          {actionBar}
         </div>
-        {actionBar}
       </div>
+      <style jsx>{`
+        :global(.risk-assessments-table) {
+          width: 100%;
+        }
+      `}</style>
     </Layout>
   )
 }

@@ -45,9 +45,8 @@ const RiskAssessmentsTable = (props: Props) => {
           background-color: lightgray;
         }
 
-        th,
-        td {
-          padding: 0, 1rem;
+        th {
+          padding: 0 1rem;
         }
       `}</style>
     </table>

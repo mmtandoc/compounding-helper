@@ -69,7 +69,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
         </h1>
         <div className="risk-assessment-container">
           <PrintableRiskAssessmentDetails data={data} />
-          <div className="row print-hide">
+          <div className="action-row">
             <button type="button" onClick={handlePrint}>
               Print
             </button>
@@ -86,6 +86,12 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
         .page {
           margin-bottom: 5rem;
         }
+
+        .action-row {
+          display: flex;
+          gap: 1rem;
+          margin-left: 0.5rem;
+        }
       `}</style>
       <style jsx global>{`
         @media not print {
@@ -96,7 +102,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
         }
         @media print {
           html {
-            font-size: 55%;
+            font-size: 52%;
           }
           .page {
             margin: 0;

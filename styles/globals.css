@@ -43,3 +43,17 @@ button {
 .hidden {
   display: none !important;
 }
+
+.row {
+  display: flex !important;
+  flex-direction: row !important;
+  column-gap: 0.7rem;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.row.grow > * {
+  flex: 1;
+}

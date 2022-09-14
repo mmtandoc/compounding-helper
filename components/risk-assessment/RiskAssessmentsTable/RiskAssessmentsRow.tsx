@@ -43,6 +43,12 @@ const RiskAssessmentsRow = (props: RiskAssessmentsRowProps) => {
       {_.range(ingredientColSpan - data.ingredients.length).map((i) => (
         <td key={i}></td>
       ))}
+      <style jsx>{`
+        th,
+        td {
+          padding: 0 1rem;
+        }
+      `}</style>
     </tr>
   )
 }

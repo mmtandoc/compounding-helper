@@ -39,7 +39,7 @@ const form = css.global`
     margin-bottom: 0;
   }
 
-  .form-group:not(.row) label > span:first-child {
+  .form-group label > span:first-child {
     font-weight: 600;
     display: block;
     width: fit-content;
@@ -56,16 +56,6 @@ const form = css.global`
 
   label.disabled {
     color: dimgray;
-  }
-
-  .row {
-    display: flex !important;
-    flex-direction: row !important;
-    column-gap: 0.7rem;
-  }
-
-  .row.grow > * {
-    flex: 1;
   }
 `
 
