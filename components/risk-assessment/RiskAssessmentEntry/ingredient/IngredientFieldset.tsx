@@ -80,18 +80,6 @@ const IngredientFieldset = ({
     console.log(vendorsError)
   }
 
-  useEffect(() => {
-    if (
-      ingredient &&
-      ingredient.sdsId !== null &&
-      !!sdsesData &&
-      !sdsesData.map((sds) => sds.id).includes(ingredient.sdsId)
-    ) {
-      register(`ingredients.${index}.sdsId`)
-      setValue(`ingredients.${index}.sdsId`, sdsesData?.[0]?.id)
-    }
-  }, [index, ingredient, register, sdsesData, setValue])
-
   const isCommercialProduct = watch(
     `ingredients.${index}.commercialProduct.isCommercialProduct`,
   ) as boolean
@@ -128,7 +116,7 @@ const IngredientFieldset = ({
   useEffect(() => {
     if (
       !isLoading &&
-      !!ingredient?.sdsId &&
+      !ingredient?.sdsId &&
       !!sdsesData &&
       sdsesData.length > 0
     ) {
