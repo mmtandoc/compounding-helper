@@ -136,8 +136,8 @@ const IngredientFieldset = ({
 
   return (
     <fieldset className="ingredient-fieldset">
-      <div className="row">
-        <div>
+      <div className="ingredient-body">
+        <div className="inputs-container">
           <div className="row">
             <input
               type="hidden"
@@ -153,29 +153,10 @@ const IngredientFieldset = ({
                   name={`ingredients.${index}.chemicalId`}
                   control={control}
                   rules={{ required: !isCommercialProduct }}
+                  size={30}
                 />
 
                 <button type="button" disabled={!ingredient?.chemicalId}>
-                  ...
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="form-group">
-              <label htmlFor={`i${index}-sds-select`}>Safety Datasheet</label>
-              <div className="row">
-                <SdsSelect
-                  chemical={chemicalData}
-                  vendors={vendorsData}
-                  sdses={sdsesData}
-                  showPastRevisions={showPastRevisions}
-                  ingredientIndex={index}
-                  register={register}
-                  disabled={!ingredient?.chemicalId}
-                  required={!isCommercialProduct}
-                />
-                <button type="button" disabled={!ingredient?.sdsId}>
                   ...
                 </button>
               </div>
@@ -196,6 +177,26 @@ const IngredientFieldset = ({
                 <option value="liquid">Liquid</option>
                 <option value="solid">Solid</option>
               </select>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label htmlFor={`i${index}-sds-select`}>Safety Datasheet</label>
+              <div className="row">
+                <SdsSelect
+                  chemical={chemicalData}
+                  vendors={vendorsData}
+                  sdses={sdsesData}
+                  showPastRevisions={showPastRevisions}
+                  ingredientIndex={index}
+                  register={register}
+                  disabled={!ingredient?.chemicalId}
+                  required={!isCommercialProduct}
+                />
+                <button type="button" disabled={!ingredient?.sdsId}>
+                  ...
+                </button>
+              </div>
             </div>
           </div>
           <div className="row">
@@ -257,7 +258,7 @@ const IngredientFieldset = ({
                   id={`i${index}-commercial-product`}
                 />
               </div>
-              <div className="form-group row">
+              <div className="form-group">
                 <label
                   className={`col ${!isCommercialProduct ? "disabled" : ""}`}
                 >
@@ -337,13 +338,11 @@ const IngredientFieldset = ({
             </div>
           </div>
         </div>
-        <div style={{ minWidth: "30%", marginLeft: "auto" }}>
-          <fieldset className="safety-info">
+        <div className="safety-info">
+          <fieldset>
             <legend>Safety Information:</legend>
             <div>
-              <span className="label" style={{ marginRight: "0.5rem" }}>
-                Niosh Table:{" "}
-              </span>
+              <span className="label">Niosh Table:</span>
               {chemicalData?.nioshTable === undefined
                 ? "N/A"
                 : chemicalData?.nioshTable === -1
@@ -351,18 +350,13 @@ const IngredientFieldset = ({
                 : `Table ${chemicalData?.nioshTable}`}
             </div>
             <div>
-              <span className="label" style={{ marginRight: "0.5rem" }}>
-                SDS HMIS health hazard level:{" "}
-              </span>
+              <span className="label">SDS HMIS health hazard level:</span>
               <span>{selectedSds?.hmisHealthHazard ?? "N/A"}</span>
             </div>
             {ingredient && ingredient.sdsId && selectedSds && (
               <div>
                 <span className="label">SDS health hazards:</span>
-                <ul
-                  id={`i${index}-health-hazard-list`}
-                  className="health-hazard-list"
-                >
+                <ul className="health-hazard-list">
                   {selectedSds.healthHazards.map((h, i) => (
                     <li key={i}>{`${
                       h.hazardCategory.hazardClass.name
@@ -376,7 +370,7 @@ const IngredientFieldset = ({
           </fieldset>
         </div>
       </div>
-      <div>
+      <div className="ingredient-actions">
         <button
           type="button"
           className="remove-button"
@@ -411,6 +405,42 @@ const IngredientFieldset = ({
         </button>
       </div>
       <style jsx>{`
+        .inputs-container {
+          margin-bottom: 0.8rem;
+        }
+
+        @media (min-width: 992px) {
+          .ingredient-body {
+            display: flex;
+            column-gap: 0.5rem;
+            align-items: stretch;
+          }
+
+          .inputs-container {
+            flex: 1;
+            margin-bottom: unset;
+          }
+
+          .safety-info {
+            min-width: 30%;
+            margin-left: auto;
+            align-self: stretch;
+          }
+
+          .safety-info > fieldset {
+            height: 100%;
+          }
+        }
+
+        .ingredient-actions {
+          margin-top: 0.8rem;
+          display: flex;
+          column-gap: 0.7rem;
+        }
+
+        .label {
+          margin-right: 0.5rem;
+        }
         .health-hazard-list {
           margin-top: 0;
           margin-bottom: 0;
@@ -420,10 +450,6 @@ const IngredientFieldset = ({
 
         .hmis-health-hazard {
           width: min-content;
-        }
-
-        .safety-info {
-          height: 100%;
         }
       `}</style>
     </fieldset>

@@ -225,7 +225,6 @@ const NewRiskAssessment: NextPage = () => {
       </div>
       <style jsx>{`
         form {
-          width: 90%;
           margin-bottom: 5rem;
           align-self: center;
         }

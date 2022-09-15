@@ -95,16 +95,21 @@ const ExposureRisksInputs = ({
         </div>
         <div className="health-hazards">
           {sdses?.map((sds, i) => (
-            <>
               <ul key={i}>
                 <span className="label">{sds.product.name}</span>
                 {sds.healthHazards.map((h, i) => (
                   <li key={i}>{hazardToString(h)}</li>
                 ))}
               </ul>
-            </>
           ))}
           <style jsx global>{`
+            .health-hazards {
+              display: flex;
+              flex-direction: column;
+              flex-wrap: wrap;
+              row-gap: 0.7rem;
+            }
+
             .health-hazards ul > li,
             .health-hazards span.label {
               font-size: 1rem;

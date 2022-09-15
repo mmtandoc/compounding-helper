@@ -11,6 +11,7 @@ interface Props extends UseControllerProps<NullPartialRiskAssessmentFields> {
   id: string
   error?: FieldError
   onItemChange?: (val: Chemical) => void
+  size?: number
 }
 
 const renderSuggestion = (item: Chemical) => <div>{item.name}</div>
@@ -19,7 +20,7 @@ const getItemValue = (item?: Chemical | null): string => item?.name ?? ""
 
 const AsyncAutocomplete = withAsync<Chemical>(AutocompleteInput)
 
-const ChemicalSearch = ({ id, control, name, rules }: Props) => {
+const ChemicalSearch = ({ id, control, name, rules, size }: Props) => {
   const {
     field: { onChange, onBlur, value, ref },
   } = useController({
@@ -89,6 +90,7 @@ const ChemicalSearch = ({ id, control, name, rules }: Props) => {
       item={chemicalData}
       onItemChange={handleItemChange}
       inputRef={ref}
+      width={size}
     />
   )
 }
