@@ -3,7 +3,10 @@ import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { RiskAssessmentAll } from "types/models"
 import { Prisma } from "@prisma/client"
-import { mapRiskAssessmentFieldsToUpdateData } from "lib/RiskAssessmentUtil"
+import IngredientMapper from "lib/mappers/IngredientMapper"
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import { RiskAssessmentFields } from "types/fields"
+import _ from "lodash"
 
 export default async function handler(
   req: NextApiRequest,
@@ -44,12 +47,32 @@ export default async function handler(
       return
     }
     case "PUT": {
+      const fields: RiskAssessmentFields = body
+
+      const ingredients = fields.ingredients.map(IngredientMapper.toModel)
+
       let riskAssessment
       try {
-        riskAssessment = await updateRiskAssessmentById(
-          id,
-          mapRiskAssessmentFieldsToUpdateData(body),
-        )
+        riskAssessment = await updateRiskAssessmentById(id, {
+          ingredients: {
+            deleteMany: {
+              id: {
+                notIn: fields.ingredients
+                  .filter((v) => v.id !== null)
+                  .map((v) => v.id as number),
+              },
+            },
+            createMany: {
+              data: ingredients.filter((data) => data.id === null),
+            },
+            update: ingredients
+              .filter((data) => data.id !== null)
+              .map((data) => {
+                return { where: { id: data.id }, data: _.omit(data, "id") }
+              }),
+          },
+          ...RiskAssessmentMapper.toModel(fields),
+        })
       } catch (error) {
         console.log(error)
         res.status(500).json({

@@ -6,97 +6,10 @@ import RiskAssessmentEntry, {
 } from "components/risk-assessment/RiskAssessmentEntry"
 import { SubmitHandler, useForm } from "react-hook-form"
 import axios from "axios"
-import { IngredientFields } from "types/fields"
-import { IngredientAll, RiskAssessmentAll } from "types/models"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { useRouter } from "next/router"
 import Link from "next/link"
-
-const mapIngredientModelsToFieldValues = (
-  ingredientsData: IngredientAll[],
-): IngredientFields[] => {
-  return ingredientsData.map((ingredientData: IngredientAll) => {
-    const values: IngredientFields = {
-      id: ingredientData.id,
-      sdsId: ingredientData?.safetyDataSheetId ?? null,
-      chemicalId: ingredientData?.safetyDataSheet?.product.chemicalId ?? null,
-      productId: ingredientData?.safetyDataSheet?.productId ?? null,
-      physicalForm: ingredientData.physicalForm,
-      commercialProduct: {
-        isCommercialProduct: !!ingredientData?.commercialProductName,
-        din: ingredientData.commercialProductDin ?? null,
-        name: ingredientData?.commercialProductName ?? null,
-        hasNoDin:
-          !!ingredientData?.commercialProductName &&
-          !ingredientData?.commercialProductDin,
-        hasProductMonographConcerns:
-          ingredientData.hasProductMonographConcerns ?? null,
-        concernsDescription: ingredientData.concernsDescription ?? null,
-      },
-    }
-
-    return values
-  })
-}
-
-const mapRiskAssessmentModelToFieldValues = (
-  data: RiskAssessmentAll,
-): NullPartialRiskAssessmentFields => {
-  return {
-    compoundName: data.compoundName,
-    ingredients: mapIngredientModelsToFieldValues(data.ingredients),
-    complexity: data.complexity,
-    preparationFrequency: data.preparationFrequency,
-    isSmallQuantity: data.isSmallQuantity,
-    isPreparedOccasionally: data.isPreparedOccasionally,
-    averagePreparationAmount: {
-      quantity: data.averagePreparationAmountQuantity,
-      unit: data.averagePreparationAmountUnit,
-    },
-    isConcentrationHealthRisk: data.isConcentrationHealthRisk,
-    hasVerificationSteps: data.hasVerificationSteps,
-    haveAppropriateFacilities: data.haveAppropriateFacilities,
-    isWorkflowUninterrupted: data.isWorkflowUninterrupted,
-    workflowStandardsProcess: data.workflowStandardsProcess,
-    microbialContaminationRisk: data.microbialContaminationRisk,
-    crossContaminationRisk: data.crossContaminationRisk,
-    requireSpecialEducation: data.requireSpecialEducation,
-    requireVentilation: data.requireVentilation,
-    exposureRisks: {
-      sds: {
-        skin: data.sdsSkinExposureRisk,
-        eye: data.sdsEyeExposureRisk,
-        inhalation: data.sdsInhalationExposureRisk,
-        oral: data.sdsOralExposureRisk,
-        other: data.sdsOtherExposureRisk,
-        otherDescription: data.sdsOtherExposureRiskDescription,
-      },
-      productMonograph: {
-        skin: data.pmSkinExposureRisk,
-        eye: data.pmEyeExposureRisk,
-        inhalation: data.pmInhalationExposureRisk,
-        oral: data.pmOralExposureRisk,
-        other: data.pmOtherExposureRisk,
-        otherDescription: data.pmOtherExposureRiskDescription,
-      },
-    },
-    ppe: {
-      gloves: { required: data.ppeGlovesRequired, type: data.ppeGlovesType },
-      coat: { required: data.ppeCoatRequired, type: data.ppeCoatType },
-      mask: { required: data.ppeMaskRequired, type: data.ppeMaskType },
-      eyeProtection: { required: data.ppeEyeProtectionRequired },
-      other: data.ppeOther,
-        },
-    requireEyeWashStation: data.requireEyeWashStation,
-    requireSafetyShower: data.requireSafetyShower,
-    riskLevel: data.riskLevel,
-    rationaleList: {
-      automatic: data.automaticRationale,
-      additional: data.additionalRationale,
-      },
-    dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
-  }
-}
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 
 type EditRiskAssessmentProps = {
   values: NullPartialRiskAssessmentFields
@@ -188,7 +101,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      values: mapRiskAssessmentModelToFieldValues(data),
+      values: RiskAssessmentMapper.toFieldValues(data),
     },
   }
 }

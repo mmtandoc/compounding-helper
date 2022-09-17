@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
-import { mapRiskAssessmentFieldsToCreateData } from "lib/RiskAssessmentUtil"
 import { riskAssessmentAll } from "types/models"
+import IngredientMapper from "lib/mappers/IngredientMapper"
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import { RiskAssessmentFields } from "types/fields"
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,11 +34,21 @@ export default async function handler(
         res.status(200).send({ success: true })
         return
       }
+
+      const fields: RiskAssessmentFields = req.body
+
       const result = await prisma.riskAssessment.create({
         include: {
           ingredients: true,
         },
-        data: mapRiskAssessmentFieldsToCreateData(req.body),
+        data: {
+          ingredients: {
+            createMany: {
+              data: fields.ingredients.map(IngredientMapper.toModel),
+            },
+          },
+          ...RiskAssessmentMapper.toModel(fields),
+        },
       })
       res.status(200).json({ success: true, content: result })
       return
