@@ -127,8 +127,9 @@ const autoRationalesFunctions: ((
 
     const allNonNiosh = values.ingredients.every(
       (ing) =>
-        chemicals.find((c) => c.id === ing?.chemicalId)?.nioshTable ?? 0 < 0,
+        (chemicals.find((c) => c.id === ing?.chemicalId)?.nioshTable ?? 0) < 0,
     )
+
     if (allNonNiosh) {
       return "Non-NIOSH ingredients."
     }
