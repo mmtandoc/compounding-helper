@@ -6,10 +6,8 @@ import RiskAssessmentEntry, {
 } from "components/risk-assessment/RiskAssessmentEntry"
 import { SubmitHandler, useForm } from "react-hook-form"
 import axios from "axios"
-import { IngredientFields, RiskAssessmentFields } from "types/fields"
+import { IngredientFields } from "types/fields"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
-import { PartialDeep } from "type-fest"
-import _ from "lodash"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { useRouter } from "next/router"
 import Link from "next/link"
@@ -43,77 +41,65 @@ const mapIngredientModelsToFieldValues = (
 
 const mapRiskAssessmentModelToFieldValues = (
   data: RiskAssessmentAll,
-): RiskAssessmentFields => {
-  const values: PartialDeep<RiskAssessmentFields> = {}
-
-  const map = new Map<
-    keyof RiskAssessmentAll,
-    string | { path: string; transform: (value: any) => any }
-  >([
-    ["averagePreparationAmountQuantity", "averagePreparationAmount.quantity"],
-    ["averagePreparationAmountUnit", "averagePreparationAmount.unit"],
-    ["sdsSkinExposureRisk", "exposureRisks.sds.skin"],
-    ["sdsEyeExposureRisk", "exposureRisks.sds.eye"],
-    ["sdsInhalationExposureRisk", "exposureRisks.sds.inhalation"],
-    ["sdsOralExposureRisk", "exposureRisks.sds.oral"],
-    ["sdsOtherExposureRisk", "exposureRisks.sds.other"],
-    ["sdsOtherExposureRiskDescription", "exposureRisks.sds.otherDescription"],
-    ["pmSkinExposureRisk", "exposureRisks.productMonograph.skin"],
-    ["pmEyeExposureRisk", "exposureRisks.productMonograph.eye"],
-    ["pmInhalationExposureRisk", "exposureRisks.productMonograph.inhalation"],
-    ["pmOralExposureRisk", "exposureRisks.productMonograph.oral"],
-    ["pmOtherExposureRisk", "exposureRisks.productMonograph.other"],
-    [
-      "pmOtherExposureRiskDescription",
-      "exposureRisks.productMonograph.otherDescription",
-    ],
-    ["ppeGlovesRequired", "ppe.gloves.required"],
-    ["ppeGlovesType", "ppe.gloves.type"],
-    ["ppeCoatRequired", "ppe.coat.required"],
-    ["ppeCoatType", "ppe.coat.type"],
-    ["ppeMaskRequired", "ppe.mask.required"],
-    ["ppeMaskType", "ppe.mask.type"],
-    ["ppeEyeProtectionRequired", "ppe.eyeProtection.required"],
-    ["ppeOther", "ppe.other"],
-    ["automaticRationale", "rationaleList.automatic"],
-    ["additionalRationale", "rationaleList.additional"],
-    [
-      "ingredients",
-      { path: "ingredients", transform: mapIngredientModelsToFieldValues },
-    ],
-    [
-      "dateAssessed",
-      {
-        path: "dateAssessed",
-        transform: (value: Date) => {
-          const offset = value.getTimezoneOffset()
-          value = new Date(value.getTime() - offset * 60 * 1000)
-          return value.toISOString().split("T")[0]
-        },
+): NullPartialRiskAssessmentFields => {
+  return {
+    compoundName: data.compoundName,
+    ingredients: mapIngredientModelsToFieldValues(data.ingredients),
+    complexity: data.complexity,
+    preparationFrequency: data.preparationFrequency,
+    isSmallQuantity: data.isSmallQuantity,
+    isPreparedOccasionally: data.isPreparedOccasionally,
+    averagePreparationAmount: {
+      quantity: data.averagePreparationAmountQuantity,
+      unit: data.averagePreparationAmountUnit,
+    },
+    isConcentrationHealthRisk: data.isConcentrationHealthRisk,
+    hasVerificationSteps: data.hasVerificationSteps,
+    haveAppropriateFacilities: data.haveAppropriateFacilities,
+    isWorkflowUninterrupted: data.isWorkflowUninterrupted,
+    workflowStandardsProcess: data.workflowStandardsProcess,
+    microbialContaminationRisk: data.microbialContaminationRisk,
+    crossContaminationRisk: data.crossContaminationRisk,
+    requireSpecialEducation: data.requireSpecialEducation,
+    requireVentilation: data.requireVentilation,
+    exposureRisks: {
+      sds: {
+        skin: data.sdsSkinExposureRisk,
+        eye: data.sdsEyeExposureRisk,
+        inhalation: data.sdsInhalationExposureRisk,
+        oral: data.sdsOralExposureRisk,
+        other: data.sdsOtherExposureRisk,
+        otherDescription: data.sdsOtherExposureRiskDescription,
       },
-    ],
-  ])
-  for (const keyString in data) {
-    const key = keyString as keyof RiskAssessmentAll
-    const mappedPath = map.get(key)
-    if (!mappedPath) {
-      _.set(values, keyString, data[key] ?? null)
-      continue
-    }
-
-    if (typeof mappedPath === "string") {
-      _.set(values, mappedPath, data[key] ?? null)
-      continue
-    }
-
-    _.set(values, mappedPath.path, mappedPath.transform(data[key]))
+      productMonograph: {
+        skin: data.pmSkinExposureRisk,
+        eye: data.pmEyeExposureRisk,
+        inhalation: data.pmInhalationExposureRisk,
+        oral: data.pmOralExposureRisk,
+        other: data.pmOtherExposureRisk,
+        otherDescription: data.pmOtherExposureRiskDescription,
+      },
+    },
+    ppe: {
+      gloves: { required: data.ppeGlovesRequired, type: data.ppeGlovesType },
+      coat: { required: data.ppeCoatRequired, type: data.ppeCoatType },
+      mask: { required: data.ppeMaskRequired, type: data.ppeMaskType },
+      eyeProtection: { required: data.ppeEyeProtectionRequired },
+      other: data.ppeOther,
+        },
+    requireEyeWashStation: data.requireEyeWashStation,
+    requireSafetyShower: data.requireSafetyShower,
+    riskLevel: data.riskLevel,
+    rationaleList: {
+      automatic: data.automaticRationale,
+      additional: data.additionalRationale,
+      },
+    dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
   }
-
-  return values as RiskAssessmentFields
 }
 
 type EditRiskAssessmentProps = {
-  values?: RiskAssessmentFields
+  values: NullPartialRiskAssessmentFields
 }
 
 const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
