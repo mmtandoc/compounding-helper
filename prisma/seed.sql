@@ -24,7 +24,7 @@ BEGIN;
 
 SET SESSION AUTHORIZATION DEFAULT;
 
-ALTER TABLE public.chemicals DISABLE TRIGGER ALL;
+-- ALTER TABLE public.chemicals DISABLE TRIGGER ALL;
 
 INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (1, 'tetracycline hydrochloride', '64-75-5', '{tetracycline,"tetracycline HCl"}', -1, NULL, '2022-08-14 14:11:31.531');
 INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (4, 'clindamycin hydrochloride', '21462-39-5', '{clindamycin,"clindamycin HCl"}', -1, NULL, '2022-08-14 14:11:31.531');
@@ -35,13 +35,13 @@ INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "ni
 INSERT INTO public.chemicals (id, name, "casNumber", synonyms, "nioshTable", "nioshRevisionDate", "updatedAt") VALUES (2, 'acetylsalicylic acid', '50-78-2', '{Aspirin,ASA}', -1, NULL, '2022-09-05 19:53:38.997');
 
 
-ALTER TABLE public.chemicals ENABLE TRIGGER ALL;
+-- ALTER TABLE public.chemicals ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: hazard_classes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.hazard_classes DISABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_classes DISABLE TRIGGER ALL;
 
 INSERT INTO public.hazard_classes (id, name, description) VALUES (1, 'Acute toxicity - Oral', 'Serious adverse health effects (i.e., lethality) occuring after a single or short-term oral exposure to a substance or mixture.');
 INSERT INTO public.hazard_classes (id, name, description) VALUES (2, 'Acute toxicity - Dermal', 'Serious adverse health effects (i.e., lethality) occuring after a single or short-term dermal exposure to a substance or mixture.');
@@ -58,13 +58,13 @@ INSERT INTO public.hazard_classes (id, name, description) VALUES (12, 'Specific 
 INSERT INTO public.hazard_classes (id, name, description) VALUES (13, 'Aspiration hazard', 'Severe acute effects such as chemical pneumonia, pulmonary injury or death occurring after aspiration of a subtance or mixture.');
 
 
-ALTER TABLE public.hazard_classes ENABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_classes ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: hazard_categories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.hazard_categories DISABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_categories DISABLE TRIGGER ALL;
 
 INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level, description) VALUES (1, 3, NULL, '1', 'Fatal if inhaled.');
 INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level, description) VALUES (2, 3, NULL, '2', 'Fatal if inhaled.');
@@ -119,25 +119,25 @@ INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level,
 INSERT INTO public.hazard_categories (id, "hazardClassId", "parentLevel", level, description) VALUES (51, 13, NULL, '2', 'Substance which causes concern owing to the presumtion that they cause human aspiration toxicity hazard.');
 
 
-ALTER TABLE public.hazard_categories ENABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_categories ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: vendors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.vendors DISABLE TRIGGER ALL;
+-- ALTER TABLE public.vendors DISABLE TRIGGER ALL;
 
 INSERT INTO public.vendors (id, name) VALUES (1, 'Medisca');
 INSERT INTO public.vendors (id, name) VALUES (2, 'Xenex');
 
 
-ALTER TABLE public.vendors ENABLE TRIGGER ALL;
+-- ALTER TABLE public.vendors ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.products DISABLE TRIGGER ALL;
+-- ALTER TABLE public.products DISABLE TRIGGER ALL;
 
 INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (1, 'TETRACYCLINE HYDROCHLORIDE, USP', 1, 1, '2022-08-14 14:11:31.531');
 INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (2, 'ACETYL SALICYLIC ACID, USP', 2, 1, '2022-08-14 14:11:31.531');
@@ -149,13 +149,13 @@ INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VA
 INSERT INTO public.products (id, name, "chemicalId", "vendorId", "updatedAt") VALUES (8, 'CAMPHOR, USP (Synthetic Crystals)', 7, 1, '2022-09-01 18:45:58.955');
 
 
-ALTER TABLE public.products ENABLE TRIGGER ALL;
+-- ALTER TABLE public.products ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: safety_data_sheets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.safety_data_sheets DISABLE TRIGGER ALL;
+-- ALTER TABLE public.safety_data_sheets DISABLE TRIGGER ALL;
 
 INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (1, 1, '2021-04-01 00:00:00', 2, true, 'medisca_0053_04-2021.pdf', '2022-08-14 14:11:31.531');
 INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (2, 2, '2021-04-01 00:00:00', 2, true, 'medisca_0955_04-2021.pdf', '2022-08-14 14:11:31.531');
@@ -168,13 +168,13 @@ INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHea
 INSERT INTO public.safety_data_sheets (id, "productId", "revisionDate", "hmisHealthHazard", "requireVentilation", filename, "updatedAt") VALUES (9, 8, '2022-06-01 00:00:00', 2, true, 'medisca_0386_06-2022.pdf', '2022-09-01 18:51:21.696');
 
 
-ALTER TABLE public.safety_data_sheets ENABLE TRIGGER ALL;
+-- ALTER TABLE public.safety_data_sheets ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: hazard_category_to_sds; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.hazard_category_to_sds DISABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_category_to_sds DISABLE TRIGGER ALL;
 
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (1, 1, 17, NULL);
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (2, 1, 25, NULL);
@@ -210,13 +210,13 @@ INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "add
 INSERT INTO public.hazard_category_to_sds (id, "sdsId", "hazardCategoryId", "additionalInfo") VALUES (27, 7, 49, 'Endocrine system');
 
 
-ALTER TABLE public.hazard_category_to_sds ENABLE TRIGGER ALL;
+-- ALTER TABLE public.hazard_category_to_sds ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: risk_assessments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.risk_assessments DISABLE TRIGGER ALL;
+-- ALTER TABLE public.risk_assessments DISABLE TRIGGER ALL;
 
 INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparationFrequency", "isPreparedOccasionally", "isSmallQuantity", "averagePreparationAmountQuantity", "averagePreparationAmountUnit", "isConcentrationHealthRisk", "requireSpecialEducation", "hasVerificationSteps", "haveAppropriateFacilities", "requireVentilation", "isWorkflowUninterrupted", "workflowStandardsProcess", "microbialContaminationRisk", "crossContaminationRisk", "sdsSkinExposureRisk", "sdsEyeExposureRisk", "sdsInhalationExposureRisk", "sdsOralExposureRisk", "sdsOtherExposureRisk", "sdsOtherExposureRiskDescription", "pmSkinExposureRisk", "pmEyeExposureRisk", "pmInhalationExposureRisk", "pmOralExposureRisk", "pmOtherExposureRisk", "pmOtherExposureRiskDescription", "ppeGlovesRequired", "ppeGlovesType", "ppeCoatRequired", "ppeCoatType", "ppeMaskRequired", "ppeMaskType", "ppeEyeProtectionRequired", "ppeOther", "requireEyeWashStation", "requireSafetyShower", "riskLevel", "automaticRationale", "additionalRationale", "dateAssessed", "updatedAt") VALUES (1, 'test compound', 'Moderate', 'monthly', true, false, 12, 'g', false, false, false, true, false, true, NULL, false, false, true, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 'regular', false, NULL, false, NULL, false, '', false, false, 'A', '{"Do not have appropriate facilities.","Compounding complexity is moderate.","Ingredient # is a cream."}', '{"Additional 1","Additional 2"}', '2022-08-17', '2022-08-17 22:58:39.125');
 INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparationFrequency", "isPreparedOccasionally", "isSmallQuantity", "averagePreparationAmountQuantity", "averagePreparationAmountUnit", "isConcentrationHealthRisk", "requireSpecialEducation", "hasVerificationSteps", "haveAppropriateFacilities", "requireVentilation", "isWorkflowUninterrupted", "workflowStandardsProcess", "microbialContaminationRisk", "crossContaminationRisk", "sdsSkinExposureRisk", "sdsEyeExposureRisk", "sdsInhalationExposureRisk", "sdsOralExposureRisk", "sdsOtherExposureRisk", "sdsOtherExposureRiskDescription", "pmSkinExposureRisk", "pmEyeExposureRisk", "pmInhalationExposureRisk", "pmOralExposureRisk", "pmOtherExposureRisk", "pmOtherExposureRiskDescription", "ppeGlovesRequired", "ppeGlovesType", "ppeCoatRequired", "ppeCoatType", "ppeMaskRequired", "ppeMaskType", "ppeEyeProtectionRequired", "ppeOther", "requireEyeWashStation", "requireSafetyShower", "riskLevel", "automaticRationale", "additionalRationale", "dateAssessed", "updatedAt") VALUES (2, 'TEST COMPOUND', 'Complex', 'monthly', true, true, 5, 'g', false, false, false, true, true, false, 'TEST WORKFLOW INTERRUPTION MITIGATION STANDARDS DESCRIPTION', false, false, true, true, true, false, false, NULL, true, true, false, false, false, NULL, true, 'regular', true, 'designated', true, 'Disposable', true, '', false, false, 'A', '{"(5 g)","Compounding complexity is complex.","Ingredient # is a cream."}', '{"TEST ADDITIONAL RATIONALE 1","TEST ADDITIONAL RATIONALE 2"}', '2022-08-21', '2022-08-21 18:25:01.504');
@@ -228,13 +228,13 @@ INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparatio
 INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparationFrequency", "isPreparedOccasionally", "isSmallQuantity", "averagePreparationAmountQuantity", "averagePreparationAmountUnit", "isConcentrationHealthRisk", "requireSpecialEducation", "hasVerificationSteps", "haveAppropriateFacilities", "requireVentilation", "isWorkflowUninterrupted", "workflowStandardsProcess", "microbialContaminationRisk", "crossContaminationRisk", "sdsSkinExposureRisk", "sdsEyeExposureRisk", "sdsInhalationExposureRisk", "sdsOralExposureRisk", "sdsOtherExposureRisk", "sdsOtherExposureRiskDescription", "pmSkinExposureRisk", "pmEyeExposureRisk", "pmInhalationExposureRisk", "pmOralExposureRisk", "pmOtherExposureRisk", "pmOtherExposureRiskDescription", "ppeGlovesRequired", "ppeGlovesType", "ppeCoatRequired", "ppeCoatType", "ppeMaskRequired", "ppeMaskType", "ppeEyeProtectionRequired", "ppeOther", "requireEyeWashStation", "requireSafetyShower", "riskLevel", "automaticRationale", "additionalRationale", "dateAssessed", "updatedAt") VALUES (8, '1% CLINDAMYCIN IN GLAXAL BASE CREAM', 'Simple', 'monthly', true, true, 100, 'g', false, false, false, true, false, true, NULL, false, false, true, true, false, false, false, NULL, false, false, false, false, false, NULL, true, 'regular', true, 'designated', false, NULL, true, '', false, false, 'A', '{"Low frequency.","Small quantity is being used (100 g)","Low concentration.","Have appropriate facilities.","Compounding complexity is simple.","Safety risks to compounding staff minimized by PPE: Eye protection, Coat (designated), Gloves (regular)"}', '{"Ventilation  not required due to above mitagating measures"}', '2022-09-10', '2022-09-12 00:29:55.257');
 
 
-ALTER TABLE public.risk_assessments ENABLE TRIGGER ALL;
+-- ALTER TABLE public.risk_assessments ENABLE TRIGGER ALL;
 
 --
 -- Data for Name: ingredients; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-ALTER TABLE public.ingredients DISABLE TRIGGER ALL;
+-- ALTER TABLE public.ingredients DISABLE TRIGGER ALL;
 
 INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (1, 1, 2, 'cream', NULL, NULL, NULL, NULL);
 INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (2, 2, 1, 'cream', 'TEST COMMERCIAL PRODUCT', 123456, true, 'TEST PRODUCT MONOGRAPH CONCERNS');
@@ -251,70 +251,69 @@ INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "ph
 INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (28, 11, 7, 'powder', NULL, NULL, NULL, NULL);
 INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (29, 11, NULL, 'cream', 'CLOTRIMADERM 2% CREAM or CANESTEN 2% CREAM', NULL, false, NULL);
 
-
-ALTER TABLE public.ingredients ENABLE TRIGGER ALL;
+-- ALTER TABLE public.ingredients ENABLE TRIGGER ALL;
 
 --
 -- Name: chemicals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chemicals_id_seq', 7, true);
+SELECT pg_catalog.setval('public.chemicals_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.chemicals;
 
 
 --
 -- Name: hazard_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.hazard_categories_id_seq', 51, true);
+SELECT pg_catalog.setval('public.hazard_categories_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.hazard_categories;
 
 
 --
 -- Name: hazard_category_to_sds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.hazard_category_to_sds_id_seq', 32, true);
+SELECT pg_catalog.setval('public.hazard_category_to_sds_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.hazard_category_to_sds;
 
 
 --
 -- Name: hazard_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.hazard_classes_id_seq', 13, true);
+SELECT pg_catalog.setval('public.hazard_classes_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.hazard_classes;
 
 
 --
 -- Name: ingredients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ingredients_id_seq', 29, true);
+SELECT pg_catalog.setval('public.ingredients_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.ingredients;
 
 
 --
 -- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.products_id_seq', 8, true);
+SELECT pg_catalog.setval('public.products_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.products;
 
 
 --
 -- Name: risk_assessments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.risk_assessments_id_seq', 11, true);
+SELECT pg_catalog.setval('public.risk_assessments_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.risk_assessments;
 
 
 --
 -- Name: safety_data_sheets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.safety_data_sheets_id_seq', 9, true);
+SELECT pg_catalog.setval('public.safety_data_sheets_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.safety_data_sheets;
 
 
 --
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendors_id_seq', 2, true);
+SELECT pg_catalog.setval('public.vendors_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.vendors;
 
 
 --
