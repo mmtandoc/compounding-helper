@@ -5,9 +5,10 @@ import { GetServerSideProps, NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { RiskAssessmentAll } from "types/models"
+import Modal from "components/common/Modal"
 
 const PrintableRiskAssessmentDetails = React.forwardRef(
   function PrintableRiskAssessmentDetails(
@@ -30,6 +31,8 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
   props: RiskAssessmentProps,
 ) => {
   const { data } = props
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const printableRef = useRef(null)
 
   const router = useRouter()
@@ -72,11 +75,34 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
             <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
               <button type="button">Edit</button>
             </Link>
-            <button type="button" onClick={handleDelete}>
+            <button type="button" onClick={() => setIsModalOpen(true)}>
               Delete
             </button>
           </div>
         </div>
+        <Modal isOpen={isModalOpen}>
+          <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
+            Delete risk assessment?
+          </Modal.Header>
+          <Modal.Body>
+            <p>Are you sure you want to delete this risk assessment?</p>
+            <p>This is permanent and cannot be undone.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <button
+              type="button"
+              onClick={() => {
+                handleDelete()
+                setIsModalOpen(false)
+              }}
+            >
+              Confirm
+            </button>
+            <button type="button" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </button>
+          </Modal.Footer>
+        </Modal>
       </div>
       <style jsx>{`
         .page {
@@ -149,7 +175,9 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<
+  RiskAssessmentProps
+> = async (context) => {
   const riskAssessmentId = parseInt(context.query.id as string)
 
   if (isNaN(riskAssessmentId)) {
