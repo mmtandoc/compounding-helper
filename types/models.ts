@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client"
 
-
 const sdsWithHazards = Prisma.validator<Prisma.SDSArgs>()({
   include: {
     healthHazards: {
@@ -65,29 +64,29 @@ const chemicalAll = Prisma.validator<Prisma.ChemicalArgs>()({
 export type ChemicalAll = Prisma.ChemicalGetPayload<typeof chemicalAll>
 
 const ingredientAll = Prisma.validator<Prisma.IngredientArgs>()({
+  include: {
+    safetyDataSheet: {
       include: {
-        safetyDataSheet: {
+        product: {
           include: {
-            product: {
+            chemical: true,
+            vendor: true,
+          },
+        },
+        healthHazards: {
+          include: {
+            hazardCategory: {
               include: {
-                chemical: true,
-                vendor: true,
-              },
-            },
-            healthHazards: {
-              include: {
-                hazardCategory: {
-                  include: {
-                    hazardClass: true,
-                    parentCategory: true,
-                    subcategories: true,
-                  },
-                },
+                hazardClass: true,
+                parentCategory: true,
+                subcategories: true,
               },
             },
           },
         },
       },
+    },
+  },
 })
 
 export type IngredientAll = Prisma.IngredientGetPayload<typeof ingredientAll>

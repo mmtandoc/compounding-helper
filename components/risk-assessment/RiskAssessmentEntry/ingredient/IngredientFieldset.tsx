@@ -74,9 +74,11 @@ const IngredientFieldset = ({
   if (chemicalError) {
     console.log(chemicalError)
   }
+
   if (sdsesError) {
     console.log(sdsesError)
   }
+
   if (vendorsError) {
     console.log(vendorsError)
   }

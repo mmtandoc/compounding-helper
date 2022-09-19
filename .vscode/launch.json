@@ -1,24 +1,51 @@
 {
-    "configurations": [
-        {
-            "type": "node",
-            "name": "vscode-jest-tests.v2",
-            "request": "launch",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "disableOptimisticBPs": true,
-            "cwd": "${workspaceFolder}",
-            "runtimeExecutable": "npm",
-            "args": [
-                "test",
-                "--",
-                "--runInBand",
-                "--watchAll=false",
-                "--testNamePattern",
-                "${jest.testNamePattern}",
-                "--runTestsByPath",
-                "${jest.testFile}"
-            ]
-        }
-    ]
+  "configurations": [
+    {
+      "type": "node",
+      "name": "vscode-jest-tests.v2",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "args": [
+        "test",
+        "--",
+        "--runInBand",
+        "--watchAll=false",
+        "--testNamePattern",
+        "${jest.testNamePattern}",
+        "--runTestsByPath",
+        "${jest.testFile}"
+      ]
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Next: Firefox",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "reAttach": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Next: Node",
+      "outputCapture": "std",
+      "program": "./node_modules/next/dist/bin/next",
+      "args": [
+        "dev"
+      ],
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next: Full",
+      "configurations": [
+        "Next: Node",
+        "Next: Firefox"
+      ]
+    }
+  ]
 }

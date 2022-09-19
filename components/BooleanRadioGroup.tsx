@@ -114,8 +114,8 @@ export const BooleanRadioGroup = ({
   return (
     <div className={`boolean-radio-group ${direction} ${className ?? ""}`}>
       {options.map((option, index) => (
-        <div key={index}>
           <label
+          key={index}
             className={`${disabled ? "disabled" : ""} ${
               readOnly ? "readOnly" : ""
             }`}
@@ -133,12 +133,15 @@ export const BooleanRadioGroup = ({
             />
             <span>{option.label}</span>
           </label>
-        </div>
       ))}
       <style jsx>{`
         .boolean-radio-group {
           display: flex;
           flex-direction: ${direction === "col" ? "column" : direction};
+        }
+
+        .boolean-radio-group > :global(label) {
+          display: block;
         }
       `}</style>
     </div>

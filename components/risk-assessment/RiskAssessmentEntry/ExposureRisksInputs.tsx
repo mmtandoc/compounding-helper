@@ -39,7 +39,6 @@ const ExposureRisksInputs = ({
       string,
       SdsWithRelations["healthHazards"]
     >()
-    console.log({ sdses })
     for (const sds of sdses) {
       const hazards = sds.healthHazards.filter((h) =>
         classNames.includes(h.hazardCategory.hazardClass.name),
@@ -95,12 +94,12 @@ const ExposureRisksInputs = ({
         </div>
         <div className="health-hazards">
           {sdses?.map((sds, i) => (
-              <ul key={i}>
-                <span className="label">{sds.product.name}</span>
-                {sds.healthHazards.map((h, i) => (
-                  <li key={i}>{hazardToString(h)}</li>
-                ))}
-              </ul>
+            <ul key={i}>
+              <span className="label">{sds.product.name}</span>
+              {sds.healthHazards.map((h, i) => (
+                <li key={i}>{hazardToString(h)}</li>
+              ))}
+            </ul>
           ))}
           <style jsx global>{`
             .health-hazards {
@@ -115,12 +114,8 @@ const ExposureRisksInputs = ({
               font-size: 1rem;
             }
 
-            .health-hazards ul:first-child {
-              margin-top: 0;
-            }
-
-            .health-hazards ul:last-child {
-              margin-bottom: 0;
+            .health-hazards ul {
+              margin-block: 0;
             }
 
             .health-hazards span.label {
