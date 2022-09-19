@@ -200,7 +200,6 @@ const IngredientFieldset = ({
             </div>
           </div>
           <div className="row">
-            <div>
               <div className="form-group">
                 <label htmlFor={`i${index}-is-commercial-product`}>
                   Is a commercial product?
@@ -212,28 +211,9 @@ const IngredientFieldset = ({
                   className="is-commercial-product"
                 />
               </div>
-              <div
-                className={`form-group ${!isCommercialProduct ? "hidden" : ""}`}
-              >
-                <label
-                  htmlFor={`i${index}-has-product-monograph-concerns`}
-                  className={!isCommercialProduct ? "disabled" : ""}
-                >
-                  Does the product monograph have any concerns?
-                </label>
-                <RHFBooleanRadioGroup
-                  id={`i${index}-has-product-monograph-concerns`}
-                  name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
-                  control={control}
-                  disabled={!isCommercialProduct}
-                  className="has-product-monograph-concerns"
-                  rules={{
-                    required: isCommercialProduct,
-                  }}
-                />
               </div>
-            </div>
-            <div className={`col ${!isCommercialProduct ? "hidden" : ""}`}>
+          {isCommercialProduct && (
+            <div className="row">
               <div className="form-group">
                 <label
                   htmlFor={`i${index}-commercial-product`}
@@ -259,9 +239,7 @@ const IngredientFieldset = ({
                 />
               </div>
               <div className="form-group">
-                <label
-                  className={`col ${!isCommercialProduct ? "disabled" : ""}`}
-                >
+                <label className={`${!isCommercialProduct ? "disabled" : ""}`}>
                   <span>Product DIN:</span>
                   <div className="row">
                     <input
@@ -300,10 +278,32 @@ const IngredientFieldset = ({
                 </label>
               </div>
             </div>
+          )}
+
+          {isCommercialProduct && (
+            <div className="row">
+              <div className="form-group">
+                <label
+                  htmlFor={`i${index}-has-product-monograph-concerns`}
+                  className={!isCommercialProduct ? "disabled" : ""}
+                >
+                  Does the product monograph have any concerns?
+                </label>
+                <RHFBooleanRadioGroup
+                  id={`i${index}-has-product-monograph-concerns`}
+                  name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
+                  control={control}
+                  disabled={!isCommercialProduct}
+                  className="has-product-monograph-concerns"
+                  rules={{
+                    required: isCommercialProduct,
+                  }}
+                />
           </div>
-          <div
-            className={`row ${!hasProductMonographConcerns ? "hidden" : ""}`}
-          >
+            </div>
+          )}
+          {hasProductMonographConcerns && (
+            <div className="row">
             <div
               className={`form-group ${
                 !hasProductMonographConcerns ? "hidden" : ""
@@ -337,6 +337,7 @@ const IngredientFieldset = ({
               />
             </div>
           </div>
+          )}
         </div>
         <div className="safety-info">
           <fieldset>
