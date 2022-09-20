@@ -362,11 +362,14 @@ const IngredientFieldset = ({
                 <span className="label">SDS health hazards:</span>
                 <ul className="health-hazard-list">
                   {selectedSds.healthHazards.map((h, i) => (
-                    <li key={i}>{`${
-                      h.hazardCategory.hazardClass.name
-                    } - Category ${h.hazardCategory.level}${
-                      !h.additionalInfo ? "" : ` (${h.additionalInfo})`
-                    }`}</li>
+                    <li key={i}>
+                      {h.hazardCategory.hazardClass.name} - Category{" "}
+                      {h.hazardCategory.level}
+                      {h.hazardCategory.shortDescription
+                        ? ` - ${h.hazardCategory.shortDescription}`
+                        : ""}
+                      {!h.additionalInfo ? "" : ` (${h.additionalInfo})`}
+                    </li>
                   ))}
                 </ul>
               </div>

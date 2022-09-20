@@ -76,6 +76,7 @@ model HazardCategory {
   parentLevel      String?
   subcategories    HazardCategory[]      @relation("hazard_subcategories")
   level            String
+  shortDescription String?
   description      String
   safetyDataSheets HazardCategoryToSDS[]
 
