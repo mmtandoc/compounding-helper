@@ -203,18 +203,18 @@ const IngredientFieldset = ({
             </div>
           </div>
           <div className="row">
-              <div className="form-group">
-                <label htmlFor={`i${index}-is-commercial-product`}>
-                  Is a commercial product?
-                </label>
-                <RHFBooleanRadioGroup
-                  id={`i${index}-is-commercial-product`}
-                  name={`ingredients.${index}.commercialProduct.isCommercialProduct`}
-                  control={control}
-                  className="is-commercial-product"
-                />
-              </div>
-              </div>
+            <div className="form-group">
+              <label htmlFor={`i${index}-is-commercial-product`}>
+                Is a commercial product?
+              </label>
+              <RHFBooleanRadioGroup
+                id={`i${index}-is-commercial-product`}
+                name={`ingredients.${index}.commercialProduct.isCommercialProduct`}
+                control={control}
+                className="is-commercial-product"
+              />
+            </div>
+          </div>
           {isCommercialProduct && (
             <div className="row">
               <div className="form-group">
@@ -267,12 +267,12 @@ const IngredientFieldset = ({
                         type="checkbox"
                         {...register(
                           `ingredients.${index}.commercialProduct.hasNoDin`,
-                              {
-                                disabled: !isCommercialProduct,
-                                deps: [
-                                  `ingredients.${index}.commercialProduct.din`,
-                                ],
-                              },
+                          {
+                            disabled: !isCommercialProduct,
+                            deps: [
+                              `ingredients.${index}.commercialProduct.din`,
+                            ],
+                          },
                         )}
                       />
                       <span>No DIN</span>
@@ -302,44 +302,44 @@ const IngredientFieldset = ({
                     required: isCommercialProduct,
                   }}
                 />
-          </div>
+              </div>
             </div>
           )}
           {hasProductMonographConcerns && (
             <div className="row">
-            <div
-              className={`form-group ${
-                !hasProductMonographConcerns ? "hidden" : ""
-              }`}
-              style={{ width: "100%" }}
-            >
-              <label
-                htmlFor={`i${index}-commercial-product-concerns-desc`}
-                className={!hasProductMonographConcerns ? "disabled" : ""}
+              <div
+                className={`form-group ${
+                  !hasProductMonographConcerns ? "hidden" : ""
+                }`}
+                style={{ width: "100%" }}
               >
-                Please describe health concerns on the product monograph:
-              </label>
-              <textarea
-                {...register(
-                  `ingredients.${index}.commercialProduct.concernsDescription`,
-                  {
-                    required: !!hasProductMonographConcerns,
-                    disabled: !hasProductMonographConcerns,
-                    setValueAs: (value) => {
-                      return value === "" ? undefined : value
-                    },
-                    /* deps: [
+                <label
+                  htmlFor={`i${index}-commercial-product-concerns-desc`}
+                  className={!hasProductMonographConcerns ? "disabled" : ""}
+                >
+                  Please describe health concerns on the product monograph:
+                </label>
+                <textarea
+                  {...register(
+                    `ingredients.${index}.commercialProduct.concernsDescription`,
+                    {
+                      required: !!hasProductMonographConcerns,
+                      disabled: !hasProductMonographConcerns,
+                      setValueAs: (value) => {
+                        return value === "" ? undefined : value
+                      },
+                      /* deps: [
                       `ingredients.${index}.isCommercialProduct`,
                       `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
                     ], */
-                  },
-                )}
-                id={`i${index}-commercial-product-concerns-desc`}
-                cols={30}
-                readOnly={!hasProductMonographConcerns}
-              />
+                    },
+                  )}
+                  id={`i${index}-commercial-product-concerns-desc`}
+                  cols={30}
+                  readOnly={!hasProductMonographConcerns}
+                />
+              </div>
             </div>
-          </div>
           )}
         </div>
         <div className="safety-info">
