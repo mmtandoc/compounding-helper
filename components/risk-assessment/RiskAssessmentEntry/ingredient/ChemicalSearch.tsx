@@ -46,7 +46,7 @@ const ChemicalSearch = ({ id, control, name, rules, size }: Props) => {
     return axios
       .get<Chemical[]>(`/api/chemicals?query=${query}`)
       .then((response) => {
-        return response.data
+        return response.data.sort((a, b) => a.name.localeCompare(b.name))
       })
       .catch((error) => {
         //TODO: Handle error
