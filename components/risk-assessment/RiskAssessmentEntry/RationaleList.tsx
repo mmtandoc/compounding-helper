@@ -1,6 +1,6 @@
 import DotJotList from "components/common/forms/DotJotList"
 import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
-import { useIngredientChemicals } from "components/risk-assessment/RiskAssessmentEntry/helpers"
+import _ from "lodash"
 import React, { useEffect } from "react"
 import {
   FieldError,
@@ -11,7 +11,9 @@ import {
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form"
-import { ChemicalAll } from "types/models"
+import useSWR from "swr"
+import { JsonError } from "types/common"
+import { SdsWithRelations } from "types/models"
 
 interface RationaleListProps
   extends Omit<UseControllerProps<NullPartialRiskAssessmentFields>, "name"> {
@@ -38,22 +40,29 @@ const RationaleList = ({
   const ingredients = watch("ingredients")
 
   //TODO: Handle error
-  const { data: chemicalsData, error: chemicalError } =
-    useIngredientChemicals(ingredients)
+  const sdsUrls =
+    ingredients?.map((ingredient) =>
+      ingredient?.chemicalId ? `/api/chemicals/${ingredient.chemicalId}` : null,
+    ) ?? null
 
-  if (chemicalError) {
-    console.log(chemicalError)
+  const { data: safetyDatasheets, error: sdsesError } = useSWR<
+    SdsWithRelations[],
+    JsonError
+  >([sdsUrls])
+
+  if (sdsesError) {
+    console.log(sdsesError)
   }
 
   //Autoupdate automatic rationale list
   useEffect(() => {
-    if (chemicalsData === undefined) {
+    if (safetyDatasheets === undefined) {
       return
     }
 
     register("rationaleList")
     setValue("rationaleList", {
-      automatic: determineAutoRationale(allValues, chemicalsData),
+      automatic: determineAutoRationale(allValues, safetyDatasheets),
       additional: getValues("rationaleList.additional"),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +72,7 @@ const RationaleList = ({
     register,
     setValue,
     getValues,
-    chemicalsData,
+    safetyDatasheets,
   ])
 
   const {
@@ -77,7 +86,7 @@ const RationaleList = ({
   })
 
   //TODO: Improve loading handling
-  if (!chemicalsData) {
+  if (!safetyDatasheets) {
     return <div>Loading...</div>
   }
 
@@ -118,16 +127,20 @@ const RationaleList = ({
 
 const autoRationalesFunctions: ((
   values: NullPartialRiskAssessmentFields,
-  chemicals: ChemicalAll[],
+  sdses: SdsWithRelations[],
 ) => string | null)[] = [
-  (values, chemicals) => {
-    if (!chemicals || !values.ingredients) {
+  (values, sdses) => {
+    if (!sdses || !values.ingredients) {
       return null
     }
 
     const allNonNiosh = values.ingredients.every(
       (ing) =>
-        (chemicals.find((c) => c.id === ing?.chemicalId)?.nioshTable ?? 0) < 0,
+        _.get(
+          sdses.find((sds) => sds.id === ing?.sdsId),
+          "product.chemical.nioshTable",
+          0,
+        ) < 0,
     )
 
     if (allNonNiosh) {
@@ -156,8 +169,8 @@ const autoRationalesFunctions: ((
     values.complexity
       ? `Compounding complexity is ${values.complexity}.`
       : null,
-  (values, chemicals) => {
-    if (!chemicals || !values.ingredients) {
+  (values) => {
+    if (!values.ingredients) {
       return null
     }
 
@@ -229,7 +242,7 @@ const autoRationalesFunctions: ((
 
 const determineAutoRationale = (
   fields: NullPartialRiskAssessmentFields,
-  chemicals: ChemicalAll[],
+  safetyDatasheets: SdsWithRelations[],
   hidden: number[] = [],
 ) => {
   const items = []
@@ -240,7 +253,7 @@ const determineAutoRationale = (
       continue
     }
 
-    const result = autoRationalesFunction(fields, chemicals)
+    const result = autoRationalesFunction(fields, safetyDatasheets)
     if (result) {
       items.push(result)
     }

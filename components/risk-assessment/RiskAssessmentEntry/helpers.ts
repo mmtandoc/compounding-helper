@@ -144,24 +144,3 @@ export const useClearDisabledField = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [register, setValue, clearConditional, JSON.stringify(names)])
 }
-
-export const useIngredientChemicals = (
-  ingredients: NullPartialRiskAssessmentFields["ingredients"],
-): {
-  data?: ChemicalAll[]
-  error?: JsonError
-} => {
-  const { data, error } = useSWR<ChemicalAll[], JsonError>(
-    !ingredients || ingredients.length === 0
-      ? null
-      : [
-          ingredients?.map((ingredient) =>
-            ingredient?.chemicalId
-              ? `/api/chemicals/${ingredient.chemicalId}`
-              : null,
-          ),
-        ],
-  )
-
-  return { data, error }
-}
