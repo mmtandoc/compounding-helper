@@ -156,6 +156,11 @@ const IngredientFieldset = ({
                   name={`ingredients.${index}.chemicalId`}
                   control={control}
                   rules={{ required: !isCommercialProduct }}
+                  onItemChange={() => {
+                    console.log("onItemChange")
+                    register(`ingredients.${index}.sdsId`)
+                    setValue(`ingredients.${index}.sdsId`, null)
+                  }}
                   size={30}
                 />
 

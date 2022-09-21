@@ -20,7 +20,14 @@ const getItemValue = (item?: Chemical | null): string => item?.name ?? ""
 
 const AsyncAutocomplete = withAsync<Chemical>(AutocompleteInput)
 
-const ChemicalSearch = ({ id, control, name, rules, size }: Props) => {
+const ChemicalSearch = ({
+  id,
+  control,
+  name,
+  rules,
+  size,
+  onItemChange,
+}: Props) => {
   const {
     field: { onChange, onBlur, value, ref },
   } = useController({
@@ -75,7 +82,10 @@ const ChemicalSearch = ({ id, control, name, rules, size }: Props) => {
       })
   }
 
-  const handleItemChange = (item: Chemical) => onChange(item?.id)
+  const handleItemChange = (item: Chemical) => {
+    onChange(item?.id)
+    onItemChange?.(item)
+  }
 
   return (
     <AsyncAutocomplete
