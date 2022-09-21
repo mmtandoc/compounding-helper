@@ -1,13 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
-import { riskAssessmentAll } from "types/models"
+import {
+  RiskAssessmentAll,
+  riskAssessmentAll as includeAllNested,
+} from "types/models"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { RiskAssessmentFields } from "types/fields"
+import { ApiBody } from "types/common"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>,
 ) {
   const { query, method } = req
 
@@ -30,17 +34,10 @@ export default async function handler(
       return
     }
     case "POST": {
-      if (query.debug !== undefined) {
-        res.status(200).send({ success: true })
-        return
-      }
-
       const fields: RiskAssessmentFields = req.body
 
       const result = await prisma.riskAssessment.create({
-        include: {
-          ingredients: true,
-        },
+        ...includeAllNested,
         data: {
           ingredients: {
             createMany: {
@@ -50,7 +47,7 @@ export default async function handler(
           ...RiskAssessmentMapper.toModel(fields),
         },
       })
-      res.status(200).json({ success: true, content: result })
+      res.status(200).json(result)
       return
     }
     default:
@@ -65,6 +62,6 @@ export default async function handler(
 export const getRiskAssessments = async () => {
   return await prisma.riskAssessment.findMany({
     orderBy: { id: "asc" },
-    ...riskAssessmentAll,
+    ...includeAllNested,
   })
 }
