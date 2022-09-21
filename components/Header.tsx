@@ -2,6 +2,10 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import Dropdown, {
+  DropdownToggle,
+  DropdownMenu,
+} from "components/common/Dropdown"
 
 const Header = () => {
   const router = useRouter()
@@ -15,28 +19,48 @@ const Header = () => {
           Home
         </a>
       </Link>
-      <Link href="/risk-assessments">
-        <a className="bold" data-active={isActive("/risk-assessments")}>
-          Risk Assessments
-        </a>
-      </Link>
+      <Dropdown>
+        <DropdownToggle>
+          <Link href="/risk-assessments">
+            <a className="bold" data-active={isActive("/risk-assessments")}>
+              Risk Assessments
+            </a>
+          </Link>
+        </DropdownToggle>
+        <DropdownMenu>
+          <Link href="/risk-assessments">
+            <a className="bold" data-active={isActive("/risk-assessments")}>
+              View Risk Assessments
+            </a>
+          </Link>
+          <Link href="/risk-assessments/new">
+            <a className="bold" data-active={isActive("/risk-assessments/new")}>
+              Create New Risk Assessment
+            </a>
+          </Link>
+        </DropdownMenu>
+      </Dropdown>
       <style jsx>{`
         .bold {
           font-weight: bold;
         }
 
-        a {
+        .left {
+          display: flex;
+          flex-direction: row;
+          column-gap: 1.5rem;
+        }
+
+        .left > a,
+        .left :global(.dropdown-main > a) {
           text-decoration: none;
           color: #000;
           display: inline-block;
+          font-weight: bold;
         }
 
         .left a[data-active="true"] {
           color: gray;
-        }
-
-        a + a {
-          margin-left: 1rem;
         }
       `}</style>
     </div>

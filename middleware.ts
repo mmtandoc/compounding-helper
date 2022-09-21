@@ -1,21 +1,23 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextMiddleware, NextRequest, NextResponse } from "next/server"
 
-export const config = {
-  matcher: ["/", "/index"],
-}
+export const middleware: NextMiddleware = (req: NextRequest) => {
+  const basicAuthCredentials = process.env.BASIC_AUTH_CREDENTIALS
 
-export function middleware(req: NextRequest) {
+  if (!basicAuthCredentials) {
+    return NextResponse.next()
+  }
+
+  const [validUser, validPassword] = basicAuthCredentials.split(":")
+
   const basicAuth = req.headers.get("authorization")
-  const url = req.nextUrl
 
   if (basicAuth) {
-    const authValue = basicAuth.split(" ")[1]
-    const [user, pwd] = atob(authValue).split(":")
-    if (user === "mmtandoc" && pwd === "mXi~9e++Q$>w4qF[rn@l") {
+    const credentials = basicAuth.split(" ")[1]
+    const [user, password] = atob(credentials).split(":")
+    if (user === validUser && password === validPassword) {
       return NextResponse.next()
     }
   }
-  url.pathname = "/api/auth"
 
-  return NextResponse.rewrite(url)
+  return NextResponse.rewrite(new URL("/api/auth", req.url))
 }
