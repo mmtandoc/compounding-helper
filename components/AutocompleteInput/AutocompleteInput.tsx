@@ -5,12 +5,12 @@ import SuggestionsList from "./SuggestionsList"
 export type AutocompleteProps<T> = {
   name: string
   id?: string
-  item?: T | null
+  item?: T
   query?: string
   getItemValue: (item: T | undefined | null) => string
   renderSuggestion: (item: T) => JSX.Element
   items: T[]
-  onItemChange?: (val: T) => void
+  onItemChange?: (val?: T | null) => void
   onQueryChange?: (query: string) => void
   width?: string | number
   minLength: number
@@ -21,9 +21,29 @@ export type AutocompleteProps<T> = {
 }
 
 const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
-  const { getItemValue, item, items, inputRef, onBlur, onFocus } = props
+  const {
+    getItemValue,
+    item,
+    items,
+    inputRef,
+    onBlur,
+    onFocus,
+    onItemChange,
+    onQueryChange,
+  } = props
+
+  const didMount = React.useRef(false)
 
   const [inputQuery, setInputQuery] = useState(getItemValue(item))
+
+  React.useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true
+      return
+    }
+
+    onQueryChange?.(inputQuery)
+  }, [inputQuery, onQueryChange])
 
   useEffect(() => {
     setInputQuery(getItemValue(item))
@@ -86,11 +106,11 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
       case "Enter":
         if (selectedIndex === undefined) {
           if (suggestions.length > 0) {
-            props.onItemChange?.(suggestions[0])
+            onItemChange?.(suggestions[0])
           }
         } else {
           setInputQuery(getItemValue(suggestions[selectedIndex]))
-          props.onItemChange?.(suggestions[selectedIndex])
+          onItemChange?.(suggestions[selectedIndex])
           setSuggestionsVisible(false)
         }
         break
@@ -103,7 +123,9 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
     setSelectedIndex(undefined)
     setSuggestionsVisible(true)
     setInputQuery(e.target.value)
-    props.onQueryChange?.(e.target.value)
+    if (!e.target.value.trim() && item) {
+      onItemChange?.(null)
+    }
   }
 
   const displaySuggestionsList =

@@ -1,4 +1,4 @@
-import ChemicalSearch from "./ChemicalSearch"
+import ChemicalSearch from "../../../chemical/ChemicalSearch"
 import React, { useEffect } from "react"
 import {
   Control,
@@ -162,6 +162,7 @@ const IngredientFieldset = ({
                     setValue(`ingredients.${index}.sdsId`, null)
                   }}
                   size={30}
+                  defaultValue={null}
                 />
 
                 <button type="button" disabled={!ingredient?.chemicalId}>

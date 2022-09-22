@@ -1,16 +1,21 @@
 import { Chemical } from "@prisma/client"
 import axios from "axios"
 import AutocompleteInput, { withAsync } from "components/AutocompleteInput"
-import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
 import { useState } from "react"
-import { FieldError, useController, UseControllerProps } from "react-hook-form"
+import {
+  FieldError,
+  FieldValues,
+  useController,
+  UseControllerProps,
+} from "react-hook-form"
 import useSWR from "swr"
 import { JsonError } from "types/common"
 
-interface Props extends UseControllerProps<NullPartialRiskAssessmentFields> {
+interface ChemicalSearchProps<TFieldValues extends FieldValues>
+  extends UseControllerProps<TFieldValues> {
   id: string
   error?: FieldError
-  onItemChange?: (val: Chemical) => void
+  onItemChange?: (val: Chemical | null) => void
   size?: number
 }
 
@@ -20,21 +25,22 @@ const getItemValue = (item?: Chemical | null): string => item?.name ?? ""
 
 const AsyncAutocomplete = withAsync<Chemical>(AutocompleteInput)
 
-const ChemicalSearch = ({
+const ChemicalSearch = <TFieldValues extends FieldValues>({
   id,
   control,
   name,
   rules,
   size,
+  defaultValue,
   onItemChange,
-}: Props) => {
+}: ChemicalSearchProps<TFieldValues>) => {
   const {
     field: { onChange, onBlur, value, ref },
   } = useController({
     name,
     control,
     rules,
-    defaultValue: null,
+    defaultValue,
   })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -82,9 +88,9 @@ const ChemicalSearch = ({
       })
   }
 
-  const handleItemChange = (item: Chemical) => {
-    onChange(item?.id)
-    onItemChange?.(item)
+  const handleItemChange = (item?: Chemical | null) => {
+    onChange(item?.id ?? null)
+    onItemChange?.(item ?? null)
   }
 
   return (
