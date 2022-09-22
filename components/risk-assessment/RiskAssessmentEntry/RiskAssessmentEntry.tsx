@@ -47,12 +47,13 @@ const RiskAssessmentEntry = (props: Props) => {
       "ppe.mask.required",
     ])
 
-  const { fields: ingredientFields, ...ingredientsArrayMethods } =
-    useFieldArray({
-      control: control,
-      name: "ingredients",
-      rules: { required: true },
-    })
+  const ingredientsArrayMethods = useFieldArray({
+    control: control,
+    name: "ingredients",
+    rules: { required: true },
+  })
+
+  const ingredientFields = ingredientsArrayMethods.fields
 
   const ingredients = watch("ingredients")
 
@@ -112,23 +113,16 @@ const RiskAssessmentEntry = (props: Props) => {
         <legend>Ingredients:</legend>
         {ingredientFields.map((field, index) => (
           <IngredientFieldset
-            fields={ingredientFields}
             key={field.id}
             field={field}
             index={index}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-            control={control}
-            remove={ingredientsArrayMethods.remove}
-            update={ingredientsArrayMethods.update}
-            move={ingredientsArrayMethods.move}
+            formMethods={formMethods}
+            arrayMethods={ingredientsArrayMethods}
             reset={() => {
               formMethods.resetField(`ingredients.${index}`, {
                 defaultValue: emptyIngredientValues,
               })
             }}
-            watch={watch}
           />
         ))}
         <div>

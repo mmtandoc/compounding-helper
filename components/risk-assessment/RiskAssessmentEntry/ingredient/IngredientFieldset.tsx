@@ -1,17 +1,12 @@
 import ChemicalSearch from "../../../chemical/ChemicalSearch"
 import React, { useEffect } from "react"
 import {
-  Control,
   FieldArrayWithId,
   FieldError,
   UseFieldArrayReturn,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormWatch,
+  UseFormReturn,
 } from "react-hook-form"
 import useSWR from "swr"
-import { SetRequired } from "type-fest"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
@@ -20,35 +15,26 @@ import { Vendor } from "@prisma/client"
 import { useClearDisabledField } from "../helpers"
 import SdsSelect from "./SdsSelect"
 
-interface IngredientFieldsetProps
-  extends SetRequired<
-    Partial<UseFieldArrayReturn<NullPartialRiskAssessmentFields>>,
-    "remove" | "update" | "move" | "fields"
-  > {
+interface IngredientFieldsetProps {
   id?: string
   error?: FieldError
   field: FieldArrayWithId<NullPartialRiskAssessmentFields>
   index: number
-  register: UseFormRegister<NullPartialRiskAssessmentFields>
-  setValue: UseFormSetValue<NullPartialRiskAssessmentFields>
-
-  getValues: UseFormGetValues<NullPartialRiskAssessmentFields>
-  control: Control<NullPartialRiskAssessmentFields>
+  formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
+  arrayMethods: UseFieldArrayReturn<NullPartialRiskAssessmentFields>
   reset: () => void
-  watch: UseFormWatch<NullPartialRiskAssessmentFields>
 }
 
 const IngredientFieldset = ({
   index,
-  register,
-  setValue,
-  fields,
-  control,
-  remove,
   reset,
-  move,
-  watch,
+  formMethods,
+  arrayMethods,
 }: IngredientFieldsetProps) => {
+  const { register, control, setValue, watch } = formMethods
+
+  const { fields, move, remove } = arrayMethods
+
   const ingredient = watch(`ingredients.${index}`)
 
   const { data: chemicalData, error: chemicalError } = useSWR<
