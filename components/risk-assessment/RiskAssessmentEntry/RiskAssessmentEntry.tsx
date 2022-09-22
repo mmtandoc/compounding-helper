@@ -6,7 +6,7 @@ import form from "styles/form"
 import { RiskAssessmentFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
-import { useClearDisabledField } from "./helpers"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import IngredientFieldset from "./ingredient/IngredientFieldset"
 import RationaleList from "./RationaleList"
 
@@ -76,23 +76,23 @@ const RiskAssessmentEntry = (props: Props) => {
     }
   }, [ingredients, ingredientFields, ingredientsArrayMethods])
 
-  useClearDisabledField({
-    clearConditional: coatRequired === false || coatRequired === null,
-    names: ["ppe.coat.type"],
+  useUpdateFieldConditionally({
+    updateCondition: coatRequired === false || coatRequired === null,
+    fields: [["ppe.coat.type", null]],
     register,
     setValue,
   })
 
-  useClearDisabledField({
-    clearConditional: glovesRequired === false || glovesRequired === null,
-    names: ["ppe.gloves.type"],
+  useUpdateFieldConditionally({
+    updateCondition: glovesRequired === false || glovesRequired === null,
+    fields: [["ppe.gloves.type", null]],
     register,
     setValue,
   })
 
-  useClearDisabledField({
-    clearConditional: maskRequired === false || maskRequired === null,
-    names: ["ppe.mask.type"],
+  useUpdateFieldConditionally({
+    updateCondition: maskRequired === false || maskRequired === null,
+    fields: [["ppe.mask.type", null]],
     register,
     setValue,
   })

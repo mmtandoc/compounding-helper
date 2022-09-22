@@ -1,10 +1,7 @@
 import { NullPartialRiskAssessmentFields } from "."
-import { ChemicalAll, SdsWithHazards } from "types/models"
+import { SdsWithHazards } from "types/models"
 import { Chemical } from "@prisma/client"
-import { useEffect } from "react"
-import { Path, UseFormRegister, UseFormSetValue } from "react-hook-form"
-import useSWR from "swr"
-import { JsonError } from "types/common"
+import { Path } from "react-hook-form"
 
 export const calculateSuggestedRiskLevel = (
   chemicals: Chemical[],
@@ -119,28 +116,4 @@ export const calculateSuggestedRiskLevel = (
     return null
   }
   return null
-}
-
-type UseClearDisabledFieldProps = {
-  clearConditional: boolean | undefined
-  names: Path<NullPartialRiskAssessmentFields>[]
-  register: UseFormRegister<NullPartialRiskAssessmentFields>
-  setValue: UseFormSetValue<NullPartialRiskAssessmentFields>
-}
-
-export const useClearDisabledField = ({
-  clearConditional,
-  names,
-  register,
-  setValue,
-}: UseClearDisabledFieldProps) => {
-  useEffect(() => {
-    if (clearConditional) {
-      for (const name of names) {
-        register(name)
-        setValue(name, null)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [register, setValue, clearConditional, JSON.stringify(names)])
 }

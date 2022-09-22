@@ -12,7 +12,7 @@ import { ChemicalAll, SdsWithRelations } from "types/models"
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import { NullPartialRiskAssessmentFields } from ".."
 import { Vendor } from "@prisma/client"
-import { useClearDisabledField } from "../helpers"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import SdsSelect from "./SdsSelect"
 
 interface IngredientFieldsetProps {
@@ -79,20 +79,20 @@ const IngredientFieldset = ({
     `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
   )
 
-  useClearDisabledField({
-    clearConditional: isCommercialProduct !== true,
-    names: [
-      `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
-      `ingredients.${index}.commercialProduct.name`,
-      `ingredients.${index}.commercialProduct.din`,
+  useUpdateFieldConditionally({
+    updateCondition: isCommercialProduct !== true,
+    fields: [
+      [`ingredients.${index}.commercialProduct.hasProductMonographConcerns`, null],
+      [`ingredients.${index}.commercialProduct.name`, null],
+      [`ingredients.${index}.commercialProduct.din`, null],
     ],
     register,
     setValue,
   })
 
-  useClearDisabledField({
-    clearConditional: hasNoDin === true,
-    names: [`ingredients.${index}.commercialProduct.din`],
+  useUpdateFieldConditionally({
+    updateCondition: hasNoDin === true,
+    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
     register,
     setValue,
   })
