@@ -1,5 +1,18 @@
 import { Prisma } from "@prisma/client"
 
+const hazardClassesWithCategories = Prisma.validator<Prisma.HazardClassArgs>()({
+  include: {
+    hazardCategories: {
+      where: { parentLevel: { equals: null } },
+      include: { subcategories: true },
+    },
+  },
+})
+
+export type HazardClassesWithCategories = Prisma.HazardClassGetPayload<
+  typeof hazardClassesWithCategories
+>
+
 const sdsWithHazards = Prisma.validator<Prisma.SDSArgs>()({
   include: {
     healthHazards: {

@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
+import { HazardClassesWithCategories } from "types/models"
+import { ApiBody } from "types/common"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse<ApiBody<HazardClassesWithCategories[]>>,
 ) {
   const { method } = req
 
@@ -11,16 +13,7 @@ export default async function handler(
     case "GET": {
       let hazards
       try {
-        hazards = await prisma.hazardClass.findMany({
-          include: {
-            hazardCategories: {
-              orderBy: { level: "desc" },
-              where: { parentLevel: { equals: null } },
-              include: { subcategories: { orderBy: { level: "desc" } } },
-            },
-          },
-          orderBy: { id: "asc" },
-        })
+        hazards = await getHazards()
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
@@ -40,4 +33,17 @@ export default async function handler(
         .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
       break
   }
+}
+
+export async function getHazards() {
+  return await prisma.hazardClass.findMany({
+    include: {
+      hazardCategories: {
+        orderBy: { level: "desc" },
+        where: { parentLevel: { equals: null } },
+        include: { subcategories: { orderBy: { level: "desc" } } },
+      },
+    },
+    orderBy: { id: "asc" },
+  })
 }
