@@ -28,14 +28,14 @@ const form = css.global`
     width: 100%;
   }
 
-  .form-group > label {
+  .form-group > :where(label, .label) {
     font-weight: 600;
     display: block;
     width: fit-content;
     margin-bottom: 0.3rem;
   }
 
-  .form-group.row > label {
+  .form-group.row > :where(label, .label) {
     margin-bottom: 0;
   }
 
@@ -44,6 +44,10 @@ const form = css.global`
     display: block;
     width: fit-content;
     margin-bottom: 0.3rem;
+  }
+
+  .form-group label > :not(span:first-child) {
+    font-weight: initial;
   }
 
   .label {
