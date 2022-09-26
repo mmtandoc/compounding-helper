@@ -63,7 +63,7 @@ const sdsWithHazards = Prisma.validator<Prisma.SDSArgs>()({
 
 export type SdsWithHazards = Prisma.SDSGetPayload<typeof sdsWithHazards>
 
-const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
+export const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
   include: {
     product: {
       include: {
