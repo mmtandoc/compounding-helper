@@ -20,6 +20,11 @@ const SdsPage: NextPage<SdsPageProps> = (props: SdsPageProps) => {
           {data.revisionDate.toLocaleDateString("en-CA")})
         </h1>
         <SdsDetails data={data} />
+        <div className="action-row">
+          <Link href={`/sds/${data.id}/edit`} passHref>
+            <button type="button">Edit</button>
+          </Link>
+        </div>
       </div>
       <style jsx>{`
         .page {
