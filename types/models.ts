@@ -1,5 +1,39 @@
 import { Prisma } from "@prisma/client"
 
+//TODO: Refactor
+
+const productAll = Prisma.validator<Prisma.ProductArgs>()({
+  include: {
+    sds: {
+      include: {
+        healthHazards: {
+          include: {
+            hazardCategory: {
+              include: {
+                hazardClass: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    chemical: true,
+    vendor: true,
+  },
+})
+
+export type ProductAll = Prisma.ProductGetPayload<typeof productAll>
+
+const productWithVendor = Prisma.validator<Prisma.ProductArgs>()({
+  include: {
+    vendor: true,
+  },
+})
+
+export type ProductWithVendor = Prisma.ProductGetPayload<
+  typeof productWithVendor
+>
+
 const hazardClassesWithCategories = Prisma.validator<Prisma.HazardClassArgs>()({
   include: {
     hazardCategories: {
@@ -42,6 +76,8 @@ const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
         hazardCategory: {
           include: {
             hazardClass: true,
+            parentCategory: true,
+            subcategories: true,
           },
         },
       },

@@ -1,3 +1,21 @@
+export type HazardFields = {
+  id: number | null
+  classId: number | null
+  categoryId: number | null
+  subcategoryId?: number | null
+  additionalInfo?: string | null
+}
+
+export type SdsFields = {
+  id?: number
+  chemicalId: number
+  productId: number
+  hmisHazardLevel: number
+  revisionDate: string
+  hazards: HazardFields[]
+  requireVentilation: boolean
+}
+
 export type ExposureRisksFields = {
   skin: boolean
   eye: boolean
