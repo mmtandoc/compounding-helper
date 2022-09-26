@@ -1,16 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
-import { SdsWithRelations } from "types/models"
+import { sdsWithRelations, SdsWithRelations } from "types/models"
 import { ApiBody } from "types/common"
+import { SdsFields } from "types/fields"
+import SdsMapper from "lib/mappers/SdsMapper"
+import _ from "lodash"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiBody<SdsWithRelations>>,
+  res: NextApiResponse<ApiBody<SdsWithRelations | undefined>>,
 ) {
-  const {
-    query: { id },
-    method,
-  } = req
+  const { query, method } = req
+
+  const id = query.id ? parseInt(query.id as string) : undefined
 
   if (id === undefined) {
     res.status(404).json({
@@ -24,7 +26,7 @@ export default async function handler(
       let sds
 
       try {
-        sds = await getSdsById(parseInt(typeof id === "string" ? id : id[0]))
+        sds = await getSdsById(id)
       } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -43,15 +45,41 @@ export default async function handler(
       res.status(200).json(sds)
       return
     }
-
     case "PUT": {
-      //TODO: Implement PUT method
-      throw new Error("PUT method not implemented.")
-    }
+      const fields: SdsFields = req.body
 
+      let result
+      try {
+        result = await updateSdsById(id, fields)
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
+        })
+        return
+      }
+
+      res.status(200).json(result)
+      return
+    }
+    case "DELETE": {
+      try {
+        await deleteSdsById(id)
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
+        })
+        return
+      }
+
+      res.status(204).send(undefined)
+      return
+    }
     default:
       res
-        .setHeader("Allow", ["GET", "PUT"])
+        .setHeader("Allow", ["GET", "PUT", "DELETE"])
         .status(405)
         .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
       break
@@ -61,24 +89,51 @@ export default async function handler(
 export const getSdsById = async (id: number) => {
   return await prisma.sDS.findUnique({
     where: { id },
-    include: {
-      product: {
-        include: {
-          vendor: true,
-          chemical: true,
-        },
-      },
+    ...sdsWithRelations,
+  })
+}
+
+export const deleteSdsById = async (id: number) => {
+  await prisma.hazardCategoryToSDS.deleteMany({ where: { sdsId: id } })
+
+  await prisma.sDS.delete({
+    where: { id },
+  })
+}
+
+export const updateSdsById = async (id: number, fields: SdsFields) => {
+  const hazards = fields.hazards
+    .filter((h) => h.classId !== null && h.categoryId !== null)
+    .map((h) => ({
+      id: h.id ?? undefined,
+      hazardCategoryId:
+        (h?.subcategoryId as number) ?? (h.categoryId as number),
+      additionalInfo: h.additionalInfo ?? undefined,
+    }))
+
+  return await prisma.sDS.update({
+    where: { id },
+    data: {
       healthHazards: {
-        include: {
-          hazardCategory: {
-            include: {
-              hazardClass: true,
-              parentCategory: true,
-              subcategories: true,
-            },
+        deleteMany: {
+          id: {
+            notIn: fields.hazards
+              .filter((h) => h.id)
+              .map((h) => h.id as number),
           },
         },
+        createMany: {
+          data: hazards.filter((data) => data.id === null),
+        },
+        update: hazards
+          .filter((data) => data.id !== null)
+          .map((data) => ({
+            where: { id: data.id },
+            data: _.omit(data, "id"),
+          })),
       },
+      ...SdsMapper.toModel(fields),
     },
+    ...sdsWithRelations,
   })
 }
