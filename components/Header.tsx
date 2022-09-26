@@ -40,6 +40,27 @@ const Header = () => {
           </Link>
         </DropdownMenu>
       </Dropdown>
+      <Dropdown>
+        <DropdownToggle>
+          <Link href="/sds">
+            <a className="bold" data-active={isActive("/sds")}>
+              Safety Data Sheets
+            </a>
+          </Link>
+        </DropdownToggle>
+        <DropdownMenu>
+          <Link href="/sds">
+            <a className="bold" data-active={isActive("/sds")}>
+              View Safety Data Sheets
+            </a>
+          </Link>
+          <Link href="/sds/new">
+            <a className="bold" data-active={isActive("/sds/new")}>
+              Create New Safety Data Sheet
+            </a>
+          </Link>
+        </DropdownMenu>
+      </Dropdown>
       <style jsx>{`
         .bold {
           font-weight: bold;
