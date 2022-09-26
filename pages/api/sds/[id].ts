@@ -40,7 +40,7 @@ export default async function handler(
         return
       }
 
-      res.status(200).json({ ...sds })
+      res.status(200).json(sds)
       return
     }
 
@@ -73,6 +73,8 @@ export const getSdsById = async (id: number) => {
           hazardCategory: {
             include: {
               hazardClass: true,
+              parentCategory: true,
+              subcategories: true,
             },
           },
         },
