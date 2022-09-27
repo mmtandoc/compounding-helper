@@ -1,82 +1,97 @@
 import React, { useState } from "react"
-
 import { MdClose } from "react-icons/md"
 
 type DotJotItem = { text: string; readOnly?: boolean }
 
 type DotJotListProps = {
   readOnly?: boolean
-  onChange: (items: DotJotItem[]) => void
+  onChange?: (items: DotJotItem[]) => void
+  onBlur?: () => void
   items?: DotJotItem[]
+  size?: number
 }
 
 //TODO: Support drag-and-drop reordering
-const DotJotList = (props: DotJotListProps) => {
-  const { items = [], readOnly = false, onChange } = props
 
-  const [newItemText, setNewItemText] = useState("")
+const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
+  (props, ref) => {
+    const { items = [], readOnly = false, onChange, onBlur, size } = props
 
-  const handleRemove = (index: number) => {
-    onChange([...items.slice(0, index), ...items.slice(index + 1)])
-  }
+    const [newItemText, setNewItemText] = useState("")
 
-  const handleAddNewItem = () => {
-    if (newItemText !== "") {
-      onChange([...items, { text: newItemText, readOnly: false }])
-      setNewItemText("")
+    const handleRemove = (index: number) => {
+      onChange?.([...items.slice(0, index), ...items.slice(index + 1)])
     }
-  }
 
-  return (
-    <div>
-      <ul>
-        {items.map((item, i) => (
-          <DotJotItem
-            key={i}
-            index={i}
-            readOnly={item.readOnly}
-            text={item.text}
-            onRemove={handleRemove}
-          />
-        ))}
-        {!readOnly && (
-          <li>
-            <div className="new-item-row row">
-              <input
-                className="new-item-text-input"
-                type="text"
-                value={newItemText}
-                onChange={(e) => setNewItemText(e.target.value)}
-                onKeyDown={(e) =>
-                  newItemText !== "" && e.key === "Enter" && handleAddNewItem()
-                }
-              />
-              <button
-                type="button"
-                className="add-item-button"
-                onClick={handleAddNewItem}
-                disabled={newItemText === ""}
-              >
-                Add
-              </button>
-            </div>
-          </li>
-        )}
-      </ul>
-      <style jsx>{`
-        ul {
-          margin-block-start: 0;
-          margin-block-end: 0;
-        }
-        .new-item-text-input {
-          width: 100%;
-        }
-      `}</style>
-    </div>
-  )
-}
+    const handleAddNewItem = () => {
+      if (newItemText !== "") {
+        onChange?.([...items, { text: newItemText, readOnly: false }])
+        setNewItemText("")
+      }
+    }
 
-interface DotJotItemProps extends DotJotItem {
+    return (
+      <div>
+        <ul>
+          {items.map((item, i) => (
+            <DotJotItem
+              key={i}
+              index={i}
+              readOnly={item?.readOnly}
+              text={item.text}
+              onRemove={handleRemove}
+            />
+          ))}
+          {!readOnly && (
+            <li>
+              <div className="new-item-row row">
+                <input
+                  className="new-item-text-input"
+                  type="text"
+                  value={newItemText}
+                  onChange={(e) => setNewItemText(e.target.value)}
+                  onBlur={onBlur}
+                  onKeyDown={(e) =>
+                    newItemText !== "" &&
+                    e.key === "Enter" &&
+                    handleAddNewItem()
+                  }
+                  ref={ref}
+                  size={size}
+                />
+                <button
+                  type="button"
+                  className="add-item-button"
+                  onClick={handleAddNewItem}
+                  disabled={newItemText === ""}
+                >
+                  Add
+                </button>
+              </div>
+            </li>
+          )}
+        </ul>
+        <style jsx>{`
+          ul {
+            margin-block-start: 0;
+            margin-block-end: 0;
+          }
+           {
+            .new-item-text-input {
+              width: ${size ? "initial" : "100%"};
+            }
+          }
+        `}</style>
+      </div>
+    )
+  },
+)
+
+DotJotList.displayName = "DotJotList"
+
+interface DotJotItemProps {
+  text: string
+  readOnly?: boolean
   index: number
   onRemove?: (index: number) => void
 }
