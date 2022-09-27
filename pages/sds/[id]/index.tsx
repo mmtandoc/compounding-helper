@@ -4,7 +4,7 @@ import Layout from "components/Layout"
 import SdsDetails from "components/sds/SdsDetails"
 import { GetServerSideProps, NextPage } from "next"
 import Link from "next/link"
-import router from "next/router"
+import { useRouter } from "next/router"
 import { getSdsById } from "pages/api/sds/[id]"
 import { useState } from "react"
 import { SdsWithRelations } from "types/models"
@@ -15,6 +15,8 @@ type SdsPageProps = {
 
 const SdsPage: NextPage<SdsPageProps> = (props: SdsPageProps) => {
   const { data } = props
+
+  const router = useRouter()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const sdsId = parseInt(router.query.id as string)
