@@ -1,5 +1,52 @@
 import { Prisma } from "@prisma/client"
 
+//TODO: Refactor
+
+const productAll = Prisma.validator<Prisma.ProductArgs>()({
+  include: {
+    sds: {
+      include: {
+        healthHazards: {
+          include: {
+            hazardCategory: {
+              include: {
+                hazardClass: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    chemical: true,
+    vendor: true,
+  },
+})
+
+export type ProductAll = Prisma.ProductGetPayload<typeof productAll>
+
+const productWithVendor = Prisma.validator<Prisma.ProductArgs>()({
+  include: {
+    vendor: true,
+  },
+})
+
+export type ProductWithVendor = Prisma.ProductGetPayload<
+  typeof productWithVendor
+>
+
+const hazardClassesWithCategories = Prisma.validator<Prisma.HazardClassArgs>()({
+  include: {
+    hazardCategories: {
+      where: { parentLevel: { equals: null } },
+      include: { subcategories: true },
+    },
+  },
+})
+
+export type HazardClassesWithCategories = Prisma.HazardClassGetPayload<
+  typeof hazardClassesWithCategories
+>
+
 const sdsWithHazards = Prisma.validator<Prisma.SDSArgs>()({
   include: {
     healthHazards: {
@@ -16,7 +63,7 @@ const sdsWithHazards = Prisma.validator<Prisma.SDSArgs>()({
 
 export type SdsWithHazards = Prisma.SDSGetPayload<typeof sdsWithHazards>
 
-const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
+export const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
   include: {
     product: {
       include: {
@@ -29,6 +76,8 @@ const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
         hazardCategory: {
           include: {
             hazardClass: true,
+            parentCategory: true,
+            subcategories: true,
           },
         },
       },
