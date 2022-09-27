@@ -1,3 +1,4 @@
+import Table from "components/common/Table"
 import Link from "next/link"
 import React from "react"
 import { SdsWithRelations } from "types/models"
@@ -11,58 +12,66 @@ const SdsTable = (props: Props) => {
   const { data } = props
 
   return (
-    <table className="risk-assessments-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Chemical</th>
-          <th>Product</th>
-          <th>Vendor</th>
-          <th>Revision Date</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((sds, i) => (
-          <tr key={i}>
-            <td>{sds.id}</td>
-            <td>{sds.product.chemical.name}</td>
-            <td>{sds.product.name}</td>
-            <td>{sds.product.vendor.name}</td>
-            <td>{sds.revisionDate.toLocaleDateString("en-CA")}</td>
-            <td>
-              <Link href={`/sds/${sds.id}`} passHref>
-                <button type="button">View</button>
-              </Link>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-      <style jsx>{`
-        table {
-          border-collapse: collapse;
-        }
-        table,
-        th,
-        :global(td) {
-          border: black solid 1px;
-        }
-
-        thead {
-          background-color: lightgray;
-        }
-
-        th,
-        td {
-          padding: 0 1rem;
-        }
-
-        td > button {
-          display: block;
-          margin: auto;
-        }
-      `}</style>
-    </table>
+    <>
+      <Table
+        data={data}
+        columns={[
+          {
+            accessorPath: "id",
+            label: "ID",
+            sortable: true,
+            compare: (a: number, b: number) => a - b,
+          },
+          {
+            accessorPath: "product.chemical.name",
+            label: "Chemical",
+            sortable: true,
+            compare: (a: string, b: string) =>
+              a.localeCompare(b, "en-CA", { numeric: true }),
+          },
+          {
+            accessorPath: "product.name",
+            label: "Product",
+            sortable: true,
+            compare: (a: string, b: string) =>
+              a.localeCompare(b, "en-CA", { numeric: true }),
+          },
+          {
+            accessorPath: "product.vendor.name",
+            label: "Vendor",
+            sortable: true,
+            compare: (a: string, b: string) =>
+              a.localeCompare(b, "en-CA", { numeric: true }),
+          },
+          {
+            accessorPath: "revisionDate",
+            label: "Revision Date",
+            sortable: true,
+            compare: (a: Date, b: Date) =>
+              a.toISOString().localeCompare(b.toISOString()),
+            renderCell: (date: Date) => date.toLocaleDateString("en-CA"),
+          },
+          {
+            accessorPath: "",
+            label: "",
+            sortable: false,
+            renderCell: (_, value) => (
+              <>
+                <Link href={`/sds/${value.id}`} passHref>
+                  <button type="button">View</button>
+                </Link>
+                <style jsx>{`
+                  td > button {
+                    display: block;
+                    margin: auto;
+                  }
+                `}</style>
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
   )
 }
 
