@@ -12,6 +12,7 @@ const form = css.global`
   .form-group {
     padding-block: 0.1rem 0.1rem;
     min-inline-size: min-content;
+    display: block;
   }
 
   .form-group:not(.row) > * {
@@ -39,14 +40,14 @@ const form = css.global`
     margin-bottom: 0;
   }
 
-  .form-group label > span:first-child {
+  :where(.form-group label, label.form-group) > span:first-child {
     font-weight: 600;
     display: block;
     width: fit-content;
     margin-bottom: 0.3rem;
   }
 
-  .form-group label > :not(span:first-child) {
+  :where(.form-group label, label.form-group) > :not(span:first-child) {
     font-weight: initial;
   }
 
