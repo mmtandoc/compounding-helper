@@ -2,10 +2,12 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { Chemical, Prisma } from "@prisma/client"
 import { ApiBody } from "types/common"
+import { ChemicalFields } from "types/fields"
+import ChemicalMapper from "lib/mappers/ChemicalMapper"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiBody<Chemical[]>>,
+  res: NextApiResponse<ApiBody<Chemical[] | Chemical>>,
 ) {
   const { query: queryValues, method } = req
 
@@ -18,23 +20,10 @@ export default async function handler(
 
   switch (method) {
     case "GET": {
-      const where =
-        queryString !== undefined
-          ? Prisma.sql`WHERE (
-            0 < (
-              SELECT COUNT(*) 
-              FROM unnest(synonyms) AS synonym
-              WHERE synonym ILIKE ${`${queryString?.replaceAll("*", "%")}%`}
-            ) OR name ILIKE ${`${queryString?.replaceAll("*", "%")}%`}
-          )`
-          : Prisma.empty
-
       let chemicals
 
       try {
-        chemicals = await prisma.$queryRaw<Chemical[]>(
-          Prisma.sql`SELECT * FROM public.chemicals ${where} ORDER BY id ASC;`,
-        )
+        chemicals = await getChemicals(queryString)
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
@@ -47,11 +36,47 @@ export default async function handler(
       res.status(200).json(chemicals)
       return
     }
+    case "POST": {
+      let chemical
+
+      try {
+        chemical = await createChemical(req.body)
+      } catch (error) {
+        //TODO: HANDLE ERROR
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
+        })
+        return
+      }
+
+      res.status(200).json(chemical)
+      return
+    }
     default:
       res
-        .setHeader("Allow", ["GET"])
+        .setHeader("Allow", ["GET", "POST"])
         .status(405)
         .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
       break
   }
 }
+
+export async function getChemicals(nameQuery?: string) {
+  const where =
+    nameQuery !== undefined
+      ? Prisma.sql`WHERE (
+            0 < (
+              SELECT COUNT(*) 
+              FROM unnest(synonyms) AS synonym
+              WHERE synonym ILIKE ${`${nameQuery?.replaceAll("*", "%")}%`}
+            ) OR name ILIKE ${`${nameQuery?.replaceAll("*", "%")}%`}
+          )`
+      : Prisma.empty
+  return await prisma.$queryRaw<Chemical[]>(
+    Prisma.sql`SELECT * FROM public.chemicals ${where} ORDER BY id ASC;`,
+  )
+}
+
+export const createChemical = async (values: ChemicalFields) =>
+  await prisma.chemical.create({ data: ChemicalMapper.toModel(values) })
