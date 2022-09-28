@@ -46,11 +46,11 @@ interface RadioGroupProps {
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   inputRef?: React.LegacyRef<HTMLInputElement>
-  radioOptions: [string | number, string][]
+  radioOptions: [value: string | number, label: string][]
   readOnly?: boolean
   disabled?: boolean
   className?: string
-  selectedValue?: string
+  selectedValue?: string | number
 }
 
 export const RadioGroup = (props: RadioGroupProps) => {
@@ -84,7 +84,10 @@ export const RadioGroup = (props: RadioGroupProps) => {
               onBlur={onBlur}
               value={value}
               readOnly={readOnly}
-              checked={selectedValue === value}
+              checked={
+                selectedValue === value ||
+                Number(selectedValue) === Number(value)
+              }
               onClick={(e) => readOnly && e.preventDefault()}
               disabled={disabled}
             />
