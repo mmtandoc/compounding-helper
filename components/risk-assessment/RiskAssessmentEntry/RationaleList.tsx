@@ -41,9 +41,11 @@ const RationaleList = ({
 
   //TODO: Handle error
   const sdsUrls =
-    ingredients?.map((ingredient) =>
-      ingredient?.chemicalId ? `/api/chemicals/${ingredient.chemicalId}` : null,
-    ) ?? null
+    ingredients
+      ?.map((ingredient) =>
+        ingredient?.sdsId ? `/api/sds/${ingredient.sdsId}` : null,
+      )
+      .filter<string>(_.isString) ?? null
 
   const { data: safetyDatasheets, error: sdsesError } = useSWR<
     SdsWithRelations[],
