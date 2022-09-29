@@ -4,16 +4,16 @@ import { Get } from "type-fest"
 import { TableColumn } from "./Table"
 import { Property as CSSProperty } from "csstype"
 
-type Props<TItem> = {
-  columns: TableColumn<TItem>[]
-  data: TItem[]
+type Props<TData> = {
+  columns: TableColumn<TData>[]
+  data: TData[]
   backgroundColor?: CSSProperty.Color
 }
 
-const TableBody = <TItem,>(props: Props<TItem>) => {
+const TableBody = <TData,>(props: Props<TData>) => {
   const { columns, data } = props
 
-  const get = (object: TItem, path: string): Get<TItem, string> =>
+  const get = (object: TData, path: string): Get<TData, string> =>
     _.get(object, path)
 
   return (

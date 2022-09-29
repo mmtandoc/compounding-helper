@@ -1,22 +1,22 @@
 import _ from "lodash"
-import React, { ReactNode, useCallback, useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { Get } from "type-fest"
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
 import { Property as CSSProperty } from "csstype"
 
-export type TableColumn<TItem, T = any> = {
+export type TableColumn<TData, T = any> = {
   label: string
   accessorPath?: string
   sortable: boolean
   compare?: (a: T, b: T) => number
-  renderCell?: (value: T, item: TItem) => ReactNode
+  renderCell?: (value: T, item: TData) => ReactNode
 }
 
-type Props<TItem> = {
+type Props<TData> = {
   className?: string
-  columns: TableColumn<TItem>[]
-  data: TItem[]
+  columns: TableColumn<TData>[]
+  data: TData[]
   limit?: number
   offset?: number
   defaultSort?: { path: string; order: "asc" | "desc" }

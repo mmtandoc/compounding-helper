@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react"
-import { TableColumn } from "./Table"
+import { Property as CSSProperty } from "csstype"
+import { useEffect, useState } from "react"
 import {
   TiArrowSortedDown,
   TiArrowSortedUp,
   TiArrowUnsorted,
 } from "react-icons/ti"
-import { Property as CSSProperty } from "csstype"
-import { access } from "fs/promises"
+import { TableColumn } from "./Table"
 
-type Props<TItem> = {
-  columns: TableColumn<TItem>[]
+type Props<TData> = {
+  columns: TableColumn<TData>[]
   onSortChange: (path: string, order: "asc" | "desc") => void
   defaultSort?: { path: string; order: "asc" | "desc" }
   backgroundColor?: CSSProperty.Color
 }
 
-const TableHead = <TItem,>(props: Props<TItem>) => {
+const TableHead = <TData,>(props: Props<TData>) => {
   const {
     columns,
     onSortChange,
