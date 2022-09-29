@@ -44,7 +44,6 @@ const ChemicalEntry = (props: Props) => {
         <Controller
           control={control}
           name="synonyms"
-          rules={{ required: true }}
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <DotJotList
               items={value?.map((v) => ({ text: v })) ?? []}
