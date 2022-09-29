@@ -1,6 +1,7 @@
 import React from "react"
 import {
   FieldPath,
+  FieldPathValue,
   FieldValues,
   useController,
   UseControllerProps,
@@ -10,13 +11,22 @@ interface RHFRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
     Omit<RadioGroupProps, "onChange" | "onBlur" | "ref"> {
   name: FieldPath<T>
+  valueAsNumber?: boolean
 }
 
 export const RHFRadioGroup = <T extends FieldValues>(
   props: RHFRadioGroupProps<T>,
 ) => {
-  const { name, rules, control, radioOptions, readOnly, className, disabled } =
-    props
+  const {
+    name,
+    rules,
+    control,
+    radioOptions,
+    readOnly,
+    className,
+    disabled,
+    valueAsNumber = false,
+  } = props
 
   const { field } = useController({
     control,
@@ -27,7 +37,7 @@ export const RHFRadioGroup = <T extends FieldValues>(
   return (
     <RadioGroup
       onChange={(e) => {
-        field.onChange(e.target.value)
+        field.onChange(valueAsNumber ? Number(e.target.value) : e.target.value)
       }}
       inputRef={field.ref}
       onBlur={field.onBlur}

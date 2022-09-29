@@ -61,6 +61,7 @@ const ChemicalEntry = (props: Props) => {
           name={"nioshTable"}
           control={control}
           rules={{ required: true }}
+          valueAsNumber={true}
           radioOptions={[
             [-1, "None"],
             [1, "Table 1"],
