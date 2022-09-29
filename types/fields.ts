@@ -25,6 +25,13 @@ export type ChemicalFields = {
   nioshRevisionDate: string | null
 }
 
+export type ProductFields = {
+  id?: number
+  name: string
+  chemicalId: number
+  vendorId: number
+}
+
 export type ExposureRisksFields = {
   skin: boolean
   eye: boolean

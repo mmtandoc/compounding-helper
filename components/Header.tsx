@@ -82,6 +82,27 @@ const Header = () => {
           </Link>
         </DropdownMenu>
       </Dropdown>
+      <Dropdown>
+        <DropdownToggle>
+          <Link href="/products">
+            <a className="bold" data-active={isActive("/products")}>
+              Products
+            </a>
+          </Link>
+        </DropdownToggle>
+        <DropdownMenu>
+          <Link href="/products">
+            <a className="bold" data-active={isActive("/products")}>
+              View products
+            </a>
+          </Link>
+          <Link href="/products/new">
+            <a className="bold" data-active={isActive("/products/new")}>
+              Add new product
+            </a>
+          </Link>
+        </DropdownMenu>
+      </Dropdown>
       <style jsx>{`
         .bold {
           font-weight: bold;
