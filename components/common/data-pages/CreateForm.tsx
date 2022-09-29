@@ -86,7 +86,7 @@ const CreateForm = <
                 Add another {dataName}
               </a>
             </Link>
-            <Link href={`${urlPath}${savedData.id}`} passHref>
+            <Link href={`${urlPath}/${savedData.id}`} passHref>
               <a>View created {dataName}</a>
             </Link>
           </div>
