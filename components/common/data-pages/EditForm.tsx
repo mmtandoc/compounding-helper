@@ -84,9 +84,11 @@ const EditForm = <TFieldValues extends FieldValues>(
       <style jsx>{`
         form {
           align-self: center;
-        }
-        .page {
-          margin-bottom: 5rem;
+          margin-bottom: 2rem;
+          display: flex;
+          flex-direction: column;
+          row-gap: 0.8rem;
+          align-items: flex-start;
         }
 
         .button-row {

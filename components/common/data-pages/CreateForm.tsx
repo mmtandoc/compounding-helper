@@ -99,13 +99,14 @@ const CreateForm = <
           display: flex;
           flex-direction: column;
           row-gap: 0.8rem;
+          align-items: flex-start;
         }
 
         .action-row {
           display: flex;
           gap: 1rem;
           margin-left: 0.5rem;
-          margin-top: 2rem;
+          margin-top: 1rem;
         }
       `}</style>
     </>
