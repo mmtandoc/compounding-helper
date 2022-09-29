@@ -16,15 +16,11 @@ type Props = {
 const ChemicalEntry = (props: Props) => {
   const { values, formMethods } = props
 
-  const { register, control, reset, formState } = formMethods
-
-  console.log({ values })
-  console.log({ errors: formState.errors })
+  const { register, control, reset } = formMethods
 
   useEffect(() => {
     reset(values)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reset, JSON.stringify(values)])
+  }, [reset, values])
 
   return (
     <>
