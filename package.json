@@ -11,7 +11,8 @@
     "typecheck": "tsc",
     "typecheck:watch": "tsc -w",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:backup": "env-cmd -x  pg_dump --disable-triggers --data-only --column-inserts --schema=public --exclude-table='_prisma_migrations' \"\\$DATABASE_URL\" > database-dump.sql"
   },
   "prisma": {
     "seed": "bash prisma/seed.sh"
@@ -38,6 +39,7 @@
     "@types/react-dom": "^18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.30.3",
     "@typescript-eslint/parser": "^5.30.3",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.18.0",
     "eslint-config-next": "^12.1.6",
     "eslint-config-prettier": "^8.5.0",
