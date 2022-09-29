@@ -21,7 +21,7 @@ const TableBody = <TData,>(props: Props<TData>) => {
       {data.map((r, i) => (
         <tr key={i}>
           {columns.map((c, i) => (
-            <td key={i}>
+            <td key={i} style={c.cellStyle}>
               {(c?.renderCell ?? ((v: any) => v.toString()))?.(
                 get(r, c.accessorPath ?? ""),
                 r,

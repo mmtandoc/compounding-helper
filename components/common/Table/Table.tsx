@@ -11,6 +11,7 @@ export type TableColumn<TData, T = any> = {
   sortable: boolean
   compare?: (a: T, b: T) => number
   renderCell?: (value: T, item: TData) => ReactNode
+  cellStyle?: React.CSSProperties
 }
 
 type Props<TData> = {
