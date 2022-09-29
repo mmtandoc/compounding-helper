@@ -20,9 +20,9 @@ export type ChemicalFields = {
   id?: number
   name: string
   casNumber: string
-  synonyms: string[]
+  synonyms?: string[]
   nioshTable: -1 | 1 | 2 | 3
-  nioshRevisionDate?: string
+  nioshRevisionDate: string | null
 }
 
 export type ExposureRisksFields = {

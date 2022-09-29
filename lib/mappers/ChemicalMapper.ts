@@ -1,5 +1,4 @@
-import { Chemical } from "@prisma/client"
-import { SetOptional } from "type-fest"
+import { Prisma } from "@prisma/client"
 import { ChemicalFields } from "types/fields"
 import { ChemicalAll } from "types/models"
 
@@ -10,18 +9,20 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     casNumber: data.casNumber,
     nioshTable: data.nioshTable as -1 | 1 | 2 | 3,
     synonyms: data.synonyms,
+    nioshRevisionDate:
+      data.nioshRevisionDate?.toLocaleDateString("en-CA") ?? null,
   }
 }
 
 const toModel = (
   values: ChemicalFields,
-): SetOptional<Chemical, "id" | "updatedAt"> => {
+): Prisma.ChemicalUncheckedCreateInput => {
   return {
     id: values.id ?? undefined,
     name: values.name,
     casNumber: values.casNumber,
     nioshTable: values.nioshTable,
-    synonyms: values.synonyms,
+    synonyms: values?.synonyms ?? [],
     nioshRevisionDate: values.nioshRevisionDate
       ? new Date(values.nioshRevisionDate)
       : null,
