@@ -87,7 +87,7 @@ export const sdsWithRelations = Prisma.validator<Prisma.SDSArgs>()({
 
 export type SdsWithRelations = Prisma.SDSGetPayload<typeof sdsWithRelations>
 
-const chemicalAll = Prisma.validator<Prisma.ChemicalArgs>()({
+export const chemicalAll = Prisma.validator<Prisma.ChemicalArgs>()({
   include: {
     products: {
       include: {
