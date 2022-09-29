@@ -38,7 +38,6 @@ const SdsEntry = (props: Props) => {
   const hazardsArrayMethods = useFieldArray({
     control: control,
     name: "hazards",
-    rules: { required: true },
   })
 
   const hazardFields = hazardsArrayMethods.fields
@@ -55,14 +54,7 @@ const SdsEntry = (props: Props) => {
 
   useEffect(() => {
     reset(values)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reset, JSON.stringify(values)])
-
-  useEffect(() => {
-    if (hazards && hazards.length === 0 && hazardFields.length === 0) {
-      hazardsArrayMethods.append(emptyHazardValues)
-    }
-  }, [hazards, hazardFields, hazardsArrayMethods])
+  }, [reset, values])
 
   return (
     <>
@@ -154,7 +146,7 @@ const SdsEntry = (props: Props) => {
               hazardsArrayMethods.append(emptyHazardValues)
             }}
           >
-            Add another hazard
+            Add hazard
           </button>
         </div>
       </div>
@@ -172,10 +164,6 @@ const SdsEntry = (props: Props) => {
         {form}
       </style>
       <style jsx>{`
-        #risk-level-select {
-          width: min-content;
-        }
-
         .hazard-list {
           margin: 0;
           padding: 0;
