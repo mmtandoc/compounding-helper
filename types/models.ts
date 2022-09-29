@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client"
 
 //TODO: Refactor
 
-const productAll = Prisma.validator<Prisma.ProductArgs>()({
+export const productAll = Prisma.validator<Prisma.ProductArgs>()({
   include: {
     sds: {
       include: {
