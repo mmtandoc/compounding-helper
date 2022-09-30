@@ -104,7 +104,7 @@ const CreateForm = <
 
         .action-row {
           display: flex;
-          gap: 1rem;
+          column-gap: 1rem;
           margin-left: 0.5rem;
           margin-top: 1rem;
         }

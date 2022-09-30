@@ -78,7 +78,7 @@ const SdsPage: NextPage<SdsPageProps> = (props: SdsPageProps) => {
 
         .action-row {
           display: flex;
-          gap: 1rem;
+          column-gap: 1rem;
           margin-left: 0.5rem;
         }
       `}</style>

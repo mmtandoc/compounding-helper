@@ -111,7 +111,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
 
         .action-row {
           display: flex;
-          gap: 1rem;
+          column-gap: 1rem;
           margin-left: 0.5rem;
         }
       `}</style>

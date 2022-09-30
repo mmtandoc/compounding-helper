@@ -93,7 +93,7 @@ const EditForm = <TFieldValues extends FieldValues>(
 
         .button-row {
           display: flex;
-          gap: 0.8rem;
+          column-gap: 0.8rem;
           margin-top: 1.2rem;
         }
       `}</style>
