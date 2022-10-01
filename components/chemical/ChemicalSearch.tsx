@@ -97,15 +97,16 @@ const ChemicalSearch = <TFieldValues extends FieldValues>({
     <AsyncAutocomplete
       id={id}
       name={name}
+      item={chemicalData}
+      items={options}
+      inputRef={ref}
       getItemValue={getItemValue}
       renderSuggestion={renderSuggestion}
-      items={options}
       isLoading={isLoading}
       onSearch={handleSearch}
-      minLength={2}
-      item={chemicalData}
       onItemChange={handleItemChange}
-      inputRef={ref}
+      onBlur={onBlur}
+      minLength={2}
       width={size}
     />
   )
