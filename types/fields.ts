@@ -7,7 +7,7 @@ export type HazardFields = {
 }
 
 export type SdsFields = {
-  id?: number
+  id: number | null
   chemicalId: number
   productId: number
   hmisHazardLevel: number

@@ -58,6 +58,7 @@ const SdsEntry = (props: Props) => {
 
   return (
     <>
+      <input type="hidden" {...register("id", { valueAsNumber: true })} />
       <div className="form-group">
         <label>
           <span>Chemical:</span>

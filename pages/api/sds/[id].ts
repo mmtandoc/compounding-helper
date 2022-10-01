@@ -4,7 +4,9 @@ import { sdsWithRelations, SdsWithRelations } from "types/models"
 import { ApiBody } from "types/common"
 import { SdsFields } from "types/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
-import _ from "lodash"
+import _, { update } from "lodash"
+import { Prisma } from "@prisma/client"
+import SdsHazardMapper from "lib/mappers/SdsHazardMapper"
 
 export default async function handler(
   req: NextApiRequest,
@@ -104,14 +106,9 @@ export const deleteSdsById = async (id: number) => {
 export const updateSdsById = async (id: number, fields: SdsFields) => {
   const hazards = fields.hazards
     .filter((h) => h.classId !== null && h.categoryId !== null)
-    .map((h) => ({
-      id: h.id ?? undefined,
-      hazardCategoryId:
-        (h?.subcategoryId as number) ?? (h.categoryId as number),
-      additionalInfo: h.additionalInfo ?? undefined,
-    }))
+    .map(SdsHazardMapper.toModel)
 
-  return await prisma.sDS.update({
+  const updateArgs = Prisma.validator<Prisma.SDSUpdateArgs>()({
     where: { id },
     data: {
       healthHazards: {
@@ -123,17 +120,21 @@ export const updateSdsById = async (id: number, fields: SdsFields) => {
           },
         },
         createMany: {
-          data: hazards.filter((data) => data.id === null),
+          data: hazards.filter((data) => !data.id),
         },
         update: hazards
-          .filter((data) => data.id !== null)
+          .filter((data) => !!data.id)
           .map((data) => ({
             where: { id: data.id },
             data: _.omit(data, "id"),
           })),
       },
-      ...SdsMapper.toModel(fields),
+      ..._.omit(SdsMapper.toModel(fields), "id"),
     },
     ...sdsWithRelations,
   })
+
+  console.dir(updateArgs, { depth: null })
+
+  return await prisma.sDS.update(updateArgs)
 }
