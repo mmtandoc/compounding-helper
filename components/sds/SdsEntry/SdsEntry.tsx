@@ -127,7 +127,7 @@ const SdsEntry = (props: Props) => {
           />
         </label>
       </div>
-      <div className="form-group">
+      <div className="form-group" style={{ width: "100%" }}>
         <span className="label">Health hazards:</span>
         <div>
           <ul className="hazard-list">
