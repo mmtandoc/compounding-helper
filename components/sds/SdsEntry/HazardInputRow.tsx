@@ -1,3 +1,4 @@
+import Select from "components/common/forms/Select"
 import {
   FieldArrayWithId,
   FieldError,
@@ -23,7 +24,7 @@ const HazardInputRow = ({
   formMethods,
   arrayMethods,
 }: HazardInputRowProps) => {
-  const { register, setValue, watch } = formMethods
+  const { register, setValue, watch, control } = formMethods
 
   const { remove } = arrayMethods
 
@@ -59,20 +60,23 @@ const HazardInputRow = ({
 
   return (
     <li>
-      <select
+      <Select
         className="class-select"
-        defaultValue={undefined}
-        {...register(`hazards.${index}.classId`, {
+        name={`hazards.${index}.classId`}
+        rules={{
           required: true,
           onChange: () => {
             register(`hazards.${index}.categoryId`)
-            setValue(`hazards.${index}.categoryId`, -1)
+            setValue(`hazards.${index}.categoryId`, null)
+            register(`hazards.${index}.subcategoryId`)
+            setValue(`hazards.${index}.subcategoryId`, null)
             register(`hazards.${index}.additionalInfo`)
             setValue(`hazards.${index}.additionalInfo`, null)
           },
-          setValueAs: (val) => (!val ? null : val),
           valueAsNumber: true,
-        })}
+        }}
+        initialOption={{ label: "--Select a hazard class--", value: "none" }}
+        control={control}
       >
         {hazardClasses.map((h, i) => {
           return (
@@ -85,25 +89,23 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </select>
-      <select
+      </Select>
+      <Select
         className="category-select"
         placeholder="Category"
-        defaultValue={undefined}
-        {...register(`hazards.${index}.categoryId`, {
+        name={`hazards.${index}.categoryId`}
+        rules={{
           required: true,
-          disabled: !classId,
           onChange: () => {
             register(`hazards.${index}.subcategoryId`)
-            setValue(`hazards.${index}.subcategoryId`, -1)
+            setValue(`hazards.${index}.subcategoryId`, null)
           },
-          setValueAs: (val) => (val === -1 || !val ? null : val),
           valueAsNumber: true,
-        })}
+        }}
+        disabled={!classId}
+        control={control}
+        initialOption={{ label: "--Select a category--", value: "none" }}
       >
-        <option value={-1} disabled>
-          --Select a category--
-        </option>
         {hazardClass?.hazardCategories?.map((h, i) => {
           return (
             <option key={i} value={h.id}>
@@ -112,29 +114,21 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </select>
-
-      <select
+      </Select>
+      <Select
         className="subcategory-select"
-        {...register(`hazards.${index}.subcategoryId`, {
-          disabled: !categoryId || category?.subcategories.length == 0,
-          setValueAs: (val) => {
-            console.log("setValueAs:")
-            console.log({ val })
-            return !val || val === -1 ? null : val
-          },
-          valueAsNumber: true,
-        })}
-        placeholder="Subcategory"
+        name={`hazards.${index}.subcategoryId`}
+        disabled={!categoryId || !category?.subcategories.length}
+        rules={{ valueAsNumber: true }}
+        initialOption={{
+          label: "No Subcategory",
+          value: "none",
+          disabled: false,
+        }}
         hidden={isTargetOrganToxicity}
+        control={control}
       >
-        <option value={-1} disabled>
-          {!categoryId || category?.subcategories.length == 0
-            ? "N/A"
-            : "--Select a subcategory--"}
-        </option>
         {category?.subcategories?.map((h, i) => {
-          console.log(h)
           return (
             <option key={i} value={h.id}>
               Subcategory {h.level}
@@ -142,7 +136,7 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </select>
+      </Select>
       <input
         className="targeted-organ"
         type="text"
@@ -165,8 +159,8 @@ const HazardInputRow = ({
         li > :is(select, input) {
           flex: 1;
         }
-        .category-select,
-        .subcategory-select {
+
+        :global(.category-select, .subcategory-select) {
           flex: 1;
         }
         li > button {

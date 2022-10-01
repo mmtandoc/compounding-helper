@@ -1,5 +1,6 @@
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Select from "components/common/forms/Select"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
@@ -27,13 +28,11 @@ const emptyHazardValues = {
 const SdsEntry = (props: Props) => {
   const { values, formMethods } = props
 
-  const { register, reset, control, watch, setValue, getValues } = formMethods
+  const { register, reset, control, watch, setValue } = formMethods
 
   const [chemicalId, productId] = watch(["chemicalId", "productId"])
 
   console.log({ productId })
-
-  const hazards = watch("hazards")
 
   const hazardsArrayMethods = useFieldArray({
     control: control,
@@ -70,34 +69,29 @@ const SdsEntry = (props: Props) => {
             onItemChange={(chemical) => {
               if (chemical?.id !== chemicalId) {
                 register(`productId`)
-                setValue(`productId`, -1)
+                setValue(`productId`, null)
               }
             }}
             size={30}
-            defaultValue={null}
           />
         </label>
       </div>
       <div className="form-group">
         <label>
           <span>Product:</span>
-          <select
-            {...register(`productId`, {
-              required: true,
-              disabled: !chemicalId,
-              setValueAs: (val) => (val === -1 || !val ? null : val),
-              valueAsNumber: true,
-            })}
+          <Select
+            name="productId"
+            control={control}
+            rules={{ required: true, valueAsNumber: true }}
+            disabled={!chemicalId}
+            initialOption={{ label: "--- Select product ---", value: "none" }}
           >
-            <option value={-1} disabled>
-              --- Select product ---
-            </option>
             {products?.map((p) => (
               <option key={p.id} value={p.id as number}>
                 {p.name} ({p.vendor.name})
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
       <div className="form-group">
