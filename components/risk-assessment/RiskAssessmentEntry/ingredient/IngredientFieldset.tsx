@@ -208,6 +208,7 @@ const IngredientFieldset = ({
                 name={`ingredients.${index}.commercialProduct.isCommercialProduct`}
                 control={control}
                 className="is-commercial-product"
+                rules={{ required: true }}
               />
             </div>
           </div>
