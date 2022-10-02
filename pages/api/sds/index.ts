@@ -13,6 +13,8 @@ export default async function handler(
 ) {
   const { query, method } = req
 
+  const latestOnly = query["latestOnly"] !== undefined
+
   const offset = query.offset ? parseInt(query.offset as string) : undefined
   const limit = query.offset ? parseInt(query.limit as string) : undefined
 
@@ -21,10 +23,10 @@ export default async function handler(
   //TODO: Implement filtering
   switch (method) {
     case "GET": {
-      let where: Prisma.SDSWhereInput = {}
+      const findManyArgs: Prisma.SDSFindManyArgs = { skip: offset, take: limit }
 
       if (query.chemicalId !== undefined) {
-        where = {
+        findManyArgs.where = {
           product: {
             chemicalId: {
               in: (Array.isArray(query.chemicalId)
@@ -33,26 +35,31 @@ export default async function handler(
               ).map((id) => parseInt(id)),
             },
           },
-          ...where,
+          ...findManyArgs.where,
         }
       }
 
       if (query.productId !== undefined) {
-        where = {
+        findManyArgs.where = {
           productId: {
             in: (Array.isArray(query.productId)
               ? query.productId
               : [query.productId]
             ).map((id) => parseInt(id)),
           },
-          ...where,
+          ...findManyArgs.where,
         }
+      }
+
+      if (latestOnly) {
+        findManyArgs.distinct = "productId"
+        findManyArgs.orderBy = { revisionDate: "desc" }
       }
 
       let safetyDatasheets
 
       try {
-        safetyDatasheets = await getSafetyDataSheets({ where, offset, limit })
+        safetyDatasheets = await getSafetyDataSheets(findManyArgs)
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
@@ -112,20 +119,6 @@ export const createSds = async (fields: SdsFields) => {
   })
 }
 
-export const getSafetyDataSheets = async (options?: {
-  where?: Prisma.SDSWhereInput
-  offset?: number
-  limit?: number
-  orderBy?:
-    | Prisma.SDSOrderByWithRelationInput
-    | Array<Prisma.SDSOrderByWithRelationInput>
-}) => {
-  const { where, offset, limit, orderBy } = options ?? {}
-  return await prisma.sDS.findMany({
-    where,
-    orderBy: orderBy,
-    skip: offset,
-    take: limit,
-    ...sdsWithRelations,
-  })
-}
+export const getSafetyDataSheets = async (
+  args?: Omit<Prisma.SDSFindManyArgs, "select" | "include">,
+) => prisma.sDS.findMany({ ...args, ...sdsWithRelations })

@@ -16,6 +16,7 @@ export type NullPartialRiskAssessmentFields =
 type Props = {
   values?: NullPartialRiskAssessmentFields
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
+  showPastSdsRevisions?: boolean
 }
 
 const emptyIngredientValues = {
@@ -35,7 +36,7 @@ const emptyIngredientValues = {
 }
 
 const RiskAssessmentEntry = (props: Props) => {
-  const { values, formMethods } = props
+  const { values, formMethods, showPastSdsRevisions = false } = props
 
   const { register, reset, control, watch, setValue, getValues } = formMethods
 
@@ -123,6 +124,7 @@ const RiskAssessmentEntry = (props: Props) => {
                 defaultValue: emptyIngredientValues,
               })
             }}
+            showPastSdsRevisions={showPastSdsRevisions}
           />
         ))}
         <div>
