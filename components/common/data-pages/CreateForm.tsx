@@ -2,6 +2,7 @@ import axios from "axios"
 import Link from "next/link"
 import { useState } from "react"
 import {
+  DeepPartial,
   FieldValues,
   SubmitHandler,
   useForm,
@@ -9,7 +10,7 @@ import {
 } from "react-hook-form"
 
 type EntryComponentProps<TFieldValues extends FieldValues> = {
-  values: TFieldValues
+  values?: TFieldValues
   formMethods: UseFormReturn<TFieldValues>
 }
 
@@ -39,7 +40,9 @@ const CreateForm = <
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
   const [savedData, setSavedData] = useState<TDataModel | undefined>()
-  const formMethods = useForm<TFieldValues>()
+  const formMethods = useForm<TFieldValues>({
+    defaultValues: defaultValues as DeepPartial<TFieldValues>,
+  })
 
   const { handleSubmit, reset } = formMethods
 
@@ -61,7 +64,7 @@ const CreateForm = <
     <>
       {!saveSuccessful || !savedData ? (
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-          <EntryComponent values={defaultValues} formMethods={formMethods} />
+          <EntryComponent formMethods={formMethods} />
           <div className="action-row">
             <button type="submit">Submit</button>
             <button type="button" onClick={() => reset()}>
@@ -96,10 +99,6 @@ const CreateForm = <
         form {
           margin-bottom: 5rem;
           align-self: center;
-          display: flex;
-          flex-direction: column;
-          row-gap: 0.8rem;
-          align-items: flex-start;
         }
 
         .action-row {

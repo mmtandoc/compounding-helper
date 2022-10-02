@@ -13,20 +13,25 @@ import Link from "next/link"
 type entryComponentProps<TFieldValues extends FieldValues> = {
   values: TFieldValues
   formMethods: UseFormReturn<TFieldValues>
-}
+} & Record<string, unknown>
 
-type EditFormProps<TFieldValues extends FieldValues> = {
+type EditFormProps<
+  TFieldValues extends FieldValues,
+  TEntryProps extends Record<string, unknown>,
+> = {
   id: number
   values: TFieldValues
   apiEndpointPath: string
   urlPath: string
-  entryComponent: (
-    props: Record<string, unknown> & entryComponentProps<TFieldValues>,
-  ) => JSX.Element
+  entryComponent: (props: entryComponentProps<TFieldValues>) => JSX.Element
+  entryComponentProps?: TEntryProps
 }
 
-const EditForm = <TFieldValues extends FieldValues>(
-  props: EditFormProps<TFieldValues>,
+const EditForm = <
+  TFieldValues extends FieldValues,
+  TEntryProps extends Record<string, unknown>,
+>(
+  props: EditFormProps<TFieldValues, TEntryProps>,
 ) => {
   const {
     id,
@@ -34,6 +39,7 @@ const EditForm = <TFieldValues extends FieldValues>(
     apiEndpointPath,
     urlPath,
     entryComponent: EntryComponent,
+    entryComponentProps,
   } = props
 
   const router = useRouter()
@@ -67,7 +73,11 @@ const EditForm = <TFieldValues extends FieldValues>(
       })}
       autoComplete="off"
     >
-      <EntryComponent values={values} formMethods={formMethods} />
+      <EntryComponent
+        values={values}
+        formMethods={formMethods}
+        {...entryComponentProps}
+      />
       <div>
         <div className="button-row">
           <button type="submit">Save</button>
@@ -85,10 +95,6 @@ const EditForm = <TFieldValues extends FieldValues>(
         form {
           align-self: center;
           margin-bottom: 2rem;
-          display: flex;
-          flex-direction: column;
-          row-gap: 0.8rem;
-          align-items: flex-start;
         }
 
         .button-row {
