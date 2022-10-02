@@ -48,9 +48,9 @@ const TableHead = <TData,>(props: Props<TData>) => {
   return (
     <thead>
       <tr>
-        {columns.map(({ label, accessorPath, sortable }) => (
+        {columns.map(({ label, accessorPath, sortable }, i) => (
           <th
-            key={accessorPath}
+            key={i}
             className={sortable ? "sortable" : ""}
             onClick={
               sortable && accessorPath
