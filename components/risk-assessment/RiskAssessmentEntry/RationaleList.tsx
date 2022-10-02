@@ -40,12 +40,9 @@ const RationaleList = ({
   const ingredients = watch("ingredients")
 
   //TODO: Handle error
-  const sdsUrls =
-    ingredients
-      ?.map((ingredient) =>
-        ingredient?.sdsId ? `/api/sds/${ingredient.sdsId}` : null,
-      )
-      .filter<string>(_.isString) ?? null
+  const sdsUrls = ingredients?.map((ingredient) =>
+    ingredient?.sdsId ? `/api/sds/${ingredient.sdsId}` : null,
+  )
 
   const { data: safetyDatasheets, error: sdsesError } = useSWR<
     SdsWithRelations[],
@@ -88,7 +85,7 @@ const RationaleList = ({
   })
 
   //TODO: Improve loading handling
-  if (!safetyDatasheets) {
+  if (sdsUrls?.length && !safetyDatasheets) {
     return <div>Loading...</div>
   }
 
