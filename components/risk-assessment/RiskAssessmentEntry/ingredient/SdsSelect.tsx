@@ -8,7 +8,7 @@ type SdsSelectProps = {
   chemical?: ChemicalAll
   sdses?: SdsWithRelations[]
   vendors?: Vendor[]
-  showPastRevisions: boolean
+  showAllRevisions: boolean
   register: UseFormRegister<NullPartialRiskAssessmentFields>
   ingredientIndex: number
   disabled?: boolean
@@ -19,7 +19,7 @@ const SdsSelect = ({
   chemical,
   sdses,
   vendors,
-  showPastRevisions,
+  showAllRevisions,
   register,
   ingredientIndex,
   disabled = true,
@@ -70,7 +70,7 @@ const SdsSelect = ({
             </option>
           )
 
-          if (showPastRevisions) {
+          if (showAllRevisions) {
             return (
               <optgroup label={productLabel} key={pid}>
                 {sdsArray.map(renderSdsOption)}

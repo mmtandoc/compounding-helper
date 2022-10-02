@@ -22,6 +22,7 @@ interface IngredientFieldsetProps {
   index: number
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
   arrayMethods: UseFieldArrayReturn<NullPartialRiskAssessmentFields>
+  showPastSdsRevisions?: boolean
   reset: () => void
 }
 
@@ -30,6 +31,7 @@ const IngredientFieldset = ({
   reset,
   formMethods,
   arrayMethods,
+  showPastSdsRevisions = false,
 }: IngredientFieldsetProps) => {
   const { register, control, setValue, watch } = formMethods
 
@@ -53,7 +55,9 @@ const IngredientFieldset = ({
   >(
     !ingredient?.chemicalId
       ? null
-      : `/api/sds?chemicalId=${ingredient.chemicalId}`,
+      : `/api/sds?chemicalId=${ingredient.chemicalId}${
+          !showPastSdsRevisions ? "&latestOnly" : ""
+        }`,
   )
 
   //TODO: Handle error
@@ -82,7 +86,10 @@ const IngredientFieldset = ({
   useUpdateFieldConditionally({
     updateCondition: isCommercialProduct !== true,
     fields: [
-      [`ingredients.${index}.commercialProduct.hasProductMonographConcerns`, null],
+      [
+        `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
+        null,
+      ],
       [`ingredients.${index}.commercialProduct.name`, null],
       [`ingredients.${index}.commercialProduct.din`, null],
     ],
@@ -117,9 +124,6 @@ const IngredientFieldset = ({
   if (isLoading) {
     return <div>Loading...</div>
   }
-
-  //TODO: Show past revisions only in certain situations
-  const showPastRevisions = false
 
   const selectedSds = sdsesData?.find((sds) => sds.id === ingredient?.sdsId)
 
@@ -182,7 +186,7 @@ const IngredientFieldset = ({
                   chemical={chemicalData}
                   vendors={vendorsData}
                   sdses={sdsesData}
-                  showPastRevisions={showPastRevisions}
+                  showAllRevisions={showPastSdsRevisions}
                   ingredientIndex={index}
                   register={register}
                   disabled={!ingredient?.chemicalId}
