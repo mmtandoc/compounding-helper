@@ -35,7 +35,9 @@ const toFieldValues = (
   return {
     id: data.id,
     compoundName: data.compoundName,
-    ingredients: data.ingredients.map(IngredientMapper.toFieldValues),
+    ingredients: data.ingredients
+      .map(IngredientMapper.toFieldValues)
+      .sort((a, b) => a.order - b.order),
     complexity: data.complexity,
     preparationFrequency: data.preparationFrequency,
     isSmallQuantity: data.isSmallQuantity,

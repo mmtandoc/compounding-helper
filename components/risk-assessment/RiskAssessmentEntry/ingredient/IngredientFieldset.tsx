@@ -83,6 +83,11 @@ const IngredientFieldset = ({
     `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
   )
 
+  useEffect(() => {
+    register(`ingredients.${index}.order`)
+    setValue(`ingredients.${index}.order`, index + 1)
+  }, [index, register, setValue])
+
   useUpdateFieldConditionally({
     updateCondition: isCommercialProduct !== true,
     fields: [
@@ -126,8 +131,6 @@ const IngredientFieldset = ({
   }
 
   const selectedSds = sdsesData?.find((sds) => sds.id === ingredient?.sdsId)
-
-  register(`ingredients.${index}.id`)
 
   return (
     <fieldset className="ingredient-fieldset">

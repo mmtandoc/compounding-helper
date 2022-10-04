@@ -55,20 +55,10 @@ export default async function handler(
       try {
         riskAssessment = await updateRiskAssessmentById(id, {
           ingredients: {
-            deleteMany: {
-              id: {
-                notIn: fields.ingredients.map((v) => v.id).filter(_.isNumber),
-              },
-            },
+            deleteMany: {},
             createMany: {
-              data: ingredients.filter((data) => !_.isNumber(data.id)),
+              data: ingredients,
             },
-            update: ingredients
-              .filter((data) => _.isNumber(data.id))
-              .map((data) => ({
-                where: { id: data.id },
-                data: _.omit(data, "id"),
-              })),
           },
           ...RiskAssessmentMapper.toModel(fields),
         })

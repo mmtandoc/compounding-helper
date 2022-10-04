@@ -234,33 +234,33 @@ INSERT INTO public.risk_assessments (id, "compoundName", complexity, "preparatio
 -- Data for Name: ingredients; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (1, 1, 2, 'cream', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (2, 2, 1, 'cream', 'TEST COMMERCIAL PRODUCT', 123456, true, 'TEST PRODUCT MONOGRAPH CONCERNS');
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (20, 7, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (21, 7, NULL, 'liquid', 'Cetaphil lotion', NULL, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (32, 13, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (33, 13, 16, 'cream', 'KETODERM CREAM', 99999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (34, 14, 7, 'cream', 'HYDERM CREAM', 99999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (35, 14, 16, 'cream', 'KETODERM CREAM', 99999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (36, 15, 8, 'cream', 'CLOTRIMADERM 1% CREAM', 999999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (37, 15, 7, 'cream', 'HYDERM 1% CREAM', 99999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (38, 16, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (39, 16, 15, 'cream', 'LAMISIL CREAM', 9999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (30, 12, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (31, 12, 17, 'cream', 'NYADERM', 9999999, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (3, 3, 1, 'cream', 'TEST COMMERCIAL PRODUCT', 123456, true, 'TEST PRODUCT MONOGRAPH CONCERNS 2');
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (4, 3, 2, 'cream', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (40, 17, 4, 'cream', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (22, 8, 5, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (23, 8, NULL, 'cream', 'GLAXAL BASE', NULL, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (26, 10, 5, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (27, 10, NULL, 'liquid', 'NEOSTRATA SOLUTION', NULL, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (5, 4, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (6, 4, 8, 'cream', 'CLOTRIMADERM/CANESTEN 1%', 999995, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (28, 11, 7, 'powder', NULL, NULL, NULL, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (29, 11, NULL, 'cream', 'CLOTRIMADERM 2% CREAM or CANESTEN 2% CREAM', NULL, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (42, 18, NULL, 'ointment', 'PRODUCT NAME', NULL, false, NULL);
-INSERT INTO public.ingredients (id, "riskAssessmentId", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (41, 18, 3, 'solid', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (1, 1, 2, 'cream', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (2, 1, 1, 'cream', 'TEST COMMERCIAL PRODUCT', 123456, true, 'TEST PRODUCT MONOGRAPH CONCERNS');
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (3, 1, 1, 'cream', 'TEST COMMERCIAL PRODUCT', 123456, true, 'TEST PRODUCT MONOGRAPH CONCERNS 2');
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (3, 2, 2, 'cream', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (4, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (4, 2, 8, 'cream', 'CLOTRIMADERM/CANESTEN 1%', 999995, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (7, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (7, 2, NULL, 'liquid', 'Cetaphil lotion', NULL, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (8, 1, 5, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (8, 2, NULL, 'cream', 'GLAXAL BASE', NULL, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (10, 1, 5, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (10, 2, NULL, 'liquid', 'NEOSTRATA SOLUTION', NULL, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (11, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (11, 2, NULL, 'cream', 'CLOTRIMADERM 2% CREAM or CANESTEN 2% CREAM', NULL, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (12, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (12, 2, 17, 'cream', 'NYADERM', 9999999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (13, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (13, 2, 16, 'cream', 'KETODERM CREAM', 99999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (14, 1, 7, 'cream', 'HYDERM CREAM', 99999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (14, 2, 16, 'cream', 'KETODERM CREAM', 99999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (15, 1, 7, 'cream', 'HYDERM 1% CREAM', 99999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (15, 2, 8, 'cream', 'CLOTRIMADERM 1% CREAM', 999999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (16, 1, 7, 'powder', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (16, 2, 15, 'cream', 'LAMISIL CREAM', 9999, false, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (17, 1, 4, 'cream', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (18, 1, 3, 'solid', NULL, NULL, NULL, NULL);
+INSERT INTO public.ingredients ("riskAssessmentId", "order", "safetyDataSheetId", "physicalForm", "commercialProductName", "commercialProductDin", "hasProductMonographConcerns", "concernsDescription") VALUES (18, 2, NULL, 'ointment', 'PRODUCT NAME', NULL, false, NULL);
 
 
 --
@@ -289,13 +289,6 @@ SELECT pg_catalog.setval('public.hazard_category_to_sds_id_seq', COALESCE(MAX(id
 --
 
 SELECT pg_catalog.setval('public.hazard_classes_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.hazard_classes;
-
-
---
--- Name: ingredients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.ingredients_id_seq', COALESCE(MAX(id), 1), TRUE) FROM public.ingredients;
 
 
 --

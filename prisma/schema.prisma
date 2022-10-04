@@ -190,9 +190,9 @@ enum PreparationFrequency {
 }
 
 model Ingredient {
-  id                          Int            @id @default(autoincrement())
   riskAssessment              RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
   riskAssessmentId            Int
+  order                       Int
   safetyDataSheet             SDS?           @relation(fields: [safetyDataSheetId], references: [id])
   safetyDataSheetId           Int?
   physicalForm                PhysicalForm
@@ -201,6 +201,7 @@ model Ingredient {
   hasProductMonographConcerns Boolean?
   concernsDescription         String?
 
+  @@id([riskAssessmentId, order])
   @@map("ingredients")
 }
 
