@@ -4,34 +4,23 @@ import {
   FieldValues,
   SubmitHandler,
   useForm,
-  UseFormReturn,
 } from "react-hook-form"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Link from "next/link"
+import { DataEntryComponent } from "types/common"
 
-type entryComponentProps<TFieldValues extends FieldValues> = {
-  values: TFieldValues
-  formMethods: UseFormReturn<TFieldValues>
-} & Record<string, unknown>
-
-type EditFormProps<
-  TFieldValues extends FieldValues,
-  TEntryProps extends Record<string, unknown>,
-> = {
+type EditFormProps<TFieldValues extends FieldValues> = {
   id: number
   values: TFieldValues
   apiEndpointPath: string
   urlPath: string
-  entryComponent: (props: entryComponentProps<TFieldValues>) => JSX.Element
-  entryComponentProps?: TEntryProps
+  entryComponent: DataEntryComponent<TFieldValues>
+  entryComponentProps?: Record<string, unknown>
 }
 
-const EditForm = <
-  TFieldValues extends FieldValues,
-  TEntryProps extends Record<string, unknown>,
->(
-  props: EditFormProps<TFieldValues, TEntryProps>,
+const EditForm = <TFieldValues extends FieldValues>(
+  props: EditFormProps<TFieldValues>,
 ) => {
   const {
     id,
@@ -49,7 +38,11 @@ const EditForm = <
     defaultValues: values as DeepPartial<TFieldValues>,
   })
 
-  const { handleSubmit } = formMethods
+  const { handleSubmit, reset } = formMethods
+
+  useEffect(() => {
+    reset(values)
+  }, [reset, values])
 
   const onSubmit: SubmitHandler<TFieldValues> = async (data) => {
     await axios

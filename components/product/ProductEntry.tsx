@@ -1,29 +1,24 @@
 import { Vendor } from "@prisma/client"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
-import DotJotList from "components/common/forms/DotJotList"
-import { RHFRadioGroup } from "components/RadioGroup"
-import React, { useEffect } from "react"
-import { Controller, UseFormReturn } from "react-hook-form"
+import { UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import useSWR from "swr"
+import { DataEntryComponent } from "types/common"
 import { ProductFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 
 export type NullPartialProductFields = NullPartialDeep<ProductFields>
 
 type Props = {
-  values?: NullPartialProductFields
   formMethods: UseFormReturn<NullPartialProductFields>
 }
 
-const ProductEntry = (props: Props) => {
-  const { values, formMethods } = props
+const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
+  props,
+) => {
+  const { formMethods } = props
 
-  const { register, control, reset, watch } = formMethods
-
-  useEffect(() => {
-    reset(values)
-  }, [reset, values])
+  const { register, control } = formMethods
 
   const { data: vendors, error: vendorsError } =
     useSWR<Vendor[]>("/api/vendors")

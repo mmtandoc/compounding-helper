@@ -1,26 +1,22 @@
 import axios from "axios"
+import _ from "lodash"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   DeepPartial,
   FieldValues,
+  FormProvider,
   SubmitHandler,
   useForm,
   UseFormReturn,
 } from "react-hook-form"
-
-type EntryComponentProps<TFieldValues extends FieldValues> = {
-  values?: TFieldValues
-  formMethods: UseFormReturn<TFieldValues>
-}
+import { DataEntryComponent } from "types/common"
 
 type CreateFormProps<TFieldValues extends FieldValues> = {
   defaultValues: TFieldValues
   apiEndpointPath: string
   urlPath: string
-  entryComponent: (
-    props: Record<string, unknown> & EntryComponentProps<TFieldValues>,
-  ) => JSX.Element
+  entryComponent: DataEntryComponent<TFieldValues>
   dataName: string
 }
 
@@ -45,6 +41,10 @@ const CreateForm = <
   })
 
   const { handleSubmit, reset } = formMethods
+
+  useEffect(() => {
+    reset(defaultValues)
+  }, [reset, defaultValues])
 
   const onSubmit: SubmitHandler<TFieldValues> = async (data) => {
     await axios
