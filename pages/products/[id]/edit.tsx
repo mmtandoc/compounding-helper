@@ -1,21 +1,19 @@
-import ChemicalEntry, {
-  NullPartialChemicalFields,
-} from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
 import Layout from "components/Layout"
-import ChemicalMapper from "lib/mappers/ChemicalMapper"
+import ProductEntry, {
+  NullPartialProductFields,
+} from "components/product/ProductEntry"
+import ProductMapper from "lib/mappers/ProductMapper"
 import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { getChemicalById } from "pages/api/chemicals/[id]"
-import { ChemicalFields } from "types/fields"
+import { getProductById } from "pages/api/products/[id]"
+import { ProductFields } from "types/fields"
 
-type EditChemicalProps = {
-  values: ChemicalFields
+type EditProductProps = {
+  values: ProductFields
 }
 
-const EditChemical: NextPage<EditChemicalProps> = (
-  props: EditChemicalProps,
-) => {
+const EditProduct: NextPage<EditProductProps> = (props: EditProductProps) => {
   const { values } = props
 
   const router = useRouter()
@@ -24,13 +22,13 @@ const EditChemical: NextPage<EditChemicalProps> = (
   return (
     <Layout>
       <div className="page">
-        <h1>Edit Chemical - {values?.name}</h1>
+        <h1>Edit Product - {values?.name}</h1>
         <EditForm
           id={id}
-          values={values as NullPartialChemicalFields}
-          apiEndpointPath="/api/chemicals"
-          urlPath="/chemicals"
-          entryComponent={ChemicalEntry}
+          values={values as NullPartialProductFields}
+          apiEndpointPath="/api/products"
+          urlPath="/products"
+          entryComponent={ProductEntry}
         />
       </div>
       <style jsx>{`
@@ -46,14 +44,16 @@ const EditChemical: NextPage<EditChemicalProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
+  context,
+) => {
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getChemicalById(id)
+  const data = await getProductById(id)
 
   if (data === null) {
     return { notFound: true }
@@ -61,9 +61,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      values: ChemicalMapper.toFieldValues(data),
+      values: ProductMapper.toFieldValues(data),
     },
   }
 }
 
-export default EditChemical
+export default EditProduct
