@@ -40,14 +40,17 @@ const RationaleList = ({
   const ingredients = watch("ingredients")
 
   //TODO: Handle error
-  const sdsUrls = ingredients?.map((ingredient) =>
-    ingredient?.sdsId ? `/api/sds/${ingredient.sdsId}` : null,
-  )
+  const sdsUrls =
+    ingredients
+      ?.map((ingredient) =>
+        ingredient?.sdsId ? `/api/sds/${ingredient.sdsId}` : null,
+      )
+      .filter<string>(_.isString) ?? []
 
   const { data: safetyDatasheets, error: sdsesError } = useSWR<
     SdsWithRelations[],
     JsonError
-  >([sdsUrls])
+  >(sdsUrls.length > 0 ? [sdsUrls] : null)
 
   if (sdsesError) {
     console.log(sdsesError)
@@ -85,7 +88,7 @@ const RationaleList = ({
   })
 
   //TODO: Improve loading handling
-  if (sdsUrls?.length && !safetyDatasheets) {
+  if (sdsUrls.length > 0 && !safetyDatasheets) {
     return <div>Loading...</div>
   }
 
