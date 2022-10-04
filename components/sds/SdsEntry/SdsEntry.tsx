@@ -13,7 +13,6 @@ import HazardInputRow from "./HazardInputRow"
 export type NullPartialSdsFields = NullPartialDeep<SdsFields>
 
 type Props = {
-  values?: NullPartialSdsFields
   formMethods: UseFormReturn<NullPartialSdsFields>
 }
 
@@ -26,9 +25,9 @@ const emptyHazardValues = {
 }
 
 const SdsEntry = (props: Props) => {
-  const { values, formMethods } = props
+  const { formMethods } = props
 
-  const { register, reset, control, watch, setValue } = formMethods
+  const { register, control, watch, setValue } = formMethods
 
   const [chemicalId, productId] = watch(["chemicalId", "productId"])
 
@@ -50,10 +49,6 @@ const SdsEntry = (props: Props) => {
   if (productsError) {
     console.error(productsError)
   }
-
-  useEffect(() => {
-    reset(values)
-  }, [reset, values])
 
   return (
     <>

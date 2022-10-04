@@ -14,7 +14,6 @@ export type NullPartialRiskAssessmentFields =
   NullPartialDeep<RiskAssessmentFields>
 
 type Props = {
-  values?: NullPartialRiskAssessmentFields
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
   showPastSdsRevisions?: boolean
 }
@@ -36,9 +35,9 @@ const emptyIngredientValues = {
 }
 
 const RiskAssessmentEntry = (props: Props) => {
-  const { values, formMethods, showPastSdsRevisions = false } = props
+  const { formMethods, showPastSdsRevisions = false } = props
 
-  const { register, reset, control, watch, setValue, getValues } = formMethods
+  const { register, control, watch, setValue, getValues } = formMethods
 
   const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
     watch([
@@ -57,11 +56,6 @@ const RiskAssessmentEntry = (props: Props) => {
   const ingredientFields = ingredientsArrayMethods.fields
 
   const ingredients = watch("ingredients")
-
-  useEffect(() => {
-    reset(values)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reset, JSON.stringify(values)])
 
   const usesCommercialProduct = ingredients?.some(
     (i) => i?.commercialProduct?.isCommercialProduct === true,
