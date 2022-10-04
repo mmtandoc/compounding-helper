@@ -1,26 +1,24 @@
 import DotJotList from "components/common/forms/DotJotList"
 import { RHFRadioGroup } from "components/RadioGroup"
-import React, { useEffect } from "react"
+import React from "react"
 import { Controller, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
+import { DataEntryComponent } from "types/common"
 import { ChemicalFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 
 export type NullPartialChemicalFields = NullPartialDeep<ChemicalFields>
 
 type Props = {
-  values?: NullPartialChemicalFields
   formMethods: UseFormReturn<NullPartialChemicalFields>
 }
 
-const ChemicalEntry = (props: Props) => {
-  const { values, formMethods } = props
+const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
+  props: Props,
+) => {
+  const { formMethods } = props
 
-  const { register, control, reset } = formMethods
-
-  useEffect(() => {
-    reset(values)
-  }, [reset, values])
+  const { register, control } = formMethods
 
   return (
     <>
