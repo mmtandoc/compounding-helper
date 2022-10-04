@@ -14,10 +14,10 @@ model Chemical {
   synonyms          String[]
   products          Product[]
   nioshTable        Int       @default(-1)
-  nioshRevisionDate DateTime?
+  nioshRevisionDate DateTime? @db.Date
   updatedAt         DateTime  @default(now()) @updatedAt
-  //ingredients       Ingredient[]
 
+  //@@index([synonyms(ops: ArrayOps)], type: Gin)
   @@map("chemicals")
 }
 
@@ -47,7 +47,7 @@ model SDS {
   id                 Int                   @id @default(autoincrement())
   product            Product               @relation(fields: [productId], references: [id])
   productId          Int
-  revisionDate       DateTime
+  revisionDate       DateTime              @db.Date
   hmisHealthHazard   Int
   requireVentilation Boolean
   healthHazards      HazardCategoryToSDS[]

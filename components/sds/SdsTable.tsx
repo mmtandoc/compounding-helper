@@ -49,7 +49,7 @@ const SdsTable = (props: Props) => {
             sortable: true,
             compare: (a: Date, b: Date) =>
               a.toISOString().localeCompare(b.toISOString()),
-            renderCell: (date: Date) => date.toLocaleDateString("en-CA"),
+            renderCell: (date: Date) => date.toISOString().split("T")[0],
           },
           {
             accessorPath: "",
