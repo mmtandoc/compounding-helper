@@ -7,7 +7,10 @@ import { DataEntryComponent } from "types/common"
 import { ProductFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 
-export type NullPartialProductFields = NullPartialDeep<ProductFields>
+export type NullPartialProductFields = NullPartialDeep<
+  ProductFields,
+  { ignoreKeys: "id" }
+>
 
 type Props = {
   formMethods: UseFormReturn<NullPartialProductFields>
@@ -27,6 +30,7 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
     console.error(vendorsError)
   }
 
+  register("id")
   return (
     <>
       <label className="form-group">

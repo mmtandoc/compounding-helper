@@ -4,7 +4,6 @@ import SdsEntry, { NullPartialSdsFields } from "components/sds/SdsEntry"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialSdsFields = {
-  id: null,
   chemicalId: null,
   productId: null,
   hmisHazardLevel: null,

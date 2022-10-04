@@ -57,19 +57,18 @@ export default async function handler(
           ingredients: {
             deleteMany: {
               id: {
-                notIn: fields.ingredients
-                  .filter((v) => v.id !== null)
-                  .map((v) => v.id as number),
+                notIn: fields.ingredients.map((v) => v.id).filter(_.isNumber),
               },
             },
             createMany: {
-              data: ingredients.filter((data) => data.id === null),
+              data: ingredients.filter((data) => !_.isNumber(data.id)),
             },
             update: ingredients
-              .filter((data) => data.id !== null)
-              .map((data) => {
-                return { where: { id: data.id }, data: _.omit(data, "id") }
-              }),
+              .filter((data) => _.isNumber(data.id))
+              .map((data) => ({
+                where: { id: data.id },
+                data: _.omit(data, "id"),
+              })),
           },
           ...RiskAssessmentMapper.toModel(fields),
         })

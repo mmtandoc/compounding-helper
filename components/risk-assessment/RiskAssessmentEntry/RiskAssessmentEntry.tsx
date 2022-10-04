@@ -3,23 +3,32 @@ import { RHFRadioGroup } from "components/RadioGroup"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
-import { RiskAssessmentFields } from "types/fields"
-import { NullPartialDeep } from "types/util"
+import { RiskAssessmentFields, IngredientFields } from "types/fields"
+import { NullPartialDeep, Overwrite } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import IngredientFieldset from "./ingredient/IngredientFieldset"
 import RationaleList from "./RationaleList"
 
-export type NullPartialRiskAssessmentFields =
-  NullPartialDeep<RiskAssessmentFields>
+export type NullPartialIngredientFields = NullPartialDeep<
+  IngredientFields,
+  { ignoreKeys: "id" }
+>
+
+export type NullPartialRiskAssessmentFields = NullPartialDeep<
+  Overwrite<
+    RiskAssessmentFields,
+    { ingredients: NullPartialIngredientFields[] }
+  >,
+  { ignoreKeys: "id" }
+>
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
   showPastSdsRevisions?: boolean
 }
 
-const emptyIngredientValues = {
-  id: null,
+const emptyIngredientValues: NullPartialIngredientFields = {
   chemicalId: null,
   physicalForm: null,
   productId: null,
@@ -92,6 +101,7 @@ const RiskAssessmentEntry = (props: Props) => {
     setValue,
   })
 
+  register("id")
   return (
     <>
       <div className="form-group">

@@ -1,5 +1,6 @@
 import { RiskAssessment } from "@prisma/client"
 import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
+import { SetOptional } from "type-fest"
 import { ExposureRisksFields, RiskAssessmentFields } from "types/fields"
 import { RiskAssessmentAll } from "types/models"
 import IngredientMapper from "./IngredientMapper"
@@ -32,6 +33,7 @@ const toFieldValues = (
   data: RiskAssessmentAll,
 ): NullPartialRiskAssessmentFields => {
   return {
+    id: data.id,
     compoundName: data.compoundName,
     ingredients: data.ingredients.map(IngredientMapper.toFieldValues),
     complexity: data.complexity,
@@ -87,8 +89,11 @@ const toFieldValues = (
   }
 }
 
-const toModel = (fields: RiskAssessmentFields): RiskAssessment => {
-  let data: RiskAssessment = {} as RiskAssessment
+//TODO: Refactor
+const toModel = (
+  fields: RiskAssessmentFields,
+): SetOptional<RiskAssessment, "id"> => {
+  let data = {} as SetOptional<RiskAssessment, "id">
   console.log({ fields })
   for (const key in fields) {
     if (Object.hasOwn(fields, key)) {

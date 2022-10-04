@@ -127,15 +127,13 @@ const IngredientFieldset = ({
 
   const selectedSds = sdsesData?.find((sds) => sds.id === ingredient?.sdsId)
 
+  register(`ingredients.${index}.id`)
+
   return (
     <fieldset className="ingredient-fieldset">
       <div className="ingredient-body">
         <div className="inputs-container">
           <div className="row">
-            <input
-              type="hidden"
-              {...register(`ingredients.${index}.id`, { valueAsNumber: true })}
-            />
             <div className="form-group">
               <label htmlFor={`i${index}-chemical-search`}>
                 Chemical name:{" "}

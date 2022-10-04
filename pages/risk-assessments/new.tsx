@@ -9,7 +9,6 @@ const defaultValues: NullPartialRiskAssessmentFields = {
   compoundName: null,
   ingredients: [
     {
-      id: null,
       chemicalId: null,
       physicalForm: null,
       productId: null,

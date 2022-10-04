@@ -7,7 +7,10 @@ import { DataEntryComponent } from "types/common"
 import { ChemicalFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
 
-export type NullPartialChemicalFields = NullPartialDeep<ChemicalFields>
+export type NullPartialChemicalFields = NullPartialDeep<
+  ChemicalFields,
+  { ignoreKeys: "id" }
+>
 
 type Props = {
   formMethods: UseFormReturn<NullPartialChemicalFields>
@@ -20,6 +23,7 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
 
   const { register, control } = formMethods
 
+  register("id")
   return (
     <>
       <label className="form-group">

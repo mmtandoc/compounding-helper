@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Primitive, Simplify } from "type-fest"
+import { Merge, Primitive, Simplify } from "type-fest"
 
 //Based off of PartialDeep from type-fest (https://github.com/sindresorhus/type-fest)
+
+//TODO: Make "ignoreKeys" based on full path and not just key name
 
 type BuiltIns = Primitive | Date | RegExp
 
@@ -20,6 +22,14 @@ export interface NullPartialDeepOptions {
 	@default false
 	*/
   readonly makeArrayTypeNullable?: boolean
+
+  readonly ignoreKeys?: unknown
+}
+
+interface DefaultNullPartialDeepOptions extends NullPartialDeepOptions {
+  recurseIntoArrays: true
+  makeArrayTypeNullable: false
+  ignoreKeys: never
 }
 
 /**
@@ -73,36 +83,37 @@ If this is undesirable, you can pass `{recurseIntoArrays: false}` as the second 
 */
 export type NullPartialDeep<
   T,
-  Options extends NullPartialDeepOptions = {
-    recurseIntoArrays: true
-    makeArrayTypeNullable: false
-  },
+  Options extends NullPartialDeepOptions = DefaultNullPartialDeepOptions,
+  MergedOptions extends NullPartialDeepOptions = Merge<
+    DefaultNullPartialDeepOptions,
+    Options
+  >,
 > = T extends BuiltIns
   ? T
   : T extends Map<infer KeyType, infer ValueType>
-  ? NullPartialMapDeep<KeyType, ValueType, Options>
+  ? NullPartialMapDeep<KeyType, ValueType, MergedOptions>
   : T extends Set<infer ItemType>
-  ? NullPartialSetDeep<ItemType, Options>
+  ? NullPartialSetDeep<ItemType, MergedOptions>
   : T extends ReadonlyMap<infer KeyType, infer ValueType>
-  ? NullPartialReadonlyMapDeep<KeyType, ValueType, Options>
+  ? NullPartialReadonlyMapDeep<KeyType, ValueType, MergedOptions>
   : T extends ReadonlySet<infer ItemType>
-  ? NullPartialReadonlySetDeep<ItemType, Options>
+  ? NullPartialReadonlySetDeep<ItemType, MergedOptions>
   : T extends (...args: any[]) => unknown
   ? T | null
   : T extends object
   ? T extends ReadonlyArray<infer ItemType> // Test for arrays/tuples, per https://github.com/microsoft/TypeScript/issues/35156
-    ? Options["recurseIntoArrays"] extends false // If they opt out of array testing, just use the original type
+    ? MergedOptions["recurseIntoArrays"] extends false // If they opt out of array testing, just use the original type
       ? T
       : ItemType[] extends T // Test for arrays (non-tuples) specifically
       ? readonly ItemType[] extends T // Differentiate readonly and mutable arrays
-        ? Options["makeArrayTypeNullable"] extends false
-          ? ReadonlyArray<NullPartialDeep<ItemType, Options>>
-          : ReadonlyArray<NullPartialDeep<ItemType | null, Options>>
-        : Options["makeArrayTypeNullable"] extends false
-        ? Array<NullPartialDeep<ItemType, Options>>
-        : Array<NullPartialDeep<ItemType | null, Options>>
-      : NullPartialObjectDeep<T, Options> // Tuples behave properly
-    : NullPartialObjectDeep<T, Options>
+        ? MergedOptions["makeArrayTypeNullable"] extends false
+          ? ReadonlyArray<NullPartialDeep<ItemType, MergedOptions>>
+          : ReadonlyArray<NullPartialDeep<ItemType | null, MergedOptions>>
+        : MergedOptions["makeArrayTypeNullable"] extends false
+        ? Array<NullPartialDeep<ItemType, MergedOptions>>
+        : Array<NullPartialDeep<ItemType | null, MergedOptions>>
+      : NullPartialObjectDeep<T, MergedOptions> // Tuples behave properly
+    : NullPartialObjectDeep<T, MergedOptions>
   : unknown
 
 /**
@@ -148,8 +159,7 @@ type NullPartialObjectDeep<
   ObjectType extends object,
   Options extends NullPartialDeepOptions,
 > = Simplify<{
-  [KeyType in keyof ObjectType]: NullPartialDeep<
-    ObjectType[KeyType],
-    Options
-  > | null
+  [KeyType in keyof ObjectType]: KeyType extends Options["ignoreKeys"]
+    ? ObjectType[KeyType]
+    : NullPartialDeep<ObjectType[KeyType], Options> | null
 }>

@@ -6,7 +6,6 @@ import ProductEntry, {
 import { NextPage } from "next"
 
 const defaultValues: NullPartialProductFields = {
-  id: null,
   name: null,
   vendorId: null,
   chemicalId: null,

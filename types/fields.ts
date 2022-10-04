@@ -1,13 +1,13 @@
 export type HazardFields = {
-  id: number | null
-  classId: number | null
-  categoryId: number | null
+  id?: number
+  classId: number
+  categoryId: number
   subcategoryId?: number | null
   additionalInfo?: string | null
 }
 
 export type SdsFields = {
-  id: number | null
+  id?: number
   chemicalId: number
   productId: number
   hmisHazardLevel: number
@@ -42,22 +42,23 @@ export type ExposureRisksFields = {
 }
 
 export type IngredientFields = {
-  id: number | null
+  id?: number
   chemicalId: number | null
   productId: number | null
   sdsId: number | null
   physicalForm: "cream" | "ointment" | "powder" | "liquid" | "solid"
   commercialProduct: {
     isCommercialProduct: boolean
-    name: string | null
-    din: number | null
-    hasNoDin: boolean | null
-    hasProductMonographConcerns: boolean | null
-    concernsDescription: string | null
-  } | null
+    name?: string | null
+    din?: number | null
+    hasNoDin?: boolean | null
+    hasProductMonographConcerns?: boolean | null
+    concernsDescription?: string | null
+  }
 }
 
 export type RiskAssessmentFields = {
+  id?: number
   compoundName: string
   ingredients: IngredientFields[]
   complexity: "simple" | "moderate" | "complex"

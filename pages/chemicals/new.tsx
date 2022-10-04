@@ -6,7 +6,6 @@ import Layout from "components/Layout"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialChemicalFields = {
-  id: null,
   name: null,
   casNumber: null,
   synonyms: null,

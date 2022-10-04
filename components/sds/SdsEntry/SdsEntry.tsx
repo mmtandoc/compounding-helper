@@ -6,18 +6,26 @@ import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import useSWR from "swr"
 import { JsonError } from "types/common"
-import { SdsFields } from "types/fields"
+import { HazardFields, SdsFields } from "types/fields"
 import { ProductWithVendor } from "types/models"
-import { NullPartialDeep } from "types/util"
+import { NullPartialDeep, Overwrite } from "types/util"
 import HazardInputRow from "./HazardInputRow"
-export type NullPartialSdsFields = NullPartialDeep<SdsFields>
+
+export type NullPartialHazardFields = NullPartialDeep<
+  HazardFields,
+  { ignoreKeys: "id" }
+>
+
+export type NullPartialSdsFields = NullPartialDeep<
+  Overwrite<SdsFields, { hazards: NullPartialHazardFields[] }>,
+  { ignoreKeys: "id" }
+>
 
 type Props = {
   formMethods: UseFormReturn<NullPartialSdsFields>
 }
 
 const emptyHazardValues = {
-  id: null,
   categoryId: null,
   classId: null,
   additionalInfo: null,
@@ -50,9 +58,9 @@ const SdsEntry = (props: Props) => {
     console.error(productsError)
   }
 
+  register("id")
   return (
     <>
-      <input type="hidden" {...register("id", { valueAsNumber: true })} />
       <div className="form-group">
         <label>
           <span>Chemical:</span>
