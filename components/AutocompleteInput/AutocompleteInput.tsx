@@ -136,7 +136,7 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
 
   return (
     <div className="autocomplete" id={props.id}>
-      <div style={{ display: "flex", flex: "100%" }}>
+      <div>
         <input
           name={props.name}
           type="search"
@@ -165,6 +165,7 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
       <style jsx>{`
         .autocomplete {
           position: relative;
+          width: min-content;
         }
         input {
           display: flex;

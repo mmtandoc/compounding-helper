@@ -21,6 +21,13 @@ const SuggestionItem = <T,>(props: {
       aria-selected={props.isSelected}
     >
       {props.renderSuggestion(props.item)}
+      <style jsx>{`
+        li > * {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+      `}</style>
     </li>
   )
 }
