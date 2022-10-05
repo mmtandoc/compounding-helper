@@ -53,7 +53,8 @@ const SafetyDataSheets: NextPage<SafetyDataSheetsProps> = (
 }
 
 export async function getServerSideProps() {
-  const data: SdsWithRelations[] = (await getSafetyDataSheets()) ?? []
+  const data: SdsWithRelations[] =
+    (await getSafetyDataSheets({ orderBy: { id: "asc" } })) ?? []
 
   return { props: { data } }
 }
