@@ -49,6 +49,7 @@ const IngredientFieldset = ({
     JsonError
   >(`/api/vendors`)
 
+  //TODO: Use mutate to fill "/sds/[id]" keys based on data retrieved
   const { data: sdsesData, error: sdsesError } = useSWR<
     SdsWithRelations[],
     JsonError
@@ -213,132 +214,119 @@ const IngredientFieldset = ({
               />
             </div>
           </div>
-          {isCommercialProduct && (
-            <div className="row">
-              <div className="form-group">
-                <label
-                  htmlFor={`i${index}-commercial-product`}
-                  className={!isCommercialProduct ? "disabled" : ""}
-                >
-                  Product name:
-                </label>
-                <input
-                  {...register(
-                    `ingredients.${index}.commercialProduct.name` as const,
-                    {
-                      required: isCommercialProduct,
-                      disabled: !isCommercialProduct,
-                      setValueAs: (value) => {
-                        return value === "" || !value ? null : value
-                      },
+          <div className="row" hidden={!isCommercialProduct}>
+            <div className="form-group">
+              <label
+                htmlFor={`i${index}-commercial-product`}
+                className={!isCommercialProduct ? "disabled" : ""}
+              >
+                Product name:
+              </label>
+              <input
+                {...register(
+                  `ingredients.${index}.commercialProduct.name` as const,
+                  {
+                    required: isCommercialProduct,
+                    disabled: !isCommercialProduct,
+                    setValueAs: (value) => {
+                      return value === "" || !value ? null : value
                     },
-                  )}
-                  type="text"
-                  readOnly={!isCommercialProduct}
-                  size={25}
-                  id={`i${index}-commercial-product`}
-                />
-              </div>
-              <div className="form-group">
-                <label className={`${!isCommercialProduct ? "disabled" : ""}`}>
-                  <span>Product DIN:</span>
-                  <div className="row">
+                  },
+                )}
+                type="text"
+                readOnly={!isCommercialProduct}
+                size={25}
+                id={`i${index}-commercial-product`}
+              />
+            </div>
+            <div className="form-group">
+              <label className={`${!isCommercialProduct ? "disabled" : ""}`}>
+                <span>Product DIN:</span>
+                <div className="row">
+                  <input
+                    {...register(
+                      `ingredients.${index}.commercialProduct.din` as const,
+                      {
+                        required:
+                          !!isCommercialProduct &&
+                          !ingredient?.commercialProduct?.hasNoDin,
+                        disabled:
+                          !isCommercialProduct ||
+                          !!ingredient?.commercialProduct?.hasNoDin,
+                      },
+                    )}
+                    inputMode="numeric"
+                    type="text"
+                    readOnly={!isCommercialProduct}
+                    size={7}
+                  />
+                  <label>
                     <input
+                      type="checkbox"
                       {...register(
-                        `ingredients.${index}.commercialProduct.din` as const,
+                        `ingredients.${index}.commercialProduct.hasNoDin`,
                         {
-                          required:
-                            !!isCommercialProduct &&
-                            !ingredient?.commercialProduct?.hasNoDin,
-                          disabled:
-                            !isCommercialProduct ||
-                            !!ingredient?.commercialProduct?.hasNoDin,
+                          disabled: !isCommercialProduct,
+                          deps: [`ingredients.${index}.commercialProduct.din`],
                         },
                       )}
-                      inputMode="numeric"
-                      type="text"
-                      readOnly={!isCommercialProduct}
-                      size={7}
                     />
-                    <label>
-                      <input
-                        type="checkbox"
-                        {...register(
-                          `ingredients.${index}.commercialProduct.hasNoDin`,
-                          {
-                            disabled: !isCommercialProduct,
-                            deps: [
-                              `ingredients.${index}.commercialProduct.din`,
-                            ],
-                          },
-                        )}
-                      />
-                      <span>No DIN</span>
-                    </label>
-                  </div>
-                </label>
-              </div>
+                    <span>No DIN</span>
+                  </label>
+                </div>
+              </label>
             </div>
-          )}
+          </div>
 
-          {isCommercialProduct && (
-            <div className="row">
-              <div className="form-group">
-                <label
-                  htmlFor={`i${index}-has-product-monograph-concerns`}
-                  className={!isCommercialProduct ? "disabled" : ""}
-                >
-                  Does the product monograph have any concerns?
-                </label>
-                <RHFBooleanRadioGroup
-                  id={`i${index}-has-product-monograph-concerns`}
-                  name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
-                  control={control}
-                  disabled={!isCommercialProduct}
-                  className="has-product-monograph-concerns"
-                  rules={{
-                    required: isCommercialProduct,
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          {hasProductMonographConcerns && (
-            <div className="row">
-              <div
-                className={`form-group ${
-                  !hasProductMonographConcerns ? "hidden" : ""
-                }`}
-                style={{ width: "100%" }}
+          <div className="row" hidden={!isCommercialProduct}>
+            <div className="form-group">
+              <label
+                htmlFor={`i${index}-has-product-monograph-concerns`}
+                className={!isCommercialProduct ? "disabled" : ""}
               >
-                <label
-                  htmlFor={`i${index}-commercial-product-concerns-desc`}
-                  className={!hasProductMonographConcerns ? "disabled" : ""}
-                >
-                  Please describe health concerns on the product monograph:
-                </label>
-                <textarea
-                  {...register(
-                    `ingredients.${index}.commercialProduct.concernsDescription`,
-                    {
-                      required: !!hasProductMonographConcerns,
-                      disabled: !hasProductMonographConcerns,
-                      setValueAs: (value) => {
-                        return value === "" ? undefined : value
-                      },
-                      /* deps: [
+                Does the product monograph have any concerns?
+              </label>
+              <RHFBooleanRadioGroup
+                id={`i${index}-has-product-monograph-concerns`}
+                name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
+                control={control}
+                disabled={!isCommercialProduct}
+                className="has-product-monograph-concerns"
+                rules={{
+                  required: isCommercialProduct,
+                }}
+              />
+            </div>
+          </div>
+          <div className="row" hidden={!hasProductMonographConcerns}>
+            <div style={{ width: "100%" }}>
+              <label
+                htmlFor={`i${index}-commercial-product-concerns-desc`}
+                className={!hasProductMonographConcerns ? "disabled" : ""}
+              >
+                Please describe health concerns on the product monograph:
+              </label>
+              <textarea
+                {...register(
+                  `ingredients.${index}.commercialProduct.concernsDescription`,
+                  {
+                    required: !!hasProductMonographConcerns,
+                    disabled: !hasProductMonographConcerns,
+                    setValueAs: (value) => {
+                      return value === "" ? undefined : value
+                    },
+                    /* deps: [
                       `ingredients.${index}.isCommercialProduct`,
                       `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
                     ], */
-                    },
-                  )}
-                  id={`i${index}-commercial-product-concerns-desc`}
-                  cols={30}
-                  readOnly={!hasProductMonographConcerns}
-                />
-              </div>
+                  },
+                )}
+                id={`i${index}-commercial-product-concerns-desc`}
+                cols={30}
+                readOnly={!hasProductMonographConcerns}
+              />
             </div>
-          )}
+          </div>
         </div>
         <div className="safety-info">
           <fieldset>

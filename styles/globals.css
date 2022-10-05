@@ -40,10 +40,6 @@ button {
   cursor: pointer;
 }
 
-.hidden {
-  display: none !important;
-}
-
 .row {
   display: flex !important;
   flex-direction: row !important;
@@ -56,4 +52,8 @@ button {
 
 .row.grow > * {
   flex: 1;
+}
+
+.hidden, *[hidden] {
+  display: none !important;
 }
