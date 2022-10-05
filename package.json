@@ -12,7 +12,7 @@
     "typecheck:watch": "tsc -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "db:backup": "env-cmd -x  pg_dump --disable-triggers --data-only --column-inserts --schema=public --exclude-table='_prisma_migrations' \"\\$DATABASE_URL\" > database-dump.sql"
+    "db:backup": "env-cmd -x  pg_dump --data-only --column-inserts --schema=public --exclude-table='_prisma_migrations' \"\\$DATABASE_URL\" > database-dump.sql"
   },
   "prisma": {
     "seed": "bash prisma/seed.sh"
