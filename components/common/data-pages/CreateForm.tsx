@@ -63,7 +63,13 @@ const CreateForm = <
   return (
     <>
       {!saveSuccessful || !savedData ? (
-        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.error(errors)
+            setSaveSuccessful(false)
+          })}
+          autoComplete="off"
+        >
           <EntryComponent formMethods={formMethods} />
           <div className="action-row">
             <button type="submit">Submit</button>

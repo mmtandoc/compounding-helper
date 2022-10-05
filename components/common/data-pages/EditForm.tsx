@@ -61,7 +61,7 @@ const EditForm = <TFieldValues extends FieldValues>(
   return (
     <form
       onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.log(errors)
+        console.error(errors)
         setSaveSuccessful(false)
       })}
       autoComplete="off"
