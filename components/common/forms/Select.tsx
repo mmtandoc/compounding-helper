@@ -17,8 +17,8 @@ interface Props<TFieldValues extends FieldValues>
     SetRequired<UseControllerProps<TFieldValues>, "control">
   > {
   children: ReactNode
-  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate" | "disabled">
-  initialOption?: { value: string; label: string; disabled?: boolean }
+  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate">
+  initialOption?: { value: string; label: string; disabled?: boolean } | boolean
 }
 
 const Select = <TFieldValues extends FieldValues>(
@@ -26,14 +26,24 @@ const Select = <TFieldValues extends FieldValues>(
 ) => {
   const {
     children,
-    initialOption,
     control,
     name,
     rules,
     shouldUnregister,
     defaultValue,
+    disabled = rules?.disabled,
     ...selectProps
   } = props
+
+  delete selectProps.initialOption
+
+  // If initialOption is true, use blank string for value and label
+  const initialOption =
+    typeof props.initialOption === "boolean"
+      ? props.initialOption
+        ? { value: "", label: "" }
+        : undefined
+      : props.initialOption
 
   const {
     field: { onChange, onBlur, ref, value },
@@ -75,6 +85,7 @@ const Select = <TFieldValues extends FieldValues>(
       onBlur={onBlur}
       value={value ?? (initialOption ? initialOption.value : undefined)}
       ref={ref}
+      disabled={disabled}
     >
       {initialOption && (
         <option
