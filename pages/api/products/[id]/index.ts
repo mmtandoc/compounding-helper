@@ -59,6 +59,7 @@ export default async function handler(
       }
 
       res.status(200).json(updatedProduct)
+      return
     }
     case "DELETE": {
       try {
