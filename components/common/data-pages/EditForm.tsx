@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import {
   DeepPartial,
   FieldValues,
+  FormProvider,
   SubmitHandler,
   useForm,
 } from "react-hook-form"
@@ -62,44 +63,46 @@ const EditForm = <TFieldValues extends FieldValues>(
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.error(errors)
-        setSaveSuccessful(false)
-      })}
-      autoComplete="off"
-    >
-      <EntryComponent
-        values={values}
-        formMethods={formMethods}
-        {...entryComponentProps}
-      />
-      <div>
-        <div className="button-row">
-          <button type="submit">Save</button>
-          <Link href={`${urlPath}/${id}`} passHref>
-            <button type="button">Cancel</button>
-          </Link>
+    <FormProvider {...formMethods}>
+      <form
+        onSubmit={handleSubmit(onSubmit, (errors) => {
+          console.error(errors)
+          setSaveSuccessful(false)
+        })}
+        autoComplete="off"
+      >
+        <EntryComponent
+          values={values}
+          formMethods={formMethods}
+          {...entryComponentProps}
+        />
+        <div>
+          <div className="button-row">
+            <button type="submit">Save</button>
+            <Link href={`${urlPath}/${id}`} passHref>
+              <button type="button">Cancel</button>
+            </Link>
+          </div>
+          {saveSuccessful !== undefined && (
+            <p style={{ color: saveSuccessful ? "green" : "red" }}>
+              {saveSuccessful ? "Saved" : "Error"}
+            </p>
+          )}
         </div>
-        {saveSuccessful !== undefined && (
-          <p style={{ color: saveSuccessful ? "green" : "red" }}>
-            {saveSuccessful ? "Saved" : "Error"}
-          </p>
-        )}
-      </div>
-      <style jsx>{`
-        form {
-          align-self: center;
-          margin-bottom: 2rem;
-        }
+        <style jsx>{`
+          form {
+            align-self: center;
+            margin-bottom: 2rem;
+          }
 
-        .button-row {
-          display: flex;
-          column-gap: 0.8rem;
-          margin-top: 1.2rem;
-        }
-      `}</style>
-    </form>
+          .button-row {
+            display: flex;
+            column-gap: 0.8rem;
+            margin-top: 1.2rem;
+          }
+        `}</style>
+      </form>
+    </FormProvider>
   )
 }
 export default EditForm

@@ -66,21 +66,23 @@ const CreateForm = <
   return (
     <>
       {!saveSuccessful || !savedData ? (
-        <form
-          onSubmit={handleSubmit(onSubmit, (errors) => {
-            console.error(errors)
-            setSaveSuccessful(false)
-          })}
-          autoComplete="off"
-        >
-          <EntryComponent formMethods={formMethods} />
-          <div className="action-row">
-            <button type="submit">Submit</button>
-            <button type="button" onClick={() => reset()}>
-              Clear
-            </button>
-          </div>
-        </form>
+        <FormProvider {...formMethods}>
+          <form
+            onSubmit={handleSubmit(onSubmit, (errors) => {
+              console.error(errors)
+              setSaveSuccessful(false)
+            })}
+            autoComplete="off"
+          >
+            <EntryComponent formMethods={formMethods} />
+            <div className="action-row">
+              <button type="submit">Submit</button>
+              <button type="button" onClick={() => reset()}>
+                Clear
+              </button>
+            </div>
+          </form>
+        </FormProvider>
       ) : (
         <div className="savedPrompt">
           <p style={{ fontSize: "2.4rem", fontWeight: 600 }}>
