@@ -38,6 +38,9 @@ const CreateForm = <
   const [savedData, setSavedData] = useState<TDataModel | undefined>()
   const formMethods = useForm<TFieldValues>({
     defaultValues: defaultValues as DeepPartial<TFieldValues>,
+    criteriaMode: "all",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   })
 
   const { handleSubmit, reset } = formMethods

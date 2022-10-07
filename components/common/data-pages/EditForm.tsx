@@ -36,6 +36,9 @@ const EditForm = <TFieldValues extends FieldValues>(
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
   const formMethods = useForm<TFieldValues>({
     defaultValues: values as DeepPartial<TFieldValues>,
+    criteriaMode: "all",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   })
 
   const { handleSubmit, reset } = formMethods
