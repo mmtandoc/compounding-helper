@@ -1,3 +1,12 @@
+:root {
+  --invalid-bg-color: #ffc8c8;
+  --field-hover-border-color: #747480;
+  --field-active-border-color: #484851;
+  --field-border-color: #a0a0a0;
+  --disabled-field-border-color: #bebec6;
+  --disabled-field-bg-color:#ededef;
+}
+
 html {
   box-sizing: border-box;
   font-size: 62.5%;
@@ -26,13 +35,73 @@ body {
   min-height: 100vh;
 }
 
-input,
+select, input,
 textarea {
   font-size: 1.6rem;
   font-family: inherit;
+  border: 1px solid var(--field-border-color);
+  border-radius: 0.2rem;
+}
+
+select {
+  border-radius: 0.3rem;
+}
+
+input[type="radio"] {
+  --radio-background-color: white;
+  --radio-size: 1.4rem;
+  appearance: none;
+
+  border-radius: 50%;
+  width: var(--radio-size);
+  height: var(--radio-size);
+
+  border: solid 2px var(--field-border-color);
+  margin-right: 0.5rem;
+  background-color: var(--radio-background-color);
+}
+
+input[type="radio"]:checked {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23000' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='5'/%3E%3C/svg%3E");
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+
+:is(select, input, textarea):hover {
+  border-color: var(--field-hover-border-color);
+}
+
+:is(select, input, textarea):active {
+  border-color: var(--field-active-border-color);
+}
+
+select:hover {
+  background-color: #d0d0d7;
+}
+
+select:active {
+  background-color: #b1b1b9;
+}
+
+select > option {
+  background-color: white;
+}
+
+.invalid :is(input, textarea, select), :is(input, textarea, select).invalid {
+  background-color: var(--invalid-bg-color) !important;
 }
 
 input[type='radio'][readOnly], label.readOnly {
+  pointer-events: none;
+}
+
+:is(select, input,
+textarea):disabled {
+  /*border-color: #c0c0c7;*/
+  border-color: var(--disabled-field-border-color);
+  background-color: var(--disabled-field-bg-color);
   pointer-events: none;
 }
 
