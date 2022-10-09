@@ -7,6 +7,7 @@ import {
   UseControllerProps,
   useFormContext,
 } from "react-hook-form"
+import ErrorContainer from "./common/forms/ErrorContainer"
 
 interface RHFRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
@@ -37,19 +38,23 @@ export const RHFRadioGroup = <TFieldValues extends FieldValues>(
   })
 
   return (
-    <RadioGroup
-      onChange={(e) => {
-        field.onChange(valueAsNumber ? Number(e.target.value) : e.target.value)
-      }}
-      inputRef={field.ref}
-      onBlur={field.onBlur}
-      name={field.name}
-      radioOptions={radioOptions}
-      selectedValue={field.value}
-      readOnly={readOnly}
-      className={className}
-      disabled={disabled}
-    />
+    <ErrorContainer>
+      <RadioGroup
+        onChange={(e) => {
+          field.onChange(
+            valueAsNumber ? Number(e.target.value) : e.target.value,
+          )
+        }}
+        inputRef={field.ref}
+        onBlur={field.onBlur}
+        name={field.name}
+        radioOptions={radioOptions}
+        selectedValue={field.value}
+        readOnly={readOnly}
+        className={className}
+        disabled={disabled}
+      />
+    </ErrorContainer>
   )
 }
 

@@ -9,6 +9,7 @@ import {
   useFormContext,
   Validate,
 } from "react-hook-form"
+import ErrorContainer from "./common/forms/ErrorContainer"
 
 interface RHFBooleanRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T> {
@@ -72,19 +73,21 @@ export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
   })
 
   return (
-    <BooleanRadioGroup
-      onChange={(e) => {
-        field.onChange(e.target.value === "yes")
-      }}
-      inputRef={field.ref}
-      onBlur={field.onBlur}
-      name={field.name}
-      direction={direction}
-      className={className}
-      disabled={disabled}
-      selectedValue={field.value}
-      readOnly={readOnly}
-    />
+    <ErrorContainer>
+      <BooleanRadioGroup
+        onChange={(e) => {
+          field.onChange(e.target.value === "yes")
+        }}
+        inputRef={field.ref}
+        onBlur={field.onBlur}
+        name={field.name}
+        direction={direction}
+        className={className}
+        disabled={disabled}
+        selectedValue={field.value}
+        readOnly={readOnly}
+      />
+    </ErrorContainer>
   )
 }
 
