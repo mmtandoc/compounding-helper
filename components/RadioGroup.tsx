@@ -5,6 +5,7 @@ import {
   FieldValues,
   useController,
   UseControllerProps,
+  useFormContext,
 } from "react-hook-form"
 
 interface RHFRadioGroupProps<T extends FieldValues>
@@ -14,13 +15,14 @@ interface RHFRadioGroupProps<T extends FieldValues>
   valueAsNumber?: boolean
 }
 
-export const RHFRadioGroup = <T extends FieldValues>(
-  props: RHFRadioGroupProps<T>,
+export const RHFRadioGroup = <TFieldValues extends FieldValues>(
+  props: RHFRadioGroupProps<TFieldValues>,
 ) => {
+  const formMethods = useFormContext<TFieldValues>()
   const {
     name,
     rules,
-    control,
+    control = formMethods.control,
     radioOptions,
     readOnly,
     className,

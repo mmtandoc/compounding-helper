@@ -6,6 +6,7 @@ import {
   PathValue,
   useController,
   UseControllerProps,
+  useFormContext,
   Validate,
 } from "react-hook-form"
 
@@ -19,18 +20,22 @@ interface RHFBooleanRadioGroupProps<T extends FieldValues>
   direction?: "row" | "col"
 }
 
-export const RHFBooleanRadioGroup = <T extends FieldValues>({
-  control,
-  name,
-  rules,
-  readOnly = false,
-  disabled = false,
-  className,
-  direction = "row",
-}: RHFBooleanRadioGroupProps<T>) => {
+export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
+  props: RHFBooleanRadioGroupProps<TFieldValues>,
+) => {
+  const formMethods = useFormContext<TFieldValues>()
+  const {
+    control = formMethods.control,
+    name,
+    rules,
+    readOnly = false,
+    disabled = false,
+    className,
+    direction = "row",
+  } = props
   let customValidate:
-    | Validate<PathValue<T, Path<T>>>
-    | Record<string, Validate<PathValue<T, Path<T>>>>
+    | Validate<PathValue<TFieldValues, Path<TFieldValues>>>
+    | Record<string, Validate<PathValue<TFieldValues, Path<TFieldValues>>>>
     | undefined
 
   // If rules.required is true, then create custom validate function for workaround
