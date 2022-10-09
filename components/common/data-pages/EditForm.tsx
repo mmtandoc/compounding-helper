@@ -70,6 +70,7 @@ const EditForm = <TFieldValues extends FieldValues>(
           setSaveSuccessful(false)
         })}
         autoComplete="off"
+        noValidate
       >
         <EntryComponent
           values={values}

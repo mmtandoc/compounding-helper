@@ -73,6 +73,7 @@ const CreateForm = <
               setSaveSuccessful(false)
             })}
             autoComplete="off"
+            noValidate
           >
             <EntryComponent formMethods={formMethods} />
             <div className="action-row">
