@@ -5,6 +5,7 @@ import SuggestionsList from "./SuggestionsList"
 export type AutocompleteProps<T> = {
   name: string
   id?: string
+  className?: string
   item?: T
   query?: string
   getItemValue: (item: T | undefined | null) => string
@@ -22,6 +23,7 @@ export type AutocompleteProps<T> = {
 
 const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
   const {
+    className,
     getItemValue,
     item,
     items,
@@ -135,7 +137,7 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
     suggestionsVisible
 
   return (
-    <div className="autocomplete" id={props.id}>
+    <div className={`autocomplete ${className}`} id={props.id}>
       <div>
         <input
           name={props.name}
