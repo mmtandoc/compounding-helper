@@ -7,6 +7,7 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     id: data.id,
     name: data.name,
     casNumber: data.casNumber,
+    hasNoCasNumber: data.casNumber === null,
     nioshTable: data.nioshTable as -1 | 1 | 2 | 3,
     synonyms: data.synonyms,
     nioshRevisionDate:

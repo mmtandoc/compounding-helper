@@ -10,7 +10,7 @@ generator client {
 model Chemical {
   id                Int       @id @default(autoincrement())
   name              String
-  casNumber         String    @unique
+  casNumber         String?   @unique
   synonyms          String[]
   products          Product[]
   nioshTable        Int       @default(-1)

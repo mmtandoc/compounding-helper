@@ -18,7 +18,7 @@ const ChemicalDetails = (props: Props) => {
       </div>
       <div className="form-group row">
         <span className="label">CAS number:</span>
-        {data.casNumber}
+        {data.casNumber ?? "N/A"}
       </div>
       <div className="form-group row">
         <span className="label">Synonyms:</span>

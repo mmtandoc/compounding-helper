@@ -32,8 +32,9 @@ const ChemicalTable = (props: Props) => {
             accessorPath: "casNumber",
             label: "CAS Number",
             sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
+            compare: (a: string | null, b: string | null) =>
+              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
+            renderCell: (value: string | null) => value ?? "N/A",
           },
           {
             accessorPath: "nioshTable",

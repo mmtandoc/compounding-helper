@@ -8,6 +8,7 @@ import { NextPage } from "next"
 const defaultValues: NullPartialChemicalFields = {
   name: null,
   casNumber: null,
+  hasNoCasNumber: null,
   synonyms: null,
   nioshTable: null,
   nioshRevisionDate: null,

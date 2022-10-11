@@ -6,6 +6,7 @@ import form from "styles/form"
 import { DataEntryComponent } from "types/common"
 import { ChemicalFields } from "types/fields"
 import { NullPartialDeep } from "types/util"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 
 export type NullPartialChemicalFields = NullPartialDeep<
   ChemicalFields,
@@ -21,7 +22,16 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
 ) => {
   const { formMethods } = props
 
-  const { register, control } = formMethods
+  const { register, control, watch, setValue } = formMethods
+
+  const hasNoCasNumber = watch("hasNoCasNumber") as boolean
+
+  useUpdateFieldConditionally({
+    updateCondition: hasNoCasNumber === true,
+    fields: [[`casNumber`, null]],
+    register,
+    setValue,
+  })
 
   register("id")
   return (
@@ -32,14 +42,26 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
       </label>
       <label className="form-group">
         <span>CAS number:</span>
-        <input
-          type="text"
-          {...register("casNumber", {
-            required: true,
-            /* pattern: /[0-9]{4-7}-[0-9]{2}-[0-9]/, */
-          })}
-          placeholder="XXXXXXX-YY-Z"
-        />
+        <div className="row">
+          <input
+            type="text"
+            {...register("casNumber", {
+              required: !hasNoCasNumber,
+              disabled: hasNoCasNumber,
+              /* pattern: /[0-9]{4-7}-[0-9]{2}-[0-9]/, */
+            })}
+            placeholder="XXXXXXX-YY-Z"
+          />
+          <label>
+            <input
+              type="checkbox"
+              {...register(`hasNoCasNumber`, {
+                deps: "casNumber",
+              })}
+            />
+            <span>No CAS number</span>
+          </label>
+        </div>
       </label>
       <label className="form-group">
         <span>Synonyms:</span>

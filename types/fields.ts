@@ -19,7 +19,8 @@ export type SdsFields = {
 export type ChemicalFields = {
   id?: number
   name: string
-  casNumber: string
+  casNumber: string | null
+  hasNoCasNumber: boolean
   synonyms?: string[]
   nioshTable: -1 | 1 | 2 | 3
   nioshRevisionDate: string | null
