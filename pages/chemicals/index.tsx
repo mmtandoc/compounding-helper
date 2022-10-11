@@ -16,7 +16,7 @@ const Chemicals: NextPage<ChemicalsProps> = (props: ChemicalsProps) => {
 
   const actionBar = (
     <div className="action-bar">
-      <Link href="/sds/new">
+      <Link href="/chemicals/new">
         <button type="button">New Chemical</button>
       </Link>
       <style jsx>{`
