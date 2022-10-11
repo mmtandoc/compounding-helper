@@ -45,7 +45,7 @@ const Chemicals: NextPage<ChemicalsProps> = (props: ChemicalsProps) => {
           margin-top: 0;
         }
 
-        :global(.risk-assessments-table) {
+        :global(.chemical-table) {
           width: 100%;
         }
       `}</style>

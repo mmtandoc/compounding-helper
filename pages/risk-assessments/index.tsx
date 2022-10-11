@@ -40,7 +40,7 @@ const RiskAssessments: NextPage<Props> = (props: Props) => {
         </div>
       </div>
       <style jsx>{`
-        :global(.risk-assessments-table) {
+        :global(.risk-assessment-table) {
           width: 100%;
         }
       `}</style>

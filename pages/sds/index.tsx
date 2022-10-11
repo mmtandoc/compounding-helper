@@ -44,7 +44,7 @@ const SafetyDataSheets: NextPage<SafetyDataSheetsProps> = (
           margin-top: 0;
         }
 
-        :global(.risk-assessments-table) {
+        :global(.sds-table) {
           width: 100%;
         }
       `}</style>

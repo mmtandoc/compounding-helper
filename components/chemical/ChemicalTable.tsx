@@ -13,6 +13,7 @@ const ChemicalTable = (props: Props) => {
   return (
     <>
       <Table
+        className="chemical-table"
         data={data}
         columns={[
           {

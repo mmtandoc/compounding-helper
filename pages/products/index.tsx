@@ -42,6 +42,10 @@ const Products: NextPage<Props> = (props: Props) => {
         h1 {
           margin-top: 0;
         }
+
+        :global(.product-table) {
+          width: 100%;
+        }
       `}</style>
     </Layout>
   )

@@ -13,6 +13,7 @@ const ProductTable = (props: Props) => {
   return (
     <>
       <Table
+        className="product-table"
         data={data}
         columns={[
           {

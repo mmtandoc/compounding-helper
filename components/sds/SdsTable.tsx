@@ -14,6 +14,7 @@ const SdsTable = (props: Props) => {
   return (
     <>
       <Table
+        className="sds-table"
         data={data}
         columns={[
           {

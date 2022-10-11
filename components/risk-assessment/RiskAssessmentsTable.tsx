@@ -11,6 +11,7 @@ const RiskAssessmentsTable = (props: Props) => {
 
   return (
     <Table
+      className="risk-assessment-table"
       data={data}
       columns={[
         {
