@@ -10,18 +10,26 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { DataEntryComponent } from "types/common"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-type EditFormProps<TFieldValues extends FieldValues> = {
+type EditFormProps<
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+> = {
   id: number
   values: TFieldValues
+  schema?: TSchema
   apiEndpointPath: string
   urlPath: string
   entryComponent: DataEntryComponent<TFieldValues>
   entryComponentProps?: Record<string, unknown>
 }
 
-const EditForm = <TFieldValues extends FieldValues>(
-  props: EditFormProps<TFieldValues>,
+const EditForm = <
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+>(
+  props: EditFormProps<TSchema, TFieldValues>,
 ) => {
   const {
     id,
@@ -30,6 +38,7 @@ const EditForm = <TFieldValues extends FieldValues>(
     urlPath,
     entryComponent: EntryComponent,
     entryComponentProps,
+    schema,
   } = props
 
   const router = useRouter()
@@ -40,6 +49,14 @@ const EditForm = <TFieldValues extends FieldValues>(
     criteriaMode: "all",
     mode: "onTouched",
     reValidateMode: "onChange",
+    resolver: schema
+      ? async (values, context, options) => {
+          console.log("formData", values)
+          const result = await zodResolver(schema)(values, context, options)
+          console.log("validation", result)
+          return result
+        }
+      : undefined,
   })
 
   const { handleSubmit, reset } = formMethods

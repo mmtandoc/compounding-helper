@@ -8,11 +8,15 @@ import {
   FormProvider,
   SubmitHandler,
   useForm,
-  UseFormReturn,
 } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { DataEntryComponent } from "types/common"
 
-type CreateFormProps<TFieldValues extends FieldValues> = {
+type CreateFormProps<
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+> = {
+  schema?: TSchema
   defaultValues: TFieldValues
   apiEndpointPath: string
   urlPath: string
@@ -22,9 +26,10 @@ type CreateFormProps<TFieldValues extends FieldValues> = {
 
 const CreateForm = <
   TDataModel extends { id: number },
+  TSchema extends Zod.ZodTypeAny,
   TFieldValues extends FieldValues,
 >(
-  props: CreateFormProps<TFieldValues>,
+  props: CreateFormProps<TSchema, TFieldValues>,
 ) => {
   const {
     defaultValues,
@@ -32,6 +37,7 @@ const CreateForm = <
     urlPath,
     entryComponent: EntryComponent,
     dataName,
+    schema,
   } = props
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
@@ -41,6 +47,14 @@ const CreateForm = <
     criteriaMode: "all",
     mode: "onTouched",
     reValidateMode: "onChange",
+    resolver: schema
+      ? async (values, context, options) => {
+          console.log("formData", values)
+          const result = await zodResolver(schema)(values, context, options)
+          console.log("validation", result)
+          return result
+        }
+      : undefined,
   })
 
   const { handleSubmit, reset } = formMethods
