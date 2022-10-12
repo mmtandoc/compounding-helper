@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client"
-import { ChemicalFields } from "types/fields"
+import { chemicalSchema, ChemicalFields } from "lib/fields"
 import { ChemicalAll } from "types/models"
 
 const toFieldValues = (data: ChemicalAll): ChemicalFields => {
-  return {
+  return chemicalSchema.parse({
     id: data.id,
     name: data.name,
     casNumber: data.casNumber,
@@ -12,7 +12,7 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     synonyms: data.synonyms,
     nioshRevisionDate:
       data.nioshRevisionDate?.toLocaleDateString("en-CA") ?? null,
-  }
+  })
 }
 
 const toModel = (

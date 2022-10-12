@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { Chemical, Prisma } from "@prisma/client"
 import { ApiBody } from "types/common"
-import { ChemicalFields } from "types/fields"
+import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 
 export default async function handler(
@@ -37,10 +37,20 @@ export default async function handler(
       return
     }
     case "POST": {
-      let chemical
-
+      let data
       try {
-        chemical = await createChemical(req.body)
+        data = chemicalSchema.parse(req.body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
+
+      let chemical
+      try {
+        chemical = await createChemical(data)
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
