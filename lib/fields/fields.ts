@@ -74,3 +74,17 @@ export type NullPartialChemicalFields = Simplify<
   Merge<NullPartialDeep<ChemicalFields>, Pick<ChemicalFields, "id">>
 >
 
+//==== Product schema =====
+
+export const productSchema = z.object({
+  id: z.number().int().optional(),
+  name: z.string().trim().min(1),
+  chemicalId: z.number().int(),
+  vendorId: z.number().int(),
+})
+
+export type ProductFields = Simplify<z.infer<typeof productSchema>>
+
+export type NullPartialProductFields = Simplify<
+  Merge<NullPartialDeep<ProductFields>, Pick<ProductFields, "id">>
+>

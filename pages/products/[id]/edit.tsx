@@ -1,13 +1,15 @@
 import EditForm from "components/common/data-pages/EditForm"
 import Layout from "components/Layout"
-import ProductEntry, {
-  NullPartialProductFields,
-} from "components/product/ProductEntry"
+import ProductEntry from "components/product/ProductEntry"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { getProductById } from "pages/api/products/[id]"
-import { ProductFields } from "types/fields"
+import {
+  NullPartialProductFields,
+  ProductFields,
+  productSchema,
+} from "lib/fields"
 
 type EditProductProps = {
   values: ProductFields
@@ -25,6 +27,7 @@ const EditProduct: NextPage<EditProductProps> = (props: EditProductProps) => {
         <h1>Edit Product - {values?.name}</h1>
         <EditForm
           id={id}
+          schema={productSchema}
           values={values as NullPartialProductFields}
           apiEndpointPath="/api/products"
           urlPath="/products"

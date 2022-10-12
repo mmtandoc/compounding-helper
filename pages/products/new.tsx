@@ -1,8 +1,7 @@
 import CreateForm from "components/common/data-pages/CreateForm"
 import Layout from "components/Layout"
-import ProductEntry, {
-  NullPartialProductFields,
-} from "components/product/ProductEntry"
+import ProductEntry from "components/product/ProductEntry"
+import { NullPartialProductFields, productSchema } from "lib/fields"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialProductFields = {
@@ -18,6 +17,7 @@ const NewProduct: NextPage = () => {
         <h1>New Product</h1>
         <CreateForm
           dataName="product"
+          schema={productSchema}
           defaultValues={defaultValues}
           apiEndpointPath="/api/products"
           urlPath="/products"
