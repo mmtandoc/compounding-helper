@@ -88,3 +88,68 @@ export type ProductFields = Simplify<z.infer<typeof productSchema>>
 export type NullPartialProductFields = Simplify<
   Merge<NullPartialDeep<ProductFields>, Pick<ProductFields, "id">>
 >
+
+//==== SDS & Hazard schemas =====
+
+/* export type HazardFields = {
+  id?: number
+  classId: number
+  categoryId: number
+  subcategoryId?: number | null
+  additionalInfo?: string | null
+} */
+export const hazardSchema = z.object({
+  id: z.number().int().optional(),
+  classId: z.number(),
+  categoryId: z.number(),
+  subcategoryId: z.number().nullable(),
+  additionalInfo: z.string().trim().min(1).optional(),
+})
+
+export type HazardFields = Simplify<z.infer<typeof hazardSchema>>
+
+export type NullPartialHazardFields = Simplify<NullPartialDeep<HazardFields>>
+
+/* export type SdsFields = {
+  id?: number
+  chemicalId: number
+  productId: number
+  hmisHazardLevel: number
+  revisionDate: string
+  hazards: HazardFields[]
+  requireVentilation: boolean
+} */
+export const sdsSchema = z.object({
+  id: z.number().int().optional(),
+  chemicalId: z.number().int(),
+  productId: z.number().int(),
+  hmisHazardLevel: castStringToNumber(
+    z
+      .number({
+        invalid_type_error: "HMIS health hazard level must be a number.",
+      })
+      .min(0, "HMIS health hazard level must a number from 0 to 4.")
+      .max(4, "HMIS health hazard level must a number from 0 to 4."),
+  ),
+  revisionDate: castStringToDate(
+    z
+      .date()
+      .max(
+        new Date(new Date().setDate(new Date().getDate())),
+        "Date must be before the current date",
+      ),
+  ),
+  requireVentilation: z.boolean(),
+  hazards: z.array(hazardSchema),
+  filename: z
+    .string()
+    .trim()
+    .nullable()
+    .transform((arg) => (arg === null ? "N/A" : arg)),
+})
+
+export type SdsFields = z.infer<typeof sdsSchema>
+
+export type NullPartialSdsFields = Simplify<
+  Merge<NullPartialDeep<SdsFields>, Pick<SdsFields, "id">>
+>

@@ -1,12 +1,12 @@
 import { SDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
-import { SdsFields } from "types/fields"
+import { sdsSchema, SdsFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 import SdsHazardMapper from "./SdsHazardMapper"
 
 const SdsMapper = {
   toFieldValues: (data: SdsWithRelations): SdsFields => {
-    return {
+    return sdsSchema.parse({
       id: data.id,
       productId: data.productId,
       chemicalId: data.product.chemicalId,
@@ -14,7 +14,7 @@ const SdsMapper = {
       revisionDate: data.revisionDate.toLocaleDateString("en-CA"),
       hazards: data.healthHazards.map(SdsHazardMapper.toFieldValues),
       requireVentilation: data.requireVentilation,
-    }
+    })
   },
   toModel: (values: SdsFields): SetOptional<SDS, "id" | "updatedAt"> => {
     return {
@@ -23,7 +23,7 @@ const SdsMapper = {
       hmisHealthHazard: values.hmisHazardLevel,
       requireVentilation: values.requireVentilation,
       revisionDate: new Date(values.revisionDate),
-      filename: "N/A",
+      filename: values.filename,
     }
   },
 }

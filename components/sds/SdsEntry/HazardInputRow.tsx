@@ -1,3 +1,4 @@
+import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import {
   FieldArrayWithId,
@@ -8,7 +9,7 @@ import {
 import useSWR from "swr"
 import { JsonError } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
-import { NullPartialSdsFields } from "./SdsEntry"
+import { NullPartialSdsFields } from "lib/fields"
 
 interface HazardInputRowProps {
   id?: string
@@ -64,7 +65,6 @@ const HazardInputRow = ({
         className="class-select"
         name={`hazards.${index}.classId`}
         rules={{
-          required: true,
           onChange: () => {
             register(`hazards.${index}.categoryId`)
             setValue(`hazards.${index}.categoryId`, null)
@@ -74,9 +74,9 @@ const HazardInputRow = ({
             setValue(`hazards.${index}.additionalInfo`, null)
           },
           valueAsNumber: true,
+          deps: ["categoryId", "additionalInfo"],
         }}
         initialOption={{ label: "--Select a hazard class--", value: "none" }}
-        control={control}
       >
         {hazardClasses.map((h, i) => {
           return (
@@ -101,9 +101,9 @@ const HazardInputRow = ({
             setValue(`hazards.${index}.subcategoryId`, null)
           },
           valueAsNumber: true,
+          deps: ["additionalInfo"],
         }}
         disabled={!classId}
-        control={control}
         initialOption={{ label: "--Select a category--", value: "none" }}
       >
         {hazardClass?.hazardCategories?.map((h, i) => {
@@ -126,7 +126,6 @@ const HazardInputRow = ({
           disabled: false,
         }}
         hidden={isTargetOrganToxicity}
-        control={control}
       >
         {category?.subcategories?.map((h, i) => {
           return (
@@ -137,7 +136,7 @@ const HazardInputRow = ({
           )
         })}
       </Select>
-      <input
+      <Input
         className="targeted-organ"
         type="text"
         {...register(`hazards.${index}.additionalInfo`, {
