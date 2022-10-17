@@ -516,7 +516,6 @@ const RiskAssessmentEntry = (props: Props) => {
             getValues={getValues}
             register={register}
             setValue={setValue}
-            watch={watch}
           />
           {/* <textarea
             {...register("rationale", { required: true })}

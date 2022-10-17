@@ -10,8 +10,10 @@ import {
   UseFormRegister,
   UseFormSetValue,
   UseFormWatch,
+  useWatch,
 } from "react-hook-form"
 import useSWR from "swr"
+import { PartialDeep } from "type-fest"
 import { JsonError } from "types/common"
 import { SdsWithRelations } from "types/models"
 
@@ -26,7 +28,6 @@ interface RationaleListProps
   register: UseFormRegister<NullPartialRiskAssessmentFields>
   setValue: UseFormSetValue<NullPartialRiskAssessmentFields>
   getValues: UseFormGetValues<NullPartialRiskAssessmentFields>
-  watch: UseFormWatch<NullPartialRiskAssessmentFields>
 }
 
 const RationaleList = ({
@@ -34,10 +35,12 @@ const RationaleList = ({
   register,
   setValue,
   getValues,
-  watch,
 }: RationaleListProps) => {
-  const allValues = watch()
-  const ingredients = watch("ingredients")
+  const allValues = useWatch<NullPartialRiskAssessmentFields>({
+    control,
+    defaultValue: control?._defaultValues as NullPartialRiskAssessmentFields,
+  })
+  const ingredients = allValues.ingredients
 
   //TODO: Handle error
   const sdsUrls =
@@ -58,13 +61,21 @@ const RationaleList = ({
 
   //Autoupdate automatic rationale list
   useEffect(() => {
-    if (safetyDatasheets === undefined) {
+    const autoRationale = determineAutoRationale(
+      allValues,
+      safetyDatasheets ?? [],
+    )
+
+    if (
+      autoRationale.toString() ===
+      allValues.rationaleList?.automatic?.toString?.()
+    ) {
       return
     }
 
     register("rationaleList")
     setValue("rationaleList", {
-      automatic: determineAutoRationale(allValues, safetyDatasheets),
+      automatic: autoRationale,
       additional: getValues("rationaleList.additional"),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,7 +139,7 @@ const RationaleList = ({
 }
 
 const autoRationalesFunctions: ((
-  values: NullPartialRiskAssessmentFields,
+  values: PartialDeep<NullPartialRiskAssessmentFields>,
   sdses: SdsWithRelations[],
 ) => string | null)[] = [
   (values, sdses) => {
@@ -178,9 +189,9 @@ const autoRationalesFunctions: ((
 
     const [creamCount, ointmentCount] = values.ingredients.reduce(
       (counts, ing) => {
-        if (ing.physicalForm === "cream") {
+        if (ing?.physicalForm === "cream") {
           counts[0]++
-        } else if (ing.physicalForm === "ointment") {
+        } else if (ing?.physicalForm === "ointment") {
           counts[1]++
         }
         return counts
@@ -243,7 +254,7 @@ const autoRationalesFunctions: ((
 ]
 
 const determineAutoRationale = (
-  fields: NullPartialRiskAssessmentFields,
+  fields: PartialDeep<NullPartialRiskAssessmentFields>,
   safetyDatasheets: SdsWithRelations[],
   hidden: number[] = [],
 ) => {
