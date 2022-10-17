@@ -92,6 +92,7 @@ export const calculateSuggestedRiskLevel = (
             break
           case "complex":
             step = 8
+            break
           default:
             return null
         }
