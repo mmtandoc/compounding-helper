@@ -121,4 +121,4 @@ dist
 *.rest
 
 # Other
-database-dump.sql
+.db-backup/
