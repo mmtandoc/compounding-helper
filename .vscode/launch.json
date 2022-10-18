@@ -26,7 +26,13 @@
       "name": "Next: Firefox",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
-      "reAttach": true
+      "reAttach": true,
+      "pathMappings": [
+        {
+          "url": "webpack://_n_e",
+          "path": "${workspaceFolder}"
+        }
+      ]
     },
     {
       "type": "node",
@@ -36,7 +42,7 @@
       "program": "./node_modules/next/dist/bin/next",
       "args": [
         "dev"
-      ],
+      ]
     }
   ],
   "compounds": [
