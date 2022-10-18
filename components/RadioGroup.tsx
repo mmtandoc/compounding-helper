@@ -1,7 +1,6 @@
 import React from "react"
 import {
   FieldPath,
-  FieldPathValue,
   FieldValues,
   useController,
   UseControllerProps,
@@ -31,14 +30,22 @@ export const RHFRadioGroup = <TFieldValues extends FieldValues>(
     valueAsNumber = false,
   } = props
 
-  const { field } = useController({
+  const { field, fieldState, formState } = useController({
     control,
     name,
-    rules,
+    rules: {
+      ...rules,
+      //TODO: Implement disabled without workaround
+      // @ts-expect-error: Workaround to allow disabled for controllers, but still works.
+      disabled,
+    },
   })
-
   return (
-    <ErrorContainer>
+    <ErrorContainer
+      name={field.name}
+      fieldState={fieldState}
+      formState={formState}
+    >
       <RadioGroup
         onChange={(e) => {
           field.onChange(
@@ -116,6 +123,12 @@ export const RadioGroup = (props: RadioGroupProps) => {
         div.radio-group {
           display: flex;
         }
+
+        .radio-group > label {
+          display: flex;
+          align-items: center;
+        }
+
         label {
           white-space: nowrap;
         }

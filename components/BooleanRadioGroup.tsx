@@ -34,6 +34,7 @@ export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
     className,
     direction = "row",
   } = props
+
   let customValidate:
     | Validate<PathValue<TFieldValues, Path<TFieldValues>>>
     | Record<string, Validate<PathValue<TFieldValues, Path<TFieldValues>>>>
@@ -41,11 +42,16 @@ export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
 
   // If rules.required is true, then create custom validate function for workaround
   //https://github.com/react-hook-form/react-hook-form/issues/6757#issuecomment-939429340
-  if (rules?.required) {
+  if (
+    rules?.required &&
+    (typeof rules.required === "object" ? rules.required?.value : true)
+  ) {
+    const message =
+      typeof rules.required === "object" ? rules.required.message : null
+
     customValidate = {
-      required: (value: unknown) => {
-        return typeof value === "boolean"
-      },
+      required: (value: unknown) =>
+        typeof value === "boolean" || (message ?? false),
     }
 
     if (rules?.validate !== undefined) {
@@ -56,24 +62,29 @@ export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
         case "object":
           customValidate = { ...customValidate, ...rules.validate }
           break
-        default:
-          break
       }
     }
   }
 
-  const { field } = useController({
+  const { field, fieldState, formState } = useController({
     control,
     name,
     rules: {
       ...rules,
       validate: customValidate ?? rules?.validate,
       required: false,
+      //TODO: Implement disabled without workaround
+      // @ts-expect-error: Workaround to allow disabled for controllers, but still works.
+      disabled,
     },
   })
 
   return (
-    <ErrorContainer>
+    <ErrorContainer
+      name={field.name}
+      fieldState={fieldState}
+      formState={formState}
+    >
       <BooleanRadioGroup
         onChange={(e) => {
           field.onChange(e.target.value === "yes")
@@ -122,25 +133,25 @@ export const BooleanRadioGroup = ({
   return (
     <div className={`boolean-radio-group ${direction} ${className ?? ""}`}>
       {options.map((option, index) => (
-          <label
+        <label
           key={index}
-            className={`${disabled ? "disabled" : ""} ${
-              readOnly ? "readOnly" : ""
-            }`}
-          >
-            <input
-              name={name}
-              onChange={onChange}
-              ref={ref}
-              onBlur={onBlur}
-              type="radio"
-              checked={option.value === selectedValue}
-              value={option.stringValue}
-              readOnly={readOnly}
-              disabled={disabled}
-            />
-            <span>{option.label}</span>
-          </label>
+          className={`${disabled ? "disabled" : ""} ${
+            readOnly ? "readOnly" : ""
+          }`}
+        >
+          <input
+            name={name}
+            onChange={onChange}
+            ref={ref}
+            onBlur={onBlur}
+            type="radio"
+            checked={option.value === selectedValue}
+            value={option.stringValue}
+            readOnly={readOnly}
+            disabled={disabled}
+          />
+          <span>{option.label}</span>
+        </label>
       ))}
       <style jsx>{`
         .boolean-radio-group {
@@ -149,7 +160,8 @@ export const BooleanRadioGroup = ({
         }
 
         .boolean-radio-group > :global(label) {
-          display: block;
+          display: flex;
+          align-items: center;
         }
       `}</style>
     </div>
