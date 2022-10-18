@@ -48,8 +48,8 @@ export type IngredientFields = {
   productId: number | null
   sdsId: number | null
   physicalForm: "cream" | "ointment" | "powder" | "liquid" | "solid"
+  isCommercialProduct: boolean
   commercialProduct: {
-    isCommercialProduct: boolean
     name?: string | null
     din?: number | null
     hasNoDin?: boolean | null

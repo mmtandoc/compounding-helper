@@ -6,7 +6,7 @@ import {
 } from "types/models"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
-import { RiskAssessmentFields } from "types/fields"
+import { RiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import { ApiBody } from "types/common"
 
 export default async function handler(
@@ -34,7 +34,16 @@ export default async function handler(
       return
     }
     case "POST": {
-      const fields: RiskAssessmentFields = req.body
+      let fields
+      try {
+        fields = riskAssessmentSchema.parse(req.body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
 
       const result = await prisma.riskAssessment.create({
         ...includeAllNested,

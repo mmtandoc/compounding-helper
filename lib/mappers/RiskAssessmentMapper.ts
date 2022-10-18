@@ -1,7 +1,10 @@
 import { RiskAssessment } from "@prisma/client"
-import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
+import {
+  NullPartialRiskAssessmentFields,
+  riskAssessmentSchema,
+} from "lib/fields"
 import { SetOptional } from "type-fest"
-import { ExposureRisksFields, RiskAssessmentFields } from "types/fields"
+import { ExposureRisksFields, RiskAssessmentFields } from "lib/fields"
 import { RiskAssessmentAll } from "types/models"
 import IngredientMapper from "./IngredientMapper"
 
@@ -32,7 +35,7 @@ const mapExposureRisksFieldsToModel = (
 const toFieldValues = (
   data: RiskAssessmentAll,
 ): NullPartialRiskAssessmentFields => {
-  return {
+  return riskAssessmentSchema.parse({
     id: data.id,
     compoundName: data.compoundName,
     ingredients: data.ingredients
@@ -88,7 +91,7 @@ const toFieldValues = (
       additional: data.additionalRationale,
     },
     dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
-  }
+  })
 }
 
 //TODO: Refactor
@@ -133,9 +136,9 @@ const toModel = (
           data = {
             ...data,
             ppeGlovesRequired: ppe?.gloves?.required,
-            ppeGlovesType: ppe?.gloves?.type,
+            ppeGlovesType: ppe?.gloves?.type ?? null,
             ppeCoatRequired: ppe?.coat?.required,
-            ppeCoatType: ppe?.coat?.type,
+            ppeCoatType: ppe?.coat?.type ?? null,
             ppeMaskRequired: ppe?.mask?.required,
             ppeMaskType: ppe?.mask?.type ?? null,
             ppeEyeProtectionRequired: ppe?.eyeProtection?.required,

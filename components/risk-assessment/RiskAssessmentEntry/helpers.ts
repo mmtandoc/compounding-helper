@@ -1,4 +1,4 @@
-import { NullPartialRiskAssessmentFields } from "."
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { SdsWithHazards } from "types/models"
 import { Chemical } from "@prisma/client"
 import { Path } from "react-hook-form"

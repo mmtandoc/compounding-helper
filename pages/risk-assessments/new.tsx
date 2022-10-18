@@ -1,8 +1,10 @@
 import CreateForm from "components/common/data-pages/CreateForm"
 import Layout from "components/Layout"
-import RiskAssessmentEntry, {
+import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
+import {
   NullPartialRiskAssessmentFields,
-} from "components/risk-assessment/RiskAssessmentEntry"
+  riskAssessmentSchema,
+} from "lib/fields"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialRiskAssessmentFields = {
@@ -14,8 +16,8 @@ const defaultValues: NullPartialRiskAssessmentFields = {
       physicalForm: null,
       productId: null,
       sdsId: null,
+      isCommercialProduct: null,
       commercialProduct: {
-        isCommercialProduct: null,
         name: null,
         din: null,
         hasNoDin: null,
@@ -49,14 +51,6 @@ const defaultValues: NullPartialRiskAssessmentFields = {
       other: null,
       otherDescription: null,
     },
-    productMonograph: {
-      eye: null,
-      oral: null,
-      inhalation: null,
-      skin: null,
-      other: null,
-      otherDescription: null,
-    },
   },
   ppe: {
     mask: { required: null, type: null },
@@ -69,7 +63,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
     automatic: [],
     additional: [],
   },
-  dateAssessed: new Date().toLocaleDateString("en-CA"),
+  dateAssessed: new Date(),
 }
 
 const NewRiskAssessment: NextPage = () => {
@@ -78,7 +72,8 @@ const NewRiskAssessment: NextPage = () => {
       <div className="page">
         <h1>New Risk Assessment</h1>
         <CreateForm
-          defaultValues={defaultValues}
+          defaultValues={defaultValues as NullPartialRiskAssessmentFields}
+          schema={riskAssessmentSchema}
           entryComponent={RiskAssessmentEntry}
           apiEndpointPath="/api/risk-assessments"
           urlPath="/risk-assessments"

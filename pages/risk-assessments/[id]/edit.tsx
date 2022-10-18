@@ -1,13 +1,15 @@
 import React from "react"
 import Layout from "components/Layout"
 import { GetServerSideProps, NextPage } from "next"
-import RiskAssessmentEntry, {
-  NullPartialRiskAssessmentFields,
-} from "components/risk-assessment/RiskAssessmentEntry"
+import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { useRouter } from "next/router"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import EditForm from "components/common/data-pages/EditForm"
+import {
+  NullPartialRiskAssessmentFields,
+  riskAssessmentSchema,
+} from "lib/fields"
 
 type EditRiskAssessmentProps = {
   values: NullPartialRiskAssessmentFields
@@ -28,6 +30,7 @@ const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
         <EditForm
           id={riskAssessmentId}
           values={values as NullPartialRiskAssessmentFields}
+          schema={riskAssessmentSchema}
           apiEndpointPath="/api/risk-assessments"
           urlPath="/risk-assessments"
           entryComponent={RiskAssessmentEntry}

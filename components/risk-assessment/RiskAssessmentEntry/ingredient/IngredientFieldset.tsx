@@ -10,10 +10,14 @@ import useSWR from "swr"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import { NullPartialRiskAssessmentFields } from ".."
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { Vendor } from "@prisma/client"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import SdsSelect from "./SdsSelect"
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import ErrorContainer from "components/common/forms/ErrorContainer"
+import TextArea from "components/common/forms/TextArea"
 
 interface IngredientFieldsetProps {
   id?: string
@@ -33,16 +37,20 @@ const IngredientFieldset = ({
   arrayMethods,
   showPastSdsRevisions = false,
 }: IngredientFieldsetProps) => {
-  const { register, control, setValue, watch } = formMethods
+  const { register, setValue, watch } = formMethods
 
   const { fields, move, remove } = arrayMethods
 
-  const ingredient = watch(`ingredients.${index}`)
+  //const ingredient = watch(`ingredients.${index}`)
+  const [chemicalId, sdsId] = watch([
+    `ingredients.${index}.chemicalId`,
+    `ingredients.${index}.sdsId`,
+  ])
 
   const { data: chemicalData, error: chemicalError } = useSWR<
     ChemicalAll,
     JsonError
-  >(!ingredient?.chemicalId ? null : `/api/chemicals/${ingredient.chemicalId}`)
+  >(!chemicalId ? null : `/api/chemicals/${chemicalId}`)
 
   const { data: vendorsData, error: vendorsError } = useSWR<
     Vendor[],
@@ -54,9 +62,9 @@ const IngredientFieldset = ({
     SdsWithRelations[],
     JsonError
   >(
-    !ingredient?.chemicalId
+    !chemicalId
       ? null
-      : `/api/sds?chemicalId=${ingredient.chemicalId}${
+      : `/api/sds?chemicalId=${chemicalId}${
           !showPastSdsRevisions ? "&latestOnly" : ""
         }`,
   )
@@ -74,9 +82,7 @@ const IngredientFieldset = ({
     console.log(vendorsError)
   }
 
-  const isCommercialProduct = watch(
-    `ingredients.${index}.commercialProduct.isCommercialProduct`,
-  ) as boolean
+  const isCommercialProduct = watch(`ingredients.${index}.isCommercialProduct`)
 
   const hasNoDin = watch(`ingredients.${index}.commercialProduct.hasNoDin`)
 
@@ -84,20 +90,24 @@ const IngredientFieldset = ({
     `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
   )
 
+  const order = watch(`ingredients.${index}.order`)
+
   useEffect(() => {
-    register(`ingredients.${index}.order`)
-    setValue(`ingredients.${index}.order`, index + 1)
-  }, [index, register, setValue])
+    if (order !== index + 1) {
+      register(`ingredients.${index}.order`)
+      setValue(`ingredients.${index}.order`, index + 1)
+    }
+  }, [index, register, setValue, order])
 
   useUpdateFieldConditionally({
     updateCondition: isCommercialProduct !== true,
     fields: [
+      [`ingredients.${index}.commercialProduct.name`, null],
+      [`ingredients.${index}.commercialProduct.din`, null],
       [
         `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
         null,
       ],
-      [`ingredients.${index}.commercialProduct.name`, null],
-      [`ingredients.${index}.commercialProduct.din`, null],
     ],
     register,
     setValue,
@@ -113,25 +123,20 @@ const IngredientFieldset = ({
   //TODO: Handle loading better
 
   const isLoading =
-    !!ingredient?.chemicalId && (!chemicalData || !sdsesData || !vendorsData)
+    !!chemicalId && (!chemicalData || !sdsesData || !vendorsData)
 
   useEffect(() => {
-    if (
-      !isLoading &&
-      !ingredient?.sdsId &&
-      !!sdsesData &&
-      sdsesData.length > 0
-    ) {
+    if (!isLoading && !sdsId && !!sdsesData && sdsesData.length > 0) {
       register(`ingredients.${index}.sdsId`)
       setValue(`ingredients.${index}.sdsId`, sdsesData[0].id)
     }
-  }, [index, ingredient?.sdsId, isLoading, register, sdsesData, setValue])
+  }, [index, sdsId, isLoading, register, sdsesData, setValue])
 
   if (isLoading) {
     return <div>Loading...</div>
   }
 
-  const selectedSds = sdsesData?.find((sds) => sds.id === ingredient?.sdsId)
+  const selectedSds = sdsesData?.find((sds) => sds.id === sdsId)
 
   return (
     <fieldset className="ingredient-fieldset">
@@ -146,8 +151,6 @@ const IngredientFieldset = ({
                 <ChemicalSearch
                   id={`i${index}-chemical-search`}
                   name={`ingredients.${index}.chemicalId`}
-                  control={control}
-                  rules={{ required: !isCommercialProduct }}
                   onItemChange={() => {
                     console.log("onItemChange")
                     register(`ingredients.${index}.sdsId`)
@@ -157,27 +160,25 @@ const IngredientFieldset = ({
                   defaultValue={null}
                 />
 
-                <button type="button" disabled={!ingredient?.chemicalId}>
+                <button type="button" disabled={!chemicalId}>
                   ...
                 </button>
               </div>
             </div>
             <div className="form-group">
               <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
-              <select
-                {...register(`ingredients.${index}.physicalForm` as const, {
-                  required: true,
-                  setValueAs: (val) => (!val ? undefined : val),
-                })}
+              <Select
+                name={`ingredients.${index}.physicalForm`}
                 id={`i${index}-physical-form`}
                 className="physical-form"
+                initialOption={{ value: "none", label: "-- Select a form --" }}
               >
                 <option value="cream">Cream</option>
                 <option value="ointment">Ointment</option>
                 <option value="powder">Powder</option>
                 <option value="liquid">Liquid</option>
                 <option value="solid">Solid</option>
-              </select>
+              </Select>
             </div>
           </div>
           <div className="row">
@@ -190,11 +191,12 @@ const IngredientFieldset = ({
                   sdses={sdsesData}
                   showAllRevisions={showPastSdsRevisions}
                   ingredientIndex={index}
-                  register={register}
-                  disabled={!ingredient?.chemicalId}
-                  required={!isCommercialProduct}
+                  disabled={!chemicalId}
+                  required={
+                    isCommercialProduct === null || !isCommercialProduct
+                  }
                 />
-                <button type="button" disabled={!ingredient?.sdsId}>
+                <button type="button" disabled={!sdsId}>
                   ...
                 </button>
               </div>
@@ -207,10 +209,11 @@ const IngredientFieldset = ({
               </label>
               <RHFBooleanRadioGroup
                 id={`i${index}-is-commercial-product`}
-                name={`ingredients.${index}.commercialProduct.isCommercialProduct`}
-                control={control}
+                name={`ingredients.${index}.isCommercialProduct`}
                 className="is-commercial-product"
-                rules={{ required: true }}
+                rules={{
+                  deps: [`ingredients.${index}.chemicalId`],
+                }}
               />
             </div>
           </div>
@@ -222,11 +225,10 @@ const IngredientFieldset = ({
               >
                 Product name:
               </label>
-              <input
+              <Input
                 {...register(
                   `ingredients.${index}.commercialProduct.name` as const,
                   {
-                    required: isCommercialProduct,
                     disabled: !isCommercialProduct,
                     setValueAs: (value) => {
                       return value === "" || !value ? null : value
@@ -243,16 +245,11 @@ const IngredientFieldset = ({
               <label className={`${!isCommercialProduct ? "disabled" : ""}`}>
                 <span>Product DIN:</span>
                 <div className="row">
-                  <input
+                  <Input
                     {...register(
                       `ingredients.${index}.commercialProduct.din` as const,
                       {
-                        required:
-                          !!isCommercialProduct &&
-                          !ingredient?.commercialProduct?.hasNoDin,
-                        disabled:
-                          !isCommercialProduct ||
-                          !!ingredient?.commercialProduct?.hasNoDin,
+                        disabled: !isCommercialProduct || !!hasNoDin,
                       },
                     )}
                     inputMode="numeric"
@@ -261,17 +258,23 @@ const IngredientFieldset = ({
                     size={7}
                   />
                   <label>
-                    <input
-                      type="checkbox"
-                      {...register(
-                        `ingredients.${index}.commercialProduct.hasNoDin`,
-                        {
-                          disabled: !isCommercialProduct,
-                          deps: [`ingredients.${index}.commercialProduct.din`],
-                        },
-                      )}
-                    />
-                    <span>No DIN</span>
+                    <ErrorContainer>
+                      <>
+                        <input
+                          type="checkbox"
+                          {...register(
+                            `ingredients.${index}.commercialProduct.hasNoDin`,
+                            {
+                              disabled: !isCommercialProduct,
+                              deps: [
+                                `ingredients.${index}.commercialProduct.din`,
+                              ],
+                            },
+                          )}
+                        />
+                        <span>No DIN</span>
+                      </>
+                    </ErrorContainer>
                   </label>
                 </div>
               </label>
@@ -289,36 +292,27 @@ const IngredientFieldset = ({
               <RHFBooleanRadioGroup
                 id={`i${index}-has-product-monograph-concerns`}
                 name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
-                control={control}
                 disabled={!isCommercialProduct}
                 className="has-product-monograph-concerns"
-                rules={{
-                  required: isCommercialProduct,
-                }}
               />
             </div>
           </div>
           <div className="row" hidden={!hasProductMonographConcerns}>
-            <div style={{ width: "100%" }}>
+            <div className="form-group" style={{ width: "100%" }}>
               <label
                 htmlFor={`i${index}-commercial-product-concerns-desc`}
                 className={!hasProductMonographConcerns ? "disabled" : ""}
               >
                 Please describe health concerns on the product monograph:
               </label>
-              <textarea
+              <TextArea
                 {...register(
                   `ingredients.${index}.commercialProduct.concernsDescription`,
                   {
-                    required: !!hasProductMonographConcerns,
                     disabled: !hasProductMonographConcerns,
                     setValueAs: (value) => {
                       return value === "" ? undefined : value
                     },
-                    /* deps: [
-                      `ingredients.${index}.isCommercialProduct`,
-                      `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
-                    ], */
                   },
                 )}
                 id={`i${index}-commercial-product-concerns-desc`}
@@ -343,7 +337,7 @@ const IngredientFieldset = ({
               <span className="label">SDS HMIS health hazard level:</span>
               <span>{selectedSds?.hmisHealthHazard ?? "N/A"}</span>
             </div>
-            {ingredient && ingredient.sdsId && selectedSds && (
+            {sdsId && selectedSds && (
               <div>
                 <span className="label">SDS health hazards:</span>
                 <ul className="health-hazard-list">

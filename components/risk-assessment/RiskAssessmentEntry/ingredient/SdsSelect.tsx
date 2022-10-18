@@ -1,18 +1,19 @@
 import React from "react"
-import { UseFormRegister } from "react-hook-form"
 import { ChemicalAll, SdsWithRelations } from "types/models"
-import { NullPartialRiskAssessmentFields } from ".."
 import { Vendor } from "@prisma/client"
+import Select from "components/common/forms/Select"
+import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { Control } from "react-hook-form"
 
 type SdsSelectProps = {
   chemical?: ChemicalAll
   sdses?: SdsWithRelations[]
   vendors?: Vendor[]
   showAllRevisions: boolean
-  register: UseFormRegister<NullPartialRiskAssessmentFields>
   ingredientIndex: number
   disabled?: boolean
   required?: boolean
+  control?: Control<NullPartialRiskAssessmentFields>
 }
 
 const SdsSelect = ({
@@ -20,10 +21,10 @@ const SdsSelect = ({
   sdses,
   vendors,
   showAllRevisions,
-  register,
   ingredientIndex,
   disabled = true,
   required = true,
+  control,
 }: SdsSelectProps) => {
   const sdsProductMap = new Map<number, SdsWithRelations[]>()
   if (sdses !== undefined) {
@@ -38,15 +39,17 @@ const SdsSelect = ({
   }
 
   return (
-    <select
-      {...register(`ingredients.${ingredientIndex}.sdsId`, {
-        setValueAs: (val) => (val !== null ? parseInt(val) : null),
+    <Select
+      name={`ingredients.${ingredientIndex}.sdsId`}
+      rules={{
         required: required,
-        //deps: `ingredients.${ingredientIndex}.chemicalId`,
         disabled: disabled,
-      })}
+        valueAsNumber: true,
+      }}
       id={`i${ingredientIndex}-sds-select`}
       className="sds-select"
+      initialOption={false}
+      control={control}
     >
       {chemical !== undefined &&
         sdses !== undefined &&
@@ -80,12 +83,12 @@ const SdsSelect = ({
 
           return renderSdsOption(sdsArray[0])
         })}
-      <style jsx>{`
-        select.sds-select {
+      <style jsx global>{`
+        .sds-select {
           min-width: 30rem;
         }
       `}</style>
-    </select>
+    </Select>
   )
 }
 

@@ -153,3 +153,249 @@ export type SdsFields = z.infer<typeof sdsSchema>
 export type NullPartialSdsFields = Simplify<
   Merge<NullPartialDeep<SdsFields>, Pick<SdsFields, "id">>
 >
+
+//==== Risk Assessment & Ingredient schemas ====//
+
+/*
+type IngredientFields = {
+  order: number
+  chemicalId: number | null
+  productId: number | null
+  sdsId: number | null
+  physicalForm: "cream" | "ointment" | "powder" | "liquid" | "solid"
+  commercialProduct: {
+    isCommercialProduct: boolean
+    name?: string | null
+    din?: number | null
+    hasNoDin?: boolean | null
+    hasProductMonographConcerns?: boolean | null
+    concernsDescription?: string | null
+  }
+}
+*/
+
+export const ingredientSchemaBase = z.object({
+  order: z.number().int(),
+  chemicalId: z.number().int().nullable(),
+  productId: z.number().int().nullable(),
+  sdsId: z.number().int().nullable(),
+  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
+  isCommercialProduct: z.boolean(),
+  commercialProduct: z.object({
+    name: z.string().trim(),
+    din: castStringToNumber(z.number().int()).optional(),
+    hasNoDin: z.boolean(),
+    hasProductMonographConcerns: z.boolean(),
+    concernsDescription: z.string().trim().optional(),
+  }),
+})
+
+const commercialIngredientSchema = z.object({
+  order: z.number().int(),
+  chemicalId: z.number().int().nullish(),
+  productId: z.number().int().nullish(),
+  sdsId: z.number().int().nullish(),
+  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
+  isCommercialProduct: z.literal(true),
+  commercialProduct: z.object({
+    name: z.string().trim().min(1),
+    din: castStringToNumber(z.number().int()).optional(),
+    hasNoDin: z.boolean(),
+    hasProductMonographConcerns: z.boolean(),
+    concernsDescription: z.string().trim().optional(),
+  }),
+})
+
+const nonCommercialIngredientSchema = z.object({
+  order: z.number().int(),
+  chemicalId: z.number().int(),
+  productId: z.number().int(),
+  sdsId: z.number().int(),
+  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
+  isCommercialProduct: z.literal(false),
+  commercialProduct: z.object({
+    name: z.undefined(),
+    din: z.undefined(),
+    hasNoDin: z.undefined(),
+    hasProductMonographConcerns: z.undefined(),
+    concernsDescription: z.undefined(),
+  }),
+})
+
+export const ingredientSchema = z.discriminatedUnion("isCommercialProduct", [
+  commercialIngredientSchema,
+  nonCommercialIngredientSchema,
+])
+
+export type IngredientFields = Simplify<z.infer<typeof ingredientSchema>>
+
+export type NullPartialIngredientFields = Simplify<
+  NullPartialDeep<IngredientFields, { ignoreKeys: "order" }>
+>
+
+/*
+export type ExposureRisksFields = {
+  skin: boolean
+  eye: boolean
+  inhalation: boolean
+  oral: boolean
+  other: boolean
+  otherDescription: string | null
+}
+*/
+export const exposureRisksSchema = z
+  .object({
+    skin: z.boolean(),
+    eye: z.boolean(),
+    inhalation: z.boolean(),
+    oral: z.boolean(),
+    other: z.boolean(),
+    otherDescription: z.string().trim().min(1).optional(),
+  })
+  .superRefine((arg, ctx) => {
+    if (arg.other && !arg.otherDescription) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required.",
+        path: ["otherDescription"],
+      })
+    }
+  })
+
+export type ExposureRisksFields = z.infer<typeof exposureRisksSchema>
+
+/*
+type RiskAssessmentFields = {
+  id?: number
+  compoundName: string
+  ingredients: IngredientFields[]
+  complexity: "simple" | "moderate" | "complex"
+  isPreparedOccasionally: boolean
+  preparationFrequency: "daily" | "weekly" | "monthly"
+  isSmallQuantity: boolean
+  averagePreparationAmount: {
+    quantity: number
+    unit: "g" | "ml"
+  }
+  isConcentrationHealthRisk: boolean
+  requireSpecialEducation: boolean
+  hasVerificationSteps: boolean
+  haveAppropriateFacilities: boolean
+  requireVentilation: boolean
+  isWorkflowUninterrupted: boolean
+  workflowStandardsProcess?: string
+  microbialContaminationRisk: boolean
+  crossContaminationRisk: boolean
+  exposureRisks: {
+    sds: ExposureRisksFields
+    productMonograph?: ExposureRisksFields
+  }
+  ppe: {
+    gloves: {
+      required: boolean
+      type: "regular" | "chemotherapy" | "double" | null
+    }
+    coat: {
+      required: boolean
+      type: "designated" | "disposable" | null
+    }
+    mask: {
+      required: boolean
+      type?: string
+    }
+    eyeProtection: {
+      required: boolean
+    }
+    other?: string
+  }
+  requireEyeWashStation: boolean
+  requireSafetyShower: boolean
+  riskLevel: "A" | "B" | "C"
+  rationaleList: {
+    automatic: string[]
+    additional: string[]
+  }
+  dateAssessed: string
+}
+*/
+
+const refinePPE = (arg: any, ctx: any) =>
+  arg.required &&
+  !arg.type &&
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    message: "Required.",
+    path: ["type"],
+  })
+
+export const riskAssessmentSchema = z.object({
+  id: z.number().int().optional(),
+  compoundName: z.string().trim().min(1),
+  ingredients: z.array(ingredientSchema),
+  complexity: z.enum(["simple", "moderate", "complex"]),
+  isPreparedOccasionally: z.boolean(),
+  preparationFrequency: z.enum(["daily", "weekly", "monthly"]),
+  isSmallQuantity: z.boolean(),
+  averagePreparationAmount: z.object({
+    quantity: z.number(),
+    unit: z.enum(["g", "ml"]),
+  }),
+  isConcentrationHealthRisk: z.boolean(),
+  requireSpecialEducation: z.boolean(),
+  hasVerificationSteps: z.boolean(),
+  haveAppropriateFacilities: z.boolean(),
+  requireVentilation: z.boolean(),
+  isWorkflowUninterrupted: z.boolean(),
+  workflowStandardsProcess: z.string().trim().optional(),
+  microbialContaminationRisk: z.boolean(),
+  crossContaminationRisk: z.boolean(),
+  exposureRisks: z.object({
+    sds: exposureRisksSchema,
+    productMonograph: exposureRisksSchema.optional(),
+  }),
+  ppe: z.object({
+    gloves: z
+      .object({
+        required: z.boolean(),
+        type: z.enum(["regular", "chemotherapy", "double"]).optional(),
+      })
+      .superRefine(refinePPE),
+    coat: z
+      .object({
+        required: z.boolean(),
+        type: z.enum(["designated", "disposable"]).optional(),
+      })
+      .superRefine(refinePPE),
+    mask: z
+      .object({
+        required: z.boolean(),
+        type: z.string().trim().nullish(),
+      })
+      .superRefine(refinePPE),
+    eyeProtection: z.object({
+      required: z.boolean(),
+    }),
+    other: z.string().nullish(),
+  }),
+  requireEyeWashStation: z.boolean(),
+  requireSafetyShower: z.boolean(),
+  riskLevel: z.enum(["A", "B", "C"]),
+  rationaleList: z.object({
+    automatic: z.string().trim().array(),
+    additional: z.string().trim().array(),
+  }),
+  dateAssessed: castStringToDate(
+    z
+      .date()
+      .max(
+        new Date(new Date().setDate(new Date().getDate())),
+        "Date must be before the current date",
+      ),
+  ),
+})
+
+export type RiskAssessmentFields = z.infer<typeof riskAssessmentSchema>
+
+export type NullPartialRiskAssessmentFields = Simplify<
+  NullPartialDeep<RiskAssessmentFields, { ignoreKeys: "id" }>
+>

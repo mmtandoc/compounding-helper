@@ -1,5 +1,5 @@
 import DotJotList from "components/common/forms/DotJotList"
-import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import _ from "lodash"
 import React, { useEffect } from "react"
 import {
@@ -93,9 +93,6 @@ const RationaleList = ({
   } = useController({
     control,
     name: "rationaleList",
-    rules: {
-      required: true,
-    },
   })
 
   //TODO: Improve loading handling
