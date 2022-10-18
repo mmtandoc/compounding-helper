@@ -16,7 +16,6 @@ import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import SdsSelect from "./SdsSelect"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
-import ErrorContainer from "components/common/forms/ErrorContainer"
 import TextArea from "components/common/forms/TextArea"
 
 interface IngredientFieldsetProps {
@@ -37,7 +36,7 @@ const IngredientFieldset = ({
   arrayMethods,
   showPastSdsRevisions = false,
 }: IngredientFieldsetProps) => {
-  const { register, setValue, watch } = formMethods
+  const { register, setValue, watch, trigger, getFieldState } = formMethods
 
   const { fields, move, remove } = arrayMethods
 
@@ -131,6 +130,23 @@ const IngredientFieldset = ({
       setValue(`ingredients.${index}.sdsId`, sdsesData[0].id)
     }
   }, [index, sdsId, isLoading, register, sdsesData, setValue])
+
+  useUpdateFieldConditionally({
+    updateCondition: hasNoDin === true,
+    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
+    register,
+    setValue,
+  })
+
+  // Fix issue where DIN field remains invalid until onBlur event of hasNoDin checkbox
+  useEffect(() => {
+    if (
+      hasNoDin &&
+      getFieldState(`ingredients.${index}.commercialProduct.din`).error
+    ) {
+      trigger(`ingredients.${index}.commercialProduct.din`)
+    }
+  }, [getFieldState, hasNoDin, index, trigger])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -246,35 +262,26 @@ const IngredientFieldset = ({
                 <span>Product DIN:</span>
                 <div className="row">
                   <Input
-                    {...register(
-                      `ingredients.${index}.commercialProduct.din` as const,
-                      {
-                        disabled: !isCommercialProduct || !!hasNoDin,
-                      },
-                    )}
+                    {...register(`ingredients.${index}.commercialProduct.din`, {
+                      disabled: !isCommercialProduct || !!hasNoDin,
+                    })}
                     inputMode="numeric"
                     type="text"
                     readOnly={!isCommercialProduct}
                     size={7}
                   />
                   <label>
-                    <ErrorContainer>
-                      <>
-                        <input
-                          type="checkbox"
-                          {...register(
-                            `ingredients.${index}.commercialProduct.hasNoDin`,
-                            {
-                              disabled: !isCommercialProduct,
-                              deps: [
-                                `ingredients.${index}.commercialProduct.din`,
-                              ],
-                            },
-                          )}
-                        />
-                        <span>No DIN</span>
-                      </>
-                    </ErrorContainer>
+                    <input
+                      type="checkbox"
+                      {...register(
+                        `ingredients.${index}.commercialProduct.hasNoDin`,
+                        {
+                          disabled: !isCommercialProduct,
+                          deps: `ingredients.${index}.commercialProduct.din`,
+                        },
+                      )}
+                    />
+                    <span>No DIN</span>
                   </label>
                 </div>
               </label>

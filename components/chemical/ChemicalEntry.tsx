@@ -6,6 +6,7 @@ import { Controller, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import { DataEntryComponent } from "types/common"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
+import { useEffect } from "react"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialChemicalFields>
@@ -16,7 +17,8 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
 ) => {
   const { formMethods } = props
 
-  const { register, control, watch, setValue } = formMethods
+  const { register, control, watch, setValue, getFieldState, trigger } =
+    formMethods
 
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
 
@@ -26,6 +28,13 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
     register,
     setValue,
   })
+
+  // Fix issue where CAS number field remains invalid until onBlur event of hasNoCasNumber checkbox
+  useEffect(() => {
+    if (hasNoCasNumber && getFieldState("casNumber").error) {
+      trigger("casNumber")
+    }
+  }, [getFieldState, hasNoCasNumber, trigger])
 
   register("id")
   return (
@@ -39,7 +48,7 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
         <div className="row">
           <Input
             type="text"
-            {...register("casNumber")}
+            {...register("casNumber", { disabled: hasNoCasNumber })}
             placeholder="XXXXXXX-YY-Z"
           />
           <label>

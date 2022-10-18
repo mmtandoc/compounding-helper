@@ -57,7 +57,7 @@ export const chemicalSchema = z.object({
         })
       }
     })
-    .nullable(),
+    .nullish(),
   hasNoCasNumber: z.boolean(),
   synonyms: z.array(z.string().trim().min(1)).nullable(),
   nioshTable: z.number().int().min(1).max(3).or(z.literal(-1)),
@@ -199,7 +199,7 @@ const commercialIngredientSchema = z.object({
   isCommercialProduct: z.literal(true),
   commercialProduct: z.object({
     name: z.string().trim().min(1),
-    din: castStringToNumber(z.number().int()).optional(),
+    din: castStringToNumber(z.number().int()).nullish(),
     hasNoDin: z.boolean(),
     hasProductMonographConcerns: z.boolean(),
     concernsDescription: z.string().trim().optional(),
