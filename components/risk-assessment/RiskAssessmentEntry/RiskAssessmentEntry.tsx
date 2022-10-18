@@ -315,7 +315,6 @@ const RiskAssessmentEntry = (props: Props) => {
           name="exposureRisks.sds"
           category="From SDS"
           register={register}
-          control={control}
           sdsIds={ingredients
             ?.map((ing) => ing.sdsId)
             .filter<number>((id): id is number => typeof id === "number")}
@@ -325,7 +324,6 @@ const RiskAssessmentEntry = (props: Props) => {
             name="exposureRisks.productMonograph"
             category="From Product Monograph"
             register={register}
-            control={control}
           />
         )}
       </fieldset>

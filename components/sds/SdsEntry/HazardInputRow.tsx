@@ -95,7 +95,6 @@ const HazardInputRow = ({
         placeholder="Category"
         name={`hazards.${index}.categoryId`}
         rules={{
-          required: true,
           onChange: () => {
             register(`hazards.${index}.subcategoryId`)
             setValue(`hazards.${index}.subcategoryId`, null)
