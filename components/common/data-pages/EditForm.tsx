@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import {
   DeepPartial,
   FieldValues,
+  FormProvider,
   SubmitHandler,
   useForm,
 } from "react-hook-form"
@@ -9,18 +10,26 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { DataEntryComponent } from "types/common"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-type EditFormProps<TFieldValues extends FieldValues> = {
+type EditFormProps<
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+> = {
   id: number
   values: TFieldValues
+  schema?: TSchema
   apiEndpointPath: string
   urlPath: string
   entryComponent: DataEntryComponent<TFieldValues>
   entryComponentProps?: Record<string, unknown>
 }
 
-const EditForm = <TFieldValues extends FieldValues>(
-  props: EditFormProps<TFieldValues>,
+const EditForm = <
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+>(
+  props: EditFormProps<TSchema, TFieldValues>,
 ) => {
   const {
     id,
@@ -29,6 +38,7 @@ const EditForm = <TFieldValues extends FieldValues>(
     urlPath,
     entryComponent: EntryComponent,
     entryComponentProps,
+    schema,
   } = props
 
   const router = useRouter()
@@ -36,6 +46,17 @@ const EditForm = <TFieldValues extends FieldValues>(
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
   const formMethods = useForm<TFieldValues>({
     defaultValues: values as DeepPartial<TFieldValues>,
+    criteriaMode: "all",
+    mode: "onTouched",
+    reValidateMode: "onChange",
+    resolver: schema
+      ? async (values, context, options) => {
+          console.log("formData", values)
+          const result = await zodResolver(schema)(values, context, options)
+          console.log("validation", result)
+          return result
+        }
+      : undefined,
   })
 
   const { handleSubmit, reset } = formMethods
@@ -59,44 +80,47 @@ const EditForm = <TFieldValues extends FieldValues>(
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.error(errors)
-        setSaveSuccessful(false)
-      })}
-      autoComplete="off"
-    >
-      <EntryComponent
-        values={values}
-        formMethods={formMethods}
-        {...entryComponentProps}
-      />
-      <div>
-        <div className="button-row">
-          <button type="submit">Save</button>
-          <Link href={`${urlPath}/${id}`} passHref>
-            <button type="button">Cancel</button>
-          </Link>
+    <FormProvider {...formMethods}>
+      <form
+        onSubmit={handleSubmit(onSubmit, (errors) => {
+          console.error(errors)
+          setSaveSuccessful(false)
+        })}
+        autoComplete="off"
+        noValidate
+      >
+        <EntryComponent
+          values={values}
+          formMethods={formMethods}
+          {...entryComponentProps}
+        />
+        <div>
+          <div className="button-row">
+            <button type="submit">Save</button>
+            <Link href={`${urlPath}/${id}`} passHref>
+              <button type="button">Cancel</button>
+            </Link>
+          </div>
+          {saveSuccessful !== undefined && (
+            <p style={{ color: saveSuccessful ? "green" : "red" }}>
+              {saveSuccessful ? "Saved" : "Error"}
+            </p>
+          )}
         </div>
-        {saveSuccessful !== undefined && (
-          <p style={{ color: saveSuccessful ? "green" : "red" }}>
-            {saveSuccessful ? "Saved" : "Error"}
-          </p>
-        )}
-      </div>
-      <style jsx>{`
-        form {
-          align-self: center;
-          margin-bottom: 2rem;
-        }
+        <style jsx>{`
+          form {
+            align-self: center;
+            margin-bottom: 2rem;
+          }
 
-        .button-row {
-          display: flex;
-          column-gap: 0.8rem;
-          margin-top: 1.2rem;
-        }
-      `}</style>
-    </form>
+          .button-row {
+            display: flex;
+            column-gap: 0.8rem;
+            margin-top: 1.2rem;
+          }
+        `}</style>
+      </form>
+    </FormProvider>
   )
 }
 export default EditForm

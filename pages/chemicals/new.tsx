@@ -1,8 +1,7 @@
-import ChemicalEntry, {
-  NullPartialChemicalFields,
-} from "components/chemical/ChemicalEntry"
+import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
 import Layout from "components/Layout"
+import { chemicalSchema, NullPartialChemicalFields } from "lib/fields"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialChemicalFields = {
@@ -20,6 +19,7 @@ const NewChemical: NextPage = () => {
       <div className="page">
         <h1>New Chemical</h1>
         <CreateForm
+          schema={chemicalSchema}
           dataName="chemical"
           defaultValues={defaultValues}
           apiEndpointPath="/api/chemicals"

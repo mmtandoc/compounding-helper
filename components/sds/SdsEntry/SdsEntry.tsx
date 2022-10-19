@@ -1,31 +1,25 @@
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
+import {
+  NullPartialHazardFields,
+  NullPartialSdsFields,
+  sdsSchema,
+} from "lib/fields"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import useSWR from "swr"
 import { JsonError } from "types/common"
-import { HazardFields, SdsFields } from "types/fields"
 import { ProductWithVendor } from "types/models"
-import { NullPartialDeep, Overwrite } from "types/util"
 import HazardInputRow from "./HazardInputRow"
-
-export type NullPartialHazardFields = NullPartialDeep<
-  HazardFields,
-  { ignoreKeys: "id" }
->
-
-export type NullPartialSdsFields = NullPartialDeep<
-  Overwrite<SdsFields, { hazards: NullPartialHazardFields[] }>,
-  { ignoreKeys: "id" }
->
 
 type Props = {
   formMethods: UseFormReturn<NullPartialSdsFields>
 }
 
-const emptyHazardValues = {
+const emptyHazardValues: NullPartialHazardFields | null = {
   categoryId: null,
   classId: null,
   additionalInfo: null,
@@ -38,8 +32,6 @@ const SdsEntry = (props: Props) => {
   const { register, control, watch, setValue } = formMethods
 
   const [chemicalId, productId] = watch(["chemicalId", "productId"])
-
-  console.log({ productId })
 
   const hazardsArrayMethods = useFieldArray({
     control: control,
@@ -67,8 +59,6 @@ const SdsEntry = (props: Props) => {
           <ChemicalSearch
             id="chemical-search"
             name={`chemicalId`}
-            control={control}
-            rules={{ required: true }}
             onItemChange={(chemical) => {
               if (chemical?.id !== chemicalId) {
                 register(`productId`)
@@ -84,8 +74,7 @@ const SdsEntry = (props: Props) => {
           <span>Product:</span>
           <Select
             name="productId"
-            control={control}
-            rules={{ required: true, valueAsNumber: true }}
+            rules={{ valueAsNumber: true }}
             disabled={!chemicalId}
             initialOption={{ label: "--- Select product ---", value: "none" }}
           >
@@ -100,26 +89,17 @@ const SdsEntry = (props: Props) => {
       <div className="form-group">
         <label>
           <span>Revision date:</span>
-          <input
-            type="date"
-            {...register("revisionDate", { required: true })}
-            id="revision-date"
-          />
+          <Input type="date" {...register("revisionDate")} id="revision-date" />
         </label>
       </div>
       <div className="form-group">
         <label>
           <span>HMIS health hazard level:</span>
-          <input
+          <Input
             type="number"
-            {...register("hmisHazardLevel", {
-              required: true,
-              min: 0,
-              max: 5,
-              valueAsNumber: true,
-            })}
+            {...register("hmisHazardLevel")}
             min={0}
-            max={5}
+            max={4}
             size={3}
           />
         </label>
@@ -141,7 +121,9 @@ const SdsEntry = (props: Props) => {
           <button
             type="button"
             onClick={() => {
-              hazardsArrayMethods.append(emptyHazardValues)
+              hazardsArrayMethods.append(
+                emptyHazardValues as NullPartialHazardFields,
+              )
             }}
           >
             Add hazard
@@ -151,11 +133,7 @@ const SdsEntry = (props: Props) => {
       <div className="form-group">
         <label>
           <span>Is ventilation required as per SDS?</span>
-          <RHFBooleanRadioGroup
-            name="requireVentilation"
-            rules={{ required: true }}
-            control={control}
-          />
+          <RHFBooleanRadioGroup name="requireVentilation" />
         </label>
       </div>
       <style jsx global>

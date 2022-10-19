@@ -1,11 +1,12 @@
 import React from "react"
 import {
   FieldPath,
-  FieldPathValue,
   FieldValues,
   useController,
   UseControllerProps,
+  useFormContext,
 } from "react-hook-form"
+import ErrorContainer from "./common/forms/ErrorContainer"
 
 interface RHFRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
@@ -14,13 +15,14 @@ interface RHFRadioGroupProps<T extends FieldValues>
   valueAsNumber?: boolean
 }
 
-export const RHFRadioGroup = <T extends FieldValues>(
-  props: RHFRadioGroupProps<T>,
+export const RHFRadioGroup = <TFieldValues extends FieldValues>(
+  props: RHFRadioGroupProps<TFieldValues>,
 ) => {
+  const formMethods = useFormContext<TFieldValues>()
   const {
     name,
     rules,
-    control,
+    control = formMethods.control,
     radioOptions,
     readOnly,
     className,
@@ -28,26 +30,38 @@ export const RHFRadioGroup = <T extends FieldValues>(
     valueAsNumber = false,
   } = props
 
-  const { field } = useController({
+  const { field, fieldState, formState } = useController({
     control,
     name,
-    rules,
+    rules: {
+      ...rules,
+      //TODO: Implement disabled without workaround
+      // @ts-expect-error: Workaround to allow disabled for controllers, but still works.
+      disabled,
+    },
   })
-
   return (
-    <RadioGroup
-      onChange={(e) => {
-        field.onChange(valueAsNumber ? Number(e.target.value) : e.target.value)
-      }}
-      inputRef={field.ref}
-      onBlur={field.onBlur}
+    <ErrorContainer
       name={field.name}
-      radioOptions={radioOptions}
-      selectedValue={field.value}
-      readOnly={readOnly}
-      className={className}
-      disabled={disabled}
-    />
+      fieldState={fieldState}
+      formState={formState}
+    >
+      <RadioGroup
+        onChange={(e) => {
+          field.onChange(
+            valueAsNumber ? Number(e.target.value) : e.target.value,
+          )
+        }}
+        inputRef={field.ref}
+        onBlur={field.onBlur}
+        name={field.name}
+        radioOptions={radioOptions}
+        selectedValue={field.value}
+        readOnly={readOnly}
+        className={className}
+        disabled={disabled}
+      />
+    </ErrorContainer>
   )
 }
 
@@ -109,6 +123,12 @@ export const RadioGroup = (props: RadioGroupProps) => {
         div.radio-group {
           display: flex;
         }
+
+        .radio-group > label {
+          display: flex;
+          align-items: center;
+        }
+
         label {
           white-space: nowrap;
         }

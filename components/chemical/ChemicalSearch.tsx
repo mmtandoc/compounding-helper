@@ -1,6 +1,7 @@
 import { Chemical } from "@prisma/client"
 import axios from "axios"
 import AutocompleteInput, { withAsync } from "components/AutocompleteInput"
+import ErrorContainer from "components/common/forms/ErrorContainer"
 import { useState } from "react"
 import {
   FieldError,
@@ -14,6 +15,7 @@ import { JsonError } from "types/common"
 interface ChemicalSearchProps<TFieldValues extends FieldValues>
   extends UseControllerProps<TFieldValues> {
   id: string
+  className?: string
   error?: FieldError
   onItemChange?: (val: Chemical | null) => void
   size?: number
@@ -27,6 +29,7 @@ const AsyncAutocomplete = withAsync<Chemical>(AutocompleteInput)
 
 const ChemicalSearch = <TFieldValues extends FieldValues>({
   id,
+  className,
   control,
   name,
   rules,
@@ -94,21 +97,24 @@ const ChemicalSearch = <TFieldValues extends FieldValues>({
   }
 
   return (
-    <AsyncAutocomplete
-      id={id}
-      name={name}
-      item={chemicalData}
-      items={options}
-      inputRef={ref}
-      getItemValue={getItemValue}
-      renderSuggestion={renderSuggestion}
-      isLoading={isLoading}
-      onSearch={handleSearch}
-      onItemChange={handleItemChange}
-      onBlur={onBlur}
-      minLength={2}
-      width={size}
-    />
+    <ErrorContainer>
+      <AsyncAutocomplete
+        id={id}
+        name={name}
+        className={className}
+        item={chemicalData}
+        items={options}
+        inputRef={ref}
+        getItemValue={getItemValue}
+        renderSuggestion={renderSuggestion}
+        isLoading={isLoading}
+        onSearch={handleSearch}
+        onItemChange={handleItemChange}
+        onBlur={onBlur}
+        minLength={2}
+        width={size}
+      />
+    </ErrorContainer>
   )
 }
 

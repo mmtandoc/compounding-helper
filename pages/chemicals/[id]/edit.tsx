@@ -1,13 +1,15 @@
-import ChemicalEntry, {
-  NullPartialChemicalFields,
-} from "components/chemical/ChemicalEntry"
+import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
 import Layout from "components/Layout"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
+import {
+  ChemicalFields,
+  chemicalSchema,
+  NullPartialChemicalFields,
+} from "lib/fields"
 import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { getChemicalById } from "pages/api/chemicals/[id]"
-import { ChemicalFields } from "types/fields"
 
 type EditChemicalProps = {
   values: ChemicalFields
@@ -27,6 +29,7 @@ const EditChemical: NextPage<EditChemicalProps> = (
         <h1>Edit Chemical - {values?.name}</h1>
         <EditForm
           id={id}
+          schema={chemicalSchema}
           values={values as NullPartialChemicalFields}
           apiEndpointPath="/api/chemicals"
           urlPath="/chemicals"

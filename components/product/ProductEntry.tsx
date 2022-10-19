@@ -1,16 +1,12 @@
 import { Vendor } from "@prisma/client"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import { NullPartialProductFields } from "lib/fields"
 import { UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import useSWR from "swr"
 import { DataEntryComponent } from "types/common"
-import { ProductFields } from "types/fields"
-import { NullPartialDeep } from "types/util"
-
-export type NullPartialProductFields = NullPartialDeep<
-  ProductFields,
-  { ignoreKeys: "id" }
->
 
 type Props = {
   formMethods: UseFormReturn<NullPartialProductFields>
@@ -35,19 +31,13 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
     <>
       <label className="form-group">
         <span>Product name:</span>
-        <input
-          type="text"
-          {...register("name", { required: true })}
-          size={40}
-        />
+        <Input type="text" {...register("name")} size={40} />
       </label>
       <label className="form-group">
         <span>Chemical:</span>
         <ChemicalSearch
           id="chemical-search"
           name={`chemicalId`}
-          control={control}
-          rules={{ required: true }}
           size={30}
           defaultValue={null}
         />
@@ -55,21 +45,29 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
 
       <div className="form-group">
         <label>
-          <span>Vendor:</span>
-          <select
-            {...register("vendorId", { required: true, valueAsNumber: true })}
+          Vendor:
+          <Select
+            name="vendorId"
+            className="vendor-select"
+            rules={{ valueAsNumber: true }}
+            initialOption
           >
             {vendors?.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
       <style jsx global>
         {form}
       </style>
+      <style jsx global>{`
+        .vendor-select {
+          min-width: 10rem;
+        }
+      `}</style>
     </>
   )
 }

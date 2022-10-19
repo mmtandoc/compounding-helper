@@ -3,25 +3,17 @@ import { RHFRadioGroup } from "components/RadioGroup"
 import { useEffect } from "react"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
-import { RiskAssessmentFields, IngredientFields } from "types/fields"
-import { NullPartialDeep, Overwrite } from "types/util"
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import IngredientFieldset from "./ingredient/IngredientFieldset"
 import RationaleList from "./RationaleList"
-
-export type NullPartialIngredientFields = NullPartialDeep<
-  IngredientFields,
-  { ignoreKeys: "id" }
->
-
-export type NullPartialRiskAssessmentFields = NullPartialDeep<
-  Overwrite<
-    RiskAssessmentFields,
-    { ingredients: NullPartialIngredientFields[] }
-  >,
-  { ignoreKeys: "id" }
->
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import TextArea from "components/common/forms/TextArea"
+import {
+  NullPartialIngredientFields,
+  NullPartialRiskAssessmentFields,
+} from "lib/fields"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
@@ -34,8 +26,8 @@ const emptyIngredientValues: NullPartialIngredientFields = {
   physicalForm: null,
   productId: null,
   sdsId: null,
+  isCommercialProduct: null,
   commercialProduct: {
-    isCommercialProduct: null,
     name: null,
     din: null,
     hasNoDin: null,
@@ -60,7 +52,6 @@ const RiskAssessmentEntry = (props: Props) => {
   const ingredientsArrayMethods = useFieldArray({
     control: control,
     name: "ingredients",
-    rules: { required: true },
   })
 
   const ingredientFields = ingredientsArrayMethods.fields
@@ -68,7 +59,7 @@ const RiskAssessmentEntry = (props: Props) => {
   const ingredients = watch("ingredients")
 
   const usesCommercialProduct = ingredients?.some(
-    (i) => i?.commercialProduct?.isCommercialProduct === true,
+    (i) => i?.isCommercialProduct === true,
   )
 
   useEffect(() => {
@@ -107,10 +98,10 @@ const RiskAssessmentEntry = (props: Props) => {
     <>
       <div className="form-group">
         <label htmlFor="compound-name">Compound name:</label>
-        <input
+        <Input
           id="compound-name"
           type="text"
-          {...register("compoundName", { required: true })}
+          {...register("compoundName")}
           autoComplete="off"
           size={40}
         />
@@ -159,8 +150,6 @@ const RiskAssessmentEntry = (props: Props) => {
         </legend>
         <RHFRadioGroup
           name="complexity"
-          control={control}
-          rules={{ required: true }}
           radioOptions={[
             ["simple", "Simple"],
             ["moderate", "Moderate"],
@@ -170,18 +159,12 @@ const RiskAssessmentEntry = (props: Props) => {
       </fieldset>
       <fieldset>
         <legend>Is this compound only prepared occasionally?</legend>
-        <RHFBooleanRadioGroup
-          name="isPreparedOccasionally"
-          control={control}
-          rules={{ required: true }}
-        />
+        <RHFBooleanRadioGroup name="isPreparedOccasionally" />
       </fieldset>
       <fieldset>
         <legend>How often is this compound prepared?</legend>
         <RHFRadioGroup
           name="preparationFrequency"
-          control={control}
-          rules={{ required: true }}
           radioOptions={[
             ["daily", "Daily"],
             ["weekly", "Weekly"],
@@ -196,12 +179,7 @@ const RiskAssessmentEntry = (props: Props) => {
           </label>
         </legend>
         <div className="form-group">
-          <RHFBooleanRadioGroup
-            id="is-small-quantity"
-            name="isSmallQuantity"
-            control={control}
-            rules={{ required: true }}
-          />
+          <RHFBooleanRadioGroup id="is-small-quantity" name="isSmallQuantity" />
         </div>
       </fieldset>
       <fieldset>
@@ -210,26 +188,28 @@ const RiskAssessmentEntry = (props: Props) => {
           time?
         </legend>
         <div className="form-group row">
-          <input
+          <Input
             id="average-preparation-amount-value"
             {...register("averagePreparationAmount.quantity", {
-              required: true,
-              valueAsNumber: true,
+              //valueAsNumber: true,
+              setValueAs: (val) => {
+                if (typeof val === "number") {
+                  return val
+                }
+                return (val?.trim?.() ?? "") === "" ? null : Number(val)
+              },
             })}
-            step="0.1"
-            type="number"
+            type="text"
             size={3}
           />
-          <select
+          <Select
             id="average-preparation-amount-unit"
-            {...register("averagePreparationAmount.unit", {
-              required: true,
-            })}
-            defaultValue={undefined}
+            name="averagePreparationAmount.unit"
+            initialOption
           >
             <option value="g">g</option>
             <option value="ml">ml</option>
-          </select>
+          </Select>
         </div>
       </fieldset>
       <fieldset>
@@ -240,10 +220,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="is-concentration-health-risk"
           name="isConcentrationHealthRisk"
-          control={control}
-          rules={{
-            required: true,
-          }}
         />
       </fieldset>
       <fieldset>
@@ -254,13 +230,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="require-special-education"
           name="requireSpecialEducation"
-          control={control}
-          rules={{
-            required: true,
-            validate: (value) => {
-              return value !== undefined
-            },
-          }}
         />
       </fieldset>
       <fieldset>
@@ -268,8 +237,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="has-verification-steps"
           name="hasVerificationSteps"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
@@ -280,8 +247,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="have-appropriate-facilities"
           name="haveAppropriateFacilities"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
@@ -292,8 +257,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="require-ventilation"
           name="requireVentilation"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
@@ -301,8 +264,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="is-workflow-uninterrupted"
           name="isWorkflowUninterrupted"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       {isWorkflowUninterrupted === false && (
@@ -318,10 +279,9 @@ const RiskAssessmentEntry = (props: Props) => {
             If no, describe your processes to address the situation in order to
             meet standards:
           </label>
-          <textarea
+          <TextArea
             {...register("workflowStandardsProcess", {
               disabled: !!isWorkflowUninterrupted,
-              required: isWorkflowUninterrupted === false,
               deps: "isWorkflowUninterrupted",
             })}
             id="interrupted-workflow-process"
@@ -335,8 +295,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="microbial-contamination-risk"
           name="microbialContaminationRisk"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
@@ -346,8 +304,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="cross-contamination-risk"
           name="crossContaminationRisk"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset className="row grow">
@@ -359,7 +315,6 @@ const RiskAssessmentEntry = (props: Props) => {
           name="exposureRisks.sds"
           category="From SDS"
           register={register}
-          control={control}
           sdsIds={ingredients
             ?.map((ing) => ing.sdsId)
             .filter<number>((id): id is number => typeof id === "number")}
@@ -369,7 +324,6 @@ const RiskAssessmentEntry = (props: Props) => {
             name="exposureRisks.productMonograph"
             category="From Product Monograph"
             register={register}
-            control={control}
           />
         )}
       </fieldset>
@@ -385,24 +339,23 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-gloves-required"
               name="ppe.gloves.required"
-              control={control}
-              rules={{ required: true }}
+              rules={{ deps: "ppe.gloves.type" }}
             />
           </div>
           <div className="form-group">
             <label className={!glovesRequired ? "disabled" : ""}>Type:</label>
-            <select
-              {...register("ppe.gloves.type", {
+            <Select
+              name="ppe.gloves.type"
+              rules={{
                 disabled: !glovesRequired,
-                required: !!glovesRequired,
-              })}
+              }}
               id="ppe-gloves"
-              defaultValue={undefined}
+              initialOption
             >
               <option value="regular">Regular gloves</option>
               <option value="chemotherapy">Chemotherapy gloves</option>
               <option value="double">Double gloves</option>
-            </select>
+            </Select>
           </div>
         </fieldset>
         <fieldset className="row">
@@ -412,23 +365,22 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-coat-required"
               name="ppe.coat.required"
-              control={control}
-              rules={{ required: true }}
+              rules={{ deps: "ppe.coat.type" }}
             />
           </div>
           <div className="form-group">
             <label className={!coatRequired ? "disabled" : ""}>Type:</label>
-            <select
-              {...register("ppe.coat.type", {
+            <Select
+              name="ppe.coat.type"
+              rules={{
                 disabled: !coatRequired,
-                required: !!coatRequired,
-              })}
+              }}
               id="ppe-coat-type"
-              defaultValue={undefined}
+              initialOption
             >
               <option value="designated">Designated coat</option>
               <option value="disposable">Disposable coat</option>
-            </select>
+            </Select>
           </div>
         </fieldset>
         <fieldset className="row">
@@ -438,16 +390,14 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-mask-required"
               name="ppe.mask.required"
-              control={control}
-              rules={{ required: true }}
+              rules={{ deps: "ppe.mask.type" }}
             />
           </div>
           <div className="form-group">
             <label className={!maskRequired ? "disabled" : ""}>Type:</label>
-            <input
+            <Input
               {...register("ppe.mask.type", {
                 disabled: !maskRequired,
-                required: !!maskRequired,
               })}
               type="text"
               id="ppe-mask-type"
@@ -462,14 +412,12 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-eye-protection-required"
               name="ppe.eyeProtection.required"
-              control={control}
-              rules={{ required: true }}
             />
           </div>
         </fieldset>
         <div className="form-group">
           <label>Other:</label>
-          <input
+          <Input
             {...register("ppe.other")}
             type="text"
             id="ppe-other"
@@ -482,8 +430,6 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="require-eye-wash-station"
           name="requireEyeWashStation"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
@@ -491,46 +437,30 @@ const RiskAssessmentEntry = (props: Props) => {
         <RHFBooleanRadioGroup
           id="require-safety-shower"
           name="requireSafetyShower"
-          control={control}
-          rules={{ required: true }}
         />
       </fieldset>
       <fieldset>
         <div id="risk-level-container" className="form-group">
           <label>Risk level assigned:</label>
-          <select
-            {...register("riskLevel", { required: true })}
-            id="risk-level-select"
-          >
+          <Select name="riskLevel" id="risk-level-select" initialOption>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
-          </select>
+          </Select>
         </div>
         <div className="form-group">
           <label htmlFor="rationale">
             Rationale and other risk mitigation measures:
           </label>
           <RationaleList
-            control={control}
             getValues={getValues}
             register={register}
             setValue={setValue}
           />
-          {/* <textarea
-            {...register("rationale", { required: true })}
-            id="rationale"
-            cols={30}
-            rows={5}
-          ></textarea> */}
         </div>
         <div className="form-group">
           <label htmlFor="date-assessed">Date assessed:</label>
-          <input
-            type="date"
-            {...register("dateAssessed", { required: true })}
-            id="date-assessed"
-          />
+          <Input type="date" {...register("dateAssessed")} id="date-assessed" />
         </div>
       </fieldset>
       <style jsx global>

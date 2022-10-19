@@ -5,8 +5,7 @@ import { RiskAssessmentAll } from "types/models"
 import { Prisma } from "@prisma/client"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
-import { RiskAssessmentFields } from "types/fields"
-import _ from "lodash"
+import { riskAssessmentSchema } from "lib/fields"
 
 export default async function handler(
   req: NextApiRequest,
@@ -47,7 +46,16 @@ export default async function handler(
       return
     }
     case "PUT": {
-      const fields: RiskAssessmentFields = body
+      let fields
+      try {
+        fields = riskAssessmentSchema.parse(body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
 
       const ingredients = fields.ingredients.map(IngredientMapper.toModel)
 

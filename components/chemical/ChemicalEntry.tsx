@@ -1,17 +1,12 @@
 import DotJotList from "components/common/forms/DotJotList"
+import Input from "components/common/forms/Input"
 import { RHFRadioGroup } from "components/RadioGroup"
-import React from "react"
+import { NullPartialChemicalFields } from "lib/fields"
 import { Controller, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import { DataEntryComponent } from "types/common"
-import { ChemicalFields } from "types/fields"
-import { NullPartialDeep } from "types/util"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-
-export type NullPartialChemicalFields = NullPartialDeep<
-  ChemicalFields,
-  { ignoreKeys: "id" }
->
+import { useEffect } from "react"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialChemicalFields>
@@ -22,7 +17,8 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
 ) => {
   const { formMethods } = props
 
-  const { register, control, watch, setValue } = formMethods
+  const { register, control, watch, setValue, getFieldState, trigger } =
+    formMethods
 
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
 
@@ -33,31 +29,32 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
     setValue,
   })
 
+  // Fix issue where CAS number field remains invalid until onBlur event of hasNoCasNumber checkbox
+  useEffect(() => {
+    if (hasNoCasNumber && getFieldState("casNumber").error) {
+      trigger("casNumber")
+    }
+  }, [getFieldState, hasNoCasNumber, trigger])
+
   register("id")
   return (
     <>
       <label className="form-group">
         <span>Chemical name:</span>
-        <input type="text" {...register("name", { required: true })} />
+        <Input type="text" {...register("name")} />
       </label>
       <label className="form-group">
         <span>CAS number:</span>
         <div className="row">
-          <input
+          <Input
             type="text"
-            {...register("casNumber", {
-              required: !hasNoCasNumber,
-              disabled: hasNoCasNumber,
-              /* pattern: /[0-9]{4-7}-[0-9]{2}-[0-9]/, */
-            })}
+            {...register("casNumber", { disabled: hasNoCasNumber })}
             placeholder="XXXXXXX-YY-Z"
           />
           <label>
             <input
               type="checkbox"
-              {...register(`hasNoCasNumber`, {
-                deps: "casNumber",
-              })}
+              {...register(`hasNoCasNumber`, { deps: "casNumber" })}
             />
             <span>No CAS number</span>
           </label>
@@ -83,8 +80,6 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
         <span>NIOSH Tables:</span>
         <RHFRadioGroup
           name={"nioshTable"}
-          control={control}
-          rules={{ required: true }}
           valueAsNumber={true}
           radioOptions={[
             [-1, "None"],

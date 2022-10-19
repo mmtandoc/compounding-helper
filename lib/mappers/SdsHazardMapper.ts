@@ -1,6 +1,6 @@
 import { HazardCategoryToSDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
-import { HazardFields } from "types/fields"
+import { HazardFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 
 const SdsHazardMapper = {
@@ -21,7 +21,7 @@ const SdsHazardMapper = {
       classId: data.hazardCategory.hazardClassId,
       categoryId,
       subcategoryId,
-      additionalInfo: data.additionalInfo,
+      additionalInfo: data.additionalInfo ?? undefined,
     }
   },
   toModel: (

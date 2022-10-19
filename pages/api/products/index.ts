@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { Prisma, Product } from "@prisma/client"
 import { ProductAll, productAll } from "types/models"
-import { ProductFields } from "types/fields"
+import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { ApiBody } from "types/common"
 
@@ -44,7 +44,16 @@ export default async function handler(
       return
     }
     case "POST": {
-      const fields: ProductFields = req.body
+      let fields
+      try {
+        fields = productSchema.parse(req.body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
 
       let result
       try {

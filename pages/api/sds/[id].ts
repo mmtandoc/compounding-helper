@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { sdsWithRelations, SdsWithRelations } from "types/models"
 import { ApiBody } from "types/common"
-import { SdsFields } from "types/fields"
+import { SdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import _, { update } from "lodash"
 import { Prisma } from "@prisma/client"
@@ -48,7 +48,16 @@ export default async function handler(
       return
     }
     case "PUT": {
-      const fields: SdsFields = req.body
+      let fields
+      try {
+        fields = sdsSchema.parse(req.body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
 
       let result
       try {

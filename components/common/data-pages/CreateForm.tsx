@@ -8,11 +8,15 @@ import {
   FormProvider,
   SubmitHandler,
   useForm,
-  UseFormReturn,
 } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { DataEntryComponent } from "types/common"
 
-type CreateFormProps<TFieldValues extends FieldValues> = {
+type CreateFormProps<
+  TSchema extends Zod.ZodTypeAny,
+  TFieldValues extends FieldValues,
+> = {
+  schema?: TSchema
   defaultValues: TFieldValues
   apiEndpointPath: string
   urlPath: string
@@ -22,9 +26,10 @@ type CreateFormProps<TFieldValues extends FieldValues> = {
 
 const CreateForm = <
   TDataModel extends { id: number },
+  TSchema extends Zod.ZodTypeAny,
   TFieldValues extends FieldValues,
 >(
-  props: CreateFormProps<TFieldValues>,
+  props: CreateFormProps<TSchema, TFieldValues>,
 ) => {
   const {
     defaultValues,
@@ -32,12 +37,24 @@ const CreateForm = <
     urlPath,
     entryComponent: EntryComponent,
     dataName,
+    schema,
   } = props
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
   const [savedData, setSavedData] = useState<TDataModel | undefined>()
   const formMethods = useForm<TFieldValues>({
     defaultValues: defaultValues as DeepPartial<TFieldValues>,
+    criteriaMode: "all",
+    mode: "onTouched",
+    reValidateMode: "onChange",
+    resolver: schema
+      ? async (values, context, options) => {
+          console.log("formData", values)
+          const result = await zodResolver(schema)(values, context, options)
+          console.log("validation", result)
+          return result
+        }
+      : undefined,
   })
 
   const { handleSubmit, reset } = formMethods
@@ -63,21 +80,24 @@ const CreateForm = <
   return (
     <>
       {!saveSuccessful || !savedData ? (
-        <form
-          onSubmit={handleSubmit(onSubmit, (errors) => {
-            console.error(errors)
-            setSaveSuccessful(false)
-          })}
-          autoComplete="off"
-        >
-          <EntryComponent formMethods={formMethods} />
-          <div className="action-row">
-            <button type="submit">Submit</button>
-            <button type="button" onClick={() => reset()}>
-              Clear
-            </button>
-          </div>
-        </form>
+        <FormProvider {...formMethods}>
+          <form
+            onSubmit={handleSubmit(onSubmit, (errors) => {
+              console.error(errors)
+              setSaveSuccessful(false)
+            })}
+            autoComplete="off"
+            noValidate
+          >
+            <EntryComponent formMethods={formMethods} />
+            <div className="action-row">
+              <button type="submit">Submit</button>
+              <button type="button" onClick={() => reset()}>
+                Clear
+              </button>
+            </div>
+          </form>
+        </FormProvider>
       ) : (
         <div className="savedPrompt">
           <p style={{ fontSize: "2.4rem", fontWeight: 600 }}>

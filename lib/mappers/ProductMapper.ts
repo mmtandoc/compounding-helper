@@ -1,15 +1,15 @@
 import { Prisma } from "@prisma/client"
-import { ProductFields } from "types/fields"
+import { productSchema, ProductFields } from "lib/fields"
 import { ProductAll } from "types/models"
 
 const ProductMapper = {
   toFieldValues: (data: ProductAll): ProductFields => {
-    return {
+    return productSchema.parse({
       id: data.id,
       name: data.name,
       chemicalId: data.chemicalId,
       vendorId: data.vendorId,
-    }
+    })
   },
 
   toModel: (values: ProductFields): Prisma.ProductUncheckedCreateInput => {

@@ -1,7 +1,14 @@
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import { NullPartialRiskAssessmentFields } from "components/risk-assessment/RiskAssessmentEntry"
+import Input from "components/common/forms/Input"
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import React from "react"
-import { Control, Path, UseFormRegister, useWatch } from "react-hook-form"
+import {
+  Control,
+  Path,
+  useFormContext,
+  UseFormRegister,
+  useWatch,
+} from "react-hook-form"
 import useSWR from "swr"
 import { SdsWithRelations } from "types/models"
 
@@ -10,18 +17,18 @@ type ExposureRisksInputsProps = {
   category: string
   sdsIds?: number[]
   register: UseFormRegister<NullPartialRiskAssessmentFields>
-  control: Control<NullPartialRiskAssessmentFields>
-  deps?: string | string[]
+  control?: Control<NullPartialRiskAssessmentFields>
 }
 
-const ExposureRisksInputs = ({
-  name,
-  category,
-  sdsIds,
-  register,
-  control,
-  deps,
-}: ExposureRisksInputsProps) => {
+const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
+  const formMethods = useFormContext<NullPartialRiskAssessmentFields>()
+  const {
+    name,
+    category,
+    sdsIds,
+    register,
+    control = formMethods.control,
+  } = props
   const isOtherRisk = useWatch({
     name: `${name}.other` as Path<NullPartialRiskAssessmentFields>,
     control: control,
@@ -57,7 +64,6 @@ const ExposureRisksInputs = ({
             riskName="Skin"
             name={`${name}.skin` as Path<NullPartialRiskAssessmentFields>}
             control={control}
-            deps={deps}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Dermal",
               "Skin corrosion/irritation",
@@ -67,7 +73,6 @@ const ExposureRisksInputs = ({
             riskName="Eye"
             name={`${name}.eye` as Path<NullPartialRiskAssessmentFields>}
             control={control}
-            deps={deps}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Serious eye damage/eye irritation",
             )} */
@@ -76,7 +81,6 @@ const ExposureRisksInputs = ({
             riskName="Inhalation"
             name={`${name}.inhalation` as Path<NullPartialRiskAssessmentFields>}
             control={control}
-            deps={deps}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Inhalation",
               "Aspiration hazard",
@@ -86,7 +90,6 @@ const ExposureRisksInputs = ({
             riskName="Oral"
             name={`${name}.oral` as Path<NullPartialRiskAssessmentFields>}
             control={control}
-            deps={deps}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Oral",
             )} */
@@ -131,22 +134,18 @@ const ExposureRisksInputs = ({
           <RHFBooleanRadioGroup
             name={`${name}.other` as Path<NullPartialRiskAssessmentFields>}
             control={control}
-            rules={{ required: true, deps }}
+            rules={{ deps: `${name}.otherDescription` }}
           />
         </div>
         <div className="form-group" style={{ flexGrow: 1 }}>
           <label className={isOtherRisk !== true ? "disabled" : ""}>
             Description:
           </label>
-          <input
+          <Input
             type="text"
             {...register(
               `${name}.otherDescription` as Path<NullPartialRiskAssessmentFields>,
-              {
-                required: true,
-                disabled: isOtherRisk !== true,
-                deps: [`${name}.other`],
-              },
+              { disabled: isOtherRisk !== true },
             )}
             style={{ width: "100%" }}
           />
@@ -184,11 +183,7 @@ const ExposureRiskRow = ({
     <div className="row">
       <div className="form-group">
         <label>{riskName}:</label>
-        <RHFBooleanRadioGroup
-          name={name}
-          control={control}
-          rules={{ required: true, deps }}
-        />
+        <RHFBooleanRadioGroup name={name} control={control} rules={{ deps }} />
       </div>
       {relatedHazardMap && (
         <div className="col related-health-hazards">

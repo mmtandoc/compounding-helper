@@ -2,38 +2,48 @@ import _ from "lodash"
 import React, { ReactNode } from "react"
 import {
   FieldValues,
-  Path,
-  PathValue,
   RegisterOptions,
   useController,
   UseControllerProps,
-  Validate,
+  useFormContext,
 } from "react-hook-form"
-import { Merge, SetRequired } from "type-fest"
+import { Merge } from "type-fest"
+import ErrorContainer from "./ErrorContainer"
 
 interface Props<TFieldValues extends FieldValues>
   extends Merge<
     JSX.IntrinsicElements["select"],
-    SetRequired<UseControllerProps<TFieldValues>, "control">
+    UseControllerProps<TFieldValues>
   > {
   children: ReactNode
-  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate" | "disabled">
-  initialOption?: { value: string; label: string; disabled?: boolean }
+  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate">
+  initialOption?: { value: string; label: string; disabled?: boolean } | boolean
 }
 
 const Select = <TFieldValues extends FieldValues>(
   props: Props<TFieldValues>,
 ) => {
+  const formMethods = useFormContext<TFieldValues>()
   const {
     children,
-    initialOption,
-    control,
+    control = formMethods.control,
     name,
     rules,
     shouldUnregister,
     defaultValue,
+    disabled = rules?.disabled,
     ...selectProps
   } = props
+
+  delete selectProps.initialOption
+
+  // If initialOption is true, use blank string for value and label
+  const initialOption =
+    typeof props.initialOption === "boolean"
+      ? props.initialOption
+        ? { value: "", label: "" }
+        : undefined
+      : props.initialOption
 
   const {
     field: { onChange, onBlur, ref, value },
@@ -68,25 +78,28 @@ const Select = <TFieldValues extends FieldValues>(
   }
 
   return (
-    <select
-      {...selectProps}
-      name={name}
-      onChange={handleChange}
-      onBlur={onBlur}
-      value={value ?? (initialOption ? initialOption.value : undefined)}
-      ref={ref}
-    >
-      {initialOption && (
-        <option
-          value={initialOption.value}
-          disabled={initialOption.disabled ?? true}
-          hidden={initialOption.disabled ?? true}
-        >
-          {initialOption.label}
-        </option>
-      )}
-      {children}
-    </select>
+    <ErrorContainer>
+      <select
+        {...selectProps}
+        name={name}
+        onChange={handleChange}
+        onBlur={onBlur}
+        value={value ?? (initialOption ? initialOption.value : undefined)}
+        ref={ref}
+        disabled={disabled}
+      >
+        {initialOption && (
+          <option
+            value={initialOption.value}
+            disabled={initialOption.disabled ?? true}
+            hidden={initialOption.disabled ?? true}
+          >
+            {initialOption.label}
+          </option>
+        )}
+        {children}
+      </select>
+    </ErrorContainer>
   )
 }
 

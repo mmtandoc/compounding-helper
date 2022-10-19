@@ -1,6 +1,7 @@
 import CreateForm from "components/common/data-pages/CreateForm"
 import Layout from "components/Layout"
-import SdsEntry, { NullPartialSdsFields } from "components/sds/SdsEntry"
+import SdsEntry from "components/sds/SdsEntry"
+import { NullPartialSdsFields, sdsSchema } from "lib/fields"
 import { NextPage } from "next"
 
 const defaultValues: NullPartialSdsFields = {
@@ -10,6 +11,7 @@ const defaultValues: NullPartialSdsFields = {
   revisionDate: null,
   hazards: [],
   requireVentilation: null,
+  filename: "N/A",
 }
 
 const NewSafetyDataSheet: NextPage = () => {
@@ -18,6 +20,7 @@ const NewSafetyDataSheet: NextPage = () => {
       <div className="page">
         <h1>New Safety Data Sheet</h1>
         <CreateForm
+          schema={sdsSchema}
           defaultValues={defaultValues}
           entryComponent={SdsEntry}
           apiEndpointPath="/api/sds"

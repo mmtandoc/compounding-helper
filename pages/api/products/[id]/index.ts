@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "lib/prisma"
 import { ProductAll, productAll } from "types/models"
 import { ApiBody } from "types/common"
-import { ProductFields } from "types/fields"
+import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 
 export default async function handler(
@@ -47,9 +47,20 @@ export default async function handler(
     }
 
     case "PUT": {
+      let fields
+      try {
+        fields = productSchema.parse(req.body)
+      } catch (error) {
+        console.error(error)
+        res.status(400).json({
+          error: { code: 400, message: "Body is invalid." },
+        })
+        return
+      }
+
       let updatedProduct
       try {
-        updatedProduct = await updateProductById(id, req.body)
+        updatedProduct = await updateProductById(id, fields)
       } catch (error) {
         console.log(error)
         res.status(500).json({
