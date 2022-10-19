@@ -150,6 +150,7 @@ model RiskAssessment {
   automaticRationale    String[]
   additionalRationale   String[]
   dateAssessed          DateTime  @db.Date
+  compoundingSupervisor String
   updatedAt             DateTime  @default(now()) @updatedAt
 
   @@map("risk_assessments")

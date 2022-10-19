@@ -319,6 +319,12 @@ const RiskAssessmentDetails = ({ data }: Props) => {
             ))}
           </ul>
         </div>
+      </fieldset>
+      <fieldset>
+        <div className="form-group row">
+          <span className="label">Compounding supervisor:</span>
+          <span>{data.compoundingSupervisor}</span>
+        </div>
         <div className="form-group row">
           <span className="label">Date assessed:</span>
           <span>{data.dateAssessed.toLocaleDateString("en-CA")}</span>
