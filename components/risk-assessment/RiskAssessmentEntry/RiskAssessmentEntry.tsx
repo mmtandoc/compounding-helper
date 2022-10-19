@@ -265,30 +265,24 @@ const RiskAssessmentEntry = (props: Props) => {
           name="isWorkflowUninterrupted"
         />
       </fieldset>
-      {isWorkflowUninterrupted === false && (
-        <div
-          className={`form-group ${
-            isWorkflowUninterrupted !== false ? "hidden" : ""
-          }`}
+      <div className={`form-group`} hidden={!!isWorkflowUninterrupted}>
+        <label
+          htmlFor="interrupted-workflow-process"
+          className={isWorkflowUninterrupted ? "disabled" : ""}
         >
-          <label
-            htmlFor="interrupted-workflow-process"
-            className={isWorkflowUninterrupted ? "disabled" : ""}
-          >
-            If no, describe your processes to address the situation in order to
-            meet standards:
-          </label>
-          <TextArea
-            {...register("workflowStandardsProcess", {
-              disabled: !!isWorkflowUninterrupted,
-              deps: "isWorkflowUninterrupted",
-            })}
-            id="interrupted-workflow-process"
-            cols={30}
-            rows={7}
-          />
-        </div>
-      )}
+          If no, describe your processes to address the situation in order to
+          meet standards:
+        </label>
+        <TextArea
+          {...register("workflowStandardsProcess", {
+            disabled: !!isWorkflowUninterrupted,
+            deps: "isWorkflowUninterrupted",
+          })}
+          id="interrupted-workflow-process"
+          cols={30}
+          rows={7}
+        />
+      </div>
       <fieldset>
         <legend>Is there a risk of microbial contamination?</legend>
         <RHFBooleanRadioGroup
