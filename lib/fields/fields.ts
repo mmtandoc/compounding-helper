@@ -185,7 +185,7 @@ export const ingredientSchemaBase = z.object({
     din: castStringToNumber(z.number().int()).nullish(),
     hasNoDin: z.boolean(),
     hasProductMonographConcerns: z.boolean(),
-    concernsDescription: z.string().trim().nullish(),
+    concernsDescription: z.string().trim().min(1).nullish(),
   }),
 })
 
@@ -321,7 +321,7 @@ export const riskAssessmentSchema = z.object({
   preparationFrequency: z.enum(["daily", "weekly", "monthly"]),
   isSmallQuantity: z.boolean(),
   averagePreparationAmount: z.object({
-    quantity: z.number(),
+    quantity: z.number({ invalid_type_error: "Quantity must be a number." }),
     unit: z.enum(["g", "ml"]),
   }),
   isConcentrationHealthRisk: z.boolean(),
@@ -330,7 +330,7 @@ export const riskAssessmentSchema = z.object({
   haveAppropriateFacilities: z.boolean(),
   requireVentilation: z.boolean(),
   isWorkflowUninterrupted: z.boolean(),
-  workflowStandardsProcess: z.string().trim().optional(),
+  workflowStandardsProcess: z.string().trim().min(1).optional(),
   microbialContaminationRisk: z.boolean(),
   crossContaminationRisk: z.boolean(),
   exposureRisks: z.object({
@@ -353,20 +353,20 @@ export const riskAssessmentSchema = z.object({
     mask: z
       .object({
         required: z.boolean(),
-        type: z.string().trim().nullish(),
+        type: z.string().trim().min(1).nullish(),
       })
       .superRefine(refinePPE),
     eyeProtection: z.object({
       required: z.boolean(),
     }),
-    other: z.string().nullish(),
+    other: z.string().trim().min(1).nullish(),
   }),
   requireEyeWashStation: z.boolean(),
   requireSafetyShower: z.boolean(),
   riskLevel: z.enum(["A", "B", "C"]),
   rationaleList: z.object({
-    automatic: z.string().trim().array(),
-    additional: z.string().trim().array(),
+    automatic: z.string().trim().min(1).array(),
+    additional: z.string().trim().min(1).array(),
   }),
   dateAssessed: castStringToDate(
     z
