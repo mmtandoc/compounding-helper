@@ -265,7 +265,7 @@ const RiskAssessmentEntry = (props: Props) => {
           name="isWorkflowUninterrupted"
         />
       </fieldset>
-      <div className={`form-group`} hidden={!!isWorkflowUninterrupted}>
+      <div className={`form-group`} hidden={isWorkflowUninterrupted !== false}>
         <label
           htmlFor="interrupted-workflow-process"
           className={isWorkflowUninterrupted ? "disabled" : ""}
@@ -275,7 +275,7 @@ const RiskAssessmentEntry = (props: Props) => {
         </label>
         <TextArea
           {...register("workflowStandardsProcess", {
-            disabled: !!isWorkflowUninterrupted,
+            disabled: isWorkflowUninterrupted !== false,
             deps: "isWorkflowUninterrupted",
           })}
           id="interrupted-workflow-process"
