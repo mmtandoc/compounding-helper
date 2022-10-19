@@ -24,7 +24,6 @@ const emptyIngredientValues: NullPartialIngredientFields = {
   order: NaN,
   chemicalId: null,
   physicalForm: null,
-  productId: null,
   sdsId: null,
   isCommercialProduct: null,
   commercialProduct: {

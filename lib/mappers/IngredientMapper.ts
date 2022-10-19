@@ -9,7 +9,6 @@ const toFieldValues = (ingredientData: IngredientAll): IngredientFields => {
     order: ingredientData.order,
     sdsId: ingredientData?.safetyDataSheetId ?? null,
     chemicalId: ingredientData?.safetyDataSheet?.product.chemicalId ?? null,
-    productId: ingredientData?.safetyDataSheet?.productId ?? null,
     physicalForm: ingredientData.physicalForm,
     isCommercialProduct: !!ingredientData?.commercialProductName,
     commercialProduct: {

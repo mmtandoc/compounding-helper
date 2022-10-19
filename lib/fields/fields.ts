@@ -176,42 +176,26 @@ type IngredientFields = {
 
 export const ingredientSchemaBase = z.object({
   order: z.number().int(),
-  chemicalId: z.number().int().nullable(),
-  productId: z.number().int().nullable(),
-  sdsId: z.number().int().nullable(),
+  chemicalId: z.number().int(),
+  sdsId: z.number().int(),
   physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
   isCommercialProduct: z.boolean(),
-  commercialProduct: z.object({
-    name: z.string().trim(),
-    din: castStringToNumber(z.number().int()).optional(),
-    hasNoDin: z.boolean(),
-    hasProductMonographConcerns: z.boolean(),
-    concernsDescription: z.string().trim().optional(),
-  }),
-})
-
-const commercialIngredientSchema = z.object({
-  order: z.number().int(),
-  chemicalId: z.number().int().nullish(),
-  productId: z.number().int().nullish(),
-  sdsId: z.number().int().nullish(),
-  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
-  isCommercialProduct: z.literal(true),
   commercialProduct: z.object({
     name: z.string().trim().min(1),
     din: castStringToNumber(z.number().int()).nullish(),
     hasNoDin: z.boolean(),
     hasProductMonographConcerns: z.boolean(),
-    concernsDescription: z.string().trim().optional(),
+    concernsDescription: z.string().trim().nullish(),
   }),
 })
 
-const nonCommercialIngredientSchema = z.object({
-  order: z.number().int(),
-  chemicalId: z.number().int(),
-  productId: z.number().int(),
-  sdsId: z.number().int(),
-  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
+const commercialIngredientSchema = ingredientSchemaBase.extend({
+  chemicalId: ingredientSchemaBase.shape.chemicalId.nullish(),
+  sdsId: ingredientSchemaBase.shape.sdsId.nullish(),
+  isCommercialProduct: z.literal(true),
+})
+
+const nonCommercialIngredientSchema = ingredientSchemaBase.extend({
   isCommercialProduct: z.literal(false),
   commercialProduct: z.object({
     name: z.undefined(),
