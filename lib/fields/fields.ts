@@ -368,6 +368,7 @@ export const riskAssessmentSchema = z.object({
     automatic: z.string().trim().min(1).array(),
     additional: z.string().trim().min(1).array(),
   }),
+  compoundingSupervisor: z.string().trim().min(1),
   dateAssessed: castStringToDate(
     z
       .date()

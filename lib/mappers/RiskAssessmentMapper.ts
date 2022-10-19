@@ -90,6 +90,7 @@ const toFieldValues = (
       automatic: data.automaticRationale,
       additional: data.additionalRationale,
     },
+    compoundingSupervisor: data.compoundingSupervisor,
     dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
   })
 }

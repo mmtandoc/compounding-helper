@@ -62,6 +62,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
     automatic: [],
     additional: [],
   },
+  compoundingSupervisor: null,
   dateAssessed: new Date(),
 }
 

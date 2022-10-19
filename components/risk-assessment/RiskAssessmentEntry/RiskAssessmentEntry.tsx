@@ -451,6 +451,18 @@ const RiskAssessmentEntry = (props: Props) => {
             setValue={setValue}
           />
         </div>
+      </fieldset>
+      <fieldset>
+        <div className="form-group">
+          <label>
+            <span>Compounding supervisor:</span>
+            <Input
+              type="text"
+              {...register("compoundingSupervisor")}
+              size={30}
+            />
+          </label>
+        </div>
         <div className="form-group">
           <label htmlFor="date-assessed">Date assessed:</label>
           <Input type="date" {...register("dateAssessed")} id="date-assessed" />
