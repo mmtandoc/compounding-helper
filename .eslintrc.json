@@ -15,7 +15,8 @@
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "no-unexpected-multiline": "error",
-    "no-fallthrough": "error"
+    "no-fallthrough": "error",
+    "react/jsx-key": ["error", { "checkFragmentShorthand": true }]
   },
   "env": {
     "jest/globals": true
