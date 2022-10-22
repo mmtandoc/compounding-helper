@@ -98,8 +98,8 @@ model HazardCategoryToSDS {
 
 model RiskAssessment {
   id                     Int                  @id @default(autoincrement())
-  compoundName           String
-  ingredients            Ingredient[]
+  compound               Compound             @relation(fields: [compoundId], references: [id])
+  compoundId             Int
   complexity             Complexity
   isPreparedOccasionally Boolean
   preparationFrequency   PreparationFrequency
@@ -190,11 +190,20 @@ enum PreparationFrequency {
   monthly
 }
 
+model Compound {
+  id                         Int              @id @default(autoincrement())
+  name                       String
+  ingredients                Ingredient[]
+  riskAssessments            RiskAssessment[]
+
+  @@map("compounds")
+}
+
 model Ingredient {
-  riskAssessment              RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
-  riskAssessmentId            Int
+  compound                    Compound     @relation(fields: [compoundId], references: [id])
+  compoundId                  Int
   order                       Int
-  safetyDataSheet             SDS?           @relation(fields: [safetyDataSheetId], references: [id])
+  safetyDataSheet             SDS?         @relation(fields: [safetyDataSheetId], references: [id])
   safetyDataSheetId           Int?
   physicalForm                PhysicalForm
   commercialProductName       String?
@@ -202,7 +211,7 @@ model Ingredient {
   hasProductMonographConcerns Boolean?
   concernsDescription         String?
 
-  @@id([riskAssessmentId, order])
+  @@id([compoundId, order])
   @@map("ingredients")
 }
 

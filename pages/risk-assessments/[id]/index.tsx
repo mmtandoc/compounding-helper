@@ -41,7 +41,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
   const handlePrint = useReactToPrint({
     content: () => printableRef.current,
     documentTitle: `Risk Assessment - ${
-      data?.compoundName ?? "UNKNOWN COMPOUND"
+      data?.compound?.name ?? "UNKNOWN COMPOUND"
     } - ${data?.dateAssessed.toLocaleDateString("en-CA")}`,
 
     copyStyles: true,
@@ -64,7 +64,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
     <Layout>
       <div className="page" ref={printableRef}>
         <h1 style={{ marginTop: "0px" }}>
-          Risk Assessment: {data.compoundName}
+          Risk Assessment: {data.compound.name}
         </h1>
         <div className="risk-assessment-container">
           <PrintableRiskAssessmentDetails data={data} />

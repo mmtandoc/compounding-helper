@@ -8,23 +8,25 @@ import {
 import { NextPage } from "next"
 
 const defaultValues: NullPartialRiskAssessmentFields = {
-  compoundName: null,
-  ingredients: [
-    {
-      order: NaN,
-      chemicalId: null,
-      physicalForm: null,
-      sdsId: null,
-      isCommercialProduct: null,
-      commercialProduct: {
-        name: null,
-        din: null,
-        hasNoDin: null,
-        hasProductMonographConcerns: null,
-        concernsDescription: null,
+  compound: {
+    name: null,
+    ingredients: [
+      {
+        order: NaN,
+        chemicalId: null,
+        physicalForm: null,
+        sdsId: null,
+        isCommercialProduct: null,
+        commercialProduct: {
+          name: null,
+          din: null,
+          hasNoDin: null,
+          hasProductMonographConcerns: null,
+          concernsDescription: null,
+        },
       },
-    },
-  ],
+    ],
+  },
   complexity: null,
   averagePreparationAmount: null,
   crossContaminationRisk: null,

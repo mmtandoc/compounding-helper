@@ -50,12 +50,12 @@ const RiskAssessmentEntry = (props: Props) => {
 
   const ingredientsArrayMethods = useFieldArray({
     control: control,
-    name: "ingredients",
+    name: "compound.ingredients",
   })
 
   const ingredientFields = ingredientsArrayMethods.fields
 
-  const ingredients = watch("ingredients")
+  const ingredients = watch("compound.ingredients")
 
   const usesCommercialProduct = ingredients?.some(
     (i) => i?.isCommercialProduct === true,
@@ -100,7 +100,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Input
           id="compound-name"
           type="text"
-          {...register("compoundName")}
+          {...register("compound.name")}
           autoComplete="off"
           size={40}
         />
@@ -115,7 +115,7 @@ const RiskAssessmentEntry = (props: Props) => {
             formMethods={formMethods}
             arrayMethods={ingredientsArrayMethods}
             reset={() => {
-              formMethods.resetField(`ingredients.${index}`, {
+              formMethods.resetField(`compound.ingredients.${index}`, {
                 defaultValue: emptyIngredientValues,
               })
             }}

@@ -24,11 +24,11 @@ const RiskAssessmentsTable = (props: Props) => {
           label: "Compound name",
           sortable: true,
           compare: (a: string, b: string) => a.localeCompare(b),
-          accessorPath: "compoundName",
+          accessorPath: "compound.name",
         },
         {
           label: "Ingredients",
-          accessorPath: "ingredients",
+          accessorPath: "compound.ingredients",
           sortable: false,
           cellStyle: { padding: 0 },
           renderCell: (ingredients: IngredientAll[]) => (

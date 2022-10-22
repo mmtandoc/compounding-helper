@@ -40,10 +40,10 @@ const IngredientFieldset = ({
 
   const { fields, move, remove } = arrayMethods
 
-  //const ingredient = watch(`ingredients.${index}`)
+  //const ingredient = watch(`compound.ingredients.${index}`)
   const [chemicalId, sdsId] = watch([
-    `ingredients.${index}.chemicalId`,
-    `ingredients.${index}.sdsId`,
+    `compound.ingredients.${index}.chemicalId`,
+    `compound.ingredients.${index}.sdsId`,
   ])
 
   const { data: chemicalData, error: chemicalError } = useSWR<
@@ -81,30 +81,34 @@ const IngredientFieldset = ({
     console.log(vendorsError)
   }
 
-  const isCommercialProduct = watch(`ingredients.${index}.isCommercialProduct`)
-
-  const hasNoDin = watch(`ingredients.${index}.commercialProduct.hasNoDin`)
-
-  const hasProductMonographConcerns = watch(
-    `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
+  const isCommercialProduct = watch(
+    `compound.ingredients.${index}.isCommercialProduct`,
   )
 
-  const order = watch(`ingredients.${index}.order`)
+  const hasNoDin = watch(
+    `compound.ingredients.${index}.commercialProduct.hasNoDin`,
+  )
+
+  const hasProductMonographConcerns = watch(
+    `compound.ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
+  )
+
+  const order = watch(`compound.ingredients.${index}.order`)
 
   useEffect(() => {
     if (order !== index + 1) {
-      register(`ingredients.${index}.order`)
-      setValue(`ingredients.${index}.order`, index + 1)
+      register(`compound.ingredients.${index}.order`)
+      setValue(`compound.ingredients.${index}.order`, index + 1)
     }
   }, [index, register, setValue, order])
 
   useUpdateFieldConditionally({
     updateCondition: isCommercialProduct !== true,
     fields: [
-      [`ingredients.${index}.commercialProduct.name`, null],
-      [`ingredients.${index}.commercialProduct.din`, null],
+      [`compound.ingredients.${index}.commercialProduct.name`, null],
+      [`compound.ingredients.${index}.commercialProduct.din`, null],
       [
-        `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
+        `compound.ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
         null,
       ],
     ],
@@ -114,7 +118,7 @@ const IngredientFieldset = ({
 
   useUpdateFieldConditionally({
     updateCondition: hasNoDin === true,
-    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
+    fields: [[`compound.ingredients.${index}.commercialProduct.din`, null]],
     register,
     setValue,
   })
@@ -126,14 +130,14 @@ const IngredientFieldset = ({
 
   useEffect(() => {
     if (!isLoading && !sdsId && !!sdsesData && sdsesData.length > 0) {
-      register(`ingredients.${index}.sdsId`)
-      setValue(`ingredients.${index}.sdsId`, sdsesData[0].id)
+      register(`compound.ingredients.${index}.sdsId`)
+      setValue(`compound.ingredients.${index}.sdsId`, sdsesData[0].id)
     }
   }, [index, sdsId, isLoading, register, sdsesData, setValue])
 
   useUpdateFieldConditionally({
     updateCondition: hasNoDin === true,
-    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
+    fields: [[`compound.ingredients.${index}.commercialProduct.din`, null]],
     register,
     setValue,
   })
@@ -142,9 +146,9 @@ const IngredientFieldset = ({
   useEffect(() => {
     if (
       hasNoDin &&
-      getFieldState(`ingredients.${index}.commercialProduct.din`).error
+      getFieldState(`compound.ingredients.${index}.commercialProduct.din`).error
     ) {
-      trigger(`ingredients.${index}.commercialProduct.din`)
+      trigger(`compound.ingredients.${index}.commercialProduct.din`)
     }
   }, [getFieldState, hasNoDin, index, trigger])
 
@@ -166,11 +170,11 @@ const IngredientFieldset = ({
               <div className="row">
                 <ChemicalSearch
                   id={`i${index}-chemical-search`}
-                  name={`ingredients.${index}.chemicalId`}
+                  name={`compound.ingredients.${index}.chemicalId`}
                   onItemChange={() => {
                     console.log("onItemChange")
-                    register(`ingredients.${index}.sdsId`)
-                    setValue(`ingredients.${index}.sdsId`, null)
+                    register(`compound.ingredients.${index}.sdsId`)
+                    setValue(`compound.ingredients.${index}.sdsId`, null)
                   }}
                   size={30}
                   defaultValue={null}
@@ -184,7 +188,7 @@ const IngredientFieldset = ({
             <div className="form-group">
               <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
               <Select
-                name={`ingredients.${index}.physicalForm`}
+                name={`compound.ingredients.${index}.physicalForm`}
                 id={`i${index}-physical-form`}
                 className="physical-form"
                 initialOption={{ value: "none", label: "-- Select a form --" }}
@@ -225,10 +229,10 @@ const IngredientFieldset = ({
               </label>
               <RHFBooleanRadioGroup
                 id={`i${index}-is-commercial-product`}
-                name={`ingredients.${index}.isCommercialProduct`}
+                name={`compound.ingredients.${index}.isCommercialProduct`}
                 className="is-commercial-product"
                 rules={{
-                  deps: [`ingredients.${index}.chemicalId`],
+                  deps: [`compound.ingredients.${index}.chemicalId`],
                 }}
               />
             </div>
@@ -243,7 +247,7 @@ const IngredientFieldset = ({
               </label>
               <Input
                 {...register(
-                  `ingredients.${index}.commercialProduct.name` as const,
+                  `compound.ingredients.${index}.commercialProduct.name` as const,
                   {
                     disabled: !isCommercialProduct,
                     setValueAs: (value) => {
@@ -262,9 +266,12 @@ const IngredientFieldset = ({
                 <span>Product DIN:</span>
                 <div className="row">
                   <Input
-                    {...register(`ingredients.${index}.commercialProduct.din`, {
-                      disabled: !isCommercialProduct || !!hasNoDin,
-                    })}
+                    {...register(
+                      `compound.ingredients.${index}.commercialProduct.din`,
+                      {
+                        disabled: !isCommercialProduct || !!hasNoDin,
+                      },
+                    )}
                     inputMode="numeric"
                     type="text"
                     readOnly={!isCommercialProduct}
@@ -274,10 +281,10 @@ const IngredientFieldset = ({
                     <input
                       type="checkbox"
                       {...register(
-                        `ingredients.${index}.commercialProduct.hasNoDin`,
+                        `compound.ingredients.${index}.commercialProduct.hasNoDin`,
                         {
                           disabled: !isCommercialProduct,
-                          deps: `ingredients.${index}.commercialProduct.din`,
+                          deps: `compound.ingredients.${index}.commercialProduct.din`,
                         },
                       )}
                     />
@@ -298,7 +305,7 @@ const IngredientFieldset = ({
               </label>
               <RHFBooleanRadioGroup
                 id={`i${index}-has-product-monograph-concerns`}
-                name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
+                name={`compound.ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
                 disabled={!isCommercialProduct}
                 className="has-product-monograph-concerns"
               />
@@ -314,7 +321,7 @@ const IngredientFieldset = ({
               </label>
               <TextArea
                 {...register(
-                  `ingredients.${index}.commercialProduct.concernsDescription`,
+                  `compound.ingredients.${index}.commercialProduct.concernsDescription`,
                   {
                     disabled: !hasProductMonographConcerns,
                     setValueAs: (value) => {

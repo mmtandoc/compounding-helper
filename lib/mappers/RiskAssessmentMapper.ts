@@ -3,7 +3,7 @@ import { riskAssessmentSchema } from "lib/fields"
 import { SetOptional } from "type-fest"
 import { ExposureRisksFields, RiskAssessmentFields } from "lib/fields"
 import { RiskAssessmentAll } from "types/models"
-import IngredientMapper from "./IngredientMapper"
+import CompoundMapper from "./CompoundMapper"
 import { capitalize } from "lodash"
 
 type FilterByKeyPrefix<
@@ -74,10 +74,7 @@ const mapExposureRisksFieldsToModel = (
 const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
   const fieldValues: Zod.input<typeof riskAssessmentSchema> = {
     id: data.id,
-    compoundName: data.compoundName,
-    ingredients: data.ingredients
-      .map(IngredientMapper.toFieldValues)
-      .sort((a, b) => a.order - b.order),
+    compound: CompoundMapper.toFieldValues(data.compound),
     complexity: data.complexity,
     preparationFrequency: data.preparationFrequency,
     isSmallQuantity: data.isSmallQuantity,
@@ -134,13 +131,14 @@ const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
 //TODO: Refactor
 const toModel = (
   fields: RiskAssessmentFields,
-): SetOptional<RiskAssessment, "id"> => {
-  let data = {} as SetOptional<RiskAssessment, "id">
+): SetOptional<RiskAssessment, "id" | "compoundId"> => {
+  let data = {} as SetOptional<RiskAssessment, "id" | "compoundId">
   console.log({ fields })
   for (const key in fields) {
     if (Object.hasOwn(fields, key)) {
       switch (key) {
-        case "ingredients":
+        case "compound":
+          data = { ...data, compoundId: fields[key].id }
           break
         case "averagePreparationAmount":
           const averagePreparationAmount = fields[key]

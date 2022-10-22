@@ -8,6 +8,10 @@ import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { RiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import { ApiBody } from "types/common"
+import _ from "lodash"
+import { getCompoundById, updateCompoundById } from "../compounds/[id]"
+import CompoundMapper from "lib/mappers/CompoundMapper"
+import { createCompound } from "../compounds"
 
 export default async function handler(
   req: NextApiRequest,
@@ -45,18 +49,39 @@ export default async function handler(
         return
       }
 
-      const result = await prisma.riskAssessment.create({
-        ...includeAllNested,
-        data: {
-          ingredients: {
-            createMany: {
-              data: fields.ingredients.map(IngredientMapper.toModel),
-            },
+      const riskAssessmentData = RiskAssessmentMapper.toModel(fields)
+
+      const compound = CompoundMapper.toModel(fields.compound)
+      const ingredients = fields.compound.ingredients.map(
+        IngredientMapper.toModel,
+      )
+
+      try {
+        if (compound.id !== undefined) {
+          updateCompoundById(compound.id, {
+            ...compound,
+            ingredients: { deleteMany: {}, createMany: { data: ingredients } },
+          })
+        } else {
+          riskAssessmentData.compoundId = (
+            await createCompound(fields.compound)
+          ).id
+        }
+        const result = await prisma.riskAssessment.create({
+          ...includeAllNested,
+          data: {
+            ..._.omit(riskAssessmentData, "id"),
+            compoundId: riskAssessmentData.compoundId as number,
           },
-          ...RiskAssessmentMapper.toModel(fields),
-        },
-      })
-      res.status(200).json(result)
+        })
+        res.status(200).json(result)
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({
+          error: { code: 500, message: "Encountered error with database." },
+        })
+      }
+
       return
     }
     default:

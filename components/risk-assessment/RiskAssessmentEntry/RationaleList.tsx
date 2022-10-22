@@ -3,6 +3,7 @@ import { NullPartialRiskAssessmentFields } from "lib/fields"
 import _ from "lodash"
 import React, { useEffect } from "react"
 import {
+  DeepPartialSkipArrayKey,
   FieldError,
   useController,
   UseControllerProps,
@@ -38,9 +39,10 @@ const RationaleList = ({
 }: RationaleListProps) => {
   const allValues = useWatch<NullPartialRiskAssessmentFields>({
     control,
-    defaultValue: control?._defaultValues as NullPartialRiskAssessmentFields,
+    defaultValue:
+      control?._defaultValues as DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
   })
-  const ingredients = allValues.ingredients
+  const ingredients = allValues.compound?.ingredients
 
   //TODO: Handle error
   const sdsUrls =
@@ -136,15 +138,15 @@ const RationaleList = ({
 }
 
 const autoRationalesFunctions: ((
-  values: PartialDeep<NullPartialRiskAssessmentFields>,
+  values: DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
   sdses: SdsWithRelations[],
 ) => string | null)[] = [
   (values, sdses) => {
-    if (!sdses || !values.ingredients) {
+    if (!sdses || !values.compound?.ingredients) {
       return null
     }
 
-    const allNonNiosh = values.ingredients.every(
+    const allNonNiosh = values.compound.ingredients.every(
       (ing) =>
         _.get(
           sdses.find((sds) => sds.id === ing?.sdsId),
@@ -180,11 +182,11 @@ const autoRationalesFunctions: ((
       ? `Compounding complexity is ${values.complexity}.`
       : null,
   (values) => {
-    if (!values.ingredients) {
+    if (!values.compound?.ingredients) {
       return null
     }
 
-    const [creamCount, ointmentCount] = values.ingredients.reduce(
+    const [creamCount, ointmentCount] = values.compound?.ingredients?.reduce(
       (counts, ing) => {
         if (ing?.physicalForm === "cream") {
           counts[0]++
@@ -194,7 +196,7 @@ const autoRationalesFunctions: ((
         return counts
       },
       [0, 0],
-    )
+    ) ?? [0, 0]
 
     if (creamCount === 0 && ointmentCount === 0) {
       return null
@@ -209,7 +211,7 @@ const autoRationalesFunctions: ((
       forms.push("ointment")
     }
 
-    if (creamCount + ointmentCount === values.ingredients.length) {
+    if (creamCount + ointmentCount === values.compound?.ingredients?.length) {
       return `Health hazards minimized by ${forms.join("/")} formulation`
     }
 
@@ -251,7 +253,7 @@ const autoRationalesFunctions: ((
 ]
 
 const determineAutoRationale = (
-  fields: PartialDeep<NullPartialRiskAssessmentFields>,
+  fields: DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
   safetyDatasheets: SdsWithRelations[],
   hidden: number[] = [],
 ) => {
