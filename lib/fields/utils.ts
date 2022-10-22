@@ -92,3 +92,7 @@ export const deepNullPartialifyWithIds = <
   deepNullPartialify(schema).merge(
     schema.pick(ids ?? (Object.hasOwn(schema.shape, "id") ? { id: true } : {})),
   )
+
+export const utcDateZodString = z
+  .string()
+  .regex(/\d{4}-[01]\d-[0-3]\d/, "Date is invalid.") //UTC Date without time

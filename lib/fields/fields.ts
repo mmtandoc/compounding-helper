@@ -1,7 +1,7 @@
 import { Merge, Simplify } from "type-fest"
 import { NullPartialDeep } from "types/util"
 import * as z from "zod"
-import { castStringToDate, castStringToNumber } from "./utils"
+import { castStringToDate, castStringToNumber, utcDateZodString } from "./utils"
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (issue.code === z.ZodIssueCode.invalid_type && issue.received === "null") {
@@ -61,11 +61,7 @@ export const chemicalSchema = z.object({
   hasNoCasNumber: z.boolean(),
   synonyms: z.array(z.string().trim().min(1)).nullable(),
   nioshTable: z.number().int().min(1).max(3).or(z.literal(-1)),
-  nioshRevisionDate: castStringToDate(
-    z.date().max(new Date(new Date().setDate(new Date().getDate())), {
-      message: "Date must be before the current date.",
-    }),
-  ).nullable(),
+  nioshRevisionDate: utcDateZodString.nullable(), //TODO: Check that date is not in the future
 })
 
 export type ChemicalFields = z.infer<typeof chemicalSchema>
@@ -131,14 +127,7 @@ export const sdsSchema = z.object({
       .min(0, "HMIS health hazard level must a number from 0 to 4.")
       .max(4, "HMIS health hazard level must a number from 0 to 4."),
   ),
-  revisionDate: castStringToDate(
-    z
-      .date()
-      .max(
-        new Date(new Date().setDate(new Date().getDate())),
-        "Date must be before the current date",
-      ),
-  ),
+  revisionDate: utcDateZodString, //TODO: Check that date is not in the future
   requireVentilation: z.boolean(),
   hazards: z.array(hazardSchema),
   filename: z
@@ -369,14 +358,7 @@ export const riskAssessmentSchema = z.object({
     additional: z.string().trim().min(1).array(),
   }),
   compoundingSupervisor: z.string().trim().min(1),
-  dateAssessed: castStringToDate(
-    z
-      .date()
-      .max(
-        new Date(new Date().setDate(new Date().getDate())),
-        "Date must be before the current date",
-      ),
-  ),
+  dateAssessed: utcDateZodString, //TODO: Check that date is not in the future
 })
 
 export type RiskAssessmentFields = z.infer<typeof riskAssessmentSchema>

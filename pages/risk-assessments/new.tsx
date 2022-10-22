@@ -63,7 +63,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
     additional: [],
   },
   compoundingSupervisor: null,
-  dateAssessed: new Date(),
+  dateAssessed: new Date().toISOString().split("T")[0],
 }
 
 const NewRiskAssessment: NextPage = () => {
