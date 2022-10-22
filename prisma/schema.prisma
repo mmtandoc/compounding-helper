@@ -195,6 +195,9 @@ model Compound {
   name                       String
   ingredients                Ingredient[]
   riskAssessments            RiskAssessment[]
+  hasMasterFormulationRecord Boolean          @default(false)
+  beyondUseDate              String?
+  notes                      String?
 
   @@map("compounds")
 }

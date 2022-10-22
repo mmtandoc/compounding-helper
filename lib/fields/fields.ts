@@ -195,6 +195,18 @@ export const compoundSchema = z.object({
   name: z.string().trim().min(1),
   ingredients: z.array(ingredientSchema).min(1),
   hasMasterFormulationRecord: z.boolean().default(false),
+  beyondUseDate: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+  notes: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
 })
 
 export type CompoundFields = z.output<typeof compoundSchema>
