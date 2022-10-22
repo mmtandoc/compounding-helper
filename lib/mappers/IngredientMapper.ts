@@ -12,14 +12,14 @@ const toFieldValues = (ingredientData: IngredientAll): IngredientFields => {
     physicalForm: ingredientData.physicalForm,
     isCommercialProduct: !!ingredientData?.commercialProductName,
     commercialProduct: {
-      din: ingredientData.commercialProductDin ?? null,
-      name: ingredientData?.commercialProductName ?? null,
-      hasNoDin:
-        !!ingredientData?.commercialProductName &&
-        !ingredientData?.commercialProductDin,
+      din: ingredientData.commercialProductDin ?? undefined,
+      name: ingredientData?.commercialProductName ?? undefined,
+      hasNoDin: !!ingredientData?.commercialProductName
+        ? !ingredientData?.commercialProductDin
+        : undefined,
       hasProductMonographConcerns:
-        ingredientData.hasProductMonographConcerns ?? null,
-      concernsDescription: ingredientData.concernsDescription ?? null,
+        ingredientData.hasProductMonographConcerns ?? undefined,
+      concernsDescription: ingredientData.concernsDescription ?? undefined,
     },
   })
 }

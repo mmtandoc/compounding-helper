@@ -359,7 +359,7 @@ export const riskAssessmentSchema = z.object({
     eyeProtection: z.object({
       required: z.boolean(),
     }),
-    other: z.string().trim().min(1).nullish(),
+    other: z.string().trim().nullish(),
   }),
   requireEyeWashStation: z.boolean(),
   requireSafetyShower: z.boolean(),

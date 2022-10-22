@@ -1,41 +1,78 @@
-import { RiskAssessment } from "@prisma/client"
-import {
-  NullPartialRiskAssessmentFields,
-  riskAssessmentSchema,
-} from "lib/fields"
+import { RiskAssessment, Unit } from "@prisma/client"
+import { riskAssessmentSchema } from "lib/fields"
 import { SetOptional } from "type-fest"
 import { ExposureRisksFields, RiskAssessmentFields } from "lib/fields"
 import { RiskAssessmentAll } from "types/models"
 import IngredientMapper from "./IngredientMapper"
+import { capitalize } from "lodash"
 
-const mapExposureRisksFieldsToModel = (
-  prefix: string,
-  exposureRisks?: ExposureRisksFields,
-) => {
-  const data = {} as any
-  const nameMap = new Map<keyof ExposureRisksFields, string>([
-    ["skin", "SkinExposureRisk"],
-    ["eye", "EyeExposureRisk"],
-    ["inhalation", "InhalationExposureRisk"],
-    ["oral", "OralExposureRisk"],
-    ["other", "OtherExposureRisk"],
-    ["otherDescription", "OtherExposureRiskDescription"],
+type FilterByKeyPrefix<
+  T,
+  Prefix extends string,
+> = keyof T extends `${Prefix}${infer _X}` ? never : keyof T
+
+type ExposureRiskPrefix = "sds" | "pm"
+type ExposureRiskType = "Skin" | "Eye" | "Inhalation" | "Oral" | "Other"
+
+type ExposureRiskKey = `${ExposureRiskPrefix}${ExposureRiskType}ExposureRisk`
+
+type ExposureRisksData = Record<ExposureRiskKey, boolean> &
+  Record<`${ExposureRiskPrefix}OtherExposureRiskDescription`, string | null>
+
+const mapExposureRisksFieldsToFieldValues = <
+  TPrefix extends ExposureRiskPrefix,
+>(
+  prefix: TPrefix,
+  exposureRisks: Pick<
+    RiskAssessment,
+    FilterByKeyPrefix<RiskAssessment, TPrefix>
+  >,
+): ExposureRisksFields => {
+  const data = {} as ExposureRisksFields
+  const nameMap = new Map<string, keyof ExposureRisksFields>([
+    [`${prefix}SkinExposureRisk`, "skin"],
+    [`${prefix}EyeExposureRisk`, "eye"],
+    [`${prefix}InhalationExposureRisk`, "inhalation"],
+    [`${prefix}OralExposureRisk`, "oral"],
+    [`${prefix}OtherExposureRisk`, "other"],
+    [`${prefix}OtherExposureRiskDescription`, "otherDescription"],
   ])
   for (const keyString in exposureRisks) {
-    const key = keyString as keyof ExposureRisksFields
-    if (Object.hasOwn(exposureRisks, key)) {
-      const name = `${prefix}${nameMap.get(key)}`
-      data[name] = exposureRisks[key]
+    const key = keyString as keyof typeof exposureRisks
+    if (Object.hasOwn(exposureRisks, key) && nameMap.has(keyString)) {
+      const fieldKey = nameMap.get(keyString) as keyof ExposureRisksFields
+      if (fieldKey !== "otherDescription") {
+        data[fieldKey] = exposureRisks[key] as boolean
+      } else {
+        data[fieldKey] = (exposureRisks[key] as string | null) ?? undefined
+      }
     }
   }
 
   return data
 }
 
-const toFieldValues = (
-  data: RiskAssessmentAll,
-): NullPartialRiskAssessmentFields => {
-  return riskAssessmentSchema.parse({
+const mapExposureRisksFieldsToModel = (
+  prefix: ExposureRiskPrefix,
+  exposureRisks?: ExposureRisksFields,
+): ExposureRisksData => {
+  const data = {} as ExposureRisksData
+
+  for (const keyString in exposureRisks) {
+    const key = keyString as keyof ExposureRisksFields
+    if (key !== "otherDescription") {
+      data[`${prefix}${capitalize(key) as ExposureRiskType}ExposureRisk`] =
+        exposureRisks[key]
+    } else {
+      data[`${prefix}OtherExposureRiskDescription`] = exposureRisks[key] ?? null
+    }
+  }
+
+  return data
+}
+
+const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
+  const fieldValues: Zod.input<typeof riskAssessmentSchema> = {
     id: data.id,
     compoundName: data.compoundName,
     ingredients: data.ingredients
@@ -46,42 +83,40 @@ const toFieldValues = (
     isSmallQuantity: data.isSmallQuantity,
     isPreparedOccasionally: data.isPreparedOccasionally,
     averagePreparationAmount: {
-      quantity: data.averagePreparationAmountQuantity,
-      unit: data.averagePreparationAmountUnit,
+      quantity: data.averagePreparationAmountQuantity as number,
+      unit: data.averagePreparationAmountUnit as Unit,
     },
     isConcentrationHealthRisk: data.isConcentrationHealthRisk,
     hasVerificationSteps: data.hasVerificationSteps,
     haveAppropriateFacilities: data.haveAppropriateFacilities,
     isWorkflowUninterrupted: data.isWorkflowUninterrupted,
-    workflowStandardsProcess: data.workflowStandardsProcess,
+    workflowStandardsProcess: data.workflowStandardsProcess ?? undefined,
     microbialContaminationRisk: data.microbialContaminationRisk,
     crossContaminationRisk: data.crossContaminationRisk,
     requireSpecialEducation: data.requireSpecialEducation,
     requireVentilation: data.requireVentilation,
     exposureRisks: {
-      sds: {
-        skin: data.sdsSkinExposureRisk,
-        eye: data.sdsEyeExposureRisk,
-        inhalation: data.sdsInhalationExposureRisk,
-        oral: data.sdsOralExposureRisk,
-        other: data.sdsOtherExposureRisk,
-        otherDescription: data.sdsOtherExposureRiskDescription,
-      },
-      productMonograph: {
-        skin: data.pmSkinExposureRisk,
-        eye: data.pmEyeExposureRisk,
-        inhalation: data.pmInhalationExposureRisk,
-        oral: data.pmOralExposureRisk,
-        other: data.pmOtherExposureRisk,
-        otherDescription: data.pmOtherExposureRiskDescription,
-      },
+      sds: mapExposureRisksFieldsToFieldValues("sds", data),
+      productMonograph:
+        data.pmSkinExposureRisk === null
+          ? undefined
+          : mapExposureRisksFieldsToFieldValues("pm", data),
     },
     ppe: {
-      gloves: { required: data.ppeGlovesRequired, type: data.ppeGlovesType },
-      coat: { required: data.ppeCoatRequired, type: data.ppeCoatType },
-      mask: { required: data.ppeMaskRequired, type: data.ppeMaskType },
+      gloves: {
+        required: data.ppeGlovesRequired,
+        type: data.ppeGlovesType ?? undefined,
+      },
+      coat: {
+        required: data.ppeCoatRequired,
+        type: data.ppeCoatType ?? undefined,
+      },
+      mask: {
+        required: data.ppeMaskRequired,
+        type: data.ppeMaskType ?? undefined,
+      },
       eyeProtection: { required: data.ppeEyeProtectionRequired },
-      other: data.ppeOther,
+      other: data.ppeOther ?? undefined,
     },
     requireEyeWashStation: data.requireEyeWashStation,
     requireSafetyShower: data.requireSafetyShower,
@@ -92,7 +127,8 @@ const toFieldValues = (
     },
     compoundingSupervisor: data.compoundingSupervisor,
     dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
-  })
+  }
+  return riskAssessmentSchema.parse(fieldValues)
 }
 
 //TODO: Refactor
