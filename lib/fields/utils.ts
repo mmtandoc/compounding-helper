@@ -74,6 +74,22 @@ export const castStringToNumber = (numberSchema: z.ZodNumber = z.number()) =>
       return Number(arg)
   }, numberSchema)
 
+export const transformStringToNumber = (
+  numberSchema: z.ZodNumber = z.number(),
+) =>
+  numberSchema.or(
+    z.string().transform((arg, ctx) => {
+      const result = castStringToNumber(numberSchema).safeParse(arg)
+      if (result.success) {
+        return result.data
+      } else {
+        result.error.issues.map((issue) => ctx.addIssue(issue))
+        return NaN
+      }
+    }),
+    //.refine((arg) => !Number.isNaN(arg)),
+  )
+
 /**
  * Deeply allow all properties to accept null, accept for the properties specified by "ids".
  * Meant to keep "id" property as non-nullable, as required by Prisma.

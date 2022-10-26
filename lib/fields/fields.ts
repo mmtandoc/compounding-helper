@@ -1,10 +1,13 @@
 import { Merge, Simplify } from "type-fest"
 import { NullPartialDeep } from "types/util"
 import * as z from "zod"
-import { castStringToDate, castStringToNumber, utcDateZodString } from "./utils"
+import { transformStringToNumber, utcDateZodString } from "./utils"
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
-  if (issue.code === z.ZodIssueCode.invalid_type && issue.received === "null") {
+  if (
+    issue.code === z.ZodIssueCode.invalid_type &&
+    ["null", "nan", "undefined"].includes(issue.received)
+  ) {
     return { message: "Required." }
   }
   if (
@@ -64,10 +67,11 @@ export const chemicalSchema = z.object({
   nioshRevisionDate: utcDateZodString.nullable(), //TODO: Check that date is not in the future
 })
 
-export type ChemicalFields = z.infer<typeof chemicalSchema>
+export type ChemicalFields = z.output<typeof chemicalSchema>
+export type ChemicalFieldsInput = z.input<typeof chemicalSchema>
 
 export type NullPartialChemicalFields = Simplify<
-  Merge<NullPartialDeep<ChemicalFields>, Pick<ChemicalFields, "id">>
+  Merge<NullPartialDeep<ChemicalFieldsInput>, Pick<ChemicalFieldsInput, "id">>
 >
 
 //==== Product schema =====
@@ -79,10 +83,11 @@ export const productSchema = z.object({
   vendorId: z.number().int(),
 })
 
-export type ProductFields = Simplify<z.infer<typeof productSchema>>
+export type ProductFields = Simplify<z.output<typeof productSchema>>
+export type ProductFieldsInput = Simplify<z.input<typeof productSchema>>
 
 export type NullPartialProductFields = Simplify<
-  Merge<NullPartialDeep<ProductFields>, Pick<ProductFields, "id">>
+  Merge<NullPartialDeep<ProductFieldsInput>, Pick<ProductFieldsInput, "id">>
 >
 
 //==== SDS & Hazard schemas =====
@@ -102,28 +107,23 @@ export const hazardSchema = z.object({
   additionalInfo: z.string().trim().min(1).optional(),
 })
 
-export type HazardFields = Simplify<z.infer<typeof hazardSchema>>
+export type HazardFields = Simplify<z.output<typeof hazardSchema>>
+export type HazardFieldsInput = Simplify<z.input<typeof hazardSchema>>
 
-export type NullPartialHazardFields = Simplify<NullPartialDeep<HazardFields>>
+export type NullPartialHazardFields = Simplify<
+  NullPartialDeep<HazardFieldsInput>
+>
 
-/* export type SdsFields = {
-  id?: number
-  chemicalId: number
-  productId: number
-  hmisHazardLevel: number
-  revisionDate: string
-  hazards: HazardFields[]
-  requireVentilation: boolean
-} */
 export const sdsSchema = z.object({
   id: z.number().int().optional(),
   chemicalId: z.number().int(),
   productId: z.number().int(),
-  hmisHazardLevel: castStringToNumber(
+  hmisHazardLevel: transformStringToNumber(
     z
       .number({
         invalid_type_error: "HMIS health hazard level must be a number.",
       })
+      .int("HMIS health hazard level must be an integer")
       .min(0, "HMIS health hazard level must a number from 0 to 4.")
       .max(4, "HMIS health hazard level must a number from 0 to 4."),
   ),
@@ -137,31 +137,14 @@ export const sdsSchema = z.object({
     .transform((arg) => (arg === null ? "N/A" : arg)),
 })
 
-export type SdsFields = z.infer<typeof sdsSchema>
+export type SdsFields = z.output<typeof sdsSchema>
+export type SdsFieldsInput = z.input<typeof sdsSchema>
 
 export type NullPartialSdsFields = Simplify<
-  Merge<NullPartialDeep<SdsFields>, Pick<SdsFields, "id">>
+  Merge<NullPartialDeep<SdsFieldsInput>, Pick<SdsFieldsInput, "id">>
 >
 
 //==== Risk Assessment & Ingredient schemas ====//
-
-/*
-type IngredientFields = {
-  order: number
-  chemicalId: number | null
-  productId: number | null
-  sdsId: number | null
-  physicalForm: "cream" | "ointment" | "powder" | "liquid" | "solid"
-  commercialProduct: {
-    isCommercialProduct: boolean
-    name?: string | null
-    din?: number | null
-    hasNoDin?: boolean | null
-    hasProductMonographConcerns?: boolean | null
-    concernsDescription?: string | null
-  }
-}
-*/
 
 export const ingredientSchemaBase = z.object({
   order: z.number().int(),
@@ -171,7 +154,7 @@ export const ingredientSchemaBase = z.object({
   isCommercialProduct: z.boolean(),
   commercialProduct: z.object({
     name: z.string().trim().min(1),
-    din: castStringToNumber(z.number().int()).nullish(),
+    din: transformStringToNumber(z.number().int()).nullish(),
     hasNoDin: z.boolean(),
     hasProductMonographConcerns: z.boolean(),
     concernsDescription: z.string().trim().min(1).nullish(),
@@ -200,22 +183,13 @@ export const ingredientSchema = z.discriminatedUnion("isCommercialProduct", [
   nonCommercialIngredientSchema,
 ])
 
-export type IngredientFields = Simplify<z.infer<typeof ingredientSchema>>
+export type IngredientFields = Simplify<z.output<typeof ingredientSchema>>
+export type IngredientFieldsInput = Simplify<z.input<typeof ingredientSchema>>
 
 export type NullPartialIngredientFields = Simplify<
-  NullPartialDeep<IngredientFields, { ignoreKeys: "order" }>
+  NullPartialDeep<IngredientFieldsInput, { ignoreKeys: "order" }>
 >
 
-/*
-export type ExposureRisksFields = {
-  skin: boolean
-  eye: boolean
-  inhalation: boolean
-  oral: boolean
-  other: boolean
-  otherDescription: string | null
-}
-*/
 export const exposureRisksSchema = z
   .object({
     skin: z.boolean(),
@@ -235,62 +209,8 @@ export const exposureRisksSchema = z
     }
   })
 
-export type ExposureRisksFields = z.infer<typeof exposureRisksSchema>
-
-/*
-type RiskAssessmentFields = {
-  id?: number
-  compoundName: string
-  ingredients: IngredientFields[]
-  complexity: "simple" | "moderate" | "complex"
-  isPreparedOccasionally: boolean
-  preparationFrequency: "daily" | "weekly" | "monthly"
-  isSmallQuantity: boolean
-  averagePreparationAmount: {
-    quantity: number
-    unit: "g" | "ml"
-  }
-  isConcentrationHealthRisk: boolean
-  requireSpecialEducation: boolean
-  hasVerificationSteps: boolean
-  haveAppropriateFacilities: boolean
-  requireVentilation: boolean
-  isWorkflowUninterrupted: boolean
-  workflowStandardsProcess?: string
-  microbialContaminationRisk: boolean
-  crossContaminationRisk: boolean
-  exposureRisks: {
-    sds: ExposureRisksFields
-    productMonograph?: ExposureRisksFields
-  }
-  ppe: {
-    gloves: {
-      required: boolean
-      type: "regular" | "chemotherapy" | "double" | null
-    }
-    coat: {
-      required: boolean
-      type: "designated" | "disposable" | null
-    }
-    mask: {
-      required: boolean
-      type?: string
-    }
-    eyeProtection: {
-      required: boolean
-    }
-    other?: string
-  }
-  requireEyeWashStation: boolean
-  requireSafetyShower: boolean
-  riskLevel: "A" | "B" | "C"
-  rationaleList: {
-    automatic: string[]
-    additional: string[]
-  }
-  dateAssessed: string
-}
-*/
+export type ExposureRisksFields = z.output<typeof exposureRisksSchema>
+export type ExposureRisksFieldsInput = z.input<typeof exposureRisksSchema>
 
 const refinePPE = (arg: any, ctx: any) =>
   arg.required &&
@@ -361,8 +281,12 @@ export const riskAssessmentSchema = z.object({
   dateAssessed: utcDateZodString, //TODO: Check that date is not in the future
 })
 
-export type RiskAssessmentFields = z.infer<typeof riskAssessmentSchema>
+export type RiskAssessmentFields = z.output<typeof riskAssessmentSchema>
+export type RiskAssessmentFieldsInput = z.input<typeof riskAssessmentSchema>
 
 export type NullPartialRiskAssessmentFields = Simplify<
-  NullPartialDeep<RiskAssessmentFields, { ignoreKeys: "id" }>
+  Merge<
+    NullPartialDeep<RiskAssessmentFieldsInput, { ignoreKeys: "id" }>,
+    { ingredients: NullPartialIngredientFields[] }
+  >
 >
