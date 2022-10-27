@@ -40,6 +40,11 @@ const Header = () => {
           </Link>
         </DropdownMenu>
       </Dropdown>
+      <Link href="/compounds">
+        <a className="bold" data-active={isActive("/compounds")}>
+          Compounds
+        </a>
+      </Link>
       <Dropdown>
         <DropdownToggle>
           <Link href="/sds">

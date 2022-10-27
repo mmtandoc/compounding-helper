@@ -1,6 +1,6 @@
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RadioGroup } from "components/RadioGroup"
-import { IngredientDetails } from "components/risk-assessment/RiskAssessmentDetails/IngredientDetails"
+import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { capitalize } from "lib/utils"
 import React from "react"
 import form from "styles/form"

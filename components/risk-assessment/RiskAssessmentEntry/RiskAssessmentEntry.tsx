@@ -5,7 +5,7 @@ import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-import IngredientFieldset from "./ingredient/IngredientFieldset"
+import IngredientEntry from "components/compound/ingredient/IngredientEntry"
 import RationaleList from "./RationaleList"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
@@ -14,6 +14,7 @@ import {
   NullPartialIngredientFields,
   NullPartialRiskAssessmentFields,
 } from "lib/fields"
+import { nestedForm } from "lib/rhf/nestedForm"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
@@ -108,11 +109,15 @@ const RiskAssessmentEntry = (props: Props) => {
       <fieldset>
         <legend>Ingredients:</legend>
         {ingredientFields.map((field, index) => (
-          <IngredientFieldset
+          <IngredientEntry
             key={field.id}
             field={field}
+            name={`compound.ingredients`}
             index={index}
-            formMethods={formMethods}
+            formMethods={nestedForm(
+              formMethods,
+              `compound.ingredients.${index}` as "compound.ingredients.1",
+            )}
             arrayMethods={ingredientsArrayMethods}
             reset={() => {
               formMethods.resetField(`compound.ingredients.${index}`, {
