@@ -97,6 +97,11 @@ input[type='radio'][readOnly], label.readOnly {
   pointer-events: none;
 }
 
+:is(input,
+textarea):read-only {
+  border-color: var(--field-border-color);
+}
+
 :is(select, input,
 textarea):disabled {
   /*border-color: #c0c0c7;*/
