@@ -67,7 +67,7 @@ const ErrorContainer = <
   containerProps.className = containerProps.className ?? "" + " input-container"
 
   return (
-    <span {...containerProps}>
+    <span {...containerProps} hidden={inputProps.hidden}>
       {React.cloneElement(inputElement, {
         onFocus: handleFocus,
         onBlur: handleBlur,

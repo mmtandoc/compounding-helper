@@ -154,13 +154,14 @@ const HazardInputRow = ({
           margin-bottom: 1.5rem;
           align-items: center;
         }
-        li > :is(select, input) {
+        li > :global(.input-container) {
           flex: 1;
         }
 
-        :global(.category-select, .subcategory-select) {
-          flex: 1;
+        li > :global(.input-container > *) {
+          width: 100%;
         }
+
         li > button {
           flex-basis: content;
         }
