@@ -1,7 +1,6 @@
 import axios from "axios"
-import Layout from "components/Layout"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
@@ -9,6 +8,8 @@ import React, { useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { RiskAssessmentAll } from "types/models"
 import Modal from "components/common/Modal"
+import { NextPageWithLayout } from "types/common"
+import { createRef } from "react"
 
 const PrintableRiskAssessmentDetails = React.forwardRef(
   function PrintableRiskAssessmentDetails(
@@ -25,9 +26,10 @@ const PrintableRiskAssessmentDetails = React.forwardRef(
 
 type RiskAssessmentProps = {
   data: RiskAssessmentAll
+  printableRef: React.Ref<HTMLDivElement>
 }
 
-const RiskAssessment: NextPage<RiskAssessmentProps> = (
+const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
   props: RiskAssessmentProps,
 ) => {
   const { data } = props
@@ -59,56 +61,46 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
       },
     )
   }
-
   return (
-    <Layout>
-      <div className="page" ref={printableRef}>
-        <h1 style={{ marginTop: "0px" }}>
-          Risk Assessment: {data.compound.name}
-        </h1>
-        <div className="risk-assessment-container">
-          <PrintableRiskAssessmentDetails data={data} />
-          <div className="action-row">
-            <button type="button" onClick={handlePrint}>
-              Print
-            </button>
-            <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
-              <button type="button">Edit</button>
-            </Link>
-            <button type="button" onClick={() => setIsModalOpen(true)}>
-              Delete
-            </button>
-          </div>
+    <>
+      <div className="risk-assessment-container">
+        <PrintableRiskAssessmentDetails data={data} />
+        <div className="action-row">
+          <button type="button" onClick={handlePrint}>
+            Print
+          </button>
+          <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
+            <button type="button">Edit</button>
+          </Link>
+          <button type="button" onClick={() => setIsModalOpen(true)}>
+            Delete
+          </button>
         </div>
-        <Modal isOpen={isModalOpen}>
-          <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
-            Delete risk assessment?
-          </Modal.Header>
-          <Modal.Body>
-            <p>Are you sure you want to delete this risk assessment?</p>
-            <p>This is permanent and cannot be undone.</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <button
-              type="button"
-              onClick={() => {
-                handleDelete()
-                setIsModalOpen(false)
-              }}
-            >
-              Confirm
-            </button>
-            <button type="button" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </button>
-          </Modal.Footer>
-        </Modal>
       </div>
+      <Modal isOpen={isModalOpen}>
+        <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
+          Delete risk assessment?
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete this risk assessment?</p>
+          <p>This is permanent and cannot be undone.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            type="button"
+            onClick={() => {
+              handleDelete()
+              setIsModalOpen(false)
+            }}
+          >
+            Confirm
+          </button>
+          <button type="button" onClick={() => setIsModalOpen(false)}>
+            Cancel
+          </button>
+        </Modal.Footer>
+      </Modal>
       <style jsx>{`
-        .page {
-          margin-bottom: 5rem;
-        }
-
         .action-row {
           display: flex;
           column-gap: 1rem;
@@ -121,13 +113,13 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
             //width: 90%;
             align-self: center;
           }
+          .print {
+            display: none;
+          }
         }
         @media print {
           html {
             font-size: 52%;
-          }
-          .page {
-            margin: 0;
           }
           button {
             display: none;
@@ -171,7 +163,7 @@ const RiskAssessment: NextPage<RiskAssessmentProps> = (
           //font-size: 62.5%;
         }
       `}</style>
-    </Layout>
+    </>
   )
 }
 
@@ -190,7 +182,16 @@ export const getServerSideProps: GetServerSideProps<
     return { notFound: true }
   }
 
-  return { props: { data } }
+  const printableRef = createRef<HTMLDivElement>()
+
+  return {
+    props: {
+      title: `Risk Assessment: ${data.compound.name}`,
+      data,
+      printableRef,
+    },
+  }
 }
+
 
 export default RiskAssessment

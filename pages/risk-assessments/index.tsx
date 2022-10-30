@@ -1,6 +1,5 @@
 import React from "react"
-import Layout from "components/Layout"
-import { NextPage } from "next"
+import { NextPageWithLayout } from "types/common"
 import { RiskAssessment } from "@prisma/client"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
@@ -11,7 +10,7 @@ type Props = {
   data: RiskAssessmentAll[]
 }
 
-const RiskAssessments: NextPage<Props> = (props: Props) => {
+const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   const { data } = props
 
   const actionBar = (
@@ -30,28 +29,24 @@ const RiskAssessments: NextPage<Props> = (props: Props) => {
     </div>
   )
   return (
-    <Layout>
-      <div className="page">
-        <h1 style={{ marginTop: "0px" }}>Risk Assessments</h1>
-        <div>
-          {actionBar}
-          <RiskAssessmentsTable data={data} />
-          {actionBar}
-        </div>
-      </div>
+    <div>
+      {actionBar}
+      <RiskAssessmentsTable data={data} />
+      {actionBar}
       <style jsx>{`
         :global(.risk-assessment-table) {
           width: 100%;
         }
       `}</style>
-    </Layout>
+    </div>
   )
 }
+
 
 export async function getServerSideProps() {
   const data: RiskAssessment[] = (await getRiskAssessments()) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Risk Assessments", data } }
 }
 
 export default RiskAssessments

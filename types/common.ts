@@ -1,3 +1,6 @@
+import { NextPage } from "next"
+import { AppProps } from "next/app"
+import { ReactElement, ReactNode } from "react"
 import { FieldValues, UseFormReturn } from "react-hook-form"
 import { Simplify } from "type-fest"
 
@@ -15,3 +18,14 @@ export type DataEntryComponent<
     unknown
   > & { formMethods: UseFormReturn<TFieldValues> },
 > = (props: TEntryProps) => JSX.Element
+
+export type NextPageWithLayout<
+  TPageProps = Record<string, unknown>,
+  TLayoutProps = Record<string, unknown>,
+> = NextPage<TPageProps> & {
+  getLayout?: (page: ReactElement, pageProps: TLayoutProps) => ReactNode
+}
+
+export type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}

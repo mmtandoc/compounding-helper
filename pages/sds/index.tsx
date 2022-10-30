@@ -1,6 +1,5 @@
-import Layout from "components/Layout"
 import SdsTable from "components/sds/SdsTable"
-import { NextPage } from "next"
+import { NextPageWithLayout } from "types/common"
 import Link from "next/link"
 import { getSafetyDataSheets } from "pages/api/sds"
 import { SdsWithRelations } from "types/models"
@@ -9,7 +8,7 @@ type SafetyDataSheetsProps = {
   data: SdsWithRelations[]
 }
 
-const SafetyDataSheets: NextPage<SafetyDataSheetsProps> = (
+const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
   props: SafetyDataSheetsProps,
 ) => {
   const { data } = props
@@ -30,25 +29,16 @@ const SafetyDataSheets: NextPage<SafetyDataSheetsProps> = (
     </div>
   )
   return (
-    <Layout>
-      <div className="page">
-        <h1>Safety Data Sheets</h1>
-        <div>
-          {actionBar}
-          <SdsTable data={data} />
-          {actionBar}
-        </div>
-      </div>
+    <div>
+      {actionBar}
+      <SdsTable data={data} />
+      {actionBar}
       <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-
         :global(.sds-table) {
           width: 100%;
         }
       `}</style>
-    </Layout>
+    </div>
   )
 }
 
@@ -56,7 +46,8 @@ export async function getServerSideProps() {
   const data: SdsWithRelations[] =
     (await getSafetyDataSheets({ orderBy: { id: "asc" } })) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Safety Data Sheets", data } }
 }
+
 
 export default SafetyDataSheets

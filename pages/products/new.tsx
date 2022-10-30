@@ -1,8 +1,8 @@
 import CreateForm from "components/common/data-pages/CreateForm"
-import Layout from "components/Layout"
 import ProductEntry from "components/product/ProductEntry"
 import { NullPartialProductFields, productSchema } from "lib/fields"
-import { NextPage } from "next"
+import { GetStaticProps } from "next"
+import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialProductFields = {
   name: null,
@@ -10,27 +10,22 @@ const defaultValues: NullPartialProductFields = {
   chemicalId: null,
 }
 
-const NewProduct: NextPage = () => {
+const NewProduct: NextPageWithLayout = () => {
   return (
-    <Layout>
-      <div className="page">
-        <h1>New Product</h1>
-        <CreateForm
-          dataName="product"
-          schema={productSchema}
-          defaultValues={defaultValues}
-          apiEndpointPath="/api/products"
-          urlPath="/products"
-          entryComponent={ProductEntry}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-      `}</style>
-    </Layout>
+    <CreateForm
+      dataName="product"
+      schema={productSchema}
+      defaultValues={defaultValues}
+      apiEndpointPath="/api/products"
+      urlPath="/products"
+      entryComponent={ProductEntry}
+    />
   )
 }
+
+
+export const getStaticProps: GetStaticProps = () => ({
+  props: { title: "New Product" },
+})
 
 export default NewProduct

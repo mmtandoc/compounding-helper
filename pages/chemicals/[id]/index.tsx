@@ -1,41 +1,28 @@
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
-import Layout from "components/Layout"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import { getChemicalById } from "pages/api/chemicals/[id]"
+import { NextPageWithLayout } from "types/common"
 import { ChemicalAll } from "types/models"
 
 type ChemicalPageProps = {
   data: ChemicalAll
 }
 
-const ChemicalPage: NextPage<ChemicalPageProps> = (
+const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
   props: ChemicalPageProps,
 ) => {
   const { data } = props
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Chemical: {data.name}</h1>
-        <Details
-          id={data.id}
-          data={data}
-          dataLabel="chemical"
-          apiPath="/api/chemicals"
-          urlPath="/chemicals"
-          detailsComponent={ChemicalDetails}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-        .page {
-          margin-bottom: 5rem;
-        }
-      `}</style>
-    </Layout>
+    <Details
+      id={data.id}
+      data={data}
+      dataLabel="chemical"
+      apiPath="/api/chemicals"
+      urlPath="/chemicals"
+      detailsComponent={ChemicalDetails}
+    />
   )
 }
 
@@ -54,7 +41,7 @@ export const getServerSideProps: GetServerSideProps<ChemicalPageProps> = async (
     return { notFound: true }
   }
 
-  return { props: { data } }
+  return { props: { title: `Chemical: ${data.name}`, data } }
 }
 
 export default ChemicalPage

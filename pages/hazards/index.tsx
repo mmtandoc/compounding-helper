@@ -1,32 +1,17 @@
 import HazardsTable from "components/hazards/HazardsTable"
-import Layout from "components/Layout"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import { getHazards } from "pages/api/hazards"
+import { NextPageWithLayout } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
 
 type HazardsProps = {
   data: HazardClassesWithCategories[]
 }
 
-const Hazards: NextPage<HazardsProps> = (props: HazardsProps) => {
+const Hazards: NextPageWithLayout<HazardsProps> = (props: HazardsProps) => {
   const { data } = props
 
-  return (
-    <Layout>
-      <div className="page">
-        <h1>Health Hazards</h1>
-        <HazardsTable data={data} />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-        .page {
-          margin-bottom: 5rem;
-        }
-      `}</style>
-    </Layout>
-  )
+  return <HazardsTable data={data} />
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -34,7 +19,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
   const data = (await getHazards()) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Health Hazards", data } }
 }
 
 export default Hazards

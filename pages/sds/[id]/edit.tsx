@@ -1,41 +1,33 @@
 import EditForm from "components/common/data-pages/EditForm"
-import Layout from "components/Layout"
 import SdsEntry from "components/sds/SdsEntry"
 import { NullPartialSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { getSdsById } from "pages/api/sds/[id]"
+import { NextPageWithLayout } from "types/common"
 
 type EditSdsPageProps = {
   values: NullPartialSdsFields
 }
 
-const EditSdsPage: NextPage<EditSdsPageProps> = (props: EditSdsPageProps) => {
+const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
+  props: EditSdsPageProps,
+) => {
   const { values } = props
 
   const router = useRouter()
   const id = parseInt(router.query.id as string)
 
   return (
-    <Layout>
-      <div className="page">
-        <h1 style={{ marginTop: "0px" }}>Edit SDS</h1>
-        <EditForm
-          id={id}
-          schema={sdsSchema}
-          values={values as NullPartialSdsFields}
-          apiEndpointPath="/api/sds"
-          urlPath="/sds"
-          entryComponent={SdsEntry}
-        />
-      </div>
-      <style jsx>{`
-        .page {
-          margin-bottom: 5rem;
-        }
-      `}</style>
-    </Layout>
+    <EditForm
+      id={id}
+      schema={sdsSchema}
+      values={values as NullPartialSdsFields}
+      apiEndpointPath="/api/sds"
+      urlPath="/sds"
+      entryComponent={SdsEntry}
+    />
   )
 }
 
@@ -56,6 +48,9 @@ export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
 
   return {
     props: {
+      title: `Edit SDS: ${data.product.name} - ${data.product.vendor.name} (${
+        data.revisionDate.toISOString().split("T")[0]
+      })`,
       values: SdsMapper.toFieldValues(data),
     },
   }

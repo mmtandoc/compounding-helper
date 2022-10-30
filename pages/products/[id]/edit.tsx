@@ -1,8 +1,7 @@
 import EditForm from "components/common/data-pages/EditForm"
-import Layout from "components/Layout"
 import ProductEntry from "components/product/ProductEntry"
 import ProductMapper from "lib/mappers/ProductMapper"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { getProductById } from "pages/api/products/[id]"
 import {
@@ -10,40 +9,29 @@ import {
   ProductFields,
   productSchema,
 } from "lib/fields"
+import { NextPageWithLayout } from "types/common"
 
 type EditProductProps = {
   values: ProductFields
 }
 
-const EditProduct: NextPage<EditProductProps> = (props: EditProductProps) => {
+const EditProduct: NextPageWithLayout<EditProductProps> = (
+  props: EditProductProps,
+) => {
   const { values } = props
 
   const router = useRouter()
   const id = parseInt(router.query.id as string)
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Edit Product - {values?.name}</h1>
-        <EditForm
-          id={id}
-          schema={productSchema}
-          values={values as NullPartialProductFields}
-          apiEndpointPath="/api/products"
-          urlPath="/products"
-          entryComponent={ProductEntry}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-
-        .page {
-          margin-bottom: 5rem;
-        }
-      `}</style>
-    </Layout>
+    <EditForm
+      id={id}
+      schema={productSchema}
+      values={values as NullPartialProductFields}
+      apiEndpointPath="/api/products"
+      urlPath="/products"
+      entryComponent={ProductEntry}
+    />
   )
 }
 
@@ -62,11 +50,15 @@ export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
     return { notFound: true }
   }
 
+  const values = ProductMapper.toFieldValues(data)
+
   return {
     props: {
-      values: ProductMapper.toFieldValues(data),
+      title: `Edit Product - ${values?.name}`,
+      values,
     },
   }
 }
+
 
 export default EditProduct

@@ -1,8 +1,8 @@
 import CreateForm from "components/common/data-pages/CreateForm"
-import Layout from "components/Layout"
 import SdsEntry from "components/sds/SdsEntry"
 import { NullPartialSdsFields, sdsSchema } from "lib/fields"
-import { NextPage } from "next"
+import { GetStaticProps } from "next"
+import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialSdsFields = {
   chemicalId: null,
@@ -14,27 +14,23 @@ const defaultValues: NullPartialSdsFields = {
   filename: null,
 }
 
-const NewSafetyDataSheet: NextPage = () => {
+const NewSafetyDataSheet: NextPageWithLayout = () => {
   return (
-    <Layout>
-      <div className="page">
-        <h1>New Safety Data Sheet</h1>
-        <CreateForm
-          schema={sdsSchema}
-          defaultValues={defaultValues}
-          entryComponent={SdsEntry}
-          apiEndpointPath="/api/sds"
-          urlPath="/sds"
-          dataName="SDS"
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-      `}</style>
-    </Layout>
+    <CreateForm
+      schema={sdsSchema}
+      defaultValues={defaultValues}
+      entryComponent={SdsEntry}
+      apiEndpointPath="/api/sds"
+      urlPath="/sds"
+      dataName="SDS"
+    />
   )
 }
+
+export const getStaticProps: GetStaticProps = async () => ({
+  props: {
+    title: "New Safety Data Sheet",
+  },
+})
 
 export default NewSafetyDataSheet

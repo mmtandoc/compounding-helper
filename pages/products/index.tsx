@@ -1,15 +1,15 @@
-import Layout from "components/Layout"
 import ProductTable from "components/product/ProductTable"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { getProducts } from "pages/api/products"
+import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"
 
 type Props = {
   data: ProductAll[]
 }
 
-const Products: NextPage<Props> = (props: Props) => {
+const Products: NextPageWithLayout<Props> = (props: Props) => {
   const { data } = props
 
   const actionBar = (
@@ -29,32 +29,23 @@ const Products: NextPage<Props> = (props: Props) => {
   )
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Products</h1>
-        <div>
-          {actionBar}
-          <ProductTable data={data} />
-          {actionBar}
-        </div>
-      </div>
+    <div>
+      {actionBar}
+      <ProductTable data={data} />
+      {actionBar}
       <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-
         :global(.product-table) {
           width: 100%;
         }
       `}</style>
-    </Layout>
+    </div>
   )
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const data: ProductAll[] = (await getProducts()) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Products", data } }
 }
 
 export default Products

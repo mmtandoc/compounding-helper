@@ -1,17 +1,17 @@
 import { Chemical } from "@prisma/client"
 import ChemicalTable from "components/chemical/ChemicalTable"
-import Layout from "components/Layout"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { getChemicals } from "pages/api/chemicals"
-import { getSafetyDataSheets } from "pages/api/sds"
-import { ChemicalAll, SdsWithRelations } from "types/models"
+import { NextPageWithLayout } from "types/common"
 
 type ChemicalsProps = {
   data: Chemical[]
 }
 
-const Chemicals: NextPage<ChemicalsProps> = (props: ChemicalsProps) => {
+const Chemicals: NextPageWithLayout<ChemicalsProps> = (
+  props: ChemicalsProps,
+) => {
   const { data } = props
 
   const actionBar = (
@@ -31,25 +31,16 @@ const Chemicals: NextPage<ChemicalsProps> = (props: ChemicalsProps) => {
   )
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Chemicals</h1>
-        <div>
-          {actionBar}
-          <ChemicalTable data={data} />
-          {actionBar}
-        </div>
-      </div>
+    <div>
+      {actionBar}
+      <ChemicalTable data={data} />
+      {actionBar}
       <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-
         :global(.chemical-table) {
           width: 100%;
         }
       `}</style>
-    </Layout>
+    </div>
   )
 }
 
@@ -58,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
   const data: Chemical[] = (await getChemicals()) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Chemicals", data } }
 }
 
 export default Chemicals

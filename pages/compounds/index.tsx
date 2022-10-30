@@ -1,6 +1,5 @@
 import CompoundsTable from "components/compound/CompoundsTable"
-import Layout from "components/Layout"
-import { NextPage } from "next"
+import { NextPageWithLayout } from "types/common"
 import { getCompounds } from "pages/api/compounds"
 import { CompoundWithIngredients } from "types/models"
 
@@ -8,7 +7,7 @@ type Props = {
   data: CompoundWithIngredients[]
 }
 
-const Compounds: NextPage<Props> = (props: Props) => {
+const Compounds: NextPageWithLayout<Props> = (props: Props) => {
   const { data } = props
 
   const actionBar = (
@@ -27,36 +26,23 @@ const Compounds: NextPage<Props> = (props: Props) => {
     </div>
   )
   return (
-    <Layout>
-      <div className="page">
-        <h1>Compounds</h1>
-        <div>
-          {actionBar}
-          <CompoundsTable data={data} />
-          {actionBar}
-        </div>
-      </div>
+    <>
+      {actionBar}
+      <CompoundsTable data={data} />
+      {actionBar}
       <style jsx>{`
-        h1 {
-          margin-top: 0px;
-        }
-
         :global(.compound-table) {
           width: 100%;
         }
-
-        .page {
-          margin-bottom: 5rem;
-        }
       `}</style>
-    </Layout>
+    </>
   )
 }
 
 export async function getServerSideProps() {
   const data: CompoundWithIngredients[] = (await getCompounds()) ?? []
 
-  return { props: { data } }
+  return { props: { title: "Compounds", data } }
 }
 
 export default Compounds

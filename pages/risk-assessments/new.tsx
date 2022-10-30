@@ -1,11 +1,11 @@
 import CreateForm from "components/common/data-pages/CreateForm"
-import Layout from "components/Layout"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import {
   NullPartialRiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
-import { NextPage } from "next"
+import { GetStaticProps } from "next"
+import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialRiskAssessmentFields = {
   compound: {
@@ -68,27 +68,23 @@ const defaultValues: NullPartialRiskAssessmentFields = {
   dateAssessed: new Date().toISOString().split("T")[0],
 }
 
-const NewRiskAssessment: NextPage = () => {
+const NewRiskAssessment: NextPageWithLayout = () => {
   return (
-    <Layout>
-      <div className="page">
-        <h1>New Risk Assessment</h1>
-        <CreateForm
-          defaultValues={defaultValues as NullPartialRiskAssessmentFields}
-          schema={riskAssessmentSchema}
-          entryComponent={RiskAssessmentEntry}
-          apiEndpointPath="/api/risk-assessments"
-          urlPath="/risk-assessments"
-          dataName="risk assessment"
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-      `}</style>
-    </Layout>
+    <CreateForm
+      defaultValues={defaultValues as NullPartialRiskAssessmentFields}
+      schema={riskAssessmentSchema}
+      entryComponent={RiskAssessmentEntry}
+      apiEndpointPath="/api/risk-assessments"
+      urlPath="/risk-assessments"
+      dataName="risk assessment"
+    />
   )
+}
+
+export const getStaticProps: GetStaticProps = () => {
+  return {
+    props: { title: "New Risk Assessment" },
+  }
 }
 
 export default NewRiskAssessment

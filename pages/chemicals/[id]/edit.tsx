@@ -1,21 +1,21 @@
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
-import Layout from "components/Layout"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import {
   ChemicalFields,
   chemicalSchema,
   NullPartialChemicalFields,
 } from "lib/fields"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { getChemicalById } from "pages/api/chemicals/[id]"
+import { NextPageWithLayout } from "types/common"
 
 type EditChemicalProps = {
   values: ChemicalFields
 }
 
-const EditChemical: NextPage<EditChemicalProps> = (
+const EditChemical: NextPageWithLayout<EditChemicalProps> = (
   props: EditChemicalProps,
 ) => {
   const { values } = props
@@ -24,28 +24,14 @@ const EditChemical: NextPage<EditChemicalProps> = (
   const id = parseInt(router.query.id as string)
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Edit Chemical - {values?.name}</h1>
-        <EditForm
-          id={id}
-          schema={chemicalSchema}
-          values={values as NullPartialChemicalFields}
-          apiEndpointPath="/api/chemicals"
-          urlPath="/chemicals"
-          entryComponent={ChemicalEntry}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-
-        .page {
-          margin-bottom: 5rem;
-        }
-      `}</style>
-    </Layout>
+    <EditForm
+      id={id}
+      schema={chemicalSchema}
+      values={values as NullPartialChemicalFields}
+      apiEndpointPath="/api/chemicals"
+      urlPath="/chemicals"
+      entryComponent={ChemicalEntry}
+    />
   )
 }
 
@@ -62,11 +48,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true }
   }
 
+  const values = ChemicalMapper.toFieldValues(data)
+
   return {
     props: {
-      values: ChemicalMapper.toFieldValues(data),
+      title: `Edit Chemical - ${values?.name}`,
+      values,
     },
   }
 }
+
 
 export default EditChemical

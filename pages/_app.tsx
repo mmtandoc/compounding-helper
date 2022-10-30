@@ -1,9 +1,9 @@
-import "styles/globals.css"
-import type { AppProps } from "next/app"
-import { SWRConfig } from "swr"
 import axios from "axios"
-import React from "react"
+import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconContext } from "react-icons"
+import "styles/globals.css"
+import { SWRConfig } from "swr"
+import { AppPropsWithLayout } from "types/common"
 
 //TODO: Move to separate file
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,12 +78,12 @@ const multiFetcher = (urls: Record<string, string> | string[] | string) => {
   })
 }
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout ?? getDefaultLayout
+  const layout = getLayout(<Component {...pageProps} />, pageProps)
   return (
     <IconContext.Provider value={{ style: { verticalAlign: "middle" } }}>
-      <SWRConfig value={{ fetcher: multiFetcher }}>
-        <Component {...pageProps} />
-      </SWRConfig>
+      <SWRConfig value={{ fetcher: multiFetcher }}>{layout}</SWRConfig>
     </IconContext.Provider>
   )
 }

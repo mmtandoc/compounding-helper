@@ -1,8 +1,8 @@
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
-import Layout from "components/Layout"
 import { chemicalSchema, NullPartialChemicalFields } from "lib/fields"
-import { NextPage } from "next"
+import { GetStaticProps } from "next"
+import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialChemicalFields = {
   name: null,
@@ -13,27 +13,22 @@ const defaultValues: NullPartialChemicalFields = {
   nioshRevisionDate: null,
 }
 
-const NewChemical: NextPage = () => {
+const NewChemical: NextPageWithLayout = () => {
   return (
-    <Layout>
-      <div className="page">
-        <h1>New Chemical</h1>
-        <CreateForm
-          schema={chemicalSchema}
-          dataName="chemical"
-          defaultValues={defaultValues}
-          apiEndpointPath="/api/chemicals"
-          urlPath="/chemicals"
-          entryComponent={ChemicalEntry}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-      `}</style>
-    </Layout>
+    <CreateForm
+      schema={chemicalSchema}
+      dataName="chemical"
+      defaultValues={defaultValues}
+      apiEndpointPath="/api/chemicals"
+      urlPath="/chemicals"
+      entryComponent={ChemicalEntry}
+    />
   )
 }
+
+
+export const getStaticProps: GetStaticProps = () => ({
+  props: { title: "New Chemical" },
+})
 
 export default NewChemical

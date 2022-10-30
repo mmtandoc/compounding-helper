@@ -1,6 +1,5 @@
 import React from "react"
-import Layout from "components/Layout"
-import { GetServerSideProps, NextPage } from "next"
+import { GetServerSideProps } from "next"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { useRouter } from "next/router"
@@ -10,13 +9,14 @@ import {
   NullPartialRiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
+import { NextPageWithLayout } from "types/common"
 
 type EditRiskAssessmentProps = {
   values: NullPartialRiskAssessmentFields
 }
 
-const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
-  props: EditRiskAssessmentProps,
+const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
+  props,
 ) => {
   const { values } = props
 
@@ -24,27 +24,18 @@ const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
   const riskAssessmentId = parseInt(router.query.id as string)
 
   return (
-    <Layout>
-      <div className="page">
-        <h1>Edit Risk Assessment - {values?.compound?.name}</h1>
-        <EditForm
-          id={riskAssessmentId}
-          values={values as NullPartialRiskAssessmentFields}
-          schema={riskAssessmentSchema}
-          apiEndpointPath="/api/risk-assessments"
-          urlPath="/risk-assessments"
-          entryComponent={RiskAssessmentEntry}
-          entryComponentProps={{ showPastSdsRevisions: true }}
-        />
-      </div>
-      <style jsx>{`
-        h1 {
-          margin-top: 0;
-        }
-      `}</style>
-    </Layout>
+    <EditForm
+      id={riskAssessmentId}
+      values={values as NullPartialRiskAssessmentFields}
+      schema={riskAssessmentSchema}
+      apiEndpointPath="/api/risk-assessments"
+      urlPath="/risk-assessments"
+      entryComponent={RiskAssessmentEntry}
+      entryComponentProps={{ showPastSdsRevisions: true }}
+    />
   )
 }
+
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const riskAssessmentId = parseInt(context.query.id as string)
@@ -61,9 +52,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   console.dir(data, { depth: 3 })
 
+  const values = RiskAssessmentMapper.toFieldValues(data)
+
   return {
     props: {
-      values: RiskAssessmentMapper.toFieldValues(data),
+      title: `Edit Risk Assessment - ${values?.compound?.name}`,
+      values,
     },
   }
 }
