@@ -11,7 +11,7 @@ const defaultValues: NullPartialSdsFields = {
   revisionDate: null,
   hazards: [],
   requireVentilation: null,
-  filename: "N/A",
+  filename: null,
 }
 
 const NewSafetyDataSheet: NextPage = () => {

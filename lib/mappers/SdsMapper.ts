@@ -1,4 +1,4 @@
-import { SDS } from "@prisma/client"
+import { Prisma, SDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
 import { sdsSchema, SdsFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
@@ -14,15 +14,18 @@ const SdsMapper = {
       revisionDate: data.revisionDate.toLocaleDateString("en-CA"),
       hazards: data.healthHazards.map(SdsHazardMapper.toFieldValues),
       requireVentilation: data.requireVentilation,
+      filename: data.filename,
     })
   },
-  toModel: (values: SdsFields): SetOptional<SDS, "id" | "updatedAt"> => {
+  toModel: (
+    values: SdsFields,
+  ): Omit<Prisma.SDSUncheckedCreateInput, "healthHazards" | "ingredients"> => {
     return {
       id: values.id ?? undefined,
       productId: values.productId,
       hmisHealthHazard: values.hmisHazardLevel,
       requireVentilation: values.requireVentilation,
-      revisionDate: new Date(values.revisionDate),
+      revisionDate: values.revisionDate,
       filename: values.filename,
     }
   },
