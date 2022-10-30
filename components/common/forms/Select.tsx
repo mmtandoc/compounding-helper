@@ -78,7 +78,7 @@ const Select = <TFieldValues extends FieldValues>(
   }
 
   return (
-    <ErrorContainer>
+    <ErrorContainer showErrorMessages={false}>
       <select
         {...selectProps}
         name={name}

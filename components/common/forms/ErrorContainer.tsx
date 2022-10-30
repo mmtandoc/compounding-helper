@@ -24,6 +24,7 @@ interface Props<
   }
   formState?: FormState<TFieldValues>
   children: ReactElement
+  showErrorMessages?: boolean
 }
 
 const ErrorContainer = <
@@ -35,7 +36,14 @@ const ErrorContainer = <
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
   const [isInvalid, setIsInvalid] = useState(false)
 
-  const { children, name, fieldState, formState, ...containerProps } = props
+  const {
+    children,
+    name,
+    fieldState,
+    formState,
+    showErrorMessages = true,
+    ...containerProps
+  } = props
 
   const formMethods = useFormContext()
 
@@ -75,7 +83,7 @@ const ErrorContainer = <
           isInvalid ? "invalid" : ""
         }`,
       })}
-      {isTooltipVisible && (
+      {showErrorMessages && isTooltipVisible && (
         <ErrorMessage
           name={fieldName}
           errors={(formState ?? formMethods.formState).errors}
