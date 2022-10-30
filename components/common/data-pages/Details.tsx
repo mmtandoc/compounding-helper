@@ -8,6 +8,7 @@ type DetailsComponentProps<TModel> = {
   data: TModel
 }
 
+//TODO: Allow passing additional props to DetailsComponent
 type DetailsProps<TModel> = {
   id: number
   data: TModel
@@ -17,6 +18,7 @@ type DetailsProps<TModel> = {
     props: Record<string, unknown> & DetailsComponentProps<TModel>,
   ) => JSX.Element
   dataLabel: string
+  actions?: { delete: boolean; edit: boolean }
 }
 
 const Details = <TModel,>(props: DetailsProps<TModel>) => {
@@ -27,6 +29,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     urlPath,
     detailsComponent: DetailsComponent,
     dataLabel,
+    actions = { edit: true, delete: true, ...props.actions },
   } = props
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -47,12 +50,16 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     <div>
       <DetailsComponent data={data} />
       <div className="action-row">
-        <Link href={`${urlPath}/${id}/edit`} passHref>
-          <button type="button">Edit</button>
-        </Link>
-        <button type="button" onClick={() => setIsModalOpen(true)}>
-          Delete
-        </button>
+        {actions.edit && (
+          <Link href={`${urlPath}/${id}/edit`} passHref>
+            <button type="button">Edit</button>
+          </Link>
+        )}
+        {actions.delete && (
+          <button type="button" onClick={() => setIsModalOpen(true)}>
+            Delete
+          </button>
+        )}
       </div>
       <Modal isOpen={isModalOpen}>
         <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>

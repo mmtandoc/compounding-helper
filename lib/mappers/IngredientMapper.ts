@@ -26,7 +26,7 @@ const toFieldValues = (ingredientData: IngredientAll): IngredientFields => {
 
 const toModel = (
   ingredient: IngredientFields,
-): SetOptional<Ingredient, "riskAssessmentId"> => {
+): Omit<Ingredient, "compoundId"> => {
   const commercialProduct = ingredient?.commercialProduct
   return {
     order: ingredient.order,

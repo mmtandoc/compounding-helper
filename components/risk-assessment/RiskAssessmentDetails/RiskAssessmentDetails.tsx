@@ -1,6 +1,6 @@
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { RadioGroup } from "components/RadioGroup"
-import { IngredientDetails } from "components/risk-assessment/RiskAssessmentDetails/IngredientDetails"
+import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { capitalize } from "lib/utils"
 import React from "react"
 import form from "styles/form"
@@ -15,11 +15,11 @@ const RiskAssessmentDetails = ({ data }: Props) => {
     <div className="risk-assessment-details">
       <div className="form-group row">
         <label htmlFor="compound-name">Compound name:</label>
-        <span>{data.compoundName}</span>
+        <span>{data.compound.name}</span>
       </div>
       <fieldset>
         <legend>Ingredients:</legend>
-        {data.ingredients.map((ingredient, index) => (
+        {data.compound.ingredients.map((ingredient, index) => (
           <IngredientDetails key={index} ingredient={ingredient} />
         ))}
       </fieldset>
@@ -195,7 +195,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               other: data.sdsOtherExposureRiskDescription,
             }}
           />
-          {data.ingredients.some(
+          {data.compound.ingredients.some(
             (e) => e.commercialProductDin && e.commercialProductName,
           ) && (
             <ExposureRisksDisplay

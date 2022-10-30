@@ -40,7 +40,7 @@ const SdsSelect = ({
 
   return (
     <Select
-      name={`ingredients.${ingredientIndex}.sdsId`}
+      name={`compound.ingredients.${ingredientIndex}.sdsId`}
       rules={{
         required: required,
         disabled: disabled,

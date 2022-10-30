@@ -1,17 +1,17 @@
 import Table from "components/common/Table"
 import Link from "next/link"
-import { IngredientAll, RiskAssessmentAll } from "types/models"
+import { CompoundWithIngredients, IngredientAll } from "types/models"
 
 type Props = {
-  data: RiskAssessmentAll[]
+  data: CompoundWithIngredients[]
 }
 
-const RiskAssessmentsTable = (props: Props) => {
+const CompoundsTable = (props: Props) => {
   const { data } = props
 
   return (
     <Table
-      className="risk-assessment-table"
+      className="compound-table"
       data={data}
       columns={[
         {
@@ -19,18 +19,20 @@ const RiskAssessmentsTable = (props: Props) => {
           sortable: true,
           compare: (a: number, b: number) => a - b,
           accessorPath: "id",
+          cellStyle: { width: "3em" },
         },
         {
-          label: "Compound name",
+          label: "Name",
           sortable: true,
           compare: (a: string, b: string) => a.localeCompare(b),
-          accessorPath: "compound.name",
+          accessorPath: "name",
+          cellStyle: { width: "30%" },
         },
         {
           label: "Ingredients",
-          accessorPath: "compound.ingredients",
+          accessorPath: "ingredients",
           sortable: false,
-          cellStyle: { padding: 0 },
+          cellStyle: { padding: 0, width: "30%" },
           renderCell: (ingredients: IngredientAll[]) => (
             <div>
               {ingredients.map((ingredient, i) => {
@@ -72,12 +74,63 @@ const RiskAssessmentsTable = (props: Props) => {
           ),
         },
         {
+          label: "Has MFR",
+          sortable: true,
+          compare: (a: boolean, b: boolean) => Number(a) - Number(b),
+          renderCell: (value) => (value ? "Yes" : "No"),
+          accessorPath: "hasMasterFormulationRecord",
+        },
+        {
+          label: "Beyond Use Date",
+          sortable: true,
+          compare: (
+            a: string | null | undefined,
+            b: string | null | undefined,
+          ) => (a ?? "N/A").localeCompare(b ?? "N/A"),
+          renderCell: (value) => value ?? "N/A",
+          accessorPath: "beyondUseDate",
+        },
+        {
+          label: "",
+          sortable: false,
+          renderCell: (_, data) => (
+            <>
+              <Link href={`/compounds/${data.id}`} passHref>
+                <button type="button">View</button>
+              </Link>
+              <style jsx>{`
+                td > button {
+                  display: block;
+                  margin: auto;
+                }
+              `}</style>
+            </>
+          ),
+        },
+        {
+          label: "",
+          sortable: false,
+          renderCell: (_, data) => (
+            <>
+              <Link href={`/compounds/${data.id}/edit`} passHref>
+                <button type="button">Edit</button>
+              </Link>
+              <style jsx>{`
+                td > button {
+                  display: block;
+                  margin: auto;
+                }
+              `}</style>
+            </>
+          ),
+        },
+        {
           label: "",
           sortable: false,
           renderCell: (_, data) => (
             <>
               <Link href={`/risk-assessments/${data.id}`} passHref>
-                <button type="button">View</button>
+                <button type="button">View Risk Assessment</button>
               </Link>
               <style jsx>{`
                 td > button {
@@ -93,4 +146,4 @@ const RiskAssessmentsTable = (props: Props) => {
   )
 }
 
-export default RiskAssessmentsTable
+export default CompoundsTable

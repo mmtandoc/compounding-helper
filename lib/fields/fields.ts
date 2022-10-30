@@ -144,7 +144,7 @@ export type NullPartialSdsFields = Simplify<
   Merge<NullPartialDeep<SdsFieldsInput>, Pick<SdsFieldsInput, "id">>
 >
 
-//==== Risk Assessment & Ingredient schemas ====//
+//==== Compound & Ingredient schemas ====//
 
 export const ingredientSchemaBase = z.object({
   order: z.number().int(),
@@ -190,6 +190,39 @@ export type NullPartialIngredientFields = Simplify<
   NullPartialDeep<IngredientFieldsInput, { ignoreKeys: "order" }>
 >
 
+export const compoundSchema = z.object({
+  id: z.number().int().optional(),
+  name: z.string().trim().min(1),
+  ingredients: z.array(ingredientSchema).min(1),
+  hasMasterFormulationRecord: z.boolean().default(false),
+  beyondUseDate: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+  notes: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+})
+
+export type CompoundFields = z.output<typeof compoundSchema>
+export type CompoundFieldsInput = z.input<typeof compoundSchema>
+
+export type NullPartialCompoundFields = Simplify<
+  Merge<
+    Merge<
+      NullPartialDeep<CompoundFieldsInput>,
+      Pick<CompoundFieldsInput, "id">
+    >,
+    { ingredients: NullPartialIngredientFields[] }
+  >
+>
+
+//==== Risk Assessment schemas ====//
 export const exposureRisksSchema = z
   .object({
     skin: z.boolean(),
@@ -223,8 +256,7 @@ const refinePPE = (arg: any, ctx: any) =>
 
 export const riskAssessmentSchema = z.object({
   id: z.number().int().optional(),
-  compoundName: z.string().trim().min(1),
-  ingredients: z.array(ingredientSchema),
+  compound: compoundSchema,
   complexity: z.enum(["simple", "moderate", "complex"]),
   isPreparedOccasionally: z.boolean(),
   preparationFrequency: z.enum(["daily", "weekly", "monthly"]),
@@ -287,6 +319,6 @@ export type RiskAssessmentFieldsInput = z.input<typeof riskAssessmentSchema>
 export type NullPartialRiskAssessmentFields = Simplify<
   Merge<
     NullPartialDeep<RiskAssessmentFieldsInput, { ignoreKeys: "id" }>,
-    { ingredients: NullPartialIngredientFields[] }
+    { compound: NullPartialCompoundFields }
   >
 >

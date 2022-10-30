@@ -26,7 +26,7 @@ const EditRiskAssessment: NextPage<EditRiskAssessmentProps> = (
   return (
     <Layout>
       <div className="page">
-        <h1>Edit Risk Assessment - {values?.compoundName}</h1>
+        <h1>Edit Risk Assessment - {values?.compound?.name}</h1>
         <EditForm
           id={riskAssessmentId}
           values={values as NullPartialRiskAssessmentFields}
@@ -58,6 +58,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (data === null) {
     return { notFound: true }
   }
+
+  console.dir(data, { depth: 3 })
 
   return {
     props: {

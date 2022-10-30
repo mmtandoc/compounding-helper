@@ -1,49 +1,54 @@
-import ChemicalSearch from "../../../chemical/ChemicalSearch"
-import React, { useEffect } from "react"
+import { Vendor } from "@prisma/client"
+import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import TextArea from "components/common/forms/TextArea"
+import { NullPartialIngredientFields } from "lib/fields"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
+import { NestedForm } from "lib/rhf/nestedForm"
+import { useEffect } from "react"
 import {
+  FieldArrayPath,
   FieldArrayWithId,
   FieldError,
+  FieldValues,
   UseFieldArrayReturn,
-  UseFormReturn,
 } from "react-hook-form"
 import useSWR from "swr"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
-import { Vendor } from "@prisma/client"
-import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import SdsSelect from "./SdsSelect"
-import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
-import TextArea from "components/common/forms/TextArea"
 
-interface IngredientFieldsetProps {
+interface IngredientEntryProps<TFieldValues extends FieldValues> {
   id?: string
   error?: FieldError
-  field: FieldArrayWithId<NullPartialRiskAssessmentFields>
+  name: FieldArrayPath<TFieldValues>
+  field: FieldArrayWithId<TFieldValues>
   index: number
-  formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
-  arrayMethods: UseFieldArrayReturn<NullPartialRiskAssessmentFields>
+  formMethods: NestedForm<NullPartialIngredientFields>
+  arrayMethods: UseFieldArrayReturn<TFieldValues>
   showPastSdsRevisions?: boolean
   reset: () => void
 }
 
-const IngredientFieldset = ({
+const IngredientEntry = <TFieldValues extends FieldValues>({
+  name,
+  field,
   index,
   reset,
   formMethods,
   arrayMethods,
   showPastSdsRevisions = false,
-}: IngredientFieldsetProps) => {
+}: IngredientEntryProps<TFieldValues>) => {
   const { register, setValue, watch, trigger, getFieldState } = formMethods
 
   const { fields, move, remove } = arrayMethods
 
-  //const ingredient = watch(`ingredients.${index}`)
+  //const ingredient = watch(`${name}.${index}`)
   const [chemicalId, sdsId] = watch([
-    `ingredients.${index}.chemicalId`,
-    `ingredients.${index}.sdsId`,
+    formMethods.path("chemicalId"),
+    formMethods.path("sdsId"),
   ])
 
   const { data: chemicalData, error: chemicalError } = useSWR<
@@ -81,32 +86,29 @@ const IngredientFieldset = ({
     console.log(vendorsError)
   }
 
-  const isCommercialProduct = watch(`ingredients.${index}.isCommercialProduct`)
+  const isCommercialProduct = watch(formMethods.path("isCommercialProduct"))
 
-  const hasNoDin = watch(`ingredients.${index}.commercialProduct.hasNoDin`)
+  const hasNoDin = watch(formMethods.path("commercialProduct.hasNoDin"))
 
   const hasProductMonographConcerns = watch(
-    `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
+    formMethods.path("commercialProduct.hasProductMonographConcerns"),
   )
 
-  const order = watch(`ingredients.${index}.order`)
+  const order = watch(formMethods.path("order"))
 
   useEffect(() => {
     if (order !== index + 1) {
-      register(`ingredients.${index}.order`)
-      setValue(`ingredients.${index}.order`, index + 1)
+      register(formMethods.path("order"))
+      setValue(formMethods.path("order"), index + 1)
     }
-  }, [index, register, setValue, order])
+  }, [index, register, setValue, order, formMethods])
 
   useUpdateFieldConditionally({
     updateCondition: isCommercialProduct !== true,
     fields: [
-      [`ingredients.${index}.commercialProduct.name`, null],
-      [`ingredients.${index}.commercialProduct.din`, null],
-      [
-        `ingredients.${index}.commercialProduct.hasProductMonographConcerns`,
-        null,
-      ],
+      [formMethods.path("commercialProduct.name"), null],
+      [formMethods.path("commercialProduct.din"), null],
+      [formMethods.path("commercialProduct.hasProductMonographConcerns"), null],
     ],
     register,
     setValue,
@@ -114,7 +116,7 @@ const IngredientFieldset = ({
 
   useUpdateFieldConditionally({
     updateCondition: hasNoDin === true,
-    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
+    fields: [[formMethods.path("commercialProduct.din"), null]],
     register,
     setValue,
   })
@@ -126,14 +128,14 @@ const IngredientFieldset = ({
 
   useEffect(() => {
     if (!isLoading && !sdsId && !!sdsesData && sdsesData.length > 0) {
-      register(`ingredients.${index}.sdsId`)
-      setValue(`ingredients.${index}.sdsId`, sdsesData[0].id)
+      register(formMethods.path("sdsId"))
+      setValue(formMethods.path("sdsId"), sdsesData[0].id)
     }
-  }, [index, sdsId, isLoading, register, sdsesData, setValue])
+  }, [index, sdsId, isLoading, register, sdsesData, setValue, formMethods])
 
   useUpdateFieldConditionally({
     updateCondition: hasNoDin === true,
-    fields: [[`ingredients.${index}.commercialProduct.din`, null]],
+    fields: [[formMethods.path("commercialProduct.din"), null]],
     register,
     setValue,
   })
@@ -142,11 +144,11 @@ const IngredientFieldset = ({
   useEffect(() => {
     if (
       hasNoDin &&
-      getFieldState(`ingredients.${index}.commercialProduct.din`).error
+      getFieldState(formMethods.path("commercialProduct.din")).error
     ) {
-      trigger(`ingredients.${index}.commercialProduct.din`)
+      trigger(formMethods.path("commercialProduct.din"))
     }
-  }, [getFieldState, hasNoDin, index, trigger])
+  }, [getFieldState, hasNoDin, index, formMethods.path, trigger, formMethods])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -166,11 +168,11 @@ const IngredientFieldset = ({
               <div className="row">
                 <ChemicalSearch
                   id={`i${index}-chemical-search`}
-                  name={`ingredients.${index}.chemicalId`}
+                  name={`${name}.${index}.chemicalId`}
                   onItemChange={() => {
                     console.log("onItemChange")
-                    register(`ingredients.${index}.sdsId`)
-                    setValue(`ingredients.${index}.sdsId`, null)
+                    register(formMethods.path("sdsId"))
+                    setValue(formMethods.path("sdsId"), null)
                   }}
                   size={30}
                   defaultValue={null}
@@ -184,7 +186,7 @@ const IngredientFieldset = ({
             <div className="form-group">
               <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
               <Select
-                name={`ingredients.${index}.physicalForm`}
+                name={`${name}.${index}.physicalForm`}
                 id={`i${index}-physical-form`}
                 className="physical-form"
                 initialOption={{ value: "none", label: "-- Select a form --" }}
@@ -225,10 +227,10 @@ const IngredientFieldset = ({
               </label>
               <RHFBooleanRadioGroup
                 id={`i${index}-is-commercial-product`}
-                name={`ingredients.${index}.isCommercialProduct`}
+                name={`${name}.${index}.isCommercialProduct`}
                 className="is-commercial-product"
                 rules={{
-                  deps: [`ingredients.${index}.chemicalId`],
+                  deps: [`${name}.${index}.chemicalId`],
                 }}
               />
             </div>
@@ -242,15 +244,12 @@ const IngredientFieldset = ({
                 Product name:
               </label>
               <Input
-                {...register(
-                  `ingredients.${index}.commercialProduct.name` as const,
-                  {
-                    disabled: !isCommercialProduct,
-                    setValueAs: (value) => {
-                      return value === "" || !value ? null : value
-                    },
+                {...register(formMethods.path("commercialProduct.name"), {
+                  disabled: !isCommercialProduct,
+                  setValueAs: (value) => {
+                    return value === "" || !value ? null : value
                   },
-                )}
+                })}
                 type="text"
                 readOnly={!isCommercialProduct}
                 size={25}
@@ -262,7 +261,7 @@ const IngredientFieldset = ({
                 <span>Product DIN:</span>
                 <div className="row">
                   <Input
-                    {...register(`ingredients.${index}.commercialProduct.din`, {
+                    {...register(formMethods.path("commercialProduct.din"), {
                       disabled: !isCommercialProduct || !!hasNoDin,
                     })}
                     inputMode="numeric"
@@ -274,10 +273,10 @@ const IngredientFieldset = ({
                     <input
                       type="checkbox"
                       {...register(
-                        `ingredients.${index}.commercialProduct.hasNoDin`,
+                        formMethods.path("commercialProduct.hasNoDin"),
                         {
                           disabled: !isCommercialProduct,
-                          deps: `ingredients.${index}.commercialProduct.din`,
+                          deps: `${name}.${index}.commercialProduct.din`,
                         },
                       )}
                     />
@@ -298,7 +297,7 @@ const IngredientFieldset = ({
               </label>
               <RHFBooleanRadioGroup
                 id={`i${index}-has-product-monograph-concerns`}
-                name={`ingredients.${index}.commercialProduct.hasProductMonographConcerns`}
+                name={`${name}.${index}.commercialProduct.hasProductMonographConcerns`}
                 disabled={!isCommercialProduct}
                 className="has-product-monograph-concerns"
               />
@@ -314,7 +313,7 @@ const IngredientFieldset = ({
               </label>
               <TextArea
                 {...register(
-                  `ingredients.${index}.commercialProduct.concernsDescription`,
+                  formMethods.path("commercialProduct.concernsDescription"),
                   {
                     disabled: !hasProductMonographConcerns,
                     setValueAs: (value) => {
@@ -450,4 +449,4 @@ const IngredientFieldset = ({
   )
 }
 
-export default IngredientFieldset
+export default IngredientEntry

@@ -140,9 +140,19 @@ const ingredientAll = Prisma.validator<Prisma.IngredientArgs>()({
 
 export type IngredientAll = Prisma.IngredientGetPayload<typeof ingredientAll>
 
-export const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
+export const compoundWithIngredients = Prisma.validator<Prisma.CompoundArgs>()({
   include: {
     ingredients: ingredientAll,
+  },
+})
+
+export type CompoundWithIngredients = Prisma.CompoundGetPayload<
+  typeof compoundWithIngredients
+>
+
+export const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
+  include: {
+    compound: compoundWithIngredients,
   },
 })
 

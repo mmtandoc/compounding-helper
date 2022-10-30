@@ -5,7 +5,7 @@ import { useFieldArray, UseFormReturn } from "react-hook-form"
 import form from "styles/form"
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-import IngredientFieldset from "./ingredient/IngredientFieldset"
+import IngredientEntry from "components/compound/ingredient/IngredientEntry"
 import RationaleList from "./RationaleList"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
@@ -14,6 +14,7 @@ import {
   NullPartialIngredientFields,
   NullPartialRiskAssessmentFields,
 } from "lib/fields"
+import { nestedForm } from "lib/rhf/nestedForm"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
@@ -50,12 +51,12 @@ const RiskAssessmentEntry = (props: Props) => {
 
   const ingredientsArrayMethods = useFieldArray({
     control: control,
-    name: "ingredients",
+    name: "compound.ingredients",
   })
 
   const ingredientFields = ingredientsArrayMethods.fields
 
-  const ingredients = watch("ingredients")
+  const ingredients = watch("compound.ingredients")
 
   const usesCommercialProduct = ingredients?.some(
     (i) => i?.isCommercialProduct === true,
@@ -100,7 +101,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Input
           id="compound-name"
           type="text"
-          {...register("compoundName")}
+          {...register("compound.name")}
           autoComplete="off"
           size={40}
         />
@@ -108,14 +109,18 @@ const RiskAssessmentEntry = (props: Props) => {
       <fieldset>
         <legend>Ingredients:</legend>
         {ingredientFields.map((field, index) => (
-          <IngredientFieldset
+          <IngredientEntry
             key={field.id}
             field={field}
+            name={`compound.ingredients`}
             index={index}
-            formMethods={formMethods}
+            formMethods={nestedForm(
+              formMethods,
+              `compound.ingredients.${index}` as "compound.ingredients.1",
+            )}
             arrayMethods={ingredientsArrayMethods}
             reset={() => {
-              formMethods.resetField(`ingredients.${index}`, {
+              formMethods.resetField(`compound.ingredients.${index}`, {
                 defaultValue: emptyIngredientValues,
               })
             }}
