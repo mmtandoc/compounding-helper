@@ -243,7 +243,7 @@ export type ExposureRisksFieldsInput = z.input<typeof exposureRisksSchema>
 
 const refinePPE = (arg: any, ctx: any) =>
   arg.required &&
-  !arg.type &&
+  (arg.type === null || arg.type === undefined) &&
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
     message: "Required.",
