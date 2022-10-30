@@ -13,7 +13,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:backup": "env-cmd -x pg_dump --data-only --column-inserts --schema=public --exclude-table='_prisma_migrations' \"$npm_config_db\" > .db-backup/compounding_db_backup_$(date +\"%Y%m%dT%H%M%SZ\").sql",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "prepare": "husky install"
   },
   "prisma": {
     "seed": "bash prisma/seed.sh"
@@ -49,6 +50,8 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-jsx-a11y": "^6.6.0",
+    "git-format-staged": "^3.0.0",
+    "husky": "^8.0.0",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "prettier": "^2.7.1",
