@@ -39,7 +39,8 @@ const emptyIngredientValues: NullPartialIngredientFields = {
 const RiskAssessmentEntry = (props: Props) => {
   const { formMethods, showPastSdsRevisions = false } = props
 
-  const { register, control, watch, setValue, getValues } = formMethods
+  const { register, control, watch, setValue, getValues, clearErrors } =
+    formMethods
 
   const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
     watch([
@@ -71,6 +72,24 @@ const RiskAssessmentEntry = (props: Props) => {
       ingredientsArrayMethods.append(emptyIngredientValues)
     }
   }, [ingredients, ingredientFields, ingredientsArrayMethods])
+
+  useEffect(() => {
+    if (maskRequired === false) {
+      clearErrors("ppe.mask.type")
+    }
+  }, [maskRequired, clearErrors])
+
+  useEffect(() => {
+    if (coatRequired === false) {
+      clearErrors("ppe.coat.type")
+    }
+  }, [coatRequired, clearErrors])
+
+  useEffect(() => {
+    if (glovesRequired === false) {
+      clearErrors("ppe.gloves.type")
+    }
+  }, [glovesRequired, clearErrors])
 
   useUpdateFieldConditionally({
     updateCondition: coatRequired === false || coatRequired === null,
@@ -337,7 +356,6 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-gloves-required"
               name="ppe.gloves.required"
-              rules={{ deps: "ppe.gloves.type" }}
             />
           </div>
           <div className="form-group">
@@ -363,7 +381,6 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-coat-required"
               name="ppe.coat.required"
-              rules={{ deps: "ppe.coat.type" }}
             />
           </div>
           <div className="form-group">
@@ -388,7 +405,6 @@ const RiskAssessmentEntry = (props: Props) => {
             <RHFBooleanRadioGroup
               id="ppe-mask-required"
               name="ppe.mask.required"
-              rules={{ deps: "ppe.mask.type" }}
             />
           </div>
           <div className="form-group">
