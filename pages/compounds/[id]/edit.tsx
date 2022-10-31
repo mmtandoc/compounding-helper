@@ -1,9 +1,10 @@
-import EditForm from "components/common/data-pages/EditForm"
-import CompoundEntry from "components/compound/CompoundEntry"
-import { compoundSchema, NullPartialCompoundFields } from "lib/fields"
-import CompoundMapper from "lib/mappers/CompoundMapper"
 import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
+
+import EditForm from "components/common/data-pages/EditForm"
+import CompoundEntry from "components/compound/CompoundEntry"
+import { NullPartialCompoundFields, compoundSchema } from "lib/fields"
+import CompoundMapper from "lib/mappers/CompoundMapper"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -51,6 +52,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   }
 }
-
 
 export default EditCompound

@@ -1,10 +1,11 @@
-import React from "react"
-import { NextPageWithLayout } from "types/common"
 import { RiskAssessment } from "@prisma/client"
-import { getRiskAssessments } from "pages/api/risk-assessments"
-import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
-import { RiskAssessmentAll } from "types/models"
 import Link from "next/link"
+import React from "react"
+
+import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
+import { getRiskAssessments } from "pages/api/risk-assessments"
+import { NextPageWithLayout } from "types/common"
+import { RiskAssessmentAll } from "types/models"
 
 type Props = {
   data: RiskAssessmentAll[]
@@ -41,7 +42,6 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
     </div>
   )
 }
-
 
 export async function getServerSideProps() {
   const data: RiskAssessment[] = (await getRiskAssessments()) ?? []

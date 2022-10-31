@@ -1,5 +1,5 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import _ from "lodash"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import {
@@ -9,7 +9,7 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+
 import { DataEntryComponent } from "types/common"
 
 type CreateFormProps<

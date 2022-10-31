@@ -1,6 +1,7 @@
+import Link from "next/link"
+
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { capitalize } from "lib/utils"
-import Link from "next/link"
 import { IngredientAll } from "types/models"
 
 interface IngredientDetailsProps {

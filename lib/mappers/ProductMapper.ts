@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client"
-import { productSchema, ProductFields } from "lib/fields"
+
+import { ProductFields, productSchema } from "lib/fields"
 import { ProductAll } from "types/models"
 
 const ProductMapper = {

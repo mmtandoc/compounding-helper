@@ -1,7 +1,8 @@
-import React from "react"
-import { ProductAll } from "types/models"
-import form from "styles/form"
 import Link from "next/link"
+import React from "react"
+
+import form from "styles/form"
+import { ProductAll } from "types/models"
 
 type Props = {
   data: ProductAll

@@ -1,7 +1,8 @@
 import { Chemical } from "@prisma/client"
-import ChemicalTable from "components/chemical/ChemicalTable"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
+
+import ChemicalTable from "components/chemical/ChemicalTable"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 

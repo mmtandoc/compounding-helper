@@ -1,7 +1,8 @@
+import { GetStaticProps } from "next"
+
 import CreateForm from "components/common/data-pages/CreateForm"
 import ProductEntry from "components/product/ProductEntry"
 import { NullPartialProductFields, productSchema } from "lib/fields"
-import { GetStaticProps } from "next"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialProductFields = {
@@ -22,7 +23,6 @@ const NewProduct: NextPageWithLayout = () => {
     />
   )
 }
-
 
 export const getStaticProps: GetStaticProps = () => ({
   props: { title: "New Product" },

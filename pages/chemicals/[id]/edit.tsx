@@ -1,13 +1,14 @@
-import ChemicalEntry from "components/chemical/ChemicalEntry"
-import EditForm from "components/common/data-pages/EditForm"
-import ChemicalMapper from "lib/mappers/ChemicalMapper"
-import {
-  ChemicalFields,
-  chemicalSchema,
-  NullPartialChemicalFields,
-} from "lib/fields"
 import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
+
+import ChemicalEntry from "components/chemical/ChemicalEntry"
+import EditForm from "components/common/data-pages/EditForm"
+import {
+  ChemicalFields,
+  NullPartialChemicalFields,
+  chemicalSchema,
+} from "lib/fields"
+import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -57,6 +58,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   }
 }
-
 
 export default EditChemical

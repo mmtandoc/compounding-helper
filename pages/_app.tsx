@@ -1,9 +1,11 @@
 import axios from "axios"
-import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconContext } from "react-icons"
-import "styles/globals.css"
 import { SWRConfig } from "swr"
+
+import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { AppPropsWithLayout } from "types/common"
+
+import "styles/globals.css"
 
 //TODO: Move to separate file
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

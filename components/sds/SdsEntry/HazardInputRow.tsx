@@ -1,5 +1,3 @@
-import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
 import {
   FieldArrayWithId,
   FieldError,
@@ -7,9 +5,12 @@ import {
   UseFormReturn,
 } from "react-hook-form"
 import useSWR from "swr"
+
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import { NullPartialSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
-import { NullPartialSdsFields } from "lib/fields"
 
 interface HazardInputRowProps {
   id?: string

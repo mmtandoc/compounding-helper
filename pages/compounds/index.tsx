@@ -1,6 +1,6 @@
 import CompoundsTable from "components/compound/CompoundsTable"
-import { NextPageWithLayout } from "types/common"
 import { getCompounds } from "pages/api/compounds"
+import { NextPageWithLayout } from "types/common"
 import { CompoundWithIngredients } from "types/models"
 
 type Props = {

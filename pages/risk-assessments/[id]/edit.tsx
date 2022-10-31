@@ -1,14 +1,15 @@
-import React from "react"
 import { GetServerSideProps } from "next"
-import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
-import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { useRouter } from "next/router"
-import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import React from "react"
+
 import EditForm from "components/common/data-pages/EditForm"
+import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import {
   NullPartialRiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 
 type EditRiskAssessmentProps = {
@@ -35,7 +36,6 @@ const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
     />
   )
 }
-
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const riskAssessmentId = parseInt(context.query.id as string)

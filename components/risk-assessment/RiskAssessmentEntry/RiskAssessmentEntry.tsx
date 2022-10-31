@@ -1,20 +1,22 @@
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import { RHFRadioGroup } from "components/RadioGroup"
 import { useEffect } from "react"
-import { useFieldArray, UseFormReturn } from "react-hook-form"
-import form from "styles/form"
-import ExposureRisksInputs from "./ExposureRisksInputs"
-import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-import IngredientEntry from "components/compound/ingredient/IngredientEntry"
-import RationaleList from "./RationaleList"
+import { UseFormReturn, useFieldArray } from "react-hook-form"
+
+import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import TextArea from "components/common/forms/TextArea"
+import IngredientEntry from "components/compound/ingredient/IngredientEntry"
+import { RHFRadioGroup } from "components/RadioGroup"
 import {
   NullPartialIngredientFields,
   NullPartialRiskAssessmentFields,
 } from "lib/fields"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { nestedForm } from "lib/rhf/nestedForm"
+import form from "styles/form"
+
+import ExposureRisksInputs from "./ExposureRisksInputs"
+import RationaleList from "./RationaleList"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRiskAssessmentFields>

@@ -1,15 +1,15 @@
 import axios from "axios"
-import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
-import React, { useRef, useState } from "react"
+import React, { createRef, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
-import { RiskAssessmentAll } from "types/models"
+
 import Modal from "components/common/Modal"
+import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
+import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
-import { createRef } from "react"
+import { RiskAssessmentAll } from "types/models"
 
 const PrintableRiskAssessmentDetails = React.forwardRef(
   function PrintableRiskAssessmentDetails(
@@ -192,6 +192,5 @@ export const getServerSideProps: GetServerSideProps<
     },
   }
 }
-
 
 export default RiskAssessment

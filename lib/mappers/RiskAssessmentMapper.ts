@@ -1,10 +1,15 @@
 import { RiskAssessment, Unit } from "@prisma/client"
-import { riskAssessmentSchema } from "lib/fields"
-import { SetOptional } from "type-fest"
-import { ExposureRisksFields, RiskAssessmentFields } from "lib/fields"
-import { RiskAssessmentAll } from "types/models"
-import CompoundMapper from "./CompoundMapper"
 import { capitalize } from "lodash"
+import { SetOptional } from "type-fest"
+
+import {
+  ExposureRisksFields,
+  RiskAssessmentFields,
+  riskAssessmentSchema,
+} from "lib/fields"
+import { RiskAssessmentAll } from "types/models"
+
+import CompoundMapper from "./CompoundMapper"
 
 type FilterByKeyPrefix<
   T,

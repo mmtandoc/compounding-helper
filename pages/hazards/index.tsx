@@ -1,5 +1,6 @@
-import HazardsTable from "components/hazards/HazardsTable"
 import { GetServerSideProps } from "next"
+
+import HazardsTable from "components/hazards/HazardsTable"
 import { getHazards } from "pages/api/hazards"
 import { NextPageWithLayout } from "types/common"
 import { HazardClassesWithCategories } from "types/models"

@@ -1,12 +1,4 @@
 import { Vendor } from "@prisma/client"
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import ChemicalSearch from "components/chemical/ChemicalSearch"
-import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
-import TextArea from "components/common/forms/TextArea"
-import { NullPartialIngredientFields } from "lib/fields"
-import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-import { NestedForm } from "lib/rhf/nestedForm"
 import { useEffect } from "react"
 import {
   FieldArrayPath,
@@ -16,8 +8,18 @@ import {
   UseFieldArrayReturn,
 } from "react-hook-form"
 import useSWR from "swr"
+
+import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Input from "components/common/forms/Input"
+import Select from "components/common/forms/Select"
+import TextArea from "components/common/forms/TextArea"
+import { NullPartialIngredientFields } from "lib/fields"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
+import { NestedForm } from "lib/rhf/nestedForm"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
+
 import SdsSelect from "./SdsSelect"
 
 interface IngredientEntryProps<TFieldValues extends FieldValues> {

@@ -1,7 +1,7 @@
 import { Ingredient } from "@prisma/client"
-import { ingredientSchema } from "lib/fields"
 import { SetOptional } from "type-fest"
-import { IngredientFields } from "lib/fields"
+
+import { IngredientFields, ingredientSchema } from "lib/fields"
 import { IngredientAll } from "types/models"
 
 const toFieldValues = (ingredientData: IngredientAll): IngredientFields => {

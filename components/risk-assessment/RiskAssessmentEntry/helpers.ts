@@ -1,7 +1,7 @@
+import { Chemical } from "@prisma/client"
+
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { SdsWithHazards } from "types/models"
-import { Chemical } from "@prisma/client"
-import { Path } from "react-hook-form"
 
 export const calculateSuggestedRiskLevel = (
   chemicals: Chemical[],
@@ -116,5 +116,4 @@ export const calculateSuggestedRiskLevel = (
     }
     return null
   }
-  return null
 }

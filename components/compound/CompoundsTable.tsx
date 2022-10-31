@@ -1,5 +1,6 @@
-import Table from "components/common/Table"
 import Link from "next/link"
+
+import Table from "components/common/Table"
 import { CompoundWithIngredients, IngredientAll } from "types/models"
 
 type Props = {

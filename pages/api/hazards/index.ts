@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next"
+
 import { prisma } from "lib/prisma"
-import { HazardClassesWithCategories } from "types/models"
 import { ApiBody } from "types/common"
+import { HazardClassesWithCategories } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,

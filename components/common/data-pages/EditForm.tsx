@@ -1,3 +1,7 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import axios from "axios"
+import Link from "next/link"
+import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 import {
   DeepPartial,
@@ -6,11 +10,8 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form"
-import axios from "axios"
-import { useRouter } from "next/router"
-import Link from "next/link"
+
 import { DataEntryComponent } from "types/common"
-import { zodResolver } from "@hookform/resolvers/zod"
 
 type EditFormProps<
   TSchema extends Zod.ZodTypeAny,

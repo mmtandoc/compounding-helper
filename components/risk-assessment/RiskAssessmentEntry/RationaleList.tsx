@@ -1,20 +1,19 @@
-import DotJotList from "components/common/forms/DotJotList"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
 import _ from "lodash"
 import React, { useEffect } from "react"
 import {
   DeepPartialSkipArrayKey,
   FieldError,
-  useController,
   UseControllerProps,
   UseFormGetValues,
   UseFormRegister,
   UseFormSetValue,
-  UseFormWatch,
+  useController,
   useWatch,
 } from "react-hook-form"
 import useSWR from "swr"
-import { PartialDeep } from "type-fest"
+
+import DotJotList from "components/common/forms/DotJotList"
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { SdsWithRelations } from "types/models"
 

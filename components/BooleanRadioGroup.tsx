@@ -4,11 +4,12 @@ import {
   FieldValues,
   Path,
   PathValue,
-  useController,
   UseControllerProps,
-  useFormContext,
   Validate,
+  useController,
+  useFormContext,
 } from "react-hook-form"
+
 import ErrorContainer from "./common/forms/ErrorContainer"
 
 interface RHFBooleanRadioGroupProps<T extends FieldValues>

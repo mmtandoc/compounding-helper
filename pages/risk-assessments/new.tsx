@@ -1,10 +1,11 @@
+import { GetStaticProps } from "next"
+
 import CreateForm from "components/common/data-pages/CreateForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import {
   NullPartialRiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
-import { GetStaticProps } from "next"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialRiskAssessmentFields = {

@@ -1,4 +1,5 @@
-import React, { FocusEventHandler, useEffect, useState } from "react"
+import { FocusEventHandler, useEffect, useRef, useState } from "react"
+
 import SuggestionItem from "./SuggestionItem"
 import SuggestionsList from "./SuggestionsList"
 
@@ -34,11 +35,11 @@ const AutocompleteInput = <T,>(props: AutocompleteProps<T>) => {
     onQueryChange,
   } = props
 
-  const didMount = React.useRef(false)
+  const didMount = useRef(false)
 
   const [inputQuery, setInputQuery] = useState(getItemValue(item))
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!didMount.current) {
       didMount.current = true
       return

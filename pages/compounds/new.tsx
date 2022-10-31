@@ -1,7 +1,8 @@
+import { GetStaticProps } from "next"
+
 import CreateForm from "components/common/data-pages/CreateForm"
 import CompoundEntry from "components/compound/CompoundEntry"
 import { NullPartialCompoundFields, riskAssessmentSchema } from "lib/fields"
-import { GetStaticProps } from "next"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialCompoundFields = {

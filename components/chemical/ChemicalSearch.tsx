@@ -1,15 +1,16 @@
 import { Chemical } from "@prisma/client"
 import axios from "axios"
-import AutocompleteInput, { withAsync } from "components/AutocompleteInput"
-import ErrorContainer from "components/common/forms/ErrorContainer"
 import { useState } from "react"
 import {
   FieldError,
   FieldValues,
-  useController,
   UseControllerProps,
+  useController,
 } from "react-hook-form"
 import useSWR from "swr"
+
+import AutocompleteInput, { withAsync } from "components/AutocompleteInput"
+import ErrorContainer from "components/common/forms/ErrorContainer"
 import { JsonError } from "types/common"
 
 interface ChemicalSearchProps<TFieldValues extends FieldValues>

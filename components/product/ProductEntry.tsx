@@ -1,11 +1,12 @@
 import { Vendor } from "@prisma/client"
+import { UseFormReturn } from "react-hook-form"
+import useSWR from "swr"
+
 import ChemicalSearch from "components/chemical/ChemicalSearch"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import { NullPartialProductFields } from "lib/fields"
-import { UseFormReturn } from "react-hook-form"
 import form from "styles/form"
-import useSWR from "swr"
 import { DataEntryComponent } from "types/common"
 
 type Props = {

@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react"
-import { DataType } from "csstype"
 
 type TooltipProps = {
   children: ReactNode

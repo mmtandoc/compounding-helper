@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client"
-import { chemicalSchema, ChemicalFields } from "lib/fields"
+
+import { ChemicalFields, chemicalSchema } from "lib/fields"
 import { ChemicalAll } from "types/models"
 
 const toFieldValues = (data: ChemicalAll): ChemicalFields => {

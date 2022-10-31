@@ -1,5 +1,6 @@
 import { HazardCategory } from "@prisma/client"
 import React from "react"
+
 import { HazardClassesWithCategories } from "types/models"
 
 type HazardsTableProps = {

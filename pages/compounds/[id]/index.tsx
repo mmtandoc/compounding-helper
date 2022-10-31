@@ -1,6 +1,7 @@
+import { GetServerSideProps } from "next"
+
 import Details from "components/common/data-pages/Details"
 import CompoundDetails from "components/compound/CompoundDetails"
-import { GetServerSideProps } from "next"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { CompoundWithIngredients } from "types/models"
@@ -44,6 +45,5 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 
   return { props: { title: `Compound: ${data.name}`, data } }
 }
-
 
 export default CompoundPage

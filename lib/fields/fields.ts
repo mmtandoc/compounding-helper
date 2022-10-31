@@ -1,6 +1,8 @@
 import { Merge, Simplify } from "type-fest"
-import { NullPartialDeep } from "types/util"
 import * as z from "zod"
+
+import { NullPartialDeep } from "types/util"
+
 import { transformStringToNumber, utcDateZodString } from "./utils"
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {

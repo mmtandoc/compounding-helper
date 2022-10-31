@@ -1,6 +1,6 @@
-import { BooleanRadioGroup } from "components/BooleanRadioGroup"
-import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import React from "react"
+
+import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import form from "styles/form"
 import { CompoundWithIngredients } from "types/models"
 

@@ -1,6 +1,7 @@
+import { GetServerSideProps } from "next"
+
 import Details from "components/common/data-pages/Details"
 import ProductDetails from "components/product/ProductDetails"
-import { GetServerSideProps } from "next"
 import { getProductById } from "pages/api/products/[id]"
 import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"
@@ -43,6 +44,5 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     props: { title: `Product: ${data.name} (${data.vendor.name})`, data },
   }
 }
-
 
 export default ProductPage

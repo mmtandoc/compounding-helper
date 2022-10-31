@@ -1,6 +1,7 @@
+import { GetServerSideProps } from "next"
+
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
-import { GetServerSideProps } from "next"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
 import { ChemicalAll } from "types/models"

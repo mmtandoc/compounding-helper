@@ -1,8 +1,9 @@
+import { Property as CSSProperty } from "csstype"
 import _ from "lodash"
 import React from "react"
 import { Get } from "type-fest"
+
 import { TableColumn } from "./Table"
-import { Property as CSSProperty } from "csstype"
 
 type Props<TData> = {
   columns: TableColumn<TData>[]

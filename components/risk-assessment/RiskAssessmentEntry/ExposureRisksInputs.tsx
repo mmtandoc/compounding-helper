@@ -1,15 +1,16 @@
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
-import Input from "components/common/forms/Input"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
 import React from "react"
 import {
   Control,
   Path,
-  useFormContext,
   UseFormRegister,
+  useFormContext,
   useWatch,
 } from "react-hook-form"
 import useSWR from "swr"
+
+import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import Input from "components/common/forms/Input"
+import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 
 type ExposureRisksInputsProps = {

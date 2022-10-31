@@ -1,13 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { prisma } from "lib/prisma"
-import { ApiBody } from "types/common"
-import { compoundWithIngredients, RiskAssessmentAll } from "types/models"
 import { Prisma } from "@prisma/client"
-import IngredientMapper from "lib/mappers/IngredientMapper"
-import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import _ from "lodash"
+import { NextApiRequest, NextApiResponse } from "next"
+
 import { riskAssessmentSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
-import _ from "lodash"
+import IngredientMapper from "lib/mappers/IngredientMapper"
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import { prisma } from "lib/prisma"
+import { ApiBody } from "types/common"
+import { RiskAssessmentAll, compoundWithIngredients } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,

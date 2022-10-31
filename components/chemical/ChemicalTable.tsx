@@ -1,6 +1,7 @@
 import { Chemical } from "@prisma/client"
-import Table from "components/common/Table"
 import Link from "next/link"
+
+import Table from "components/common/Table"
 
 type Props = {
   data: Chemical[]

@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client"
+
 import { CompoundFields, CompoundFieldsInput, compoundSchema } from "lib/fields"
 import { CompoundWithIngredients } from "types/models"
+
 import IngredientMapper from "./IngredientMapper"
 
 const CompoundMapper = {

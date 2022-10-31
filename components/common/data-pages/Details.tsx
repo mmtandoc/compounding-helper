@@ -2,6 +2,7 @@ import axios from "axios"
 import { useRouter } from "next/dist/client/router"
 import Link from "next/link"
 import React, { useState } from "react"
+
 import Modal from "../Modal"
 
 type DetailsComponentProps<TModel> = {

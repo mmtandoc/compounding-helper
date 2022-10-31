@@ -1,9 +1,9 @@
-import { SDS } from "@prisma/client"
 import Link from "next/link"
 import React from "react"
-import { SdsWithHazards, SdsWithRelations } from "types/models"
-import form from "styles/form"
+
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
+import form from "styles/form"
+import { SdsWithRelations } from "types/models"
 
 type Props = {
   data: SdsWithRelations

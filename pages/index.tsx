@@ -1,7 +1,8 @@
-import React from "react"
-import Link from "next/link"
-import { NextPageWithLayout } from "types/common"
 import { GetStaticProps } from "next"
+import Link from "next/link"
+import React from "react"
+
+import { NextPageWithLayout } from "types/common"
 
 const Home: NextPageWithLayout = () => {
   return (
@@ -93,6 +94,5 @@ const Home: NextPageWithLayout = () => {
 export const getStaticProps: GetStaticProps = () => ({
   props: { title: "Compounding Helper - Home" },
 })
-
 
 export default Home

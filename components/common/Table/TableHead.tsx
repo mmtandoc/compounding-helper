@@ -5,6 +5,7 @@ import {
   TiArrowSortedUp,
   TiArrowUnsorted,
 } from "react-icons/ti"
+
 import { TableColumn } from "./Table"
 
 type Props<TData> = {

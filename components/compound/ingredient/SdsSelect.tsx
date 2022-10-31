@@ -1,9 +1,10 @@
-import React from "react"
-import { ChemicalAll, SdsWithRelations } from "types/models"
 import { Vendor } from "@prisma/client"
+import React from "react"
+import { Control } from "react-hook-form"
+
 import Select from "components/common/forms/Select"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
-import { Control } from "react-hook-form"
+import { ChemicalAll, SdsWithRelations } from "types/models"
 
 type SdsSelectProps = {
   chemical?: ChemicalAll

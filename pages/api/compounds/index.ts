@@ -1,8 +1,9 @@
+import { NextApiRequest, NextApiResponse } from "next"
+
 import { CompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import { prisma } from "lib/prisma"
-import { NextApiRequest, NextApiResponse } from "next"
 import { ApiBody } from "types/common"
 import {
   CompoundWithIngredients,

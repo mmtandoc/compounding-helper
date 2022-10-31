@@ -1,9 +1,10 @@
+import { Property as CSSProperty } from "csstype"
 import _ from "lodash"
 import React, { ReactNode, useState } from "react"
 import { Get } from "type-fest"
+
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
-import { Property as CSSProperty } from "csstype"
 
 export type TableColumn<TData, T = any> = {
   label: string

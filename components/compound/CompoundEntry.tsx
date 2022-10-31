@@ -1,14 +1,16 @@
+import { useEffect } from "react"
+import { UseFormReturn, useFieldArray } from "react-hook-form"
+
 import Input from "components/common/forms/Input"
+import TextArea from "components/common/forms/TextArea"
 import {
   NullPartialCompoundFields,
   NullPartialIngredientFields,
 } from "lib/fields"
-import { useEffect } from "react"
-import { useFieldArray, UseFormReturn } from "react-hook-form"
-import form from "styles/form"
-import IngredientEntry from "./ingredient/IngredientEntry"
 import { nestedForm } from "lib/rhf/nestedForm"
-import TextArea from "components/common/forms/TextArea"
+import form from "styles/form"
+
+import IngredientEntry from "./ingredient/IngredientEntry"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialCompoundFields>

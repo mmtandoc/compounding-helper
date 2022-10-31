@@ -1,12 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { prisma } from "lib/prisma"
-import { sdsWithRelations, SdsWithRelations } from "types/models"
-import { ApiBody } from "types/common"
-import { SdsFields, sdsSchema } from "lib/fields"
-import SdsMapper from "lib/mappers/SdsMapper"
-import _, { update } from "lodash"
 import { Prisma } from "@prisma/client"
+import _, { update } from "lodash"
+import { NextApiRequest, NextApiResponse } from "next"
+
+import { SdsFields, sdsSchema } from "lib/fields"
 import SdsHazardMapper from "lib/mappers/SdsHazardMapper"
+import SdsMapper from "lib/mappers/SdsMapper"
+import { prisma } from "lib/prisma"
+import { ApiBody } from "types/common"
+import { SdsWithRelations, sdsWithRelations } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,

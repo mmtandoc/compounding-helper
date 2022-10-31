@@ -1,10 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { prisma } from "lib/prisma"
 import { Prisma, Product } from "@prisma/client"
-import { ProductAll, productAll } from "types/models"
+import { NextApiRequest, NextApiResponse } from "next"
+
 import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
+import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
+import { ProductAll, productAll } from "types/models"
 
 export default async function handler(
   req: NextApiRequest,

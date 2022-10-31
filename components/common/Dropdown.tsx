@@ -1,6 +1,7 @@
-import Link from "next/link"
-import React, { CSSProperties, ReactNode, useState } from "react"
 import { UrlObject } from "url"
+
+import Link from "next/link"
+import React, { CSSProperties, ReactNode } from "react"
 
 type DropdownProps = {
   children: React.ReactNode

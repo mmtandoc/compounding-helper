@@ -1,7 +1,9 @@
 import { Prisma, SDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
-import { sdsSchema, SdsFields } from "lib/fields"
+
+import { SdsFields, sdsSchema } from "lib/fields"
 import { SdsWithRelations } from "types/models"
+
 import SdsHazardMapper from "./SdsHazardMapper"
 
 const SdsMapper = {

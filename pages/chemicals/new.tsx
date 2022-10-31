@@ -1,7 +1,8 @@
+import { GetStaticProps } from "next"
+
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
-import { chemicalSchema, NullPartialChemicalFields } from "lib/fields"
-import { GetStaticProps } from "next"
+import { NullPartialChemicalFields, chemicalSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialChemicalFields = {
@@ -25,7 +26,6 @@ const NewChemical: NextPageWithLayout = () => {
     />
   )
 }
-
 
 export const getStaticProps: GetStaticProps = () => ({
   props: { title: "New Chemical" },

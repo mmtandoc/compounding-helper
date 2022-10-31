@@ -1,5 +1,6 @@
 import { HazardCategoryToSDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
+
 import { HazardFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 

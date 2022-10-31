@@ -1,11 +1,12 @@
 import axios from "axios"
-import Modal from "components/common/Modal"
-import SdsDetails from "components/sds/SdsDetails"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { getSdsById } from "pages/api/sds/[id]"
 import { useState } from "react"
+
+import Modal from "components/common/Modal"
+import SdsDetails from "components/sds/SdsDetails"
+import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"
 
@@ -97,6 +98,5 @@ export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
 
   return { props: { title, data } }
 }
-
 
 export default SdsPage

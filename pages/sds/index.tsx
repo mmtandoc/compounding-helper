@@ -1,7 +1,8 @@
-import SdsTable from "components/sds/SdsTable"
-import { NextPageWithLayout } from "types/common"
 import Link from "next/link"
+
+import SdsTable from "components/sds/SdsTable"
 import { getSafetyDataSheets } from "pages/api/sds"
+import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"
 
 type SafetyDataSheetsProps = {
@@ -48,6 +49,5 @@ export async function getServerSideProps() {
 
   return { props: { title: "Safety Data Sheets", data } }
 }
-
 
 export default SafetyDataSheets

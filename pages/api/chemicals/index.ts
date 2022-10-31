@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { prisma } from "lib/prisma"
 import { Chemical, Prisma } from "@prisma/client"
-import { ApiBody } from "types/common"
+import { NextApiRequest, NextApiResponse } from "next"
+
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
+import { prisma } from "lib/prisma"
+import { ApiBody } from "types/common"
 
 export default async function handler(
   req: NextApiRequest,

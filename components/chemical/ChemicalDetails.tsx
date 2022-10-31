@@ -1,6 +1,7 @@
 import React from "react"
-import { ChemicalAll } from "types/models"
+
 import form from "styles/form"
+import { ChemicalAll } from "types/models"
 
 type Props = {
   data: ChemicalAll

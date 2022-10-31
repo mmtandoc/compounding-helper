@@ -1,17 +1,19 @@
+import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
+
+import { RiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
+import CompoundMapper from "lib/mappers/CompoundMapper"
+import IngredientMapper from "lib/mappers/IngredientMapper"
+import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { prisma } from "lib/prisma"
+import { ApiBody } from "types/common"
 import {
   RiskAssessmentAll,
   riskAssessmentAll as includeAllNested,
 } from "types/models"
-import IngredientMapper from "lib/mappers/IngredientMapper"
-import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
-import { RiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
-import { ApiBody } from "types/common"
-import _ from "lodash"
-import { getCompoundById, updateCompoundById } from "../compounds/[id]"
-import CompoundMapper from "lib/mappers/CompoundMapper"
+
 import { createCompound } from "../compounds"
+import { getCompoundById, updateCompoundById } from "../compounds/[id]"
 
 export default async function handler(
   req: NextApiRequest,

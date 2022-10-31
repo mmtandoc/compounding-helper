@@ -1,14 +1,15 @@
-import EditForm from "components/common/data-pages/EditForm"
-import ProductEntry from "components/product/ProductEntry"
-import ProductMapper from "lib/mappers/ProductMapper"
 import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
-import { getProductById } from "pages/api/products/[id]"
+
+import EditForm from "components/common/data-pages/EditForm"
+import ProductEntry from "components/product/ProductEntry"
 import {
   NullPartialProductFields,
   ProductFields,
   productSchema,
 } from "lib/fields"
+import ProductMapper from "lib/mappers/ProductMapper"
+import { getProductById } from "pages/api/products/[id]"
 import { NextPageWithLayout } from "types/common"
 
 type EditProductProps = {
@@ -59,6 +60,5 @@ export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
     },
   }
 }
-
 
 export default EditProduct
