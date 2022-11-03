@@ -17,21 +17,24 @@ const TableBody = <TData,>(props: Props<TData>) => {
   const get = (object: TData, path: string): Get<TData, string> =>
     _.get(object, path)
 
-  return (
-    <tbody>
-      {data.map((r, i) => (
-        <tr key={i}>
-          {columns.map((c, i) => (
-            <td key={i} style={c.cellStyle}>
-              {(c?.renderCell ?? ((v: any) => v.toString()))?.(
-                get(r, c.accessorPath ?? ""),
-                r,
+  const renderRow = (rowData: TData | null, index: number) => {
+    return (
+      <tr key={index}>
+        {columns.map((c, i) => (
+          <td key={i} style={c.cellStyle}>
+            {rowData !== null &&
+              (c?.renderCell ?? ((v: any) => v.toString()))?.(
+                get(rowData, c.accessorPath ?? ""),
+                rowData,
               )}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
+          </td>
+        ))}
+      </tr>
+    )
+  }
+
+  return (
+    <tbody>{data.length > 0 ? data.map(renderRow) : renderRow(null, -1)}</tbody>
   )
 }
 

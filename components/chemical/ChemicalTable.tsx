@@ -2,6 +2,7 @@ import { Chemical } from "@prisma/client"
 import Link from "next/link"
 
 import Table from "components/common/Table"
+import filterFns from "lib/table/filterFns"
 
 type Props = {
   data: Chemical[]
@@ -29,6 +30,8 @@ const ChemicalTable = (props: Props) => {
             sortable: true,
             compare: (a: string, b: string) =>
               a.localeCompare(b, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
             accessorPath: "casNumber",
@@ -37,6 +40,8 @@ const ChemicalTable = (props: Props) => {
             compare: (a: string | null, b: string | null) =>
               (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
             renderCell: (value: string | null) => value ?? "N/A",
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
             accessorPath: "nioshTable",
@@ -56,9 +61,7 @@ const ChemicalTable = (props: Props) => {
               date?.toLocaleDateString("en-CA") ?? "",
           },
           {
-            accessorPath: "",
-            label: "",
-            sortable: false,
+            id: "view",
             renderCell: (_, value) => (
               <>
                 <Link href={`/chemicals/${value.id}`} passHref>

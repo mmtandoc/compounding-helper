@@ -1,6 +1,8 @@
+import { Chemical } from "@prisma/client"
 import Link from "next/link"
 
 import Table from "components/common/Table"
+import filterFns from "lib/table/filterFns"
 import { ProductAll } from "types/models"
 
 type Props = {
@@ -29,6 +31,8 @@ const ProductTable = (props: Props) => {
             sortable: true,
             compare: (a: string, b: string) =>
               a.localeCompare(b, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
             accessorPath: "vendor.name",
@@ -36,18 +40,23 @@ const ProductTable = (props: Props) => {
             sortable: true,
             compare: (a: string, b: string) =>
               a.localeCompare(b, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
-            accessorPath: "chemical.name",
+            accessorPath: "chemical",
             label: "Chemical",
             sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
+            compare: (a: Chemical, b: Chemical) =>
+              a.name.localeCompare(b.name, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: (chemical: Chemical, _, query) =>
+              [chemical.name, ...chemical.synonyms].some((str) =>
+                filterFns.string(str, _, query),
+              ),
+            renderCell: (chemical: Chemical) => chemical.name,
           },
           {
-            accessorPath: "",
-            label: "",
-            sortable: false,
             renderCell: (_, value) => (
               <>
                 <Link href={`/products/${value.id}`} passHref>

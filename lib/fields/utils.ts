@@ -65,7 +65,6 @@ export const castStringToDate = (dateSchema: z.ZodDate = z.date()) =>
 
 export const castStringToNumber = (numberSchema: z.ZodNumber = z.number()) =>
   z.preprocess((arg) => {
-    console.log({ arg })
     if (arg === "" || arg === null) return
     if (
       (typeof arg == "string" || typeof arg == "number") &&

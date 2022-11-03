@@ -1,7 +1,9 @@
+import { Chemical } from "@prisma/client"
 import Link from "next/link"
 import React from "react"
 
 import Table from "components/common/Table"
+import filterFns from "lib/table/filterFns"
 import { SdsWithRelations } from "types/models"
 
 type Props = {
@@ -25,11 +27,17 @@ const SdsTable = (props: Props) => {
             compare: (a: number, b: number) => a - b,
           },
           {
-            accessorPath: "product.chemical.name",
+            accessorPath: "product.chemical",
             label: "Chemical",
             sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
+            compare: (a: Chemical, b: Chemical) =>
+              a.name.localeCompare(b.name, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: (chemical: Chemical, _, query) =>
+              [chemical.name, ...chemical.synonyms].some((str) =>
+                filterFns.string(str, _, query),
+              ),
+            renderCell: (chemical: Chemical) => chemical.name,
           },
           {
             accessorPath: "product.name",
@@ -37,6 +45,8 @@ const SdsTable = (props: Props) => {
             sortable: true,
             compare: (a: string, b: string) =>
               a.localeCompare(b, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
             accessorPath: "product.vendor.name",
@@ -44,6 +54,8 @@ const SdsTable = (props: Props) => {
             sortable: true,
             compare: (a: string, b: string) =>
               a.localeCompare(b, "en-CA", { numeric: true }),
+            enableColumnFilter: true,
+            filterFn: filterFns.string,
           },
           {
             accessorPath: "revisionDate",
@@ -54,9 +66,7 @@ const SdsTable = (props: Props) => {
             renderCell: (date: Date) => date.toISOString().split("T")[0],
           },
           {
-            accessorPath: "",
-            label: "",
-            sortable: false,
+            id: "view",
             renderCell: (_, value) => (
               <>
                 <Link href={`/sds/${value.id}`} passHref>

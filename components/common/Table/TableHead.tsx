@@ -1,96 +1,142 @@
 import { Property as CSSProperty } from "csstype"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   TiArrowSortedDown,
   TiArrowSortedUp,
   TiArrowUnsorted,
 } from "react-icons/ti"
 
-import { TableColumn } from "./Table"
+import { ColumnFilter, TableColumn } from "./Table"
 
 type Props<TData> = {
   columns: TableColumn<TData>[]
-  onSortChange: (path: string, order: "asc" | "desc") => void
-  defaultSort?: { path: string; order: "asc" | "desc" }
+  onSortChange: (sort: { path: string; order: "asc" | "desc" }) => void
+  currentSort?: { path: string; order: "asc" | "desc" }
   backgroundColor?: CSSProperty.Color
+  onColumnFiltersChange?: (columnFilters: ColumnFilter[]) => void
+  columnFilters: ColumnFilter[]
 }
 
 const TableHead = <TData,>(props: Props<TData>) => {
   const {
     columns,
     onSortChange,
-    defaultSort,
     backgroundColor = "lightgray",
+    onColumnFiltersChange,
+    columnFilters = [],
+    currentSort,
   } = props
-  const [sortPath, setSortPath] = useState<string | undefined>(
-    defaultSort?.path,
-  )
-  const [order, setOrder] = useState<"asc" | "desc">(
-    defaultSort?.order ?? "asc",
-  )
+
+  const colWidthsRef = useRef<(number | undefined)[]>([])
+  const [colWidths, setColWidths] = useState<(number | undefined)[]>([])
 
   useEffect(() => {
-    if (defaultSort) {
-      onSortChange(defaultSort.path, defaultSort.order)
-    }
-  }, [defaultSort, onSortChange])
+    setColWidths([...colWidthsRef.current])
+  }, [])
 
   const handleSortChange = (path: string) => {
-    if (sortPath === path) {
-      setOrder(order === "asc" ? "desc" : "asc")
-      onSortChange(path, order === "asc" ? "desc" : "asc")
-      return
+    let order: "asc" | "desc" = "asc"
+    if (currentSort?.path === path) {
+      order = currentSort?.order === "asc" ? "desc" : "asc"
     }
-    setSortPath(path)
-    setOrder("asc")
-    onSortChange(path, "asc")
+    onSortChange({ path, order })
+  }
+
+  const setFilterValue = (id: string, value: string) => {
+    const newColumnFilters = [
+      ...columnFilters.filter((colFilter) => colFilter.id !== id),
+      { id, value },
+    ]
+    onColumnFiltersChange?.(newColumnFilters)
   }
 
   return (
     <thead>
       <tr>
-        {columns.map(({ label, accessorPath, sortable }, i) => (
-          <th
-            key={i}
-            className={sortable ? "sortable" : ""}
-            onClick={
-              sortable && accessorPath
-                ? () => handleSortChange(accessorPath)
-                : undefined
-            }
-          >
-            <span>
-              {label}
-              {sortable &&
-                (sortPath === accessorPath ? (
-                  order === "asc" ? (
-                    <TiArrowSortedUp />
+        {columns.map((col, i) => {
+          const { label, accessorPath, sortable, enableColumnFilter } = col
+          return (
+            <th
+              key={i}
+              ref={(el) => {
+                colWidthsRef.current[i] = el?.clientWidth
+              }}
+              className={`head-cell ${sortable ? "sortable" : ""}`}
+              style={colWidths[i] ? { width: `${colWidths[i]}px` } : undefined}
+            >
+              <div
+                className="head-label"
+                onClick={
+                  sortable && accessorPath
+                    ? () => handleSortChange(accessorPath)
+                    : undefined
+                }
+              >
+                <span>{label ?? ""}</span>
+                {sortable &&
+                  (currentSort?.path === accessorPath ? (
+                    currentSort?.order === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
                   ) : (
-                    <TiArrowSortedDown />
-                  )
-                ) : (
-                  <TiArrowUnsorted />
-                ))}
-            </span>
-          </th>
-        ))}
+                    <TiArrowUnsorted />
+                  ))}
+              </div>
+              {enableColumnFilter && accessorPath && (
+                <div className="filter">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    onChange={(e) =>
+                      setFilterValue(accessorPath, e.target.value)
+                    }
+                  />
+                </div>
+              )}
+            </th>
+          )
+        })}
       </tr>
       <style jsx>{`
         th {
           background-color: ${backgroundColor};
+          padding: 0;
         }
 
-        th > span {
+        th > div {
+          padding: 0 1rem;
           display: flex;
+          justify-content: center;
           align-items: center;
         }
 
-        th.sortable {
+        .head-cell {
+          white-space: nowrap;
+        }
+
+        .head-cell > .head-label > span {
+          white-space: normal;
+        }
+
+        .sortable {
           cursor: pointer;
         }
 
-        th.sortable:hover {
+        .sortable:hover {
           box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.3);
+        }
+
+        th > .filter {
+          background-color: white;
+          border-top: 1px solid black;
+          padding: 0.5rem 1rem;
+        }
+
+        .filter > input {
+          width: 100%;
+          min-width: 5rem;
         }
       `}</style>
     </thead>

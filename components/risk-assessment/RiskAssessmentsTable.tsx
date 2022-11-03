@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import Table from "components/common/Table"
+import filterFns from "lib/table/filterFns"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -26,11 +27,12 @@ const RiskAssessmentsTable = (props: Props) => {
           sortable: true,
           compare: (a: string, b: string) => a.localeCompare(b),
           accessorPath: "compound.name",
+          enableColumnFilter: true,
+          filterFn: filterFns.string,
         },
         {
           label: "Ingredients",
           accessorPath: "compound.ingredients",
-          sortable: false,
           cellStyle: { padding: 0 },
           renderCell: (ingredients: IngredientAll[]) => (
             <div>
@@ -71,10 +73,11 @@ const RiskAssessmentsTable = (props: Props) => {
               `}</style>
             </div>
           ),
+          enableColumnFilter: true,
+          filterFn: filterFns.ingredients,
         },
         {
-          label: "",
-          sortable: false,
+          id: "view",
           renderCell: (_, data) => (
             <>
               <Link href={`/risk-assessments/${data.id}`} passHref>
