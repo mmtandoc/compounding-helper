@@ -1,7 +1,7 @@
 import { Property as CSSProperty } from "csstype"
 import _ from "lodash"
 import React, { ReactNode, useEffect, useMemo, useState } from "react"
-import { Get, Simplify } from "type-fest"
+import { Simplify } from "type-fest"
 
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
@@ -81,11 +81,6 @@ const Table = <TData,>(props: Props<TData>) => {
     }, data)
   }, [columnFilters, columns, data])
 
-  const get = <T, TPath extends string>(
-    object: T,
-    path: TPath,
-  ): Get<T, TPath> => _.get(object, path)
-
   useEffect(() => {
     if (defaultSort) {
       setCurrentSort(defaultSort)
@@ -106,7 +101,7 @@ const Table = <TData,>(props: Props<TData>) => {
 
     const sortedData = Array.from(filteredData).sort(
       (a, b) =>
-        (column?.compare?.(get(a, path), get(b, path)) ?? 0) *
+        (column?.compare?.(_.get(a, path), _.get(b, path)) ?? 0) *
         (order === "asc" ? 1 : -1),
     )
 

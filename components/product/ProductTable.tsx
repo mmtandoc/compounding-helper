@@ -59,7 +59,7 @@ const ProductTable = (props: Props) => {
           {
             renderCell: (_, value) => (
               <>
-                <Link href={`/products/${value.id}`} passHref>
+                <Link href={`/products/${value.id}`}>
                   <button type="button">View</button>
                 </Link>
                 <style jsx>{`

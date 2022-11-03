@@ -104,19 +104,18 @@ const CreateForm = <
             The {dataName} has been saved.
           </p>
           <div style={{ display: "flex", columnGap: "3rem" }}>
-            <Link href={`${urlPath}/new`} passHref>
-              <a
-                onClick={() => {
-                  setSaveSuccessful(undefined)
-                  setSavedData(undefined)
-                  reset()
-                }}
-              >
-                Add another {dataName}
-              </a>
+            <Link
+              href={`${urlPath}/new`}
+              onClick={() => {
+                setSaveSuccessful(undefined)
+                setSavedData(undefined)
+                reset()
+              }}
+            >
+              Add another {dataName}
             </Link>
-            <Link href={`${urlPath}/${savedData.id}`} passHref>
-              <a>View created {dataName}</a>
+            <Link href={`${urlPath}/${savedData.id}`}>
+              View created {dataName}
             </Link>
           </div>
         </div>

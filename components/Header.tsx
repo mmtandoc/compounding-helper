@@ -15,97 +15,78 @@ const Header = () => {
 
   const left = (
     <div className="left">
-      <Link href="/">
-        <a className="bold" data-active={isActive("/")}>
-          Home
-        </a>
+      <Link href="/" className="bold" data-active={isActive("/")}>
+        Home
       </Link>
       <Dropdown>
         <DropdownToggle>
-          <Link href="/risk-assessments">
-            <a className="bold" data-active={isActive("/risk-assessments")}>
-              Risk Assessments
-            </a>
+          <Link
+            href="/risk-assessments"
+            data-active={isActive("/risk-assessments")}
+          >
+            Risk Assessments
           </Link>
         </DropdownToggle>
         <DropdownMenu>
-          <Link href="/risk-assessments">
-            <a className="bold" data-active={isActive("/risk-assessments")}>
-              View Risk Assessments
-            </a>
+          <Link
+            href="/risk-assessments"
+            data-active={isActive("/risk-assessments")}
+          >
+            View Risk Assessments
           </Link>
-          <Link href="/risk-assessments/new">
-            <a className="bold" data-active={isActive("/risk-assessments/new")}>
-              Create New Risk Assessment
-            </a>
+          <Link
+            href="/risk-assessments/new"
+            data-active={isActive("/risk-assessments/new")}
+          >
+            Create New Risk Assessment
           </Link>
         </DropdownMenu>
       </Dropdown>
-      <Link href="/compounds">
-        <a className="bold" data-active={isActive("/compounds")}>
-          Compounds
-        </a>
+      <Link href="/compounds" data-active={isActive("/compounds")}>
+        Compounds
       </Link>
       <Dropdown>
         <DropdownToggle>
-          <Link href="/sds">
-            <a className="bold" data-active={isActive("/sds")}>
-              Safety Data Sheets
-            </a>
+          <Link href="/sds" data-active={isActive("/sds")}>
+            Safety Data Sheets
           </Link>
         </DropdownToggle>
         <DropdownMenu>
-          <Link href="/sds">
-            <a className="bold" data-active={isActive("/sds")}>
-              View Safety Data Sheets
-            </a>
+          <Link href="/sds" data-active={isActive("/sds")}>
+            View Safety Data Sheets
           </Link>
-          <Link href="/sds/new">
-            <a className="bold" data-active={isActive("/sds/new")}>
-              Create New Safety Data Sheet
-            </a>
+          <Link href="/sds/new" data-active={isActive("/sds/new")}>
+            Create New Safety Data Sheet
           </Link>
         </DropdownMenu>
       </Dropdown>
       <Dropdown>
         <DropdownToggle>
-          <Link href="/chemicals">
-            <a className="bold" data-active={isActive("/chemicals")}>
-              Chemicals
-            </a>
+          <Link href="/chemicals" data-active={isActive("/chemicals")}>
+            Chemicals
           </Link>
         </DropdownToggle>
         <DropdownMenu>
-          <Link href="/chemicals">
-            <a className="bold" data-active={isActive("/chemicals")}>
-              View chemicals
-            </a>
+          <Link href="/chemicals" data-active={isActive("/chemicals")}>
+            View chemicals
           </Link>
-          <Link href="/chemicals/new">
-            <a className="bold" data-active={isActive("/chemicals/new")}>
-              Add new chemical
-            </a>
+          <Link href="/chemicals/new" data-active={isActive("/chemicals/new")}>
+            Add new chemical
           </Link>
         </DropdownMenu>
       </Dropdown>
       <Dropdown>
         <DropdownToggle>
-          <Link href="/products">
-            <a className="bold" data-active={isActive("/products")}>
-              Products
-            </a>
+          <Link href="/products" data-active={isActive("/products")}>
+            Products
           </Link>
         </DropdownToggle>
         <DropdownMenu>
-          <Link href="/products">
-            <a className="bold" data-active={isActive("/products")}>
-              View products
-            </a>
+          <Link href="/products" data-active={isActive("/products")}>
+            View products
           </Link>
-          <Link href="/products/new">
-            <a className="bold" data-active={isActive("/products/new")}>
-              Add new product
-            </a>
+          <Link href="/products/new" data-active={isActive("/products/new")}>
+            Add new product
           </Link>
         </DropdownMenu>
       </Dropdown>
@@ -114,10 +95,8 @@ const Header = () => {
           <span className="bold">Misc.</span>
         </DropdownToggle>
         <DropdownMenu>
-          <Link href="/hazards">
-            <a className="bold" data-active={isActive("/hazards")}>
-              Health hazards table
-            </a>
+          <Link href="/hazards" data-active={isActive("/hazards")}>
+            Health hazards table
           </Link>
         </DropdownMenu>
       </Dropdown>
@@ -132,15 +111,14 @@ const Header = () => {
           column-gap: 1.5rem;
         }
 
-        .left > a,
-        .left :global(.dropdown-main > a) {
+        .left :global(a) {
           text-decoration: none;
           color: #000;
           display: inline-block;
           font-weight: bold;
         }
 
-        .left a[data-active="true"] {
+        .left :global(a[data-active="true"]) {
           color: gray;
         }
       `}</style>

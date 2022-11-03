@@ -36,7 +36,7 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
     <>
       <SdsDetails data={data} />
       <div className="action-row">
-        <Link href={`/sds/${data.id}/edit`} passHref>
+        <Link href={`/sds/${data.id}/edit`}>
           <button type="button">Edit</button>
         </Link>
         <button type="button" onClick={() => setIsModalOpen(true)}>

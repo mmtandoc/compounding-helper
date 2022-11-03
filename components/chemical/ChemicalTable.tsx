@@ -64,7 +64,7 @@ const ChemicalTable = (props: Props) => {
             id: "view",
             renderCell: (_, value) => (
               <>
-                <Link href={`/chemicals/${value.id}`} passHref>
+                <Link href={`/chemicals/${value.id}`}>
                   <button type="button">View</button>
                 </Link>
                 <style jsx>{`

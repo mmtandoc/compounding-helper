@@ -12,14 +12,10 @@ const Home: NextPageWithLayout = () => {
           <h2>Risk Assessments</h2>
           <ul>
             <li>
-              <Link href="/risk-assessments">
-                <a>View Risk Assessments</a>
-              </Link>
+              <Link href="/risk-assessments">View Risk Assessments</Link>
             </li>
             <li>
-              <Link href="/risk-assessments/new">
-                <a>New Risk Assessment</a>
-              </Link>
+              <Link href="/risk-assessments/new">New Risk Assessment</Link>
             </li>
           </ul>
         </div>
@@ -27,14 +23,10 @@ const Home: NextPageWithLayout = () => {
           <h2>Safety Data Sheets</h2>
           <ul>
             <li>
-              <Link href="/sds">
-                <a>View Safety Data Sheets</a>
-              </Link>
+              <Link href="/sds">View Safety Data Sheets</Link>
             </li>
             <li>
-              <Link href="/sds/new">
-                <a>New Safety Data Sheet</a>
-              </Link>
+              <Link href="/sds/new">New Safety Data Sheet</Link>
             </li>
           </ul>
         </div>
@@ -42,14 +34,10 @@ const Home: NextPageWithLayout = () => {
           <h2>Chemicals</h2>
           <ul>
             <li>
-              <Link href="/chemicals">
-                <a>View Chemicals</a>
-              </Link>
+              <Link href="/chemicals">View Chemicals</Link>
             </li>
             <li>
-              <Link href="/chemicals/new">
-                <a>New Chemical</a>
-              </Link>
+              <Link href="/chemicals/new">New Chemical</Link>
             </li>
           </ul>
         </div>
@@ -57,14 +45,10 @@ const Home: NextPageWithLayout = () => {
           <h2>Products</h2>
           <ul>
             <li>
-              <Link href="/products">
-                <a>View Products</a>
-              </Link>
+              <Link href="/products">View Products</Link>
             </li>
             <li>
-              <Link href="/products/new">
-                <a>New Product</a>
-              </Link>
+              <Link href="/products/new">New Product</Link>
             </li>
           </ul>
         </div>

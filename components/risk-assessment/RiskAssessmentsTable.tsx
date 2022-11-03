@@ -43,7 +43,7 @@ const RiskAssessmentsTable = (props: Props) => {
                 }
                 const chemicalLink = (
                   <Link href={`/chemicals/${chemical.id}`}>
-                    <a>{chemical.name}</a>
+                    {chemical.name}
                   </Link>
                 )
                 return (
@@ -80,7 +80,7 @@ const RiskAssessmentsTable = (props: Props) => {
           id: "view",
           renderCell: (_, data) => (
             <>
-              <Link href={`/risk-assessments/${data.id}`} passHref>
+              <Link href={`/risk-assessments/${data.id}`}>
                 <button type="button">View</button>
               </Link>
               <style jsx>{`

@@ -24,8 +24,11 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
           {chemical && (
             <div>
               <span className="label">Chemical name:</span>
-              <Link href={`/chemicals/${chemical?.id}`}>
-                <a style={{ whiteSpace: "pre" }}>{chemical?.name}</a>
+              <Link
+                href={`/chemicals/${chemical?.id}`}
+                style={{ whiteSpace: "pre" }}
+              >
+                {chemical?.name}
               </Link>
             </div>
           )}
@@ -40,17 +43,15 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               <span className="label">SDS:</span>
 
               <Link href={`/sds/${sds.id}`}>
-                <a>
-                  <span>{sds.product.name}</span>
-                  <span>
-                    {" - "}
-                    {sds.product.vendor.name}
-                  </span>
-                  <span>
-                    {" - "}
-                    {sds.revisionDate.toLocaleDateString("en-CA")}
-                  </span>
-                </a>
+                <span>{sds.product.name}</span>
+                <span>
+                  {" - "}
+                  {sds.product.vendor.name}
+                </span>
+                <span>
+                  {" - "}
+                  {sds.revisionDate.toLocaleDateString("en-CA")}
+                </span>
               </Link>
             </div>
           )}

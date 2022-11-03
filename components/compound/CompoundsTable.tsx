@@ -38,9 +38,7 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
             return <span key={i}>{ingredient.commercialProductName}</span>
           }
           const chemicalLink = (
-            <Link href={`/chemicals/${chemical.id}`}>
-              <a>{chemical.name}</a>
-            </Link>
+            <Link href={`/chemicals/${chemical.id}`}>{chemical.name}</Link>
           )
           return (
             <span key={i}>
@@ -91,7 +89,7 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     id: "view",
     renderCell: (_, data) => (
       <>
-        <Link href={`/compounds/${data.id}`} passHref>
+        <Link href={`/compounds/${data.id}`}>
           <button type="button">View</button>
         </Link>
         <style jsx>{`
@@ -107,7 +105,7 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     id: "edit",
     renderCell: (_, data) => (
       <>
-        <Link href={`/compounds/${data.id}/edit`} passHref>
+        <Link href={`/compounds/${data.id}/edit`}>
           <button type="button">Edit</button>
         </Link>
         <style jsx>{`
@@ -123,7 +121,7 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     id: "viewRiskAssessment",
     renderCell: (_, data) => (
       <>
-        <Link href={`/risk-assessments/${data.id}`} passHref>
+        <Link href={`/risk-assessments/${data.id}`}>
           <button type="button">View Risk Assessment</button>
         </Link>
         <style jsx>{`

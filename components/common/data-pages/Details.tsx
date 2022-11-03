@@ -52,7 +52,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
       <DetailsComponent data={data} />
       <div className="action-row">
         {actions.edit && (
-          <Link href={`${urlPath}/${id}/edit`} passHref>
+          <Link href={`${urlPath}/${id}/edit`}>
             <button type="button">Edit</button>
           </Link>
         )}

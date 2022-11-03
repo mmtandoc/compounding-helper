@@ -98,7 +98,7 @@ const EditForm = <
         <div>
           <div className="button-row">
             <button type="submit">Save</button>
-            <Link href={`${urlPath}/${id}`} passHref>
+            <Link href={`${urlPath}/${id}`}>
               <button type="button">Cancel</button>
             </Link>
           </div>

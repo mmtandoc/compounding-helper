@@ -145,14 +145,10 @@ const autoRationalesFunctions: ((
       return null
     }
 
-    const allNonNiosh = values.compound.ingredients.every(
-      (ing) =>
-        _.get(
-          sdses.find((sds) => sds.id === ing?.sdsId),
-          "product.chemical.nioshTable",
-          0,
-        ) < 0,
-    )
+    const allNonNiosh = values.compound.ingredients.every((ing) => {
+      const sds = sdses.find((sds) => sds.id === ing?.sdsId)
+      return sds ? _.get(sds, "product.chemical.nioshTable", 0) < 0 : true
+    })
 
     if (allNonNiosh) {
       return "Non-NIOSH ingredients."

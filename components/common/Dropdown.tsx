@@ -100,13 +100,7 @@ export const DropdownItem = (props: DropdownItemProps) => {
   const { href, text, style } = props
   return (
     <div style={style} className="dropdown-item">
-      {href ? (
-        <Link href={href}>
-          <a>{text}</a>
-        </Link>
-      ) : (
-        <a>{text}</a>
-      )}
+      {href ? <Link href={href}>{text}</Link> : <a>{text}</a>}
       <style jsx>{`
         .dropdown-item {
           padding: 0.6rem 1rem;

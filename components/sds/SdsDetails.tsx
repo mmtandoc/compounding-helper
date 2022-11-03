@@ -26,15 +26,13 @@ const SdsDetails = (props: Props) => {
       <div className="form-group row">
         <span className="label">Chemical</span>
         <Link href={`/chemicals/${product.chemicalId}`}>
-          <a>{product.chemical.name}</a>
+          {product.chemical.name}
         </Link>
       </div>
       <div className="form-group row">
         <span className="label">Product: </span>
         <Link href={`/products/${productId}`}>
-          <a>
-            {product.name} ({product.vendor.name})
-          </a>
+          {product.name} ({product.vendor.name})
         </Link>
       </div>
       <div className="form-group row">

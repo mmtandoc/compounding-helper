@@ -1,7 +1,6 @@
 import { Property as CSSProperty } from "csstype"
 import _ from "lodash"
 import React from "react"
-import { Get } from "type-fest"
 
 import { TableColumn } from "./Table"
 
@@ -14,9 +13,6 @@ type Props<TData> = {
 const TableBody = <TData,>(props: Props<TData>) => {
   const { columns, data } = props
 
-  const get = (object: TData, path: string): Get<TData, string> =>
-    _.get(object, path)
-
   const renderRow = (rowData: TData | null, index: number) => {
     return (
       <tr key={index}>
@@ -24,7 +20,7 @@ const TableBody = <TData,>(props: Props<TData>) => {
           <td key={i} style={c.cellStyle}>
             {rowData !== null &&
               (c?.renderCell ?? ((v: any) => v.toString()))?.(
-                get(rowData, c.accessorPath ?? ""),
+                _.get(rowData, c.accessorPath ?? ""),
                 rowData,
               )}
           </td>

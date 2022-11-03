@@ -20,9 +20,7 @@ const ProductDetails = (props: Props) => {
       </div>
       <div className="form-group row">
         <span className="label">Chemical:</span>
-        <Link href={`/chemicals/${data.chemicalId}`}>
-          <a>{data.chemical.name}</a>
-        </Link>
+        <Link href={`/chemicals/${data.chemicalId}`}>{data.chemical.name}</Link>
       </div>
       <div className="form-group row">
         <span className="label">Vendor:</span>

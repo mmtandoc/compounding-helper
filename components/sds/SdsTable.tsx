@@ -69,7 +69,7 @@ const SdsTable = (props: Props) => {
             id: "view",
             renderCell: (_, value) => (
               <>
-                <Link href={`/sds/${value.id}`} passHref>
+                <Link href={`/sds/${value.id}`}>
                   <button type="button">View</button>
                 </Link>
                 <style jsx>{`
