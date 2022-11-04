@@ -44,6 +44,7 @@ const DefaultLayout = ({ title, pageRef, children }: Props) => (
         max-width: 1264px;
         margin: 0 auto;
         width: 100%;
+        margin-bottom: 5rem;
       }
     `}</style>
   </>

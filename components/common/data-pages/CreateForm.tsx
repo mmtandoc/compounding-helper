@@ -122,7 +122,6 @@ const CreateForm = <
       )}
       <style jsx>{`
         form {
-          margin-bottom: 5rem;
           align-self: center;
         }
 
