@@ -15,7 +15,7 @@ const Header = () => {
 
   const left = (
     <div className="left">
-      <Link href="/" className="bold" data-active={isActive("/")}>
+      <Link href="/" data-active={isActive("/")}>
         Home
       </Link>
       <Dropdown>
@@ -92,7 +92,7 @@ const Header = () => {
       </Dropdown>
       <Dropdown>
         <DropdownToggle>
-          <span className="bold">Misc.</span>
+          <a>Misc.</a>
         </DropdownToggle>
         <DropdownMenu>
           <Link href="/hazards" data-active={isActive("/hazards")}>
@@ -101,10 +101,6 @@ const Header = () => {
         </DropdownMenu>
       </Dropdown>
       <style jsx>{`
-        .bold {
-          font-weight: bold;
-        }
-
         .left {
           display: flex;
           flex-direction: row;
@@ -113,13 +109,15 @@ const Header = () => {
 
         .left :global(a) {
           text-decoration: none;
-          color: #000;
           display: inline-block;
           font-weight: bold;
-        }
-
-        .left :global(a[data-active="true"]) {
-          color: gray;
+          color: var(--color-nav-fg);
+          &:hover {
+            color: var(--color-nav-link-hover-fg);
+          }
+          &[data-active="true"] {
+            color: var(--color-nav-link-current-fg);
+          }
         }
       `}</style>
     </div>
@@ -138,6 +136,8 @@ const Header = () => {
           align-items: center;
           flex-grow: 0;
           flex-shrink: 0;
+          background-color: var(--color-nav-bg);
+          border-bottom: var(--nav-border);
         }
       `}</style>
     </nav>

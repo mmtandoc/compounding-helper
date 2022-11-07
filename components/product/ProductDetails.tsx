@@ -1,7 +1,7 @@
 import Link from "next/link"
 import React from "react"
 
-import form from "styles/form"
+import { FormGroup } from "components/common/forms/FormGroup"
 import { ProductAll } from "types/models"
 
 type Props = {
@@ -14,21 +14,18 @@ const ProductDetails = (props: Props) => {
 
   return (
     <>
-      <div className="form-group row">
+      <FormGroup row>
         <span className="label">Product name:</span>
         {data.name}
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">Chemical:</span>
         <Link href={`/chemicals/${data.chemicalId}`}>{data.chemical.name}</Link>
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">Vendor:</span>
         {data.vendor.name}
-      </div>
-      <style jsx global>
-        {form}
-      </style>
+      </FormGroup>
     </>
   )
 }

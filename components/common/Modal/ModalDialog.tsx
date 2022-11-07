@@ -16,8 +16,8 @@ const ModalDialog = (props: ModalDialogProps) => {
           left: 50%;
           transform: translate(-50%, -50%);
           width: 600px;
-          background-color: whitesmoke;
-          border: 1px black ridge;
+          background-color: var(--color-modal-bg);
+          border: var(--modal-border);
           padding: 0.8rem;
           z-index: 3;
         }

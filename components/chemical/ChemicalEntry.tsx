@@ -2,11 +2,11 @@ import { useEffect } from "react"
 import { Controller, UseFormReturn } from "react-hook-form"
 
 import DotJotList from "components/common/forms/DotJotList"
+import { LabelFormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import { RHFRadioGroup } from "components/RadioGroup"
 import { NullPartialChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
-import form from "styles/form"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
@@ -40,11 +40,11 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
   register("id")
   return (
     <>
-      <label className="form-group">
+      <LabelFormGroup>
         <span>Chemical name:</span>
         <Input type="text" {...register("name")} />
-      </label>
-      <label className="form-group">
+      </LabelFormGroup>
+      <LabelFormGroup>
         <span>CAS number:</span>
         <div className="row">
           <Input
@@ -60,8 +60,8 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
             <span>No CAS number</span>
           </label>
         </div>
-      </label>
-      <label className="form-group">
+      </LabelFormGroup>
+      <LabelFormGroup>
         <span>Synonyms:</span>
         <Controller
           control={control}
@@ -76,8 +76,8 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
             />
           )}
         ></Controller>
-      </label>
-      <label className="form-group">
+      </LabelFormGroup>
+      <LabelFormGroup>
         <span>NIOSH Tables:</span>
         <RHFRadioGroup
           name={"nioshTable"}
@@ -89,10 +89,7 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
             [3, "Table 3"],
           ]}
         />
-      </label>
-      <style jsx global>
-        {form}
-      </style>
+      </LabelFormGroup>
     </>
   )
 }

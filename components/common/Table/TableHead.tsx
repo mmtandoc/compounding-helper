@@ -21,7 +21,7 @@ const TableHead = <TData,>(props: Props<TData>) => {
   const {
     columns,
     onSortChange,
-    backgroundColor = "lightgray",
+    backgroundColor,
     onColumnFiltersChange,
     columnFilters = [],
     currentSort,
@@ -100,8 +100,11 @@ const TableHead = <TData,>(props: Props<TData>) => {
         })}
       </tr>
       <style jsx>{`
+        thead {
+          background-color: ${backgroundColor ?? "var(--color-table-head-bg)"};
+        }
+
         th {
-          background-color: ${backgroundColor};
           padding: 0;
         }
 
@@ -110,6 +113,7 @@ const TableHead = <TData,>(props: Props<TData>) => {
           display: flex;
           justify-content: center;
           align-items: center;
+          column-gap: 0.4rem;
         }
 
         .head-cell {
@@ -118,6 +122,10 @@ const TableHead = <TData,>(props: Props<TData>) => {
 
         .head-cell > .head-label > span {
           white-space: normal;
+        }
+
+        .head-label > :global(svg) {
+          flex-shrink: 0;
         }
 
         .sortable {
@@ -129,8 +137,8 @@ const TableHead = <TData,>(props: Props<TData>) => {
         }
 
         th > .filter {
-          background-color: white;
-          border-top: 1px solid black;
+          background-color: var(--color-white);
+          border-top: var(--table-border);
           padding: 0.5rem 1rem;
         }
 

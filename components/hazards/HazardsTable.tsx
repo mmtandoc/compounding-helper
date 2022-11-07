@@ -78,11 +78,11 @@ const HazardsTable = (props: HazardsTableProps) => {
         }
 
         thead {
-          background-color: lightgray;
+          background-color: var(--color-table-head-bg);
         }
 
         tbody {
-          background-color: rgb(245, 245, 245);
+          background-color: var(--color-canvas-subtle);
         }
 
         td,
@@ -90,10 +90,10 @@ const HazardsTable = (props: HazardsTableProps) => {
           padding: 0.3rem 1rem;
         }
 
-        .hazards-table,
+        table,
         td,
         th {
-          border: 1px solid black;
+          border: var(--table-border);
         }
 
         th.category {
@@ -102,17 +102,21 @@ const HazardsTable = (props: HazardsTableProps) => {
         }
 
         .class-description,
-        .category-descriptio {
+        .category-description {
           font-size: 1.4rem;
         }
 
         th.class-name {
-          background-color: rgb(231, 231, 231);
+          background-color: var(--color-scale-gray-150);
+        }
+
+        .category {
+          background-color: var(--color-canvas-subtle);
         }
 
         .subcategory {
           padding-left: 2rem;
-          background-color: white;
+          background-color: var(--color-canvas-default);
         }
       `}</style>
     </table>

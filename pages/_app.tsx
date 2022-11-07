@@ -5,7 +5,7 @@ import { SWRConfig } from "swr"
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { AppPropsWithLayout } from "types/common"
 
-import "styles/globals.css"
+import "styles/main.scss"
 
 //TODO: Move to separate file
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,9 +84,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
   return (
-    <IconContext.Provider value={{ style: { verticalAlign: "middle" } }}>
-      <SWRConfig value={{ fetcher: multiFetcher }}>{layout}</SWRConfig>
-    </IconContext.Provider>
+    <>
+      <IconContext.Provider value={{ style: { verticalAlign: "middle" } }}>
+        <SWRConfig value={{ fetcher: multiFetcher }}>{layout}</SWRConfig>
+      </IconContext.Provider>
+      <style jsx global>{`
+        #__next {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+      `}</style>
+    </>
   )
 }
 

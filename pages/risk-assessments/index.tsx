@@ -2,6 +2,7 @@ import { RiskAssessment } from "@prisma/client"
 import Link from "next/link"
 import React from "react"
 
+import Button from "components/common/Button"
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import { NextPageWithLayout } from "types/common"
@@ -17,7 +18,7 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   const actionBar = (
     <div className="action-bar">
       <Link href="/risk-assessments/new">
-        <button type="button">New Risk Assessment</button>
+        <Button>New Risk Assessment</Button>
       </Link>
       <style jsx>{`
         .action-bar {

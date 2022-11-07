@@ -3,10 +3,11 @@ import useSWR from "swr"
 
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Button from "components/common/Button"
+import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import { NullPartialHazardFields, NullPartialSdsFields } from "lib/fields"
-import form from "styles/form"
 import { JsonError } from "types/common"
 import { ProductWithVendor } from "types/models"
 
@@ -50,7 +51,7 @@ const SdsEntry = (props: Props) => {
   register("id")
   return (
     <>
-      <div className="form-group">
+      <FormGroup>
         <label>
           <span>Chemical:</span>
           <ChemicalSearch
@@ -65,8 +66,8 @@ const SdsEntry = (props: Props) => {
             size={30}
           />
         </label>
-      </div>
-      <div className="form-group">
+      </FormGroup>
+      <FormGroup>
         <label>
           <span>Product:</span>
           <Select
@@ -82,14 +83,14 @@ const SdsEntry = (props: Props) => {
             ))}
           </Select>
         </label>
-      </div>
-      <div className="form-group">
+      </FormGroup>
+      <FormGroup>
         <label>
           <span>Revision date:</span>
           <Input type="date" {...register("revisionDate")} id="revision-date" />
         </label>
-      </div>
-      <div className="form-group">
+      </FormGroup>
+      <FormGroup>
         <label>
           <span>HMIS health hazard level:</span>
           <Input
@@ -100,7 +101,7 @@ const SdsEntry = (props: Props) => {
             size={3}
           />
         </label>
-      </div>
+      </FormGroup>
       <div className="form-group" style={{ width: "100%" }}>
         <span className="label">Health hazards:</span>
         <div>
@@ -115,8 +116,8 @@ const SdsEntry = (props: Props) => {
               />
             ))}
           </ul>
-          <button
-            type="button"
+          <Button
+            size="small"
             onClick={() => {
               hazardsArrayMethods.append(
                 emptyHazardValues as NullPartialHazardFields,
@@ -124,18 +125,15 @@ const SdsEntry = (props: Props) => {
             }}
           >
             Add hazard
-          </button>
+          </Button>
         </div>
       </div>
-      <div className="form-group">
+      <FormGroup>
         <label>
           <span>Is ventilation required as per SDS?</span>
           <RHFBooleanRadioGroup name="requireVentilation" />
         </label>
-      </div>
-      <style jsx global>
-        {form}
-      </style>
+      </FormGroup>
       <style jsx>{`
         .hazard-list {
           margin: 0;

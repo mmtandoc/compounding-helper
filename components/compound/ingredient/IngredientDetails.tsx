@@ -1,6 +1,8 @@
 import Link from "next/link"
 
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import { capitalize } from "lib/utils"
 import { IngredientAll } from "types/models"
 
@@ -18,7 +20,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
   const isCommercialProduct = !!ingredient.commercialProductName
 
   return (
-    <fieldset className="ingredient-fieldset">
+    <Fieldset className="ingredient-fieldset">
       <div className="inputs-container">
         <div className="row">
           {chemical && (
@@ -58,14 +60,14 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
         </div>
         <div className="row">
           <div>
-            <div className="form-group">
+            <FormGroup>
               <span className="label">Is a commercial product?</span>
               <BooleanRadioGroup
                 readOnly={true}
                 className="is-commercial-product"
                 selectedValue={isCommercialProduct}
               />
-            </div>
+            </FormGroup>
             {isCommercialProduct && (
               <>
                 <div className="row">
@@ -78,7 +80,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
                     <span>{ingredient.commercialProductDin ?? "N/A"}</span>
                   </div>
                 </div>
-                <div className="form-group">
+                <FormGroup>
                   <span
                     className={`label ${
                       !ingredient.commercialProductName ? "disabled" : ""
@@ -91,7 +93,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
                     className="has-product-monograph-concerns"
                     selectedValue={ingredient.hasProductMonographConcerns}
                   />
-                </div>
+                </FormGroup>
               </>
             )}
           </div>
@@ -117,8 +119,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
         )}
       </div>
       <div className="safety-info">
-        <fieldset>
-          <legend>Safety Information:</legend>
+        <Fieldset legend="Safety Information:">
           <div>
             <span className="label">Niosh Table:</span>
             {chemical?.nioshTable === undefined
@@ -150,7 +151,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               "N/A"
             )}
           </div>
-        </fieldset>
+        </Fieldset>
       </div>
       <style jsx>{`
         .inputs-container {
@@ -190,6 +191,6 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
           width: min-content;
         }
       `}</style>
-    </fieldset>
+    </Fieldset>
   )
 }

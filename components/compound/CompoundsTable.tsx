@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import Button from "components/common/Button"
 import Table from "components/common/Table"
 import { TableColumn } from "components/common/Table/Table"
 import filterFns from "lib/table/filterFns"
@@ -85,52 +86,29 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     renderCell: (value) => <>{value ?? "N/A"}</>,
     accessorPath: "beyondUseDate",
   },
+
   {
-    id: "view",
+    id: "actions",
     renderCell: (_, data) => (
-      <>
+      <div>
         <Link href={`/compounds/${data.id}`}>
-          <button type="button">View</button>
+          <Button size="small">View</Button>
         </Link>
-        <style jsx>{`
-          td > button {
-            display: block;
-            margin: auto;
-          }
-        `}</style>
-      </>
-    ),
-  },
-  {
-    id: "edit",
-    renderCell: (_, data) => (
-      <>
         <Link href={`/compounds/${data.id}/edit`}>
-          <button type="button">Edit</button>
+          <Button size="small">Edit</Button>
+        </Link>
+        <Link href={`/risk-assessments/${data.id}`} className="button">
+          <Button size="small">View Risk Assessment</Button>
         </Link>
         <style jsx>{`
-          td > button {
-            display: block;
-            margin: auto;
+          div {
+            display: flex;
+            column-gap: 0.3rem;
+            flex-wrap: nowrap;
+            margin: 0.2rem 0;
           }
         `}</style>
-      </>
-    ),
-  },
-  {
-    id: "viewRiskAssessment",
-    renderCell: (_, data) => (
-      <>
-        <Link href={`/risk-assessments/${data.id}`}>
-          <button type="button">View Risk Assessment</button>
-        </Link>
-        <style jsx>{`
-          td > button {
-            display: block;
-            margin: auto;
-          }
-        `}</style>
-      </>
+      </div>
     ),
   },
 ]

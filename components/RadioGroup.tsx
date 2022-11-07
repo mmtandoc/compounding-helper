@@ -98,7 +98,7 @@ export const RadioGroup = (props: RadioGroupProps) => {
           <label
             key={i}
             className={`${disabled ? "disabled" : ""} ${
-              readOnly ? "readOnly" : ""
+              readOnly ? "read-only" : ""
             }`}
           >
             <input

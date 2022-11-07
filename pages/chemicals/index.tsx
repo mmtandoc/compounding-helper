@@ -3,6 +3,7 @@ import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import ChemicalTable from "components/chemical/ChemicalTable"
+import Button from "components/common/Button"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 
@@ -18,7 +19,7 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
   const actionBar = (
     <div className="action-bar">
       <Link href="/chemicals/new">
-        <button type="button">New Chemical</button>
+        <Button>New Chemical</Button>
       </Link>
       <style jsx>{`
         .action-bar {

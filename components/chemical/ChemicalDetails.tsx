@@ -1,6 +1,6 @@
 import React from "react"
 
-import form from "styles/form"
+import { FormGroup } from "components/common/forms/FormGroup"
 import { ChemicalAll } from "types/models"
 
 type Props = {
@@ -13,29 +13,26 @@ const ChemicalDetails = (props: Props) => {
 
   return (
     <>
-      <div className="form-group row">
+      <FormGroup row>
         <span className="label">Chemical name:</span>
         {data.name}
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">CAS number:</span>
         {data.casNumber ?? "N/A"}
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">Synonyms:</span>
         {data.synonyms.length > 0 ? data.synonyms.join(", ") : "None"}
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">NIOSH Table:</span>
         {data.nioshTable === -1 ? "N/A" : data.nioshTable}
-      </div>
-      <div className="form-group row">
+      </FormGroup>
+      <FormGroup row>
         <span className="label">NIOSH revision date: </span>
         {data.nioshRevisionDate?.toLocaleDateString("en-CA") ?? "N/A"}
-      </div>
-      <style jsx global>
-        {form}
-      </style>
+      </FormGroup>
       <style jsx>{`
         .health-hazard-list {
           margin-top: 0;

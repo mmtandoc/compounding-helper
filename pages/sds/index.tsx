@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import Button from "components/common/Button"
 import SdsTable from "components/sds/SdsTable"
 import { getSafetyDataSheets } from "pages/api/sds"
 import { NextPageWithLayout } from "types/common"
@@ -17,7 +18,7 @@ const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
   const actionBar = (
     <div className="action-bar">
       <Link href="/sds/new">
-        <button type="button">New Safety Data Sheet</button>
+        <Button>New Safety Data Sheet</Button>
       </Link>
       <style jsx>{`
         .action-bar {

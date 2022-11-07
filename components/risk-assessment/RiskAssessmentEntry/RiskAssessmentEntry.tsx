@@ -2,6 +2,9 @@ import { useEffect } from "react"
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import Button from "components/common/Button"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import TextArea from "components/common/forms/TextArea"
@@ -13,7 +16,6 @@ import {
 } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { nestedForm } from "lib/rhf/nestedForm"
-import form from "styles/form"
 
 import ExposureRisksInputs from "./ExposureRisksInputs"
 import RationaleList from "./RationaleList"
@@ -117,7 +119,7 @@ const RiskAssessmentEntry = (props: Props) => {
   register("id")
   return (
     <>
-      <div className="form-group">
+      <FormGroup>
         <label htmlFor="compound-name">Compound name:</label>
         <Input
           id="compound-name"
@@ -126,9 +128,8 @@ const RiskAssessmentEntry = (props: Props) => {
           autoComplete="off"
           size={40}
         />
-      </div>
-      <fieldset>
-        <legend>Ingredients:</legend>
+      </FormGroup>
+      <Fieldset legend="Ingredients:">
         {ingredientFields.map((field, index) => (
           <IngredientEntry
             key={field.id}
@@ -149,30 +150,33 @@ const RiskAssessmentEntry = (props: Props) => {
           />
         ))}
         <div>
-          <button
-            type="button"
+          <Button
             className="add-button"
+            size="small"
             value="add"
             onClick={() =>
               ingredientsArrayMethods.append(emptyIngredientValues)
             }
           >
             Add Ingredient
-          </button>
+          </Button>
         </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          How complex is the compound? (As per{" "}
-          <a
-            href="https://www.uspnf.com/sites/default/files/usp_pdf/EN/USPNF/revisions/gc795.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            USP 795
-          </a>
-          )
-        </legend>
+      </Fieldset>
+      <Fieldset
+        legend={
+          <>
+            How complex is the compound? (As per{" "}
+            <a
+              href="https://www.uspnf.com/sites/default/files/usp_pdf/EN/USPNF/revisions/gc795.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              USP 795
+            </a>
+            )
+          </>
+        }
+      >
         <RHFRadioGroup
           name="complexity"
           radioOptions={[
@@ -181,13 +185,11 @@ const RiskAssessmentEntry = (props: Props) => {
             ["complex", "Complex"],
           ]}
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is this compound only prepared occasionally?</legend>
+      </Fieldset>
+      <Fieldset legend="Is this compound only prepared occasionally?">
         <RHFBooleanRadioGroup name="isPreparedOccasionally" />
-      </fieldset>
-      <fieldset>
-        <legend>How often is this compound prepared?</legend>
+      </Fieldset>
+      <Fieldset legend="How often is this compound prepared?">
         <RHFRadioGroup
           name="preparationFrequency"
           radioOptions={[
@@ -196,23 +198,14 @@ const RiskAssessmentEntry = (props: Props) => {
             ["monthly", "Monthly"],
           ]}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          <label htmlFor="is-small-quantity">
-            Are there only small quantities of ingredients being prepared?
-          </label>
-        </legend>
-        <div className="form-group">
+      </Fieldset>
+      <Fieldset legend="Are there only small quantities of ingredients being prepared?">
+        <FormGroup>
           <RHFBooleanRadioGroup id="is-small-quantity" name="isSmallQuantity" />
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          On average, what quantity of this preparation is being prepared at a
-          time?
-        </legend>
-        <div className="form-group row">
+        </FormGroup>
+      </Fieldset>
+      <Fieldset legend="On average, what quantity of this preparation is being prepared at a time?">
+        <FormGroup row>
           <Input
             id="average-preparation-amount-value"
             {...register("averagePreparationAmount.quantity", {
@@ -235,63 +228,45 @@ const RiskAssessmentEntry = (props: Props) => {
             <option value="g">g</option>
             <option value="ml">ml</option>
           </Select>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          Do the concentration of ingredients in the product present a health
-          risk to the compounder?
-        </legend>
+        </FormGroup>
+      </Fieldset>
+      <Fieldset legend="Do the concentration of ingredients in the product present a health risk to the compounder?">
         <RHFBooleanRadioGroup
           id="is-concentration-health-risk"
           name="isConcentrationHealthRisk"
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Does preparation require special education or competencies for your
-          compounding personnel?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Does preparation require special education or competencies for your compounding personnel?">
         <RHFBooleanRadioGroup
           id="require-special-education"
           name="requireSpecialEducation"
         />
-      </fieldset>
-      <fieldset>
-        <legend>Are there verification steps during compounding?</legend>
+      </Fieldset>
+      <Fieldset legend="Are there verification steps during compounding?">
         <RHFBooleanRadioGroup
           id="has-verification-steps"
           name="hasVerificationSteps"
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Do you have appropriate facilities and equipment to prepare this
-          compound?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Do you have appropriate facilities and equipment to prepare this compound?">
         <RHFBooleanRadioGroup
           id="have-appropriate-facilities"
           name="haveAppropriateFacilities"
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Is ventilation required for preparation (as per section 8 of SDS or
-          product monograph)?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Is ventilation required for preparation (as per section 8 of SDS or product monograph)?">
         <RHFBooleanRadioGroup
           id="require-ventilation"
           name="requireVentilation"
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is your workflow uninterrupted?</legend>
+      </Fieldset>
+      <Fieldset legend="Is your workflow uninterrupted?">
         <RHFBooleanRadioGroup
           id="is-workflow-uninterrupted"
           name="isWorkflowUninterrupted"
         />
-      </fieldset>
-      <div className={`form-group`} hidden={isWorkflowUninterrupted !== false}>
+      </Fieldset>
+      <FormGroup hidden={isWorkflowUninterrupted !== false}>
         <label
           htmlFor="interrupted-workflow-process"
           className={isWorkflowUninterrupted ? "disabled" : ""}
@@ -308,28 +283,23 @@ const RiskAssessmentEntry = (props: Props) => {
           cols={30}
           rows={7}
         />
-      </div>
-      <fieldset>
-        <legend>Is there a risk of microbial contamination?</legend>
+      </FormGroup>
+      <Fieldset legend="Is there a risk of microbial contamination?">
         <RHFBooleanRadioGroup
           id="microbial-contamination-risk"
           name="microbialContaminationRisk"
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Is there risk of cross contamination with other products?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Is there risk of cross contamination with other products?">
         <RHFBooleanRadioGroup
           id="cross-contamination-risk"
           name="crossContaminationRisk"
         />
-      </fieldset>
-      <fieldset className="row grow">
-        <legend>
-          Exposure risk to compounding personnel (as per section 2 of the SDS or
-          product monograph)
-        </legend>
+      </Fieldset>
+      <Fieldset
+        legend="Exposure risk to compounding personnel (as per section 2 of the SDS or product monograph)"
+        className="row grow"
+      >
         <ExposureRisksInputs
           name="exposureRisks.sds"
           category="From SDS"
@@ -345,22 +315,17 @@ const RiskAssessmentEntry = (props: Props) => {
             register={register}
           />
         )}
-      </fieldset>
-      <fieldset>
-        <legend>
-          PPE deemed necessary (as per SDS, product monograph) and assessment of
-          risk:
-        </legend>
-        <fieldset className="row">
-          <legend>Gloves:</legend>
-          <div className="form-group">
+      </Fieldset>
+      <Fieldset legend="PPE deemed necessary (as per SDS, product monograph) and assessment of risk:">
+        <Fieldset legend="Gloves:" className="row">
+          <FormGroup>
             <label>Required?</label>
             <RHFBooleanRadioGroup
               id="ppe-gloves-required"
               name="ppe.gloves.required"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label className={!glovesRequired ? "disabled" : ""}>Type:</label>
             <Select
               name="ppe.gloves.type"
@@ -374,18 +339,17 @@ const RiskAssessmentEntry = (props: Props) => {
               <option value="chemotherapy">Chemotherapy gloves</option>
               <option value="double">Double gloves</option>
             </Select>
-          </div>
-        </fieldset>
-        <fieldset className="row">
-          <legend>Coat:</legend>
-          <div className="form-group">
+          </FormGroup>
+        </Fieldset>
+        <Fieldset legend="Coat:" className="row">
+          <FormGroup>
             <label>Required?</label>
             <RHFBooleanRadioGroup
               id="ppe-coat-required"
               name="ppe.coat.required"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label className={!coatRequired ? "disabled" : ""}>Type:</label>
             <Select
               name="ppe.coat.type"
@@ -398,18 +362,17 @@ const RiskAssessmentEntry = (props: Props) => {
               <option value="designated">Designated coat</option>
               <option value="disposable">Disposable coat</option>
             </Select>
-          </div>
-        </fieldset>
-        <fieldset className="row">
-          <legend>Mask:</legend>
-          <div className="form-group">
+          </FormGroup>
+        </Fieldset>
+        <Fieldset legend="Mask:" className="row">
+          <FormGroup>
             <label>Required?</label>
             <RHFBooleanRadioGroup
               id="ppe-mask-required"
               name="ppe.mask.required"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label className={!maskRequired ? "disabled" : ""}>Type:</label>
             <Input
               {...register("ppe.mask.type", {
@@ -419,19 +382,18 @@ const RiskAssessmentEntry = (props: Props) => {
               id="ppe-mask-type"
               disabled={!maskRequired}
             />
-          </div>
-        </fieldset>
-        <fieldset className="row">
-          <legend>Eye Protection:</legend>
-          <div className="form-group">
+          </FormGroup>
+        </Fieldset>
+        <Fieldset legend="Eye Protection:" className="row">
+          <FormGroup>
             <label>Required?</label>
             <RHFBooleanRadioGroup
               id="ppe-eye-protection-required"
               name="ppe.eyeProtection.required"
             />
-          </div>
-        </fieldset>
-        <div className="form-group">
+          </FormGroup>
+        </Fieldset>
+        <FormGroup>
           <label>Other:</label>
           <Input
             {...register("ppe.other")}
@@ -439,23 +401,21 @@ const RiskAssessmentEntry = (props: Props) => {
             id="ppe-other"
             size={100}
           />
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Is an eye wash station required?</legend>
+        </FormGroup>
+      </Fieldset>
+      <Fieldset legend="Is an eye wash station required?">
         <RHFBooleanRadioGroup
           id="require-eye-wash-station"
           name="requireEyeWashStation"
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is a safety shower required?</legend>
+      </Fieldset>
+      <Fieldset legend="Is a safety shower required?">
         <RHFBooleanRadioGroup
           id="require-safety-shower"
           name="requireSafetyShower"
         />
-      </fieldset>
-      <fieldset>
+      </Fieldset>
+      <Fieldset>
         <div id="risk-level-container" className="form-group">
           <label>Risk level assigned:</label>
           <Select name="riskLevel" id="risk-level-select" initialOption>
@@ -464,7 +424,7 @@ const RiskAssessmentEntry = (props: Props) => {
             <option value="C">C</option>
           </Select>
         </div>
-        <div className="form-group">
+        <FormGroup>
           <label htmlFor="rationale">
             Rationale and other risk mitigation measures:
           </label>
@@ -473,10 +433,10 @@ const RiskAssessmentEntry = (props: Props) => {
             register={register}
             setValue={setValue}
           />
-        </div>
-      </fieldset>
-      <fieldset>
-        <div className="form-group">
+        </FormGroup>
+      </Fieldset>
+      <Fieldset>
+        <FormGroup>
           <label>
             <span>Compounding supervisor:</span>
             <Input
@@ -485,15 +445,12 @@ const RiskAssessmentEntry = (props: Props) => {
               size={30}
             />
           </label>
-        </div>
-        <div className="form-group">
+        </FormGroup>
+        <FormGroup>
           <label htmlFor="date-assessed">Date assessed:</label>
           <Input type="date" {...register("dateAssessed")} id="date-assessed" />
-        </div>
-      </fieldset>
-      <style jsx global>
-        {form}
-      </style>
+        </FormGroup>
+      </Fieldset>
       <style jsx>{`
         #risk-level-select {
           width: min-content;

@@ -11,6 +11,9 @@ import useSWR from "swr"
 
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
+import Button from "components/common/Button"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import TextArea from "components/common/forms/TextArea"
@@ -159,11 +162,11 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
   const selectedSds = sdsesData?.find((sds) => sds.id === sdsId)
 
   return (
-    <fieldset className="ingredient-fieldset">
+    <Fieldset className="ingredient-fieldset">
       <div className="ingredient-body">
         <div className="inputs-container">
           <div className="row">
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor={`i${index}-chemical-search`}>
                 Chemical name:{" "}
               </label>
@@ -180,12 +183,12 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                   defaultValue={null}
                 />
 
-                <button type="button" disabled={!chemicalId}>
+                <Button className="btn small" disabled={!chemicalId}>
                   ...
-                </button>
+                </Button>
               </div>
-            </div>
-            <div className="form-group">
+            </FormGroup>
+            <FormGroup>
               <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
               <Select
                 name={`${name}.${index}.physicalForm`}
@@ -199,10 +202,10 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                 <option value="liquid">Liquid</option>
                 <option value="solid">Solid</option>
               </Select>
-            </div>
+            </FormGroup>
           </div>
           <div className="row">
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor={`i${index}-sds-select`}>Safety Datasheet</label>
               <div className="row">
                 <SdsSelect
@@ -216,14 +219,14 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                     isCommercialProduct === null || !isCommercialProduct
                   }
                 />
-                <button type="button" disabled={!sdsId}>
+                <Button className="btn small" disabled={!sdsId}>
                   ...
-                </button>
+                </Button>
               </div>
-            </div>
+            </FormGroup>
           </div>
           <div className="row">
-            <div className="form-group">
+            <FormGroup>
               <label htmlFor={`i${index}-is-commercial-product`}>
                 Is a commercial product?
               </label>
@@ -235,10 +238,10 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                   deps: [`${name}.${index}.chemicalId`],
                 }}
               />
-            </div>
+            </FormGroup>
           </div>
           <div className="row" hidden={!isCommercialProduct}>
-            <div className="form-group">
+            <FormGroup>
               <label
                 htmlFor={`i${index}-commercial-product`}
                 className={!isCommercialProduct ? "disabled" : ""}
@@ -257,8 +260,8 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                 size={25}
                 id={`i${index}-commercial-product`}
               />
-            </div>
-            <div className="form-group">
+            </FormGroup>
+            <FormGroup>
               <label className={`${!isCommercialProduct ? "disabled" : ""}`}>
                 <span>Product DIN:</span>
                 <div className="row">
@@ -286,11 +289,11 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                   </label>
                 </div>
               </label>
-            </div>
+            </FormGroup>
           </div>
 
           <div className="row" hidden={!isCommercialProduct}>
-            <div className="form-group">
+            <FormGroup>
               <label
                 htmlFor={`i${index}-has-product-monograph-concerns`}
                 className={!isCommercialProduct ? "disabled" : ""}
@@ -303,7 +306,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                 disabled={!isCommercialProduct}
                 className="has-product-monograph-concerns"
               />
-            </div>
+            </FormGroup>
           </div>
           <div className="row" hidden={!hasProductMonographConcerns}>
             <div className="form-group" style={{ width: "100%" }}>
@@ -331,8 +334,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
           </div>
         </div>
         <div className="safety-info">
-          <fieldset>
-            <legend>Safety Information:</legend>
+          <Fieldset legend="Safety Information:">
             <div>
               <span className="label">Niosh Table:</span>
               {chemicalData?.nioshTable === undefined
@@ -362,42 +364,42 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                 </ul>
               </div>
             )}
-          </fieldset>
+          </Fieldset>
         </div>
       </div>
       <div className="ingredient-actions">
-        <button
-          type="button"
+        <Button
+          size="small"
           className="remove-button"
           value="remove"
           onClick={() => remove(index)}
         >
           Remove
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          size="small"
           className="clear-button"
           value="clear"
           onClick={() => reset()}
         >
           Clear
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          size="small"
           className="move-up-button"
           disabled={index === 0}
           onClick={() => index > 0 && move(index, index - 1)}
         >
           Move up
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          size="small"
           className="move-down-button"
           disabled={index + 1 === fields.length}
           onClick={() => index < fields.length && move(index, index + 1)}
         >
           Move down
-        </button>
+        </Button>
       </div>
       <style jsx>{`
         .inputs-container {
@@ -447,7 +449,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
           width: min-content;
         }
       `}</style>
-    </fieldset>
+    </Fieldset>
   )
 }
 

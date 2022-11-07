@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 import { MdClose } from "react-icons/md"
 
+import Button from "components/common/Button"
+
 type DotJotItem = { text: string; readOnly?: boolean }
 
 type DotJotListProps = {
@@ -59,14 +61,13 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
                   ref={ref}
                   size={size}
                 />
-                <button
-                  type="button"
-                  className="add-item-button"
+                <Button
+                  className="add-item-button small"
                   onClick={handleAddNewItem}
                   disabled={newItemText === ""}
                 >
                   Add
-                </button>
+                </Button>
               </div>
             </li>
           )}
@@ -76,10 +77,8 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
             margin-block-start: 0;
             margin-block-end: 0;
           }
-           {
-            .new-item-text-input {
-              width: ${size ? "initial" : "100%"};
-            }
+          .new-item-text-input {
+            width: ${size ? "initial" : "100%"};
           }
         `}</style>
       </div>
@@ -107,14 +106,13 @@ const DotJotItem = (props: DotJotItemProps) => {
           <span>{text}</span>
         )}
         {!readOnly && (
-          <button
-            type="button"
-            className="remove-item-button"
+          <Button
+            className="remove-item-button small"
             value="remove"
             onClick={() => onRemove?.(index)}
           >
             <MdClose size={"1.2em"} />
-          </button>
+          </Button>
         )}
       </div>
       <style jsx>{`
@@ -122,7 +120,7 @@ const DotJotItem = (props: DotJotItemProps) => {
           display: flex;
           align-items: center;
         }
-        .remove-item-button {
+        .item-container > .remove-item-button {
           display: flex;
           justify-content: center;
           align-items: center;

@@ -36,15 +36,17 @@ const DefaultLayout = ({ title, pageRef, children }: Props) => (
         align-items: stretch;
         flex-direction: column;
       }
-      header > h1:first-of-type {
-        margin-top: 0;
-      }
+
       .page {
         align-self: stretch;
         max-width: 1264px;
         margin: 0 auto;
         width: 100%;
-        margin-bottom: 5rem;
+        padding: 0 4rem 9rem 4rem;
+        flex-grow: 1;
+        background-color: var(--color-canvas-default);
+        border-left: var(--border-default);
+        border-right: var(--border-default);
       }
     `}</style>
   </>

@@ -1,6 +1,9 @@
 import { useEffect } from "react"
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 
+import Button from "components/common/Button"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import TextArea from "components/common/forms/TextArea"
 import {
@@ -8,7 +11,6 @@ import {
   NullPartialIngredientFields,
 } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
-import form from "styles/form"
 
 import IngredientEntry from "./ingredient/IngredientEntry"
 
@@ -60,7 +62,7 @@ const CompoundEntry = (props: Props) => {
   register("id")
   return (
     <>
-      <div className="form-group">
+      <FormGroup>
         <label htmlFor="compound-name">Compound name:</label>
         <Input
           id="compound-name"
@@ -69,9 +71,8 @@ const CompoundEntry = (props: Props) => {
           autoComplete="off"
           size={40}
         />
-      </div>
-      <fieldset>
-        <legend>Ingredients:</legend>
+      </FormGroup>
+      <Fieldset legend="Ingredients:">
         {ingredientFields.map((field, index) => (
           <IngredientEntry
             key={field.id}
@@ -92,18 +93,17 @@ const CompoundEntry = (props: Props) => {
           />
         ))}
         <div>
-          <button
-            type="button"
-            className="add-button"
+          <Button
+            className="add-button small"
             value="add"
             onClick={() =>
               ingredientsArrayMethods.append(emptyIngredientValues)
             }
           >
             Add Ingredient
-          </button>
+          </Button>
         </div>
-      </fieldset>
+      </Fieldset>
       {display === "all" && (
         <>
           <label className="form-group row">
@@ -113,7 +113,7 @@ const CompoundEntry = (props: Props) => {
               {...register("hasMasterFormulationRecord")}
             />
           </label>
-          <div className="form-group">
+          <FormGroup>
             <label htmlFor="beyond-use-date">Beyond use date:</label>
             <Input
               id="beyond-use-date"
@@ -121,16 +121,13 @@ const CompoundEntry = (props: Props) => {
               {...register("beyondUseDate")}
               size={40}
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label htmlFor="notes">Notes:</label>
             <TextArea id="notes" {...register("notes")} />
-          </div>
+          </FormGroup>
         </>
       )}
-      <style jsx global>
-        {form}
-      </style>
     </>
   )
 }

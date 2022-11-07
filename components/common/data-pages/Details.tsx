@@ -3,6 +3,8 @@ import { useRouter } from "next/dist/client/router"
 import Link from "next/link"
 import React, { useState } from "react"
 
+import Button from "components/common/Button"
+
 import Modal from "../Modal"
 
 type DetailsComponentProps<TModel> = {
@@ -53,13 +55,11 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
       <div className="action-row">
         {actions.edit && (
           <Link href={`${urlPath}/${id}/edit`}>
-            <button type="button">Edit</button>
+            <Button>Edit</Button>
           </Link>
         )}
         {actions.delete && (
-          <button type="button" onClick={() => setIsModalOpen(true)}>
-            Delete
-          </button>
+          <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
         )}
       </div>
       <Modal isOpen={isModalOpen}>
@@ -71,18 +71,15 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
           <p>This is permanent and cannot be undone.</p>
         </Modal.Body>
         <Modal.Footer>
-          <button
-            type="button"
+          <Button
             onClick={() => {
               handleDelete()
               setIsModalOpen(false)
             }}
           >
             Confirm
-          </button>
-          <button type="button" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </button>
+          </Button>
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
         </Modal.Footer>
       </Modal>
       <style jsx>{`

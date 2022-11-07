@@ -137,7 +137,7 @@ export const BooleanRadioGroup = ({
         <label
           key={index}
           className={`${disabled ? "disabled" : ""} ${
-            readOnly ? "readOnly" : ""
+            readOnly ? "read-only" : ""
           }`}
         >
           <input

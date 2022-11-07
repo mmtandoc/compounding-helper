@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
 
+import Button from "components/common/Button"
 import Modal from "components/common/Modal"
 import SdsDetails from "components/sds/SdsDetails"
 import { getSdsById } from "pages/api/sds/[id]"
@@ -37,11 +38,9 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
       <SdsDetails data={data} />
       <div className="action-row">
         <Link href={`/sds/${data.id}/edit`}>
-          <button type="button">Edit</button>
+          <Button>Edit</Button>
         </Link>
-        <button type="button" onClick={() => setIsModalOpen(true)}>
-          Delete
-        </button>
+        <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
       </div>
       <Modal isOpen={isModalOpen}>
         <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
@@ -52,18 +51,15 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
           <p>This is permanent and cannot be undone.</p>
         </Modal.Body>
         <Modal.Footer>
-          <button
-            type="button"
+          <Button
             onClick={() => {
               handleDelete()
               setIsModalOpen(false)
             }}
           >
             Confirm
-          </button>
-          <button type="button" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </button>
+          </Button>
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
         </Modal.Footer>
       </Modal>
       <style jsx>{`

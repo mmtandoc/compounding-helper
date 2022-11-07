@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import Button from "components/common/Button"
 import Table from "components/common/Table"
 import filterFns from "lib/table/filterFns"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
@@ -77,19 +78,24 @@ const RiskAssessmentsTable = (props: Props) => {
           filterFn: filterFns.ingredients,
         },
         {
-          id: "view",
+          id: "actions",
           renderCell: (_, data) => (
-            <>
+            <div>
               <Link href={`/risk-assessments/${data.id}`}>
-                <button type="button">View</button>
+                <Button size="small">View</Button>
+              </Link>
+              <Link href={`/risk-assessments/${data.id}/edit`}>
+                <Button size="small">Edit</Button>
               </Link>
               <style jsx>{`
-                td > button {
-                  display: block;
-                  margin: auto;
+                div {
+                  display: flex;
+                  column-gap: 0.3rem;
+                  flex-wrap: nowrap;
+                  margin: 0.2rem 0;
                 }
               `}</style>
-            </>
+            </div>
           ),
         },
       ]}
