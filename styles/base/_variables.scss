@@ -1,0 +1,122 @@
+$font-size-base: 1.6rem !default;
+$font-size-sm: $font-size-base * 0.875 !default;
+$font-size-lg: $font-size-base * 1.25 !default;
+
+:root {
+  --font-size-base: #{$font-size-base};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-lg: #{$font-size-lg};
+
+  --color-fg-default: var(--color-black);
+  --color-fg-muted: var(--color-scale-gray-400);
+  --color-fg-on-emphasis: var(--color-black);
+
+  --color-canvas-emphasis: var(--color-black);
+  --color-canvas-default: var(--color-white);
+  --color-canvas-subtle: var(--color-scale-gray-100);
+  --color-canvas-inset: var(--color-scale-gray-100);
+
+  // --color-accent-emphasis:
+  // --color-accent-subtle:
+  --color-accent-muted: lightblue;
+
+  --color-neutral-emphasis: var(--color-scale-gray-300);
+  --color-neutral-muted: var(--color-scale-gray-150);
+  --color-neutral-subtle: var(--color-scale-gray-100);
+
+  --border-width: 1px;
+  --border-style: solid;
+  --color-border-default: var(--color-scale-gray-300);
+  --color-border-muted: var(--color-scale-gray-200);
+  --color-border-emphasis: var(--color-scale-gray-400);
+  --border-default: var(--color-border-default) var(--border-width)
+    var(--border-style);
+
+  // Nav and dropdowns
+  --color-nav-bg: var(--color-scale-gray-150);
+  --color-nav-fg: var(--color-fg-default);
+  --color-nav-link-hover-fg: var(--color-scale-gray-600);
+  --color-nav-link-current-fg: var(--color-scale-gray-500);
+  --nav-border: var(--border-default);
+
+  --color-dropdown-link-bg: var(--color-scale-gray-150);
+  --color-dropdown-link-hover-bg: var(--color-scale-gray-300);
+  --dropdown-border: var(--border-default);
+
+  // Fields
+  --color-field-invalid-bg: #ffc8c8;
+
+  --color-field-bg: var(--color-canvas-default);
+  --color-field-border: var(--color-border-default);
+
+  --color-field-hover-border: var(--color-border-emphasis);
+  --color-field-active-border: var(--color-scale-gray-600);
+  --color-field-disabled-border: var(--color-border-muted);
+  --color-field-disabled-bg: var(--color-canvas-inset);
+  --color-field-disabled-fg: var(--color-fg-muted);
+
+  --field-font-size: var(--font-size-base);
+  --field-font-size-sm: var(--font-size-sm);
+  --field-font-size-lg: var(--font-size-lg);
+
+  // Radio buttons
+  --radio-size: 1.4rem;
+
+  --color-radio-bg: var(--color-canvas-default);
+  --color-radio-border: var(--color-border-default);
+  --color-radio-hover-border: var(--color-border-emphasis);
+  --color-radio-active-border: var(--color-scale-gray-600);
+  --color-radio-disabled-border: var(--color-border-muted);
+  --color-radio-disabled-bg: var(--color-canvas-inset);
+
+  // Select
+  --color-select-invalid-bg: #ffc8c8;
+
+  --color-select-bg: var(--color-neutral-muted);
+  --color-select-border: var(--color-border-default);
+
+  --color-select-hover-border: var(--color-border-emphasis);
+  --color-select-hover-bg: var(--color-neutral-emphasis);
+
+  --color-select-active-border: var(--color-scale-gray-600);
+  --color-select-active-bg: var(--color-scale-gray-400);
+
+  --color-select-disabled-border: var(--color-border-muted);
+  --color-select-disabled-bg: var(--color-neutral-subtle);
+  --color-select-disabled-fg: var(--color-fg-muted);
+
+  // Buttons
+  --color-button-border: var(--color-scale-gray-400);
+  --color-button-bg: var(--color-neutral-muted);
+  --color-button-fg: var(--color-fg-default);
+
+  --button-font-size: var(--font-size-base);
+  --button-font-size-small: var(--font-size-sm);
+  --button-font-size-large: var(--font-size-lg);
+
+  --color-button-hover-border: var(--color-scale-gray-600);
+  --color-button-hover-bg: var(--color-neutral-emphasis);
+
+  --color-button-disabled-border: var(--color-scale-gray-300);
+  --color-button-disabled-bg: var(--color-neutral-subtle);
+  --color-button-disabled-fg: var(--color-fg-muted);
+
+  // Fieldset
+  --color-fieldset-bg: var(--color-scale-gray-150);
+
+  // Table
+  --color-table-head-bg: var(--color-scale-gray-150);
+  --table-border: var(--border-default);
+
+  // Autosuggest
+  --suggestion-border: var(--border-default);
+  --color-suggestion-bg: var(--color-canvas-default);
+  --color-suggestion-fg: var(--color-fg-default);
+  --color-suggestion-hover-bg: var(--color-scale-gray-300);
+  --color-suggestion-focus-bg: var(--color-accent-muted);
+  --color-suggestion-focus-fg: var(--color-fg-default);
+
+  // Modal
+  --color-modal-bg: var(--color-canvas-inset);
+  --modal-border: var(--border-default);
+}

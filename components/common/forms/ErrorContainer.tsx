@@ -114,10 +114,6 @@ const ErrorContainer = <
         }
       `}</style>
       <style jsx global>{`
-        :root {
-          --invalid-bg-color: #ffc8c8;
-        }
-
         .input-error {
           margin: 0;
           width: max-content;

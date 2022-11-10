@@ -1,10 +1,11 @@
 import React from "react"
 
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { RadioGroup } from "components/RadioGroup"
 import { capitalize } from "lib/utils"
-import form from "styles/form"
 import { RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -14,28 +15,30 @@ type Props = {
 const RiskAssessmentDetails = ({ data }: Props) => {
   return (
     <div className="risk-assessment-details">
-      <div className="form-group row">
+      <FormGroup row>
         <label htmlFor="compound-name">Compound name:</label>
         <span>{data.compound.name}</span>
-      </div>
-      <fieldset>
-        <legend>Ingredients:</legend>
+      </FormGroup>
+      <Fieldset legend="Ingredients:">
         {data.compound.ingredients.map((ingredient, index) => (
           <IngredientDetails key={index} ingredient={ingredient} />
         ))}
-      </fieldset>
-      <fieldset>
-        <legend>
-          How complex is the compound? (As per{" "}
-          <a
-            href="https://www.uspnf.com/sites/default/files/usp_pdf/EN/USPNF/revisions/gc795.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            USP 795
-          </a>
-          )
-        </legend>
+      </Fieldset>
+      <Fieldset
+        legend={
+          <>
+            How complex is the compound? (As per{" "}
+            <a
+              href="https://www.uspnf.com/sites/default/files/usp_pdf/EN/USPNF/revisions/gc795.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              USP 795
+            </a>
+            )
+          </>
+        }
+      >
         <RadioGroup
           readOnly={true}
           radioOptions={[
@@ -45,9 +48,8 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           ]}
           selectedValue={data.complexity}
         />
-      </fieldset>
-      <fieldset>
-        <legend>How often is this compound prepared?</legend>
+      </Fieldset>
+      <Fieldset legend="How often is this compound prepared?">
         <RadioGroup
           readOnly={true}
           radioOptions={[
@@ -57,88 +59,60 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           ]}
           selectedValue={data.preparationFrequency}
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is this compound only prepared occasionally?</legend>
+      </Fieldset>
+      <Fieldset legend="Is this compound only prepared occasionally?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.isPreparedOccasionally}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          <label htmlFor="is-small-quantity">
-            Are there only small quantities of ingredients being prepared?
-          </label>
-        </legend>
-        <div className="form-group">
+      </Fieldset>
+      <Fieldset legend="Are there only small quantities of ingredients being prepared?">
+        <FormGroup>
           <BooleanRadioGroup
             readOnly={true}
             selectedValue={data.isSmallQuantity}
           />
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          On average, what quantity of this preparation is being prepared at a
-          time?
-        </legend>
-        <div className="form-group row">
+        </FormGroup>
+      </Fieldset>
+      <Fieldset legend="On average, what quantity of this preparation is being prepared at a time?">
+        <FormGroup row>
           <span>
             {data.averagePreparationAmountQuantity}{" "}
             {data.averagePreparationAmountUnit}
           </span>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          Do the concentration of ingredients in the product present a health
-          risk to the compounder?
-        </legend>
+        </FormGroup>
+      </Fieldset>
+      <Fieldset legend="Do the concentration of ingredients in the product present a health risk to the compounder?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.isConcentrationHealthRisk}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Does preparation require special education or competencies for your
-          compounding personnel?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Does preparation require special education or competencies for your compounding personnel?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.requireSpecialEducation}
         />
-      </fieldset>
-      <fieldset>
-        <legend>Are there verification steps during compounding?</legend>
+      </Fieldset>
+      <Fieldset legend="Are there verification steps during compounding?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.hasVerificationSteps}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Do you have appropriate facilities and equipment to prepare this
-          compound?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Do you have appropriate facilities and equipment to prepare this compound?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.haveAppropriateFacilities}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Is ventilation required for preparation (as per section 8 of SDS or
-          product monograph)?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Is ventilation required for preparation (as per section 8 of SDS or product monograph)?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.requireVentilation}
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is your workflow uninterrupted?</legend>
+      </Fieldset>
+      <Fieldset legend="Is your workflow uninterrupted?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.isWorkflowUninterrupted}
@@ -163,28 +137,20 @@ const RiskAssessmentDetails = ({ data }: Props) => {
             />
           </div>
         )}
-      </fieldset>
-      <fieldset>
-        <legend>Is there a risk of microbial contamination?</legend>
+      </Fieldset>
+      <Fieldset legend="Is there a risk of microbial contamination?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.microbialContaminationRisk}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Is there risk of cross contamination with other products?
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Is there risk of cross contamination with other products?">
         <BooleanRadioGroup
           readOnly={true}
           selectedValue={data.crossContaminationRisk}
         />
-      </fieldset>
-      <fieldset>
-        <legend>
-          Exposure risk to compounding personnel (as per section 2 of the SDS or
-          product monograph)
-        </legend>
+      </Fieldset>
+      <Fieldset legend="Exposure risk to compounding personnel (as per section 2 of the SDS or product monograph)">
         <div className="row grow">
           <ExposureRisksDisplay
             category="From SDS"
@@ -211,103 +177,92 @@ const RiskAssessmentDetails = ({ data }: Props) => {
             />
           )}
         </div>
-      </fieldset>
-      <fieldset>
-        <legend>
-          PPE deemed necessary (as per SDS, product monograph) and assessment of
-          risk:
-        </legend>
+      </Fieldset>
+      <Fieldset legend="PPE deemed necessary (as per SDS, product monograph) and assessment of risk:">
         <div className="row grow wrap">
-          <fieldset>
-            <legend>Gloves:</legend>
-            <div className="form-group">
+          <Fieldset legend="Gloves:">
+            <FormGroup>
               <label>Required?</label>
               <BooleanRadioGroup
                 readOnly={true}
                 name="ppe.gloves.required"
                 selectedValue={data.ppeGlovesRequired}
               />
-            </div>
+            </FormGroup>
             {data.ppeGlovesRequired && (
               <div className="form-group row wrap">
                 <span className="label">Type:</span>
                 <span>{capitalize(data.ppeGlovesType as string)} gloves</span>
               </div>
             )}
-          </fieldset>
-          <fieldset>
-            <legend>Coat:</legend>
-            <div className="form-group">
+          </Fieldset>
+          <Fieldset legend="Coat:">
+            <FormGroup>
               <span className="label">Required?</span>
               <BooleanRadioGroup
                 readOnly={true}
                 name="ppe.coat.required"
                 selectedValue={data.ppeCoatRequired}
               />
-            </div>
+            </FormGroup>
             {data.ppeCoatRequired && (
               <div className="form-group row wrap">
                 <span className="label">Type:</span>
                 <span>{capitalize(data.ppeCoatType as string)} coat</span>
               </div>
             )}
-          </fieldset>
-          <fieldset>
-            <legend>Mask:</legend>
-            <div className="form-group">
+          </Fieldset>
+          <Fieldset legend="Mask:">
+            <FormGroup>
               <span className="label">Required?</span>
               <BooleanRadioGroup
                 readOnly={true}
                 name="ppe.mask.required"
                 selectedValue={data.ppeMaskRequired}
               />
-            </div>
+            </FormGroup>
             {data.ppeMaskRequired && (
               <div className="form-group row wrap">
                 <span className="label">Type:</span>
                 <span>{capitalize(data.ppeMaskType as string)}</span>
               </div>
             )}
-          </fieldset>
-          <fieldset className="row">
-            <legend>Eye Protection:</legend>
-            <div className="form-group">
+          </Fieldset>
+          <Fieldset className="row" legend="Eye Protection:">
+            <FormGroup>
               <label>Required?</label>
               <BooleanRadioGroup
                 readOnly={true}
                 name="ppe.eyeProtection.required"
                 selectedValue={data.ppeEyeProtectionRequired}
               />
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Other:</legend>
+            </FormGroup>
+          </Fieldset>
+          <Fieldset legend="Other:">
             <span>{data.ppeOther ? data.ppeOther : "N/A"}</span>
-          </fieldset>
+          </Fieldset>
         </div>
-      </fieldset>
-      <fieldset>
-        <legend>Is an eye wash station required?</legend>
+      </Fieldset>
+      <Fieldset legend="Is an eye wash station required?">
         <BooleanRadioGroup
           readOnly={true}
           name="requireEyeWashStation"
           selectedValue={data.requireEyeWashStation}
         />
-      </fieldset>
-      <fieldset>
-        <legend>Is a safety shower required?</legend>
+      </Fieldset>
+      <Fieldset legend="Is a safety shower required?">
         <BooleanRadioGroup
           readOnly={true}
           name="requireSafetyShower"
           selectedValue={data.requireSafetyShower}
         />
-      </fieldset>
-      <fieldset>
+      </Fieldset>
+      <Fieldset>
         <div className="form-group row" style={{ fontSize: "2rem" }}>
           <span className="label">Risk level assigned:</span>
           <span>{data.riskLevel}</span>
         </div>
-        <div className="form-group">
+        <FormGroup>
           <span className="label">
             Rationale and other risk mitigation measures:
           </span>
@@ -319,21 +274,18 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               <li key={index}>{value}</li>
             ))}
           </ul>
-        </div>
-      </fieldset>
-      <fieldset>
-        <div className="form-group row">
+        </FormGroup>
+      </Fieldset>
+      <Fieldset>
+        <FormGroup row>
           <span className="label">Compounding supervisor:</span>
           <span>{data.compoundingSupervisor}</span>
-        </div>
-        <div className="form-group row">
+        </FormGroup>
+        <FormGroup row>
           <span className="label">Date assessed:</span>
           <span>{data.dateAssessed.toLocaleDateString("en-CA")}</span>
-        </div>
-      </fieldset>
-      <style jsx global>
-        {form}
-      </style>
+        </FormGroup>
+      </Fieldset>
       <style jsx global>{`
         .risk-assessment-details > .form-group {
           padding-left: 1.2rem;
@@ -352,33 +304,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         .radio-group label {
           display: flex;
           align-items: center;
-        }
-
-        :root {
-          --radio-background-color: #f3f3f3;
-          --radio-color: black;
-          --radio-border-color: black;
-          --radio-size: 1.2rem;
-        }
-
-        input[type="radio"] {
-          appearance: none;
-
-          border-radius: 50%;
-          width: var(--radio-size);
-          height: var(--radio-size);
-
-          border: none;
-          box-shadow: 0 0 0 1px black;
-          transition: 0.2s all linear;
-          margin-right: 0.5rem;
-          background-color: var(--radio-background-color);
-        }
-
-        input[type="radio"]:checked {
-          border: 0.35rem solid var(--radio-background-color);
-          background-color: var(--radio-color);
-          box-shadow: 0 0 0 1px black;
         }
       `}</style>
     </div>
@@ -402,37 +327,36 @@ const ExposureRisksDisplay = ({
   values,
 }: ExposureRisksInputsProps) => {
   return (
-    <fieldset className="exposure-risks-container">
-      <legend>{category}:</legend>
+    <Fieldset legend={`${category}:`} className="exposure-risks-container">
       <div className="exposure-risks-row">
-        <div className="form-group">
+        <FormGroup>
           <label>Skin:</label>
           <BooleanRadioGroup selectedValue={values.skin} readOnly={true} />
-        </div>
-        <div className="form-group">
+        </FormGroup>
+        <FormGroup>
           <label>Eye:</label>
           <BooleanRadioGroup selectedValue={values.eye} readOnly={true} />
-        </div>
-        <div className="form-group">
+        </FormGroup>
+        <FormGroup>
           <label>Inhalation:</label>
           <BooleanRadioGroup
             selectedValue={values.inhalation}
             readOnly={true}
           />
-        </div>
-        <div className="form-group">
+        </FormGroup>
+        <FormGroup>
           <label>Oral:</label>
           <BooleanRadioGroup selectedValue={values.oral} readOnly={true} />
-        </div>
+        </FormGroup>
       </div>
       <div className="row">
-        <div className="form-group">
+        <FormGroup>
           <label>Other:</label>
           <BooleanRadioGroup
             selectedValue={values.other !== null}
             readOnly={true}
           />
-        </div>
+        </FormGroup>
         <div className="form-group" style={{ flexGrow: 1 }}>
           <label className={values.other === null ? "disabled" : ""}>
             Description:
@@ -460,7 +384,7 @@ const ExposureRisksDisplay = ({
           border-right: 1px solid black;
         }
       `}</style>
-    </fieldset>
+    </Fieldset>
   )
 }
 

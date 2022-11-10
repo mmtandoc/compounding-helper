@@ -11,7 +11,10 @@ import {
   useForm,
 } from "react-hook-form"
 
+import Button from "components/common/Button"
 import { DataEntryComponent } from "types/common"
+
+import Form from "../forms/Form"
 
 type EditFormProps<
   TSchema extends Zod.ZodTypeAny,
@@ -82,7 +85,7 @@ const EditForm = <
 
   return (
     <FormProvider {...formMethods}>
-      <form
+      <Form
         onSubmit={handleSubmit(onSubmit, (errors) => {
           console.error(errors)
           setSaveSuccessful(false)
@@ -97,9 +100,11 @@ const EditForm = <
         />
         <div>
           <div className="button-row">
-            <button type="submit">Save</button>
+            <Button theme="primary" type="submit">
+              Save
+            </Button>
             <Link href={`${urlPath}/${id}`}>
-              <button type="button">Cancel</button>
+              <Button>Cancel</Button>
             </Link>
           </div>
           {saveSuccessful !== undefined && (
@@ -120,7 +125,7 @@ const EditForm = <
             margin-top: 1.2rem;
           }
         `}</style>
-      </form>
+      </Form>
     </FormProvider>
   )
 }

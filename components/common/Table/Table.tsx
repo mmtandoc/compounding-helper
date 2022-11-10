@@ -130,11 +130,7 @@ const Table = <TData,>(props: Props<TData>) => {
         table,
         th,
         :global(td) {
-          border: black solid 1px;
-        }
-
-        thead {
-          background-color: lightgray;
+          border: var(--table-border);
         }
 
         th,

@@ -5,6 +5,7 @@ import { useRouter } from "next/router"
 import React, { createRef, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 
+import Button from "components/common/Button"
 import Modal from "components/common/Modal"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
@@ -66,15 +67,14 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
       <div className="risk-assessment-container">
         <PrintableRiskAssessmentDetails data={data} />
         <div className="action-row">
-          <button type="button" onClick={handlePrint}>
-            Print
-          </button>
-          <Link href={`/risk-assessments/${riskAssessmentId}/edit`} passHref>
-            <button type="button">Edit</button>
+          <Button onClick={handlePrint}>Print</Button>
+          <Link
+            href={`/risk-assessments/${riskAssessmentId}/edit`}
+            className="button"
+          >
+            Edit
           </Link>
-          <button type="button" onClick={() => setIsModalOpen(true)}>
-            Delete
-          </button>
+          <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
         </div>
       </div>
       <Modal isOpen={isModalOpen}>
@@ -86,18 +86,15 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
           <p>This is permanent and cannot be undone.</p>
         </Modal.Body>
         <Modal.Footer>
-          <button
-            type="button"
+          <Button
             onClick={() => {
               handleDelete()
               setIsModalOpen(false)
             }}
           >
             Confirm
-          </button>
-          <button type="button" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </button>
+          </Button>
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
         </Modal.Footer>
       </Modal>
       <style jsx>{`
@@ -160,7 +157,6 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
           margin: 1.5cm;
           font-size: 12px;
           print-color-adjust: exact;
-          //font-size: 62.5%;
         }
       `}</style>
     </>

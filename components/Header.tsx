@@ -7,6 +7,7 @@ import Dropdown, {
   DropdownMenu,
   DropdownToggle,
 } from "components/common/Dropdown"
+import Logo from "public/logo.svg"
 
 const Header = () => {
   const router = useRouter()
@@ -15,7 +16,7 @@ const Header = () => {
 
   const left = (
     <div className="left">
-      <Link href="/" className="bold" data-active={isActive("/")}>
+      <Link href="/" data-active={isActive("/")}>
         Home
       </Link>
       <Dropdown>
@@ -92,7 +93,7 @@ const Header = () => {
       </Dropdown>
       <Dropdown>
         <DropdownToggle>
-          <span className="bold">Misc.</span>
+          <a>Misc.</a>
         </DropdownToggle>
         <DropdownMenu>
           <Link href="/hazards" data-active={isActive("/hazards")}>
@@ -101,25 +102,24 @@ const Header = () => {
         </DropdownMenu>
       </Dropdown>
       <style jsx>{`
-        .bold {
-          font-weight: bold;
-        }
-
         .left {
           display: flex;
           flex-direction: row;
+          padding: 2rem 1rem;
           column-gap: 1.5rem;
         }
 
         .left :global(a) {
           text-decoration: none;
-          color: #000;
           display: inline-block;
           font-weight: bold;
-        }
-
-        .left :global(a[data-active="true"]) {
-          color: gray;
+          color: var(--color-nav-fg);
+          &:hover {
+            color: var(--color-nav-link-hover-fg);
+          }
+          &[data-active="true"] {
+            color: var(--color-nav-link-current-fg);
+          }
         }
       `}</style>
     </div>
@@ -129,15 +129,25 @@ const Header = () => {
 
   return (
     <nav>
+      <Link className="logo-link" href="/">
+        <Logo />
+      </Link>
       {left}
       {right}
       <style jsx>{`
         nav {
           display: flex;
-          padding: 2rem;
           align-items: center;
           flex-grow: 0;
           flex-shrink: 0;
+          background-color: var(--color-nav-bg);
+          border-bottom: var(--nav-border);
+        }
+
+        :global(.logo-link) {
+          max-width: 4%;
+          padding: 1rem;
+          flex-grow: 1;
         }
       `}</style>
     </nav>

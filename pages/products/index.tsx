@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 
+import Button from "components/common/Button"
 import ProductTable from "components/product/ProductTable"
 import { getProducts } from "pages/api/products"
 import { NextPageWithLayout } from "types/common"
@@ -16,7 +17,7 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
   const actionBar = (
     <div className="action-bar">
       <Link href="/products/new">
-        <button type="button">New Product</button>
+        <Button>New Product</Button>
       </Link>
       <style jsx>{`
         .action-bar {

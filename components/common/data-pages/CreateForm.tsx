@@ -12,6 +12,9 @@ import {
 
 import { DataEntryComponent } from "types/common"
 
+import Button from "../Button"
+import Form from "../forms/Form"
+
 type CreateFormProps<
   TSchema extends Zod.ZodTypeAny,
   TFieldValues extends FieldValues,
@@ -81,7 +84,7 @@ const CreateForm = <
     <>
       {!saveSuccessful || !savedData ? (
         <FormProvider {...formMethods}>
-          <form
+          <Form
             onSubmit={handleSubmit(onSubmit, (errors) => {
               console.error(errors)
               setSaveSuccessful(false)
@@ -91,12 +94,12 @@ const CreateForm = <
           >
             <EntryComponent formMethods={formMethods} />
             <div className="action-row">
-              <button type="submit">Submit</button>
-              <button type="button" onClick={() => reset()}>
-                Clear
-              </button>
+              <Button theme="primary" type="submit">
+                Submit
+              </Button>
+              <Button onClick={() => reset()}>Clear</Button>
             </div>
-          </form>
+          </Form>
         </FormProvider>
       ) : (
         <div className="savedPrompt">

@@ -1,0 +1,66 @@
+@use "sass:color";
+@use "sass:map";
+
+$color-white: #fff;
+$color-black: #1d1d21;
+
+$lighten-percentage: 15%;
+$darken-percentage: 15%;
+
+$palettes: (
+  "gray": (
+    50: #fafafa,
+    100: #f5f5f5,
+    150: #ededed,
+    200: #e6e6e6,
+    250: #ddd,
+    300: #d4d4d4,
+    350: #bbb,
+    400: #a3a3a3,
+    500: #737373,
+    700: #404040,
+    600: #525252,
+    800: #262626,
+    900: #171717,
+  ),
+  "blue": (
+    100: #eff3fb,
+    200: #c7d6f0,
+    300: #9ebae5,
+    400: #769ddb,
+    500: #4e80d0,
+    600: #3165b9,
+    700: #274f91,
+    800: #1c3969,
+    900: #112340,
+  ),
+);
+
+@function color-get($color: string, $shade: number) {
+  @return map.get(map.get($palettes, $color), $shade);
+}
+
+$color-primary: color-get("blue", 600); // #3165b9;
+
+:root {
+  --color-black: #{$color-black};
+  --color-white: #{$color-white};
+
+  @each $colorname, $palette in $palettes {
+    @each $key, $value in $palette {
+      $keyname: "--color-scale-" + $colorname + "-" + $key;
+
+      #{$keyname}: #{$value};
+    }
+  }
+
+  --color-primary: #{$color-primary};
+  --color-primary-light: #{color.adjust(
+      $color-primary,
+      $lightness: $lighten-percentage
+    )};
+  --color-primary-dark: #{color.adjust(
+      $color-primary,
+      $lightness: -$darken-percentage
+    )};
+}

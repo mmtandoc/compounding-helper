@@ -6,6 +6,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
+import Button from "components/common/Button"
 import Input from "components/common/forms/Input"
 import Select from "components/common/forms/Select"
 import { NullPartialSdsFields } from "lib/fields"
@@ -145,9 +146,9 @@ const HazardInputRow = ({
         placeholder="Targeted organ"
         hidden={!isTargetOrganToxicity}
       />
-      <button type="button" onClick={() => remove(index)}>
+      <Button size="small" onClick={() => remove(index)}>
         Delete
-      </button>
+      </Button>
       <style jsx>{`
         li {
           display: flex;

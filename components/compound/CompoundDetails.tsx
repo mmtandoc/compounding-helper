@@ -1,7 +1,8 @@
 import React from "react"
 
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
-import form from "styles/form"
 import { CompoundWithIngredients } from "types/models"
 
 type Props = {
@@ -14,35 +15,31 @@ const CompoundDetails = (props: Props) => {
 
   return (
     <div className="compound-details">
-      <div className="form-group row">
+      <FormGroup row>
         <label>Name:</label>
         <span>{data.name}</span>
-      </div>
-      <fieldset>
-        <legend>Ingredients:</legend>
+      </FormGroup>
+      <Fieldset legend="Ingredients:">
         {data.ingredients.map((ingredient, index) => (
           <IngredientDetails key={index} ingredient={ingredient} />
         ))}
-      </fieldset>
+      </Fieldset>
       {display === "all" && (
         <>
-          <div className="form-group row">
+          <FormGroup row>
             <span className="label">Has master formulation record:</span>
             <span>{data.hasMasterFormulationRecord ? "Yes" : "No"}</span>
-          </div>
-          <div className="form-group row">
+          </FormGroup>
+          <FormGroup row>
             <span className="label">Beyond use date:</span>
             <span>{data.beyondUseDate ?? "N/A"}</span>
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <span className="label">Notes:</span>
             <textarea value={data.notes ?? "None"} readOnly={true} cols={20} />
-          </div>
+          </FormGroup>
         </>
       )}
-      <style jsx global>
-        {form}
-      </style>
       <style jsx global>{`
         .compound-details > .form-group {
           padding-left: 1.2rem;
@@ -61,33 +58,6 @@ const CompoundDetails = (props: Props) => {
         .radio-group label {
           display: flex;
           align-items: center;
-        }
-
-        :root {
-          --radio-background-color: #f3f3f3;
-          --radio-color: black;
-          --radio-border-color: black;
-          --radio-size: 1.2rem;
-        }
-
-        input[type="radio"] {
-          appearance: none;
-
-          border-radius: 50%;
-          width: var(--radio-size);
-          height: var(--radio-size);
-
-          border: none;
-          box-shadow: 0 0 0 1px black;
-          transition: 0.2s all linear;
-          margin-right: 0.5rem;
-          background-color: var(--radio-background-color);
-        }
-
-        input[type="radio"]:checked {
-          border: 0.35rem solid var(--radio-background-color);
-          background-color: var(--radio-color);
-          box-shadow: 0 0 0 1px black;
         }
       `}</style>
     </div>

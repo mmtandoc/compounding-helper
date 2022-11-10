@@ -1,0 +1,11 @@
+{
+    "extends": [
+        "stylelint-config-standard-scss",
+        "stylelint-config-prettier-scss"
+    ],
+    "rules": {
+        "custom-property-empty-line-before": null,
+        "selector-id-pattern": null,
+        "scss/dollar-variable-empty-line-before": null
+    }
+}

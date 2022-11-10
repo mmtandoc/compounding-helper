@@ -9,6 +9,8 @@ import {
 import useSWR from "swr"
 
 import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import Fieldset from "components/common/forms/Fieldset"
+import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
@@ -57,8 +59,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
   }
 
   return (
-    <fieldset className="exposure-risks">
-      <legend>{category}:</legend>
+    <Fieldset legend={`${category}:`} className="exposure-risks">
       <div className="row">
         <div>
           <ExposureRiskRow
@@ -130,14 +131,14 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
         </div>
       </div>
       <div className="row">
-        <div className="form-group">
+        <FormGroup>
           <label>Other:</label>
           <RHFBooleanRadioGroup
             name={`${name}.other` as Path<NullPartialRiskAssessmentFields>}
             control={control}
             rules={{ deps: `${name}.otherDescription` }}
           />
-        </div>
+        </FormGroup>
         <div className="form-group" style={{ flexGrow: 1 }}>
           <label className={isOtherRisk !== true ? "disabled" : ""}>
             Description:
@@ -152,7 +153,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           />
         </div>
       </div>
-    </fieldset>
+    </Fieldset>
   )
 }
 
@@ -182,10 +183,10 @@ const ExposureRiskRow = ({
 }: ExposureRiskRowProps) => {
   return (
     <div className="row">
-      <div className="form-group">
+      <FormGroup>
         <label>{riskName}:</label>
         <RHFBooleanRadioGroup name={name} control={control} rules={{ deps }} />
-      </div>
+      </FormGroup>
       {relatedHazardMap && (
         <div className="col related-health-hazards">
           <ul>

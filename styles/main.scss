@@ -1,0 +1,40 @@
+@use "base";
+@use "layout";
+@use "fields";
+
+a:not([class]) {
+  color: var(--color-primary);
+
+  &:hover {
+    color: var(--color-primary-light);
+  }
+}
+
+.label {
+  font-weight: 600;
+
+  &.disabled {
+    color: dimgray;
+  }
+}
+
+/* ===== MISC ===== */
+
+.row {
+  display: flex !important;
+  flex-direction: row !important;
+  column-gap: 0.7rem;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.row.grow > * {
+  flex: 1;
+}
+
+.hidden,
+[hidden] {
+  display: none !important;
+}
