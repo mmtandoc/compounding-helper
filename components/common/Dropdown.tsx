@@ -2,6 +2,9 @@ import { UrlObject } from "url"
 
 import Link from "next/link"
 import React, { CSSProperties, ReactNode } from "react"
+import { BiChevronDown } from "react-icons/bi"
+
+//TODO: Update CSS to use custom properties
 
 type DropdownProps = {
   children: React.ReactNode
@@ -48,7 +51,7 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
           box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
           z-index: 1;
 
-          :global(*) {
+          > :global(*) {
             padding: 0.6rem 1rem;
             border: var(--dropdown-border);
 
@@ -83,6 +86,13 @@ export const DropdownToggle = (props: DropdownToggleProps) => {
   return (
     <div style={style} className="dropdown-toggle">
       {children}
+      <BiChevronDown size="2rem" />
+      <style jsx>{`
+        .dropdown-toggle {
+          display: flex;
+          align-items: center;
+        }
+      `}</style>
     </div>
   )
 }
