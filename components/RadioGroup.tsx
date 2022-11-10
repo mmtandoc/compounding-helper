@@ -8,6 +8,7 @@ import {
 } from "react-hook-form"
 
 import ErrorContainer from "./common/forms/ErrorContainer"
+import RadioButton from "./common/forms/RadioButton"
 
 interface RHFRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
@@ -101,8 +102,7 @@ export const RadioGroup = (props: RadioGroupProps) => {
               readOnly ? "read-only" : ""
             }`}
           >
-            <input
-              type="radio"
+            <RadioButton
               name={name}
               onChange={onChange}
               ref={ref}

@@ -1,0 +1,42 @@
+@mixin invalid-field {
+  .invalid &,
+  &.invalid {
+    background-color: var(--color-field-invalid-bg) !important;
+  }
+}
+
+input:not([type="radio"], [type="checkbox"]),
+textarea {
+  font-size: var(--field-font-size);
+  border: 1px solid var(--color-field-border);
+  background-color: var(--color-field-bg);
+  border-radius: 0.2rem;
+
+  &:hover {
+    border-color: var(--color-field-hover-border);
+  }
+
+  &:active {
+    border-color: var(--color-field-active-border);
+  }
+
+  &:disabled {
+    border-color: var(--color-field-disabled-border);
+    background-color: var(--color-field-disabled-bg);
+    color: var(--color-field-disabled-fg);
+    pointer-events: none;
+  }
+
+  .invalid &,
+  &.invalid {
+    background-color: var(--color-field-invalid-bg) !important;
+  }
+
+  &:read-only:not(:disabled) {
+    border-color: var(--color-field-border);
+  }
+}
+
+label.read-nly {
+  pointer-events: none;
+}

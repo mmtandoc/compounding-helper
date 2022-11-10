@@ -11,6 +11,7 @@ import {
 } from "react-hook-form"
 
 import ErrorContainer from "./common/forms/ErrorContainer"
+import RadioButton from "./common/forms/RadioButton"
 
 interface RHFBooleanRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T> {
@@ -140,12 +141,11 @@ export const BooleanRadioGroup = ({
             readOnly ? "read-only" : ""
           }`}
         >
-          <input
+          <RadioButton
             name={name}
             onChange={onChange}
             ref={ref}
             onBlur={onBlur}
-            type="radio"
             checked={option.value === selectedValue}
             value={option.stringValue}
             readOnly={readOnly}

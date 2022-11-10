@@ -66,6 +66,8 @@ $font-size-lg: $font-size-base * 1.25 !default;
   --color-radio-border: var(--color-border-default);
   --color-radio-hover-border: var(--color-border-emphasis);
   --color-radio-active-border: var(--color-scale-gray-600);
+  --color-radio-disabled-border: var(--color-border-muted);
+  --color-radio-disabled-bg: var(--color-canvas-inset);
 
   // Select
   --color-select-invalid-bg: #ffc8c8;

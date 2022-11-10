@@ -1,6 +1,6 @@
 @use "base";
 @use "layout";
-@use "components";
+@use "fields";
 
 a:not([class]) {
   color: var(--color-primary);
