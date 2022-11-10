@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@styled-jsx/plugin-sass": "^4.0.2",
+    "@svgr/webpack": "^6.5.1",
     "@types/lodash": "^4.14.187",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.24",

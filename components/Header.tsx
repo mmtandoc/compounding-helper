@@ -7,6 +7,7 @@ import Dropdown, {
   DropdownMenu,
   DropdownToggle,
 } from "components/common/Dropdown"
+import Logo from "public/logo.svg"
 
 const Header = () => {
   const router = useRouter()
@@ -104,6 +105,7 @@ const Header = () => {
         .left {
           display: flex;
           flex-direction: row;
+          padding: 2rem 1rem;
           column-gap: 1.5rem;
         }
 
@@ -127,17 +129,25 @@ const Header = () => {
 
   return (
     <nav>
+      <Link className="logo-link" href="/">
+        <Logo />
+      </Link>
       {left}
       {right}
       <style jsx>{`
         nav {
           display: flex;
-          padding: 2rem;
           align-items: center;
           flex-grow: 0;
           flex-shrink: 0;
           background-color: var(--color-nav-bg);
           border-bottom: var(--nav-border);
+        }
+
+        :global(.logo-link) {
+          max-width: 4%;
+          padding: 1rem;
+          flex-grow: 1;
         }
       `}</style>
     </nav>
