@@ -1,11 +1,13 @@
 $font-size-base: 1.6rem !default;
 $font-size-sm: $font-size-base * 0.875 !default;
 $font-size-lg: $font-size-base * 1.25 !default;
+$font-size-xl: $font-size-base * 1.75 !default;
 
 :root {
   --font-size-base: #{$font-size-base};
   --font-size-sm: #{$font-size-sm};
   --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
 
   --color-fg-default: var(--color-black);
   --color-fg-muted: var(--color-scale-gray-400);
@@ -20,6 +22,7 @@ $font-size-lg: $font-size-base * 1.25 !default;
   // --color-accent-subtle:
   --color-accent-muted: lightblue;
 
+  --color-neutral-strong-emphasis: var(--color-scale-gray-350);
   --color-neutral-emphasis: var(--color-scale-gray-300);
   --color-neutral-muted: var(--color-scale-gray-150);
   --color-neutral-subtle: var(--color-scale-gray-100);
@@ -96,6 +99,9 @@ $font-size-lg: $font-size-base * 1.25 !default;
 
   --color-button-hover-border: var(--color-scale-gray-600);
   --color-button-hover-bg: var(--color-neutral-emphasis);
+
+  --color-button-active-border: var(--color-scale-gray-600);
+  --color-button-active-bg: var(--color-neutral-strong-emphasis);
 
   --color-button-disabled-border: var(--color-scale-gray-300);
   --color-button-disabled-bg: var(--color-neutral-subtle);

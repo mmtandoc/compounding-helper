@@ -2,23 +2,28 @@ import React from "react"
 
 type HtmlButtonAttributes = JSX.IntrinsicElements["button"]
 
-interface Props extends HtmlButtonAttributes {
-  size?: "small" | "normal" | "large"
+export interface ButtonProps extends HtmlButtonAttributes {
+  size?: "extra-small" | "small" | "medium" | "large"
   theme?: "primary" | "secondary" | "tertiary" | "neutral"
 }
 
-const Button = (props: Props) => {
+const Button = (props: ButtonProps) => {
   const { size, theme, children, className, ...buttonProps } = props
   return (
     <button
       {...buttonProps}
       type={buttonProps.type ?? "button"}
-      className={`${className ?? ""} ${size ?? ""} ${theme ?? ""}`}
+      className={`button ${className ?? ""} ${size ?? ""} ${theme ?? ""}`}
     >
       {children}
       <style jsx>{`
+        %button-extra-small {
+          font-size: var(--button-font-size-small);
+          padding: 0.1rem 0.1rem;
+        }
+
         %button-small {
-          font-size: var(--button-font-size-small) !important;
+          font-size: var(--button-font-size-small);
           padding: 0.15rem 0.8rem;
         }
 
@@ -28,11 +33,10 @@ const Button = (props: Props) => {
         }
 
         %button-large {
-          font-size: var(--button-font-size-large) !important;
+          font-size: var(--button-font-size-large);
           padding: 0.45rem 1.3rem;
         }
 
-        button,
         .button {
           @extend %button-medium;
 
@@ -60,16 +64,29 @@ const Button = (props: Props) => {
             @extend %button-small;
           }
 
+          &.medium {
+            @extend %button-medium;
+          }
+
+          &.extra-small {
+            @extend %button-extra-small;
+          }
+
+          &:hover {
+            background-color: var(--color-button-hover-bg);
+            border-color: var(--color-button-hover-border);
+          }
+
+          &:active {
+            background-color: var(--color-button-active-bg);
+            border-color: var(--color-button-active-border);
+          }
+
           &:disabled {
             background-color: var(--color-button-disabled-bg);
             color: var(--color-button-disabled-fg);
             border-color: var(--color-button-disabled-border);
             cursor: default;
-          }
-
-          &:hover:not(:disabled) {
-            background-color: var(--color-button-hover-bg);
-            border-color: var(--color-button-hover-border);
           }
 
           &.primary {
