@@ -19,6 +19,7 @@ interface Props<TFieldValues extends FieldValues>
   children: ReactNode
   rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate">
   initialOption?: { value: string; label: string; disabled?: boolean } | boolean
+  fullWidth?: boolean
 }
 
 const Select = <TFieldValues extends FieldValues>(
@@ -31,6 +32,7 @@ const Select = <TFieldValues extends FieldValues>(
     name,
     rules,
     shouldUnregister,
+    fullWidth,
     defaultValue,
     disabled = rules?.disabled,
     ...selectProps
@@ -78,6 +80,10 @@ const Select = <TFieldValues extends FieldValues>(
     onChange(value)
   }
 
+  selectProps.className = `${selectProps.className ?? ""}${
+    fullWidth ? " full-width" : ""
+  }`
+
   return (
     <ErrorContainer showErrorMessages={false}>
       <select
@@ -107,6 +113,7 @@ const Select = <TFieldValues extends FieldValues>(
             border-radius: 0.3rem;
             appearance: none;
             padding-right: 2.4rem;
+
             /*
             SVG icon from boxicons (boxicons.com)
             The MIT License (MIT)
@@ -161,6 +168,10 @@ const Select = <TFieldValues extends FieldValues>(
             .invalid &,
             &.invalid {
               background-color: var(--color-field-invalid-bg) !important;
+            }
+
+            &.full-width {
+              width: 100%;
             }
           }
         `}</style>

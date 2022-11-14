@@ -73,8 +73,7 @@ const ErrorContainer = <
     return inputProps.onBlur(e)
   }
 
-  containerProps.className = containerProps.className ?? "" + " input-container"
-
+  containerProps.className = `${containerProps.className ?? ""} input-container`
   return (
     <span {...containerProps} hidden={inputProps.hidden}>
       {React.cloneElement(inputElement, {
@@ -109,8 +108,10 @@ const ErrorContainer = <
       )}
       <style jsx>{`
         .input-container {
-          //display: inline-block;
-          //position: relative;
+          display: block;
+          &.full-width {
+            width: 100%;
+          }
         }
       `}</style>
       <style jsx global>{`
