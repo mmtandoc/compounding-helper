@@ -67,9 +67,10 @@ export const getLinks = async () =>
   prisma.link.findMany({ orderBy: { order: "asc" } })
 
 export const setLinks = async (data: Prisma.LinkCreateManyArgs["data"]) => {
-  prisma.$transaction([
+  const [, , result] = await prisma.$transaction([
     prisma.link.deleteMany(),
     prisma.link.createMany({ data }),
+    prisma.link.findMany({ orderBy: { order: "asc" } }),
   ])
-  return getLinks()
+  return result
 }

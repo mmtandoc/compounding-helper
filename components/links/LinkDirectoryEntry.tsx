@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import {
   UseFieldArrayReturn,
   UseFormReturn,
@@ -89,8 +90,17 @@ type LinkInputProps = Simplify<{
 
 const LinkInput = (props: LinkInputProps) => {
   const { formMethods, arrayMethods, index } = props
-  const { register } = formMethods
+  const { register, setValue, watch } = formMethods
   const { remove, swap, fields } = arrayMethods
+  const order = watch(`links.${index}.order`)
+
+  useEffect(() => {
+    if (order !== index + 1) {
+      register(`links.${index}.order`)
+      setValue(`links.${index}.order`, index + 1)
+    }
+  }, [index, register, setValue, order])
+
   return (
     <div className="link-input">
       <div className="inputs">
