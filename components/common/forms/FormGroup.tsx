@@ -40,21 +40,10 @@ export const LabelFormGroup = (props: LabelFormGroupProps) => {
 const style = css.global`
   %form-group-label {
     font-weight: 600;
-    display: block;
-    width: fit-content;
 
     &:not(:only-child) {
       margin-bottom: 0.3rem;
     }
-
-    /* > :where(span:only-child, :not(span:first-child)) {
-      font-weight: initial;
-      color: red;
-
-      * {
-        font-weight: initial;
-      }
-    } */
 
     > span:only-child,
     > :not(span:first-child) {
@@ -75,14 +64,11 @@ const style = css.global`
   .form-group {
     padding-block: 0.1rem 0.1rem;
     min-inline-size: min-content;
-    display: block;
+    display: flex;
+    flex-direction: column;
 
-    :not(.row) > * {
-      display: block;
-    }
-
-    :where(input:not([type="radio"], [type="checkbox"]), select) {
-      width: fit-content;
+    &.row {
+      flex-direction: row;
     }
 
     textarea {
