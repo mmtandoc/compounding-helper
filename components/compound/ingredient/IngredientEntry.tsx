@@ -183,7 +183,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                   defaultValue={null}
                 />
 
-                <Button className="btn small" disabled={!chemicalId}>
+                <Button size="small" disabled={!chemicalId}>
                   ...
                 </Button>
               </div>
@@ -219,7 +219,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                     isCommercialProduct === null || !isCommercialProduct
                   }
                 />
-                <Button className="btn small" disabled={!sdsId}>
+                <Button size="small" disabled={!sdsId}>
                   ...
                 </Button>
               </div>

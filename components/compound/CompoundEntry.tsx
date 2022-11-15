@@ -94,7 +94,8 @@ const CompoundEntry = (props: Props) => {
         ))}
         <div>
           <Button
-            className="add-button small"
+            className="add-button"
+            size="small"
             value="add"
             onClick={() =>
               ingredientsArrayMethods.append(emptyIngredientValues)
