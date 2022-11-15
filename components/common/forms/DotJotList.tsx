@@ -3,6 +3,8 @@ import { MdClose } from "react-icons/md"
 
 import Button from "components/common/Button"
 
+import IconButton from "../IconButton"
+
 type DotJotItem = { text: string; readOnly?: boolean }
 
 type DotJotListProps = {
@@ -106,13 +108,13 @@ const DotJotItem = (props: DotJotItemProps) => {
           <span>{text}</span>
         )}
         {!readOnly && (
-          <Button
-            className="remove-item-button small"
+          <IconButton
+            icon={MdClose}
+            className="remove-item-button"
             value="remove"
             onClick={() => onRemove?.(index)}
-          >
-            <MdClose size={"1.2em"} />
-          </Button>
+            size="extra-small"
+          />
         )}
       </div>
       <style jsx>{`

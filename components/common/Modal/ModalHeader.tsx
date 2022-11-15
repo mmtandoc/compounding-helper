@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react"
 import { MdClose } from "react-icons/md"
 
-import Button from "components/common/Button"
+import IconButton from "../IconButton"
+
 type ModalHeaderProps = {
   children: ReactNode
   closeButton?: boolean
@@ -14,9 +15,12 @@ const ModalHeader = (props: ModalHeaderProps) => {
     <div className="modal-header">
       <div className="modal-title">{children}</div>
       {closeButton && (
-        <Button className="modal-close-button" onClick={() => onClose?.()}>
-          <MdClose />
-        </Button>
+        <IconButton
+          icon={MdClose}
+          className="modal-close-button"
+          onClick={() => onClose?.()}
+          size="small"
+        />
       )}
       <style jsx>{`
         .modal-header {
