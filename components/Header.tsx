@@ -99,6 +99,9 @@ const Header = () => {
           <Link href="/hazards" data-active={isActive("/hazards")}>
             Health hazards table
           </Link>
+          <Link href="/links" data-active={isActive("/links")}>
+            Link Directory
+          </Link>
         </DropdownMenu>
       </Dropdown>
       <style jsx>{`
