@@ -16,15 +16,14 @@ const EditCompound: NextPageWithLayout<Props> = (props: Props) => {
   const { values } = props
 
   const router = useRouter()
-  const riskAssessmentId = parseInt(router.query.id as string)
+  const id = parseInt(router.query.id as string)
 
   return (
     <EditForm
-      id={riskAssessmentId}
       values={values as NullPartialCompoundFields}
       schema={compoundSchema}
-      apiEndpointPath="/api/compounds"
-      urlPath="/compounds"
+      apiEndpointPath={`/api/compounds/${id}`}
+      urlPath={`/compounds/${id}`}
       entryComponent={CompoundEntry}
       entryComponentProps={{ showPastSdsRevisions: true, display: "all" }}
     />

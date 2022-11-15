@@ -22,15 +22,14 @@ const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
   const { values } = props
 
   const router = useRouter()
-  const riskAssessmentId = parseInt(router.query.id as string)
+  const id = parseInt(router.query.id as string)
 
   return (
     <EditForm
-      id={riskAssessmentId}
       values={values as NullPartialRiskAssessmentFields}
       schema={riskAssessmentSchema}
-      apiEndpointPath="/api/risk-assessments"
-      urlPath="/risk-assessments"
+      apiEndpointPath={`/api/risk-assessments/${id}`}
+      urlPath={`/risk-assessments/${id}`}
       entryComponent={RiskAssessmentEntry}
       entryComponentProps={{ showPastSdsRevisions: true }}
     />

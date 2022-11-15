@@ -22,11 +22,10 @@ const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
 
   return (
     <EditForm
-      id={id}
       schema={sdsSchema}
       values={values as NullPartialSdsFields}
-      apiEndpointPath="/api/sds"
-      urlPath="/sds"
+      apiEndpointPath={`/api/sds/${id}`}
+      urlPath={`/sds/${id}`}
       entryComponent={SdsEntry}
     />
   )

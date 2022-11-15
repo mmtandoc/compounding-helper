@@ -26,11 +26,10 @@ const EditChemical: NextPageWithLayout<EditChemicalProps> = (
 
   return (
     <EditForm
-      id={id}
       schema={chemicalSchema}
       values={values as NullPartialChemicalFields}
-      apiEndpointPath="/api/chemicals"
-      urlPath="/chemicals"
+      apiEndpointPath={`/api/chemicals/${id}`}
+      urlPath={`/chemicals/${id}`}
       entryComponent={ChemicalEntry}
     />
   )

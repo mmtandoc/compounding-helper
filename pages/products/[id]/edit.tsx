@@ -26,11 +26,10 @@ const EditProduct: NextPageWithLayout<EditProductProps> = (
 
   return (
     <EditForm
-      id={id}
       schema={productSchema}
       values={values as NullPartialProductFields}
-      apiEndpointPath="/api/products"
-      urlPath="/products"
+      apiEndpointPath={`/api/products/${id}`}
+      urlPath={`/products/${id}`}
       entryComponent={ProductEntry}
     />
   )

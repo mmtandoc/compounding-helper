@@ -20,7 +20,6 @@ type EditFormProps<
   TSchema extends Zod.ZodTypeAny,
   TFieldValues extends FieldValues,
 > = {
-  id: number
   values: TFieldValues
   schema?: TSchema
   apiEndpointPath: string
@@ -36,7 +35,6 @@ const EditForm = <
   props: EditFormProps<TSchema, TFieldValues>,
 ) => {
   const {
-    id,
     values,
     apiEndpointPath,
     urlPath,
@@ -71,10 +69,10 @@ const EditForm = <
 
   const onSubmit: SubmitHandler<TFieldValues> = async (data) => {
     await axios
-      .put(`${apiEndpointPath}/${id}`, data)
+      .put(`${apiEndpointPath}`, data)
       .then(() => {
         setSaveSuccessful(true)
-        router.push(`${urlPath}/${id}`)
+        router.push(`${urlPath}`)
       })
       .catch((reason) => {
         //TODO: Handle error
@@ -103,7 +101,7 @@ const EditForm = <
             <Button theme="primary" type="submit">
               Save
             </Button>
-            <Link href={`${urlPath}/${id}`}>
+            <Link href={`${urlPath}`}>
               <Button>Cancel</Button>
             </Link>
           </div>
