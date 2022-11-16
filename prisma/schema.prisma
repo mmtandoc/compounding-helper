@@ -225,3 +225,14 @@ enum PhysicalForm {
   liquid
   solid
 }
+
+model Link {
+  id          Int      @id @default(autoincrement())
+  url         String
+  name        String
+  description String?
+  order       Int      @default(autoincrement())
+  updatedAt   DateTime @updatedAt
+
+  @@map("directory")
+}
