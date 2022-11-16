@@ -53,7 +53,8 @@
           "caseInsensitive": true
         }
       }
-    ]
+    ],
+    "import/newline-after-import": ["error"]
   },
   "env": {
     "jest/globals": true
