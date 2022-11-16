@@ -28,12 +28,16 @@ const Links: NextPageWithLayout<Props> = (props) => {
             {link.description ? (
               <details>
                 <summary>
-                  <a href={link.url}>{link.name}</a>
+                  <a href={link.url} target="_blank" rel="noreferrer">
+                    {link.name}
+                  </a>
                 </summary>
                 <p>{link.description}</p>
               </details>
             ) : (
-              <a href={link.url}>{link.name}</a>
+              <a href={link.url} target="_blank" rel="noreferrer">
+                {link.name}
+              </a>
             )}
           </li>
         ))}
