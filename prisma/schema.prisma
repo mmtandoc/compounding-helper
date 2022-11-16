@@ -105,8 +105,8 @@ model RiskAssessment {
   preparationFrequency   PreparationFrequency
   isSmallQuantity        Boolean
 
-  averagePreparationAmountQuantity Float?
-  averagePreparationAmountUnit     Unit?
+  averagePreparationAmountQuantity Float
+  averagePreparationAmountUnit     Unit
 
   isConcentrationHealthRisk  Boolean
   requireSpecialEducation    Boolean
