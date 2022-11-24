@@ -86,7 +86,7 @@ export const DropdownToggle = (props: DropdownToggleProps) => {
   return (
     <div style={style} className="dropdown-toggle">
       {children}
-      <BiChevronDown size="2rem" />
+      <BiChevronDown size="20px" />
       <style jsx>{`
         .dropdown-toggle {
           display: flex;
