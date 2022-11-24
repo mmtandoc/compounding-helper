@@ -2,12 +2,12 @@ import React from "react"
 
 type Props = Omit<JSX.IntrinsicElements["input"], "type" | "children">
 
-const RadioButton = (props: Props) => {
+const RadioButton = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { ...radioProps } = props
 
   return (
     <>
-      <input type="radio" {...radioProps} />
+      <input type="radio" {...radioProps} ref={ref} />
       <style jsx>{`
         input[type="radio"] {
           appearance: none;
@@ -53,6 +53,8 @@ const RadioButton = (props: Props) => {
       `}</style>
     </>
   )
-}
+})
+
+RadioButton.displayName = "RadioButton"
 
 export default RadioButton

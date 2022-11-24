@@ -54,7 +54,7 @@ export const RHFRadioGroup = <TFieldValues extends FieldValues>(
             valueAsNumber ? Number(e.target.value) : e.target.value,
           )
         }}
-        inputRef={field.ref}
+        ref={field.ref}
         onBlur={field.onBlur}
         name={field.name}
         radioOptions={radioOptions}
@@ -71,7 +71,6 @@ interface RadioGroupProps {
   name?: string
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onBlur?: React.FocusEventHandler<HTMLInputElement>
-  inputRef?: React.LegacyRef<HTMLInputElement>
   radioOptions: [value: string | number, label: string][]
   readOnly?: boolean
   disabled?: boolean
@@ -79,61 +78,64 @@ interface RadioGroupProps {
   selectedValue?: string | number
 }
 
-export const RadioGroup = (props: RadioGroupProps) => {
-  const {
-    onChange,
-    onBlur,
-    inputRef: ref,
-    name,
-    radioOptions,
-    readOnly,
-    disabled,
-    className,
-    selectedValue,
-  } = props
+export const RadioGroup = React.forwardRef<HTMLInputElement, RadioGroupProps>(
+  (props, ref) => {
+    const {
+      onChange,
+      onBlur,
+      name,
+      radioOptions,
+      readOnly,
+      disabled,
+      className,
+      selectedValue,
+    } = props
 
-  return (
-    <div className={`radio-group row ${className ?? ""}`}>
-      {radioOptions.map(([value, label], i) => {
-        return (
-          <label
-            key={i}
-            className={`${disabled ? "disabled" : ""} ${
-              readOnly ? "read-only" : ""
-            }`}
-          >
-            <RadioButton
-              name={name}
-              onChange={onChange}
-              ref={ref}
-              onBlur={onBlur}
-              value={value}
-              readOnly={readOnly}
-              checked={
-                selectedValue === value ||
-                Number(selectedValue) === Number(value)
-              }
-              onClick={(e) => readOnly && e.preventDefault()}
-              disabled={disabled}
-            />
-            <span>{label}</span>
-          </label>
-        )
-      })}
-      <style jsx>{`
-        div.radio-group {
-          display: flex;
-        }
+    return (
+      <div className={`radio-group row ${className ?? ""}`}>
+        {radioOptions.map(([value, label], i) => {
+          return (
+            <label
+              key={i}
+              className={`${disabled ? "disabled" : ""} ${
+                readOnly ? "read-only" : ""
+              }`}
+            >
+              <RadioButton
+                name={name}
+                onChange={onChange}
+                ref={ref}
+                onBlur={onBlur}
+                value={value}
+                readOnly={readOnly}
+                checked={
+                  selectedValue === value ||
+                  Number(selectedValue) === Number(value)
+                }
+                onClick={(e) => readOnly && e.preventDefault()}
+                disabled={disabled}
+              />
+              <span>{label}</span>
+            </label>
+          )
+        })}
+        <style jsx>{`
+          div.radio-group {
+            display: flex;
+          }
 
-        .radio-group > label {
-          display: flex;
-          align-items: center;
-        }
+          .radio-group > label {
+            display: flex;
+            align-items: center;
+          }
 
-        label {
-          white-space: nowrap;
-        }
-      `}</style>
-    </div>
-  )
-}
+          label {
+            white-space: nowrap;
+          }
+        `}</style>
+      </div>
+    )
+  },
+)
+
+RadioGroup.displayName = "RadioGroup"

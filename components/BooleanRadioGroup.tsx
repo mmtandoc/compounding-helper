@@ -91,7 +91,7 @@ export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
         onChange={(e) => {
           field.onChange(e.target.value === "yes")
         }}
-        inputRef={field.ref}
+        ref={field.ref}
         onBlur={field.onBlur}
         name={field.name}
         direction={direction}
@@ -108,7 +108,6 @@ type BooleanRadioGroupProps = {
   name?: string
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onBlur?: React.FocusEventHandler<HTMLInputElement>
-  inputRef?: React.LegacyRef<HTMLInputElement>
   direction?: string
   className?: string
   disabled?: boolean
@@ -116,21 +115,25 @@ type BooleanRadioGroupProps = {
   readOnly?: boolean
 }
 
-export const BooleanRadioGroup = ({
-  name,
-  onChange,
-  onBlur,
-  inputRef: ref,
-  direction = "row",
-  className,
-  disabled = false,
-  selectedValue,
-  readOnly = false,
-}: BooleanRadioGroupProps) => {
+export const BooleanRadioGroup = React.forwardRef<
+  HTMLInputElement,
+  BooleanRadioGroupProps
+>((props, ref) => {
   const options = [
     { label: "Yes", stringValue: "yes", value: true },
     { label: "No", stringValue: "no", value: false },
   ]
+
+  const {
+    name,
+    onChange,
+    onBlur,
+    direction = "row",
+    className,
+    disabled = false,
+    selectedValue,
+    readOnly = false,
+  } = props
 
   return (
     <div className={`boolean-radio-group ${direction} ${className ?? ""}`}>
@@ -167,4 +170,6 @@ export const BooleanRadioGroup = ({
       `}</style>
     </div>
   )
-}
+})
+
+BooleanRadioGroup.displayName = "BooleanRadioGroup"
