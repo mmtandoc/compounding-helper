@@ -68,11 +68,8 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
         <PrintableRiskAssessmentDetails data={data} />
         <div className="action-row">
           <Button onClick={handlePrint}>Print</Button>
-          <Link
-            href={`/risk-assessments/${riskAssessmentId}/edit`}
-            className="button"
-          >
-            Edit
+          <Link href={`/risk-assessments/${riskAssessmentId}/edit`}>
+            <Button>Edit</Button>
           </Link>
           <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
         </div>

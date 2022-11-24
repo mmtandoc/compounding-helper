@@ -97,7 +97,7 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
         <Link href={`/compounds/${data.id}/edit`}>
           <Button size="small">Edit</Button>
         </Link>
-        <Link href={`/risk-assessments/${data.id}`} className="button">
+        <Link href={`/risk-assessments/${data.id}`}>
           <Button size="small">View Risk Assessment</Button>
         </Link>
         <style jsx>{`
