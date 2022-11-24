@@ -2,7 +2,7 @@ import axios from "axios"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { createRef, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 
 import Button from "components/common/Button"
@@ -19,6 +19,7 @@ const PrintableRiskAssessmentDetails = React.forwardRef(
   ) {
     return (
       <div ref={ref}>
+        <h1 className="print">{`Risk Assessment: ${props.data.compound.name}`}</h1>
         <RiskAssessmentDetails {...props} />
       </div>
     )
@@ -27,7 +28,6 @@ const PrintableRiskAssessmentDetails = React.forwardRef(
 
 type RiskAssessmentProps = {
   data: RiskAssessmentAll
-  printableRef: React.Ref<HTMLDivElement>
 }
 
 const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
@@ -65,7 +65,7 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
   return (
     <>
       <div className="risk-assessment-container">
-        <PrintableRiskAssessmentDetails data={data} />
+        <PrintableRiskAssessmentDetails data={data} ref={printableRef} />
         <div className="action-row">
           <Button onClick={handlePrint}>Print</Button>
           <Link href={`/risk-assessments/${riskAssessmentId}/edit`}>
@@ -175,13 +175,10 @@ export const getServerSideProps: GetServerSideProps<
     return { notFound: true }
   }
 
-  const printableRef = createRef<HTMLDivElement>()
-
   return {
     props: {
       title: `Risk Assessment: ${data.compound.name}`,
       data,
-      printableRef,
     },
   }
 }
