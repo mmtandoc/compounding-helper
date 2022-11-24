@@ -2,7 +2,7 @@ import { Vendor } from "@prisma/client"
 import React from "react"
 import { Control } from "react-hook-form"
 
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 
@@ -40,7 +40,7 @@ const SdsSelect = ({
   }
 
   return (
-    <Select
+    <RhfSelect
       name={`compound.ingredients.${ingredientIndex}.sdsId`}
       rules={{
         required: required,
@@ -89,7 +89,7 @@ const SdsSelect = ({
           min-width: 30rem;
         }
       `}</style>
-    </Select>
+    </RhfSelect>
   )
 }
 

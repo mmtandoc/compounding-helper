@@ -5,7 +5,7 @@ import useSWR from "swr"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
 import { LabelFormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import { NullPartialProductFields } from "lib/fields"
 import { DataEntryComponent } from "types/common"
 
@@ -45,7 +45,7 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
       </LabelFormGroup>
       <LabelFormGroup>
         <span>Vendor:</span>
-        <Select
+        <RhfSelect
           name="vendorId"
           className="vendor-select"
           rules={{ valueAsNumber: true }}
@@ -56,7 +56,7 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
               {v.name}
             </option>
           ))}
-        </Select>
+        </RhfSelect>
       </LabelFormGroup>
       <style jsx global>{`
         .vendor-select {

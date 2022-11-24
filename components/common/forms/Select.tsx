@@ -11,99 +11,23 @@ import { Merge } from "type-fest"
 
 import ErrorContainer from "./ErrorContainer"
 
-interface Props<TFieldValues extends FieldValues>
-  extends Merge<
-    JSX.IntrinsicElements["select"],
-    UseControllerProps<TFieldValues>
-  > {
+type SelectAttributes = JSX.IntrinsicElements["select"]
+
+interface SelectProps extends SelectAttributes {
   children: ReactNode
-  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate">
-  initialOption?: { value: string; label: string; disabled?: boolean } | boolean
   fullWidth?: boolean
 }
 
-const Select = <TFieldValues extends FieldValues>(
-  props: Props<TFieldValues>,
-) => {
-  const formMethods = useFormContext<TFieldValues>()
-  const {
-    children,
-    control = formMethods.control,
-    name,
-    rules,
-    shouldUnregister,
-    fullWidth,
-    defaultValue,
-    disabled = rules?.disabled,
-    ...selectProps
-  } = props
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  (props, ref) => {
+    const { children, fullWidth, ...selectProps } = props
 
-  delete selectProps.initialOption
+    selectProps.className = `${selectProps.className ?? ""}${
+      fullWidth ? " full-width" : ""
+    }`
 
-  // If initialOption is true, use blank string for value and label
-  const initialOption =
-    typeof props.initialOption === "boolean"
-      ? props.initialOption
-        ? { value: "", label: "" }
-        : undefined
-      : props.initialOption
-
-  const {
-    field: { onChange, onBlur, ref, value },
-  } = useController({
-    control,
-    name,
-    shouldUnregister,
-    defaultValue,
-    rules: _.omit(rules, "setValueAs", "valueAsNumber"),
-  })
-
-  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
-    let value: any = e.target.value
-
-    switch (value) {
-      case undefined:
-        value = undefined
-        break
-      case initialOption?.value:
-        value = null
-        break
-      default:
-        if (rules?.setValueAs) {
-          value = rules?.setValueAs(value)
-        } else {
-          value = rules?.valueAsNumber ? Number(value) : value
-        }
-        break
-    }
-
-    onChange(value)
-  }
-
-  selectProps.className = `${selectProps.className ?? ""}${
-    fullWidth ? " full-width" : ""
-  }`
-
-  return (
-    <ErrorContainer showErrorMessages={false}>
-      <select
-        {...selectProps}
-        name={name}
-        onChange={handleChange}
-        onBlur={onBlur}
-        value={value ?? (initialOption ? initialOption.value : undefined)}
-        ref={ref}
-        disabled={disabled}
-      >
-        {initialOption && (
-          <option
-            value={initialOption.value}
-            disabled={initialOption.disabled ?? true}
-            hidden={initialOption.disabled ?? true}
-          >
-            {initialOption.label}
-          </option>
-        )}
+    return (
+      <select {...selectProps} ref={ref}>
         {children}
         <style jsx>{`
           select {
@@ -176,8 +100,10 @@ const Select = <TFieldValues extends FieldValues>(
           }
         `}</style>
       </select>
-    </ErrorContainer>
-  )
-}
+    )
+  },
+)
+
+Select.displayName = "Select"
 
 export default Select

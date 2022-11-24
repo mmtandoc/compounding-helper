@@ -6,7 +6,7 @@ import Button from "components/common/Button"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
 import IngredientEntry from "components/compound/ingredient/IngredientEntry"
 import { RHFRadioGroup } from "components/RadioGroup"
@@ -220,14 +220,14 @@ const RiskAssessmentEntry = (props: Props) => {
             type="text"
             size={3}
           />
-          <Select
+          <RhfSelect
             id="average-preparation-amount-unit"
             name="averagePreparationAmount.unit"
             initialOption
           >
             <option value="g">g</option>
             <option value="ml">ml</option>
-          </Select>
+          </RhfSelect>
         </FormGroup>
       </Fieldset>
       <Fieldset legend="Do the concentration of ingredients in the product present a health risk to the compounder?">
@@ -327,7 +327,7 @@ const RiskAssessmentEntry = (props: Props) => {
           </FormGroup>
           <FormGroup>
             <label className={!glovesRequired ? "disabled" : ""}>Type:</label>
-            <Select
+            <RhfSelect
               name="ppe.gloves.type"
               rules={{
                 disabled: !glovesRequired,
@@ -338,7 +338,7 @@ const RiskAssessmentEntry = (props: Props) => {
               <option value="regular">Regular gloves</option>
               <option value="chemotherapy">Chemotherapy gloves</option>
               <option value="double">Double gloves</option>
-            </Select>
+            </RhfSelect>
           </FormGroup>
         </Fieldset>
         <Fieldset legend="Coat:" className="row">
@@ -351,7 +351,7 @@ const RiskAssessmentEntry = (props: Props) => {
           </FormGroup>
           <FormGroup>
             <label className={!coatRequired ? "disabled" : ""}>Type:</label>
-            <Select
+            <RhfSelect
               name="ppe.coat.type"
               rules={{
                 disabled: !coatRequired,
@@ -361,7 +361,7 @@ const RiskAssessmentEntry = (props: Props) => {
             >
               <option value="designated">Designated coat</option>
               <option value="disposable">Disposable coat</option>
-            </Select>
+            </RhfSelect>
           </FormGroup>
         </Fieldset>
         <Fieldset legend="Mask:" className="row">
@@ -418,11 +418,11 @@ const RiskAssessmentEntry = (props: Props) => {
       <Fieldset>
         <div id="risk-level-container" className="form-group">
           <label>Risk level assigned:</label>
-          <Select name="riskLevel" id="risk-level-select" initialOption>
+          <RhfSelect name="riskLevel" id="risk-level-select" initialOption>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
-          </Select>
+          </RhfSelect>
         </div>
         <FormGroup>
           <label htmlFor="rationale">

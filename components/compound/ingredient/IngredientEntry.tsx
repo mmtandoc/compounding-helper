@@ -15,7 +15,7 @@ import Button from "components/common/Button"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
 import { NullPartialIngredientFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
@@ -190,7 +190,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
             </FormGroup>
             <FormGroup>
               <label htmlFor={`i${index}-physical-form`}>Physical form: </label>
-              <Select
+              <RhfSelect
                 name={`${name}.${index}.physicalForm`}
                 id={`i${index}-physical-form`}
                 className="physical-form"
@@ -201,7 +201,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
                 <option value="powder">Powder</option>
                 <option value="liquid">Liquid</option>
                 <option value="solid">Solid</option>
-              </Select>
+              </RhfSelect>
             </FormGroup>
           </div>
           <div className="row">

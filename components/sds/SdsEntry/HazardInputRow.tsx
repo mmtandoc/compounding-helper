@@ -8,7 +8,7 @@ import useSWR from "swr"
 
 import Button from "components/common/Button"
 import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import { NullPartialSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
@@ -63,7 +63,7 @@ const HazardInputRow = ({
 
   return (
     <li>
-      <Select
+      <RhfSelect
         className="class-select"
         name={`hazards.${index}.classId`}
         rules={{
@@ -91,8 +91,8 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </Select>
-      <Select
+      </RhfSelect>
+      <RhfSelect
         className="category-select"
         placeholder="Category"
         name={`hazards.${index}.categoryId`}
@@ -115,8 +115,8 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </Select>
-      <Select
+      </RhfSelect>
+      <RhfSelect
         className="subcategory-select"
         name={`hazards.${index}.subcategoryId`}
         disabled={!categoryId || !category?.subcategories.length}
@@ -136,7 +136,7 @@ const HazardInputRow = ({
             </option>
           )
         })}
-      </Select>
+      </RhfSelect>
       <Input
         className="targeted-organ"
         type="text"

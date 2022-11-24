@@ -6,7 +6,7 @@ import ChemicalSearch from "components/chemical/ChemicalSearch"
 import Button from "components/common/Button"
 import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
-import Select from "components/common/forms/Select"
+import RhfSelect from "components/common/forms/RhfSelect"
 import { NullPartialHazardFields, NullPartialSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { ProductWithVendor } from "types/models"
@@ -70,7 +70,7 @@ const SdsEntry = (props: Props) => {
       <FormGroup>
         <label>
           <span>Product:</span>
-          <Select
+          <RhfSelect
             name="productId"
             rules={{ valueAsNumber: true }}
             disabled={!chemicalId}
@@ -81,7 +81,7 @@ const SdsEntry = (props: Props) => {
                 {p.name} ({p.vendor.name})
               </option>
             ))}
-          </Select>
+          </RhfSelect>
         </label>
       </FormGroup>
       <FormGroup>
