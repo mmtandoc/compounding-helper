@@ -70,7 +70,7 @@ const ErrorContainer = <
 
   const handleBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
     setIsTooltipVisible(false)
-    return inputProps.onBlur(e)
+    return inputProps?.onBlur?.(e)
   }
 
   containerProps.className = `${containerProps.className ?? ""} input-container`

@@ -6,7 +6,10 @@ import ErrorContainer from "./ErrorContainer"
 
 type InputAttributes = JSX.IntrinsicElements["input"]
 
-type Props = Merge<InputAttributes, UseFormRegisterReturn> & {
+type Props = (
+  | InputAttributes
+  | Merge<InputAttributes, Partial<UseFormRegisterReturn>>
+) & {
   fullWidth?: boolean
 }
 

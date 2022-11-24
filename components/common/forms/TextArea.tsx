@@ -6,7 +6,9 @@ import ErrorContainer from "./ErrorContainer"
 
 type TextAreaAttributes = JSX.IntrinsicElements["textarea"]
 
-type Props = Merge<TextAreaAttributes, UseFormRegisterReturn>
+type Props =
+  | TextAreaAttributes
+  | Merge<TextAreaAttributes, Partial<UseFormRegisterReturn>>
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   return (
