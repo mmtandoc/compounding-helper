@@ -38,7 +38,7 @@ export default async function handler(
 
       if (compound === null) {
         res.status(500).json({
-          error: { code: 404, message: `Risk assessment ${id} not found.` },
+          error: { code: 404, message: `Compound ${id} not found.` },
         })
         return
       }
