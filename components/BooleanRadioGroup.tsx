@@ -13,7 +13,7 @@ import {
 import ErrorContainer from "./common/forms/ErrorContainer"
 import RadioButton from "./common/forms/RadioButton"
 
-interface RHFBooleanRadioGroupProps<T extends FieldValues>
+interface RhfBooleanRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T> {
   id?: string
   error?: FieldError
@@ -23,8 +23,8 @@ interface RHFBooleanRadioGroupProps<T extends FieldValues>
   direction?: "row" | "col"
 }
 
-export const RHFBooleanRadioGroup = <TFieldValues extends FieldValues>(
-  props: RHFBooleanRadioGroupProps<TFieldValues>,
+export const RhfBooleanRadioGroup = <TFieldValues extends FieldValues>(
+  props: RhfBooleanRadioGroupProps<TFieldValues>,
 ) => {
   const formMethods = useFormContext<TFieldValues>()
   const {

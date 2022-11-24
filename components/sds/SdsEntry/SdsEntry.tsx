@@ -1,7 +1,7 @@
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
 
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
 import Button from "components/common/Button"
 import { FormGroup } from "components/common/forms/FormGroup"
@@ -131,7 +131,7 @@ const SdsEntry = (props: Props) => {
       <FormGroup>
         <label>
           <span>Is ventilation required as per SDS?</span>
-          <RHFBooleanRadioGroup name="requireVentilation" />
+          <RhfBooleanRadioGroup name="requireVentilation" />
         </label>
       </FormGroup>
       <style jsx>{`

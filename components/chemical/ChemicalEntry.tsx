@@ -4,7 +4,7 @@ import { Controller, UseFormReturn } from "react-hook-form"
 import DotJotList from "components/common/forms/DotJotList"
 import { LabelFormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
-import { RHFRadioGroup } from "components/RadioGroup"
+import { RhfRadioGroup } from "components/RadioGroup"
 import { NullPartialChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { DataEntryComponent } from "types/common"
@@ -79,7 +79,7 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
       </LabelFormGroup>
       <LabelFormGroup>
         <span>NIOSH Tables:</span>
-        <RHFRadioGroup
+        <RhfRadioGroup
           name={"nioshTable"}
           valueAsNumber={true}
           radioOptions={[

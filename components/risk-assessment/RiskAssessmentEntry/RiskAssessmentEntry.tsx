@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import Button from "components/common/Button"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
@@ -9,7 +9,7 @@ import Input from "components/common/forms/Input"
 import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
 import IngredientEntry from "components/compound/ingredient/IngredientEntry"
-import { RHFRadioGroup } from "components/RadioGroup"
+import { RhfRadioGroup } from "components/RadioGroup"
 import {
   NullPartialIngredientFields,
   NullPartialRiskAssessmentFields,
@@ -177,7 +177,7 @@ const RiskAssessmentEntry = (props: Props) => {
           </>
         }
       >
-        <RHFRadioGroup
+        <RhfRadioGroup
           name="complexity"
           radioOptions={[
             ["simple", "Simple"],
@@ -187,10 +187,10 @@ const RiskAssessmentEntry = (props: Props) => {
         />
       </Fieldset>
       <Fieldset legend="Is this compound only prepared occasionally?">
-        <RHFBooleanRadioGroup name="isPreparedOccasionally" />
+        <RhfBooleanRadioGroup name="isPreparedOccasionally" />
       </Fieldset>
       <Fieldset legend="How often is this compound prepared?">
-        <RHFRadioGroup
+        <RhfRadioGroup
           name="preparationFrequency"
           radioOptions={[
             ["daily", "Daily"],
@@ -201,7 +201,7 @@ const RiskAssessmentEntry = (props: Props) => {
       </Fieldset>
       <Fieldset legend="Are there only small quantities of ingredients being prepared?">
         <FormGroup>
-          <RHFBooleanRadioGroup id="is-small-quantity" name="isSmallQuantity" />
+          <RhfBooleanRadioGroup id="is-small-quantity" name="isSmallQuantity" />
         </FormGroup>
       </Fieldset>
       <Fieldset legend="On average, what quantity of this preparation is being prepared at a time?">
@@ -231,37 +231,37 @@ const RiskAssessmentEntry = (props: Props) => {
         </FormGroup>
       </Fieldset>
       <Fieldset legend="Do the concentration of ingredients in the product present a health risk to the compounder?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="is-concentration-health-risk"
           name="isConcentrationHealthRisk"
         />
       </Fieldset>
       <Fieldset legend="Does preparation require special education or competencies for your compounding personnel?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="require-special-education"
           name="requireSpecialEducation"
         />
       </Fieldset>
       <Fieldset legend="Are there verification steps during compounding?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="has-verification-steps"
           name="hasVerificationSteps"
         />
       </Fieldset>
       <Fieldset legend="Do you have appropriate facilities and equipment to prepare this compound?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="have-appropriate-facilities"
           name="haveAppropriateFacilities"
         />
       </Fieldset>
       <Fieldset legend="Is ventilation required for preparation (as per section 8 of SDS or product monograph)?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="require-ventilation"
           name="requireVentilation"
         />
       </Fieldset>
       <Fieldset legend="Is your workflow uninterrupted?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="is-workflow-uninterrupted"
           name="isWorkflowUninterrupted"
         />
@@ -285,13 +285,13 @@ const RiskAssessmentEntry = (props: Props) => {
         />
       </FormGroup>
       <Fieldset legend="Is there a risk of microbial contamination?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="microbial-contamination-risk"
           name="microbialContaminationRisk"
         />
       </Fieldset>
       <Fieldset legend="Is there risk of cross contamination with other products?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="cross-contamination-risk"
           name="crossContaminationRisk"
         />
@@ -320,7 +320,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Fieldset legend="Gloves:" className="row">
           <FormGroup>
             <label>Required?</label>
-            <RHFBooleanRadioGroup
+            <RhfBooleanRadioGroup
               id="ppe-gloves-required"
               name="ppe.gloves.required"
             />
@@ -344,7 +344,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Fieldset legend="Coat:" className="row">
           <FormGroup>
             <label>Required?</label>
-            <RHFBooleanRadioGroup
+            <RhfBooleanRadioGroup
               id="ppe-coat-required"
               name="ppe.coat.required"
             />
@@ -367,7 +367,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Fieldset legend="Mask:" className="row">
           <FormGroup>
             <label>Required?</label>
-            <RHFBooleanRadioGroup
+            <RhfBooleanRadioGroup
               id="ppe-mask-required"
               name="ppe.mask.required"
             />
@@ -387,7 +387,7 @@ const RiskAssessmentEntry = (props: Props) => {
         <Fieldset legend="Eye Protection:" className="row">
           <FormGroup>
             <label>Required?</label>
-            <RHFBooleanRadioGroup
+            <RhfBooleanRadioGroup
               id="ppe-eye-protection-required"
               name="ppe.eyeProtection.required"
             />
@@ -404,13 +404,13 @@ const RiskAssessmentEntry = (props: Props) => {
         </FormGroup>
       </Fieldset>
       <Fieldset legend="Is an eye wash station required?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="require-eye-wash-station"
           name="requireEyeWashStation"
         />
       </Fieldset>
       <Fieldset legend="Is a safety shower required?">
-        <RHFBooleanRadioGroup
+        <RhfBooleanRadioGroup
           id="require-safety-shower"
           name="requireSafetyShower"
         />

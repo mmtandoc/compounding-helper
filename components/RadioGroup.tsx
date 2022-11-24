@@ -10,15 +10,15 @@ import {
 import ErrorContainer from "./common/forms/ErrorContainer"
 import RadioButton from "./common/forms/RadioButton"
 
-interface RHFRadioGroupProps<T extends FieldValues>
+interface RhfRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,
     Omit<RadioGroupProps, "onChange" | "onBlur" | "ref"> {
   name: FieldPath<T>
   valueAsNumber?: boolean
 }
 
-export const RHFRadioGroup = <TFieldValues extends FieldValues>(
-  props: RHFRadioGroupProps<TFieldValues>,
+export const RhfRadioGroup = <TFieldValues extends FieldValues>(
+  props: RhfRadioGroupProps<TFieldValues>,
 ) => {
   const formMethods = useFormContext<TFieldValues>()
   const {

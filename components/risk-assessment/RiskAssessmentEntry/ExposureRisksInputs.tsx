@@ -8,7 +8,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
@@ -133,7 +133,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
       <div className="row">
         <FormGroup>
           <label>Other:</label>
-          <RHFBooleanRadioGroup
+          <RhfBooleanRadioGroup
             name={`${name}.other` as Path<NullPartialRiskAssessmentFields>}
             control={control}
             rules={{ deps: `${name}.otherDescription` }}
@@ -185,7 +185,7 @@ const ExposureRiskRow = ({
     <div className="row">
       <FormGroup>
         <label>{riskName}:</label>
-        <RHFBooleanRadioGroup name={name} control={control} rules={{ deps }} />
+        <RhfBooleanRadioGroup name={name} control={control} rules={{ deps }} />
       </FormGroup>
       {relatedHazardMap && (
         <div className="col related-health-hazards">

@@ -9,7 +9,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import { RHFBooleanRadioGroup } from "components/BooleanRadioGroup"
+import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
 import Button from "components/common/Button"
 import Fieldset from "components/common/forms/Fieldset"
@@ -230,7 +230,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
               <label htmlFor={`i${index}-is-commercial-product`}>
                 Is a commercial product?
               </label>
-              <RHFBooleanRadioGroup
+              <RhfBooleanRadioGroup
                 id={`i${index}-is-commercial-product`}
                 name={`${name}.${index}.isCommercialProduct`}
                 className="is-commercial-product"
@@ -300,7 +300,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
               >
                 Does the product monograph have any concerns?
               </label>
-              <RHFBooleanRadioGroup
+              <RhfBooleanRadioGroup
                 id={`i${index}-has-product-monograph-concerns`}
                 name={`${name}.${index}.commercialProduct.hasProductMonographConcerns`}
                 disabled={!isCommercialProduct}
