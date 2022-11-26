@@ -171,9 +171,14 @@ const Header = () => {
         }
 
         :global(.logo-link) {
-          max-width: 4%;
-          padding: 1rem;
-          flex-grow: 1;
+          max-width: 100%;
+          margin-block: 0.5rem;
+          margin-inline: 2rem;
+          > :global(svg) {
+            height: auto;
+            width: 45px;
+            display: block;
+          }
         }
       `}</style>
     </nav>
