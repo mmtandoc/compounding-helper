@@ -228,6 +228,49 @@ export type NullPartialCompoundFields = Simplify<
   >
 >
 
+//==== MFR schema ====//
+
+export const mfrSchema = z.object({
+  compoundId: z.number().int(),
+  //TODO: Risk level (A, B, C)
+  //TODO: PPE
+  training: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+  requiredEquipment: z.string().trim().min(1).array(),
+  calculations: z.string().trim().min(1),
+  compoundingMethod: z.string().trim().min(1),
+  qualityControl: z.string().trim().min(1),
+  packaging: z.string().trim().min(1),
+  beyondUseDate: z.string().trim().min(1),
+  storage: z.enum(["room", "fridge", "freezer"]),
+  labelling: z.string().trim().min(1),
+  references: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+  developedBy: z.string().trim().min(1),
+  verifiedBy: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
+  effectiveDate: utcDateZodString,
+})
+
+export type MfrFields = Simplify<z.output<typeof mfrSchema>>
+export type MfrFieldsInput = Simplify<z.input<typeof mfrSchema>>
+
+export type NullPartialMfrFields = Simplify<
+  NullPartialDeep<MfrFieldsInput, { ignoreKeys: "compoundId" }>
+>
+
 //==== Risk Assessment schemas ====//
 export const exposureRisksSchema = z
   .object({
