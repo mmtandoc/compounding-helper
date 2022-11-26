@@ -128,7 +128,30 @@ const Header = () => {
     </div>
   )
 
-  const right = <></>
+  const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development"
+
+  const right = (
+    <div className="right">
+      {environment !== "production" && (
+        <span className="env">{environment.toUpperCase()}</span>
+      )}
+      <style jsx>{`
+        .right {
+          display: flex;
+          justify-content: end;
+          padding: 2rem 1rem;
+          column-gap: 1.5rem;
+          flex-grow: 1;
+          margin-right: 2rem;
+        }
+
+        .env {
+          color: var(--color-fg-muted);
+          font-weight: 700;
+        }
+      `}</style>
+    </div>
+  )
 
   return (
     <nav>
