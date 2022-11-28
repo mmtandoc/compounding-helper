@@ -27,7 +27,7 @@ const SdsMapper = {
       productId: values.productId,
       hmisHealthHazard: values.hmisHazardLevel,
       requireVentilation: values.requireVentilation,
-      revisionDate: values.revisionDate,
+      revisionDate: new Date(values.revisionDate),
       filename: values.filename,
     }
   },
