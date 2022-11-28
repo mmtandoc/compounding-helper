@@ -196,6 +196,7 @@ const RiskAssessmentEntry = (props: Props) => {
             ["daily", "Daily"],
             ["weekly", "Weekly"],
             ["monthly", "Monthly"],
+            ["lessThanMonthly", "Less than monthly"],
           ]}
         />
       </Fieldset>

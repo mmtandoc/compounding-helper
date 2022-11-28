@@ -188,6 +188,7 @@ enum PreparationFrequency {
   daily
   weekly
   monthly
+  lessThanMonthly
 }
 
 model Compound {
@@ -221,6 +222,7 @@ model Ingredient {
 enum PhysicalForm {
   cream
   ointment
+  lotion
   powder
   liquid
   solid

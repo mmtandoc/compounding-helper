@@ -198,6 +198,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
               >
                 <option value="cream">Cream</option>
                 <option value="ointment">Ointment</option>
+                <option value="lotion">Lotion</option>
                 <option value="powder">Powder</option>
                 <option value="liquid">Liquid</option>
                 <option value="solid">Solid</option>

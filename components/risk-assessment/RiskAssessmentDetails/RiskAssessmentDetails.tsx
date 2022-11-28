@@ -56,6 +56,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
             ["daily", "Daily"],
             ["weekly", "Weekly"],
             ["monthly", "Monthly"],
+            ["lessThanMonthly", "Less than monthly"],
           ]}
           selectedValue={data.preparationFrequency}
         />
