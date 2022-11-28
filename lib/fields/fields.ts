@@ -1,3 +1,12 @@
+import {
+  CoatType,
+  Complexity,
+  GlovesType,
+  PhysicalForm,
+  PreparationFrequency,
+  RiskLevel,
+  Unit,
+} from "@prisma/client"
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
@@ -148,7 +157,7 @@ export const ingredientSchemaBase = z.object({
   order: z.number().int(),
   chemicalId: z.number().int(),
   sdsId: z.number().int(),
-  physicalForm: z.enum(["cream", "ointment", "powder", "liquid", "solid"]),
+  physicalForm: z.nativeEnum(PhysicalForm),
   isCommercialProduct: z.boolean(),
   commercialProduct: z.object({
     name: z.string().trim().min(1),
@@ -255,13 +264,13 @@ const refinePPE = (arg: any, ctx: any) =>
 export const riskAssessmentSchema = z.object({
   id: z.number().int().optional(),
   compound: compoundSchema,
-  complexity: z.enum(["simple", "moderate", "complex"]),
+  complexity: z.nativeEnum(Complexity),
   isPreparedOccasionally: z.boolean(),
-  preparationFrequency: z.enum(["daily", "weekly", "monthly"]),
+  preparationFrequency: z.nativeEnum(PreparationFrequency),
   isSmallQuantity: z.boolean(),
   averagePreparationAmount: z.object({
     quantity: z.number({ invalid_type_error: "Quantity must be a number." }),
-    unit: z.enum(["g", "ml"]),
+    unit: z.nativeEnum(Unit),
   }),
   isConcentrationHealthRisk: z.boolean(),
   requireSpecialEducation: z.boolean(),
@@ -280,13 +289,13 @@ export const riskAssessmentSchema = z.object({
     gloves: z
       .object({
         required: z.boolean(),
-        type: z.enum(["regular", "chemotherapy", "double"]).optional(),
+        type: z.nativeEnum(GlovesType).optional(),
       })
       .superRefine(refinePPE),
     coat: z
       .object({
         required: z.boolean(),
-        type: z.enum(["designated", "disposable"]).optional(),
+        type: z.nativeEnum(CoatType).optional(),
       })
       .superRefine(refinePPE),
     mask: z
@@ -302,7 +311,7 @@ export const riskAssessmentSchema = z.object({
   }),
   requireEyeWashStation: z.boolean(),
   requireSafetyShower: z.boolean(),
-  riskLevel: z.enum(["A", "B", "C"]),
+  riskLevel: z.nativeEnum(RiskLevel),
   rationaleList: z.object({
     automatic: z.string().trim().min(1).array(),
     additional: z.string().trim().min(1).array(),
