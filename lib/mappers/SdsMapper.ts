@@ -16,7 +16,6 @@ const SdsMapper = {
       revisionDate: data.revisionDate.toLocaleDateString("en-CA"),
       hazards: data.healthHazards.map(SdsHazardMapper.toFieldValues),
       requireVentilation: data.requireVentilation,
-      filename: data.filename,
     })
   },
   toModel: (
@@ -28,7 +27,6 @@ const SdsMapper = {
       hmisHealthHazard: values.hmisHazardLevel,
       requireVentilation: values.requireVentilation,
       revisionDate: new Date(values.revisionDate),
-      filename: values.filename,
     }
   },
 }

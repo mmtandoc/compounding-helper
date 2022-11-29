@@ -17,7 +17,6 @@ const SdsDetails = (props: Props) => {
     revisionDate,
     healthHazards,
     requireVentilation,
-    filename,
     product,
   } = props.data
   //TODO: Implement editable SDS component

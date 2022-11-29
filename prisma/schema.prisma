@@ -51,7 +51,6 @@ model SDS {
   hmisHealthHazard   Int
   requireVentilation Boolean
   healthHazards      HazardCategoryToSDS[]
-  filename           String?
   updatedAt          DateTime              @default(now()) @updatedAt
   ingredients        Ingredient[]
 

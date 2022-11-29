@@ -141,7 +141,6 @@ export const sdsSchema = z.object({
   revisionDate: utcDateZodString, //TODO: Check that date is not in the future
   requireVentilation: z.boolean(),
   hazards: z.array(hazardSchema),
-  filename: z.string().trim().optional(),
 })
 
 export type SdsFields = z.output<typeof sdsSchema>
