@@ -1,5 +1,6 @@
 import { RiskAssessment } from "@prisma/client"
 import { capitalize } from "lodash"
+import Link from "next/link"
 import { useEffect, useId } from "react"
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
@@ -194,11 +195,23 @@ const MfrEntry = (props: MfrEntryProps) => {
         <label htmlFor={`${id}-risk-assessment`}>
           Referenced risk assessment:
         </label>
-        <RiskAssessmentSelect
-          id={`${id}-risk-assessment`}
-          compoundId={compoundId}
-          showAllRevisions={true}
-        />
+        <div className="row">
+          <RiskAssessmentSelect
+            id={`${id}-risk-assessment`}
+            compoundId={compoundId}
+            showAllRevisions={true}
+          />
+          {riskAssessmentId && (
+            <Link
+              href={`/risk-assessments/${riskAssessmentId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: "var(--font-size-sm)" }}
+            >
+              View
+            </Link>
+          )}
+        </div>
       </FormGroup>
       <FormGroup row style={{ alignItems: "center" }}>
         <span className="label">Risk level:</span>
