@@ -28,10 +28,8 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
     }
 
     const handleAddNewItem = () => {
-      if (newItemText !== "") {
-        onChange?.([...items, { text: newItemText, readOnly: false }])
-        setNewItemText("")
-      }
+      onChange?.([...items, { text: newItemText.trim(), readOnly: false }])
+      setNewItemText("")
     }
 
     return (
@@ -55,18 +53,21 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   onBlur={onBlur}
-                  onKeyDown={(e) =>
-                    newItemText !== "" &&
-                    e.key === "Enter" &&
-                    handleAddNewItem()
-                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      if (newItemText.trim()) {
+                        handleAddNewItem()
+                      }
+                    }
+                  }}
                   ref={ref}
                   size={size}
                 />
                 <Button
                   className="add-item-button small"
                   onClick={handleAddNewItem}
-                  disabled={newItemText === ""}
+                  disabled={!newItemText.trim()}
                 >
                   Add
                 </Button>
