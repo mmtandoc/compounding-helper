@@ -2,6 +2,7 @@ import { Prisma, SDS } from "@prisma/client"
 import { SetOptional } from "type-fest"
 
 import { SdsFields, sdsSchema } from "lib/fields"
+import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
 import SdsHazardMapper from "./SdsHazardMapper"
@@ -13,7 +14,7 @@ const SdsMapper = {
       productId: data.productId,
       chemicalId: data.product.chemicalId,
       hmisHazardLevel: data.hmisHealthHazard,
-      revisionDate: data.revisionDate.toLocaleDateString("en-CA"),
+      revisionDate: toIsoDateString(data.revisionDate),
       hazards: data.healthHazards.map(SdsHazardMapper.toFieldValues),
       requireVentilation: data.requireVentilation,
     })

@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 
 import { ChemicalFields, chemicalSchema } from "lib/fields"
+import { toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
 const toFieldValues = (data: ChemicalAll): ChemicalFields => {
@@ -11,8 +12,9 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     hasNoCasNumber: data.casNumber === null,
     nioshTable: data.nioshTable as -1 | 1 | 2 | 3,
     synonyms: data.synonyms,
-    nioshRevisionDate:
-      data.nioshRevisionDate?.toLocaleDateString("en-CA") ?? null,
+    nioshRevisionDate: data.nioshRevisionDate
+      ? toIsoDateString(data.nioshRevisionDate)
+      : null,
   })
 }
 

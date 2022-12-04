@@ -7,6 +7,7 @@ import { useState } from "react"
 import Button from "components/common/Button"
 import Modal from "components/common/Modal"
 import SdsDetails from "components/sds/SdsDetails"
+import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"
@@ -90,7 +91,7 @@ export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
 
   const title = `SDS: ${data.product.name} - ${
     data.product.vendor.name
-  } (${data.revisionDate.toLocaleDateString("en-CA")})`
+  } (${toIsoDateString(data.revisionDate)})`
 
   return { props: { title, data } }
 }

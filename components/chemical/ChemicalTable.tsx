@@ -4,6 +4,7 @@ import Link from "next/link"
 import Button from "components/common/Button"
 import Table from "components/common/Table"
 import filterFns from "lib/table/filterFns"
+import { toIsoDateString } from "lib/utils"
 
 type Props = {
   data: Chemical[]
@@ -59,7 +60,7 @@ const ChemicalTable = (props: Props) => {
             compare: (a: Date | null, b: Date | null) =>
               (a?.toISOString() ?? "").localeCompare(b?.toISOString() ?? ""),
             renderCell: (date: Date | null) =>
-              date?.toLocaleDateString("en-CA") ?? "",
+              date ? toIsoDateString(date) : "",
           },
           {
             id: "actions",

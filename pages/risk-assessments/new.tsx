@@ -6,6 +6,7 @@ import {
   NullPartialRiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
+import { toIsoDateString } from "lib/utils"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialRiskAssessmentFields = {
@@ -66,7 +67,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
     additional: [],
   },
   compoundingSupervisor: null,
-  dateAssessed: new Date().toISOString().split("T")[0],
+  dateAssessed: toIsoDateString(new Date()),
 }
 
 const NewRiskAssessment: NextPageWithLayout = () => {

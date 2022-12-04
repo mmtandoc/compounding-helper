@@ -5,6 +5,7 @@ import React from "react"
 import Button from "components/common/Button"
 import Table from "components/common/Table"
 import filterFns from "lib/table/filterFns"
+import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
 type Props = {
@@ -64,7 +65,7 @@ const SdsTable = (props: Props) => {
             sortable: true,
             compare: (a: Date, b: Date) =>
               a.toISOString().localeCompare(b.toISOString()),
-            renderCell: (date: Date) => date.toISOString().split("T")[0],
+            renderCell: (date: Date) => toIsoDateString(date),
           },
           {
             id: "actions",

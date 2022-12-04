@@ -1,6 +1,7 @@
 import React from "react"
 
 import { FormGroup } from "components/common/forms/FormGroup"
+import { toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
 type Props = {
@@ -31,7 +32,9 @@ const ChemicalDetails = (props: Props) => {
       </FormGroup>
       <FormGroup row>
         <span className="label">NIOSH revision date: </span>
-        {data.nioshRevisionDate?.toLocaleDateString("en-CA") ?? "N/A"}
+        {data.nioshRevisionDate
+          ? toIsoDateString(data.nioshRevisionDate)
+          : "N/A"}
       </FormGroup>
       <style jsx>{`
         .health-hazard-list {

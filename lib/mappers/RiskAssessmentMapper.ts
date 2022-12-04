@@ -7,6 +7,7 @@ import {
   RiskAssessmentFields,
   riskAssessmentSchema,
 } from "lib/fields"
+import { toIsoDateString } from "lib/utils"
 import { RiskAssessmentAll } from "types/models"
 
 import CompoundMapper from "./CompoundMapper"
@@ -128,7 +129,7 @@ const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
       additional: data.additionalRationale,
     },
     compoundingSupervisor: data.compoundingSupervisor,
-    dateAssessed: data.dateAssessed.toLocaleDateString("en-CA"),
+    dateAssessed: toIsoDateString(data.dateAssessed),
   }
   return riskAssessmentSchema.parse(fieldValues)
 }

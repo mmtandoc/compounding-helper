@@ -5,7 +5,7 @@ import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { RadioGroup } from "components/RadioGroup"
-import { capitalize } from "lib/utils"
+import { capitalize, toIsoDateString } from "lib/utils"
 import { RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -284,7 +284,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         </FormGroup>
         <FormGroup row>
           <span className="label">Date assessed:</span>
-          <span>{data.dateAssessed.toLocaleDateString("en-CA")}</span>
+          <span>{toIsoDateString(data.dateAssessed)}</span>
         </FormGroup>
       </Fieldset>
       <style jsx global>{`

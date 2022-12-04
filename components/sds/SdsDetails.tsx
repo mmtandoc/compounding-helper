@@ -3,6 +3,7 @@ import React from "react"
 
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import { FormGroup } from "components/common/forms/FormGroup"
+import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
 type Props = {
@@ -36,7 +37,7 @@ const SdsDetails = (props: Props) => {
       </FormGroup>
       <FormGroup row>
         <span className="label">Revision date: </span>
-        {revisionDate.toLocaleDateString("en-CA")}
+        {toIsoDateString(revisionDate)}
       </FormGroup>
       <FormGroup row>
         <span className="label">HMIS Health Hazard Rating: </span>

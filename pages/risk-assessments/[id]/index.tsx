@@ -8,6 +8,7 @@ import { useReactToPrint } from "react-to-print"
 import Button from "components/common/Button"
 import Modal from "components/common/Modal"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
+import { toIsoDateString } from "lib/utils"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RiskAssessmentAll } from "types/models"
@@ -45,7 +46,7 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
     content: () => printableRef.current,
     documentTitle: `Risk Assessment - ${
       data?.compound?.name ?? "UNKNOWN COMPOUND"
-    } - ${data?.dateAssessed.toLocaleDateString("en-CA")}`,
+    } - ${toIsoDateString(data.dateAssessed)}`,
 
     copyStyles: true,
   })

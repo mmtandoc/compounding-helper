@@ -5,6 +5,7 @@ import EditForm from "components/common/data-pages/EditForm"
 import SdsEntry from "components/sds/SdsEntry"
 import { NullPartialSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
+import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -48,9 +49,9 @@ export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
 
   return {
     props: {
-      title: `Edit SDS: ${data.product.name} - ${data.product.vendor.name} (${
-        data.revisionDate.toISOString().split("T")[0]
-      })`,
+      title: `Edit SDS: ${data.product.name} - ${
+        data.product.vendor.name
+      } (${toIsoDateString(data.revisionDate)})`,
       values: SdsMapper.toFieldValues(data),
     },
   }

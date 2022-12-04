@@ -4,6 +4,7 @@ import { Control } from "react-hook-form"
 
 import RhfSelect from "components/common/forms/RhfSelect"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { toIsoDateString } from "lib/utils"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 
 type SdsSelectProps = {
@@ -70,7 +71,7 @@ const SdsSelect = ({
 
           const renderSdsOption = (sds: SdsWithRelations) => (
             <option key={sds.id} value={sds.id}>
-              {productLabel} - {sds.revisionDate.toLocaleDateString("en-CA")}
+              {productLabel} - {toIsoDateString(sds.revisionDate)}
             </option>
           )
 

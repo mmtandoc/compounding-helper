@@ -3,7 +3,7 @@ import Link from "next/link"
 import { BooleanRadioGroup } from "components/BooleanRadioGroup"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
-import { capitalize } from "lib/utils"
+import { capitalize, toIsoDateString } from "lib/utils"
 import { IngredientAll } from "types/models"
 
 interface IngredientDetailsProps {
@@ -52,7 +52,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
                 </span>
                 <span>
                   {" - "}
-                  {sds.revisionDate.toLocaleDateString("en-CA")}
+                  {toIsoDateString(sds.revisionDate)}
                 </span>
               </Link>
             </div>
