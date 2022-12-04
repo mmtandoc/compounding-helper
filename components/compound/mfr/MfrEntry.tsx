@@ -10,6 +10,7 @@ import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
+import Spinner from "components/common/Spinner"
 import Table, { TableColumn } from "components/common/Table"
 import { NullPartialMfrFields } from "lib/fields"
 import { CompoundWithIngredients, IngredientAll } from "types/models"
@@ -98,11 +99,7 @@ const MfrEntry = (props: MfrEntryProps) => {
     <>
       <FormGroup row>
         <label htmlFor={`${id}-compound`}>Compound:</label>
-        {!isLoading.compound ? (
-          <span>{compound?.name}</span>
-        ) : (
-          <span>Loading...</span>
-        )}
+        {!isLoading.compound ? <span>{compound?.name}</span> : <Spinner />}
       </FormGroup>
       <Fieldset legend="Formula:">
         {!isLoading.compound ? (
@@ -174,7 +171,7 @@ const MfrEntry = (props: MfrEntryProps) => {
             }
           />
         ) : (
-          <span>Loading...</span>
+          <Spinner size="4rem" />
         )}
         <FormGroup row>
           <label htmlFor={`${id}-expected-yield-amount`}>Expected yield:</label>
@@ -203,13 +200,13 @@ const MfrEntry = (props: MfrEntryProps) => {
           showAllRevisions={true}
         />
       </FormGroup>
-      <FormGroup row>
+      <FormGroup row style={{ alignItems: "center" }}>
         <span className="label">Risk level:</span>
         {riskAssessmentId ? (
           !isLoading.riskAssessment ? (
             <span>{riskAssessment?.riskLevel ?? "N/A"}</span>
           ) : (
-            <span>Loading...</span>
+            <Spinner />
           )
         ) : (
           "N/A"
@@ -224,7 +221,7 @@ const MfrEntry = (props: MfrEntryProps) => {
               ))}
             </ul>
           ) : (
-            <span>Loading...</span>
+            <Spinner />
           )
         ) : (
           "N/A"
