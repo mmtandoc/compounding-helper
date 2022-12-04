@@ -230,10 +230,16 @@ export type NullPartialCompoundFields = Simplify<
 
 //==== MFR schema ====//
 
+const quantitySchema = z.object({
+  amount: z.number().positive(),
+  unit: z.nativeEnum(Unit),
+})
+
 export const mfrSchema = z.object({
   compoundId: z.number().int(),
-  //TODO: Risk level (A, B, C)
-  //TODO: PPE
+  riskAssessmentId: z.number().int(),
+  quantities: quantitySchema.array().min(1),
+  expectedYield: quantitySchema,
   training: z
     .string()
     .trim()
@@ -245,8 +251,11 @@ export const mfrSchema = z.object({
   compoundingMethod: z.string().trim().min(1),
   qualityControl: z.string().trim().min(1),
   packaging: z.string().trim().min(1),
-  beyondUseDate: z.string().trim().min(1),
-  storage: z.enum(["room", "fridge", "freezer"]),
+  beyondUseDate: z.object({
+    value: z.number().int().positive(),
+    unit: z.enum(["days", "months"]), // z.nativeEnum(TimeUnit)
+  }),
+  storage: z.enum(["room", "fridge", "freezer"]), // z.nativeEnum(Storage)
   labelling: z.string().trim().min(1),
   references: z
     .string()

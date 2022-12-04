@@ -8,8 +8,9 @@ import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialMfrFields = {
   compoundId: NaN,
-  //Risk Level (A,B,C)
-  //PPE
+  riskAssessmentId: null,
+  quantities: [],
+  expectedYield: null,
   training: null,
   requiredEquipment: [],
   calculations: null,

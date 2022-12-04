@@ -1,5 +1,7 @@
-import React, { useId } from "react"
-import { Controller, UseFormReturn } from "react-hook-form"
+import { RiskAssessment } from "@prisma/client"
+import { capitalize } from "lodash"
+import { useEffect, useId } from "react"
+import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
 
 import DotJotList from "components/common/forms/DotJotList"
@@ -8,8 +10,11 @@ import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
+import Table, { TableColumn } from "components/common/Table"
 import { NullPartialMfrFields } from "lib/fields"
-import { CompoundWithIngredients } from "types/models"
+import { CompoundWithIngredients, IngredientAll } from "types/models"
+
+import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
 interface MfrEntryProps {
   formMethods: UseFormReturn<NullPartialMfrFields>
@@ -21,47 +26,209 @@ const MfrEntry = (props: MfrEntryProps) => {
   const id = useId()
 
   const compoundId = watch("compoundId")
+  const riskAssessmentId = watch("riskAssessmentId")
+
+  const quantities = watch("quantities")
+
+  const quantityArrayMethods = useFieldArray({
+    control,
+    name: "quantities",
+  })
 
   const { data: compound, error: compoundError } =
     useSWR<CompoundWithIngredients>(`/api/compounds/${compoundId}`)
 
+  const { data: riskAssessment, error: riskAssessmentError } =
+    useSWR<RiskAssessment>(
+      riskAssessmentId ? `/api/risk-assessments/${riskAssessmentId}` : null,
+    )
+
+  //TODO: Improve error handling
+  if (riskAssessmentError) {
+    console.error(riskAssessmentError)
+  }
   if (compoundError) {
-    //TODO: Improve error handling
     console.error(compoundError)
   }
 
-  register("compoundId")
+  const isLoading = {
+    compound: !compound && !compoundError,
+    riskAssessment: !riskAssessment && !riskAssessmentError,
+  }
+
+  useEffect(() => {
+    if (
+      compound?.ingredients &&
+      quantities &&
+      compound.ingredients.length - (quantities?.length ?? 0) > 0
+    ) {
+      quantityArrayMethods.append(
+        new Array(compound.ingredients.length - quantities.length).fill({
+          amount: null,
+          unit: null,
+        }),
+        { shouldFocus: false },
+      )
+    }
+  }, [compound, quantities, quantityArrayMethods])
+
+  console.log({ quantities })
+
+  console.log({ riskAssessment })
+
+  const requiredPpe = []
+  if (riskAssessment?.ppeGlovesRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeGlovesType} gloves`))
+  }
+  if (riskAssessment?.ppeCoatRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeCoatType} coat`))
+  }
+  if (riskAssessment?.ppeMaskRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeMaskType} mask`))
+  }
+  if (riskAssessment?.ppeEyeProtectionRequired) {
+    requiredPpe.push(capitalize(`Eye protection`))
+  }
+  if (riskAssessment?.ppeOther) {
+    requiredPpe.push(capitalize(riskAssessment.ppeOther))
+  }
+
+  register("riskAssessmentId")
   return (
     <>
       <FormGroup row>
         <label htmlFor={`${id}-compound`}>Compound:</label>
-        <span>{compound?.name ?? "Loading..."}</span>
+        {!isLoading.compound ? (
+          <span>{compound?.name}</span>
+        ) : (
+          <span>Loading...</span>
+        )}
       </FormGroup>
       <Fieldset legend="Formula:">
-        <ul className="ingredient-list">
-          {compound?.ingredients.map((ing) => (
-            <li key={ing.order}>
-              {ing.commercialProductName ? (
-                <span>
-                  <span>{ing.commercialProductName}</span>
-                  <span> (DIN: {ing.commercialProductDin ?? "N/A"})</span>
-                </span>
-              ) : (
-                <span>
-                  <span>
-                    {ing?.safetyDataSheet?.product.name} (
-                    {ing?.safetyDataSheet?.product.vendor.name})
-                  </span>
-                  <span>
-                    {" "}
-                    (CAS #:{" "}
-                    {ing?.safetyDataSheet?.product.chemical.casNumber ?? "N/A"})
-                  </span>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
+        {!isLoading.compound ? (
+          <Table
+            className="ingredients-table"
+            data={compound?.ingredients ?? []}
+            columns={
+              [
+                {
+                  label: "Name",
+                  id: "name",
+                  renderCell: (_, data) =>
+                    data.commercialProductName
+                      ? data.commercialProductName
+                      : `${data?.safetyDataSheet?.product.name} (${data?.safetyDataSheet?.product.vendor.name})`,
+                },
+                {
+                  label: "Chemical",
+                  accessorPath: "safetyDataSheet.product.chemical.name",
+                },
+                {
+                  label: "Unique ID",
+                  id: "unique-id",
+                  renderCell: (_, data) =>
+                    data.commercialProductDin
+                      ? `DIN: ${data.commercialProductDin}`
+                      : `CAS #: ${
+                          data?.safetyDataSheet?.product.chemical.casNumber ??
+                          "N/A"
+                        }`,
+                },
+                {
+                  label: "Quantity",
+                  id: "quantity",
+                  cellStyle: {
+                    flexShrink: 1,
+                  },
+                  renderCell: (_, data) => {
+                    const index = data.order - 1
+                    const field = quantityArrayMethods.fields[index]
+                    return (
+                      <>
+                        {field && (
+                          <FormGroup
+                            row
+                            key={field.id}
+                            style={{ width: "minContent" }}
+                          >
+                            <Input
+                              {...register(`quantities.${index}.amount`, {
+                                valueAsNumber: true,
+                              })}
+                              size={5}
+                            />
+                            <RhfSelect
+                              name={`quantities.${index}.unit`}
+                              initialOption
+                            >
+                              <option value="g">g</option>
+                              <option value="ml">ml</option>
+                            </RhfSelect>
+                          </FormGroup>
+                        )}
+                      </>
+                    )
+                  },
+                },
+              ] as TableColumn<IngredientAll, any>[]
+            }
+          />
+        ) : (
+          <span>Loading...</span>
+        )}
+        <FormGroup row>
+          <label htmlFor={`${id}-expected-yield-amount`}>Expected yield:</label>
+          <div className="row">
+            <Input
+              id={`${id}-expected-yield-amount`}
+              {...register(`expectedYield.amount`, {
+                valueAsNumber: true,
+              })}
+              size={5}
+            />
+            <RhfSelect name={`expectedYield.unit`} initialOption>
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+            </RhfSelect>
+          </div>
+        </FormGroup>
+      </Fieldset>
+      <FormGroup>
+        <label htmlFor={`${id}-risk-assessment`}>
+          Referenced risk assessment:
+        </label>
+        <RiskAssessmentSelect
+          id={`${id}-risk-assessment`}
+          compoundId={compoundId}
+          showAllRevisions={true}
+        />
+      </FormGroup>
+      <FormGroup row>
+        <span className="label">Risk level:</span>
+        {riskAssessmentId ? (
+          !isLoading.riskAssessment ? (
+            <span>{riskAssessment?.riskLevel ?? "N/A"}</span>
+          ) : (
+            <span>Loading...</span>
+          )
+        ) : (
+          "N/A"
+        )}
+      </FormGroup>
+      <Fieldset legend="Required PPE:">
+        {riskAssessmentId ? (
+          !isLoading.riskAssessment ? (
+            <ul className="required-ppe-list">
+              {requiredPpe.map((ppe, i) => (
+                <li key={i}>{ppe}</li>
+              ))}
+            </ul>
+          ) : (
+            <span>Loading...</span>
+          )
+        ) : (
+          "N/A"
+        )}
       </Fieldset>
       {/*TODO: PPE*/}
       <FormGroup>
@@ -102,12 +269,22 @@ const MfrEntry = (props: MfrEntryProps) => {
       <Fieldset legend="Stability and storage:">
         <div className="row">
           <FormGroup>
-            <label htmlFor={`${id}-beyond-use-date`}>Beyond use date:</label>
-            <Input
-              type="text"
-              id={`${id}-beyond-use-date`}
-              {...register("beyondUseDate")}
-            />
+            <label htmlFor={`${id}-beyond-use-date-value`}>
+              Beyond use date:
+            </label>
+            <div className="row">
+              <Input
+                id={`${id}-beyond-use-date-value`}
+                type="number"
+                min={1}
+                size={3}
+                {...register("beyondUseDate.value", { valueAsNumber: true })}
+              />
+              <RhfSelect name="beyondUseDate.unit" initialOption>
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+              </RhfSelect>
+            </div>
           </FormGroup>
           <FormGroup>
             <label htmlFor={`${id}-storage`}>Storage:</label>
@@ -171,8 +348,14 @@ const MfrEntry = (props: MfrEntryProps) => {
         </FormGroup>
       </Fieldset>
       <style jsx>{`
-        .ingredient-list {
+        .ingredient-list,
+        .required-ppe-list {
           margin-block: 0;
+        }
+
+        :global(.ingredients-table) {
+          width: 100%;
+          margin-bottom: 1rem;
         }
       `}</style>
     </>
