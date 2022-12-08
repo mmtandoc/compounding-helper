@@ -21,7 +21,6 @@ const NewSafetyDataSheet: NextPageWithLayout = () => {
       defaultValues={defaultValues}
       entryComponent={SdsEntry}
       apiEndpointPath="/api/sds"
-      urlPath="/sds"
       dataName="SDS"
     />
   )

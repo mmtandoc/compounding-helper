@@ -21,7 +21,6 @@ const NewChemical: NextPageWithLayout = () => {
       dataName="chemical"
       defaultValues={defaultValues}
       apiEndpointPath="/api/chemicals"
-      urlPath="/chemicals"
       entryComponent={ChemicalEntry}
     />
   )

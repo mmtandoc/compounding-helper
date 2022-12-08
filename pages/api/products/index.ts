@@ -68,7 +68,10 @@ export default async function handler(
         return
       }
 
-      res.status(200).json(result)
+      res
+        .setHeader("Location", `/products/${result.id}`)
+        .status(201)
+        .json(result)
       return
     }
     default:

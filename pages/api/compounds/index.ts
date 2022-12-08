@@ -49,7 +49,10 @@ export default async function handler(
       }
 
       const result = await createCompound(fields)
-      res.status(200).json(result)
+      res
+        .setHeader("Location", `/compounds/${result.id}`)
+        .status(201)
+        .json(result)
       return
     }
     default:

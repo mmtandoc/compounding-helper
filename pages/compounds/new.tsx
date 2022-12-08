@@ -32,7 +32,6 @@ const NewCompound: NextPageWithLayout = () => {
       schema={riskAssessmentSchema}
       entryComponent={CompoundEntry}
       apiEndpointPath="/api/compounds"
-      urlPath="/compounds"
       dataName="compounds"
     />
   )

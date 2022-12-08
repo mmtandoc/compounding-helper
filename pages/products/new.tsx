@@ -18,7 +18,6 @@ const NewProduct: NextPageWithLayout = () => {
       schema={productSchema}
       defaultValues={defaultValues}
       apiEndpointPath="/api/products"
-      urlPath="/products"
       entryComponent={ProductEntry}
     />
   )

@@ -76,7 +76,10 @@ export default async function handler(
             compoundId: riskAssessmentData.compoundId as number,
           },
         })
-        res.status(200).json(result)
+        res
+          .setHeader("Location", `/risk-assessments/${result.id}`)
+          .status(201)
+          .json(result)
       } catch (error) {
         console.log(error)
         res.status(500).json({

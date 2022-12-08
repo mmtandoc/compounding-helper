@@ -77,7 +77,6 @@ const NewRiskAssessment: NextPageWithLayout = () => {
       schema={riskAssessmentSchema}
       entryComponent={RiskAssessmentEntry}
       apiEndpointPath="/api/risk-assessments"
-      urlPath="/risk-assessments"
       dataName="risk assessment"
     />
   )

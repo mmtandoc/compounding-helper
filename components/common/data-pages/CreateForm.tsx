@@ -21,14 +21,12 @@ type CreateFormProps<
 > = {
   schema?: TSchema
   defaultValues: TFieldValues
-  apiEndpointPath: string
-  urlPath: string
+  apiEndpointPath: string | ((values: TFieldValues) => string)
   entryComponent: DataEntryComponent<TFieldValues>
   dataName: string
 }
 
 const CreateForm = <
-  TDataModel extends { id: number },
   TSchema extends Zod.ZodTypeAny,
   TFieldValues extends FieldValues,
 >(
@@ -37,14 +35,14 @@ const CreateForm = <
   const {
     defaultValues,
     apiEndpointPath,
-    urlPath,
     entryComponent: EntryComponent,
     dataName,
     schema,
   } = props
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
-  const [savedData, setSavedData] = useState<TDataModel | undefined>()
+  const [resourceUrl, setResourceUrl] = useState<string | undefined>()
+
   const formMethods = useForm<TFieldValues>({
     defaultValues: defaultValues as DeepPartial<TFieldValues>,
     criteriaMode: "all",
@@ -68,10 +66,15 @@ const CreateForm = <
 
   const onSubmit: SubmitHandler<TFieldValues> = async (data) => {
     await axios
-      .post<TDataModel>(apiEndpointPath, data)
+      .post(
+        typeof apiEndpointPath === "function"
+          ? apiEndpointPath(data)
+          : apiEndpointPath,
+        data,
+      )
       .then((res) => {
         setSaveSuccessful(true)
-        setSavedData(res.data)
+        setResourceUrl(res.headers["location"])
       })
       .catch((reason) => {
         //TODO: Handle error
@@ -82,7 +85,7 @@ const CreateForm = <
 
   return (
     <>
-      {!saveSuccessful || !savedData ? (
+      {!saveSuccessful || !resourceUrl ? (
         <FormProvider {...formMethods}>
           <Form
             onSubmit={handleSubmit(onSubmit, (errors) => {
@@ -103,23 +106,19 @@ const CreateForm = <
         </FormProvider>
       ) : (
         <div className="savedPrompt">
-          <p style={{ fontSize: "2.4rem", fontWeight: 600 }}>
-            The {dataName} has been saved.
-          </p>
-          <div style={{ display: "flex", columnGap: "3rem" }}>
+          <p className="content">The {dataName} has been saved.</p>
+          <div className="saved-action-row">
             <Link
-              href={`${urlPath}/new`}
+              href={""}
               onClick={() => {
                 setSaveSuccessful(undefined)
-                setSavedData(undefined)
+                setResourceUrl(undefined)
                 reset()
               }}
             >
               Add another {dataName}
             </Link>
-            <Link href={`${urlPath}/${savedData.id}`}>
-              View created {dataName}
-            </Link>
+            <Link href={resourceUrl}>View created {dataName}</Link>
           </div>
         </div>
       )}
@@ -133,6 +132,18 @@ const CreateForm = <
           column-gap: 1rem;
           margin-left: 0.5rem;
           margin-top: 1rem;
+        }
+
+        .savedPrompt {
+          > .content {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+          }
+
+          .saved-action-row {
+            display: flex;
+            column-gap: 3rem;
+          }
         }
       `}</style>
     </>
