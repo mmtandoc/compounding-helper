@@ -1,10 +1,11 @@
 import { RiskAssessment } from "@prisma/client"
 import { capitalize } from "lodash"
 import Link from "next/link"
-import { useEffect, useId } from "react"
+import { useEffect, useId, useMemo } from "react"
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
 
+import Button from "components/common/Button"
 import DotJotList from "components/common/forms/DotJotList"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
@@ -12,10 +13,10 @@ import Input from "components/common/forms/Input"
 import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
 import Spinner from "components/common/Spinner"
-import Table, { TableColumn } from "components/common/Table"
 import { NullPartialMfrFields } from "lib/fields"
-import { CompoundWithIngredients, IngredientAll } from "types/models"
+import { CompoundWithIngredients } from "types/models"
 
+import { FormulaEntryTable } from "./FormulaEntryTable"
 import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
 interface MfrEntryProps {
@@ -24,13 +25,14 @@ interface MfrEntryProps {
 
 const MfrEntry = (props: MfrEntryProps) => {
   const { formMethods } = props
-  const { register, watch, control } = formMethods
+  const { register, watch, control, setValue, getValues } = formMethods
   const id = useId()
 
-  const compoundId = watch("compoundId")
-  const riskAssessmentId = watch("riskAssessmentId")
-
-  const quantities = watch("quantities")
+  const [compoundId, riskAssessmentId, quantities] = watch([
+    "compoundId",
+    "riskAssessmentId",
+    "quantities",
+  ])
 
   const quantityArrayMethods = useFieldArray({
     control,
@@ -78,103 +80,37 @@ const MfrEntry = (props: MfrEntryProps) => {
 
   console.log({ riskAssessment })
 
-  const requiredPpe = []
-  if (riskAssessment?.ppeGlovesRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeGlovesType} gloves`))
-  }
-  if (riskAssessment?.ppeCoatRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeCoatType} coat`))
-  }
-  if (riskAssessment?.ppeMaskRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeMaskType} mask`))
-  }
-  if (riskAssessment?.ppeEyeProtectionRequired) {
-    requiredPpe.push(capitalize(`Eye protection`))
-  }
-  if (riskAssessment?.ppeOther) {
-    requiredPpe.push(capitalize(riskAssessment.ppeOther))
-  }
+  const requiredPpe = useMemo(
+    () => (riskAssessment ? getRequiredPpeList(riskAssessment) : []),
+    [riskAssessment],
+  )
+
+  const presetLabellingOptions = [
+    "External use only",
+    "Shake well",
+    "Store at room temperature",
+    "Store in fridge",
+    "Expiry date",
+  ]
 
   register("riskAssessmentId")
   return (
     <>
-      <FormGroup row>
-        <label htmlFor={`${id}-compound`}>Compound:</label>
-        {!isLoading.compound ? <span>{compound?.name}</span> : <Spinner />}
+      <FormGroup row style={{ justifyContent: "space-between" }}>
+        <FormGroup className="row">
+          <label>Compound:</label>
+          {!isLoading.compound ? <span>{compound?.name}</span> : <Spinner />}
+        </FormGroup>
       </FormGroup>
+      <FormGroup row></FormGroup>
       <Fieldset legend="Formula:">
-        {!isLoading.compound ? (
-          <Table
-            className="ingredients-table"
-            data={compound?.ingredients ?? []}
-            columns={
-              [
-                {
-                  label: "Name",
-                  id: "name",
-                  renderCell: (_, data) =>
-                    data.commercialProductName
-                      ? data.commercialProductName
-                      : `${data?.safetyDataSheet?.product.name} (${data?.safetyDataSheet?.product.vendor.name})`,
-                },
-                {
-                  label: "Chemical",
-                  accessorPath: "safetyDataSheet.product.chemical.name",
-                },
-                {
-                  label: "Unique ID",
-                  id: "unique-id",
-                  renderCell: (_, data) =>
-                    data.commercialProductDin
-                      ? `DIN: ${data.commercialProductDin}`
-                      : `CAS #: ${
-                          data?.safetyDataSheet?.product.chemical.casNumber ??
-                          "N/A"
-                        }`,
-                },
-                {
-                  label: "Quantity",
-                  id: "quantity",
-                  cellStyle: {
-                    flexShrink: 1,
-                  },
-                  renderCell: (_, data) => {
-                    const index = data.order - 1
-                    const field = quantityArrayMethods.fields[index]
-                    return (
-                      <>
-                        {field && (
-                          <FormGroup
-                            row
-                            key={field.id}
-                            style={{ width: "minContent" }}
-                          >
-                            <Input
-                              {...register(`quantities.${index}.amount`, {
-                                valueAsNumber: true,
-                              })}
-                              size={5}
-                            />
-                            <RhfSelect
-                              name={`quantities.${index}.unit`}
-                              initialOption
-                            >
-                              <option value="g">g</option>
-                              <option value="ml">ml</option>
-                            </RhfSelect>
-                          </FormGroup>
-                        )}
-                      </>
-                    )
-                  },
-                },
-              ] as TableColumn<IngredientAll, any>[]
-            }
-          />
-        ) : (
-          <Spinner size="4rem" />
-        )}
-        <FormGroup row>
+        <FormulaEntryTable
+          isLoading={isLoading.compound}
+          formMethods={formMethods}
+          fields={quantityArrayMethods.fields}
+          compound={compound}
+        />
+        <FormGroup row className="expected-yield">
           <label htmlFor={`${id}-expected-yield-amount`}>Expected yield:</label>
           <div className="row">
             <Input
@@ -203,10 +139,10 @@ const MfrEntry = (props: MfrEntryProps) => {
           />
           {riskAssessmentId && (
             <Link
+              className="risk-assessment-link"
               href={`/risk-assessments/${riskAssessmentId}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: "var(--font-size-sm)" }}
             >
               View
             </Link>
@@ -240,11 +176,21 @@ const MfrEntry = (props: MfrEntryProps) => {
           "N/A"
         )}
       </Fieldset>
-      {/*TODO: PPE*/}
-      <FormGroup>
-        <label htmlFor={`${id}-training`}>Training:</label>
-        <TextArea id={`${id}-training`} {...register("training")} />
-      </FormGroup>
+      <Fieldset legend="Training:">
+        <Controller
+          control={control}
+          name="training"
+          render={({ field: { onChange, onBlur, value, ref } }) => (
+            <DotJotList
+              items={value?.map((v) => ({ text: v })) ?? []}
+              onChange={(items) => onChange(items.map((item) => item.text))}
+              ref={ref}
+              onBlur={onBlur}
+              size={60}
+            />
+          )}
+        />
+      </Fieldset>
       <Fieldset legend="Required equipment:">
         <Controller
           control={control}
@@ -258,14 +204,14 @@ const MfrEntry = (props: MfrEntryProps) => {
               size={40}
             />
           )}
-        ></Controller>
+        />
       </Fieldset>
       <FormGroup>
         <label htmlFor={`${id}-calculations`}>Calculations:</label>
         <TextArea
           id={`${id}-calculations`}
           {...register("calculations")}
-          rows={4}
+          rows={2}
         />
       </FormGroup>
       <FormGroup>
@@ -321,14 +267,51 @@ const MfrEntry = (props: MfrEntryProps) => {
         <label htmlFor={`${id}-packaging`}>Packaging:</label>
         <TextArea id={`${id}-packaging`} {...register("packaging")} />
       </FormGroup>
-      <FormGroup>
-        <label htmlFor={`${id}-labelling`}>Labelling:</label>
-        <TextArea id={`${id}-labelling`} {...register("labelling")} rows={5} />
-      </FormGroup>
-      <FormGroup>
-        <label htmlFor={`${id}-references`}>References:</label>
-        <TextArea id={`${id}-references`} {...register("references")} />
-      </FormGroup>
+      <Fieldset legend="Labelling:">
+        <FormGroup row className="preset-labelling-options">
+          <span>Add option:</span>
+          {presetLabellingOptions.map((option, i) => (
+            <Button
+              key={i}
+              size="small"
+              onClick={() =>
+                setValue("labelling", [
+                  ...(getValues("labelling") ?? []),
+                  option,
+                ])
+              }
+            >
+              {option}
+            </Button>
+          ))}
+        </FormGroup>
+        <Controller
+          control={control}
+          name="labelling"
+          render={({ field: { onChange, onBlur, value, ref } }) => (
+            <DotJotList
+              items={value?.map((v) => ({ text: v })) ?? []}
+              onChange={(items) => onChange(items.map((item) => item.text))}
+              ref={ref}
+              onBlur={onBlur}
+            />
+          )}
+        />
+      </Fieldset>
+      <Fieldset legend="References:">
+        <Controller
+          control={control}
+          name="references"
+          render={({ field: { onChange, onBlur, value, ref } }) => (
+            <DotJotList
+              items={value?.map((v) => ({ text: v })) ?? []}
+              onChange={(items) => onChange(items.map((item) => item.text))}
+              ref={ref}
+              onBlur={onBlur}
+            />
+          )}
+        />
+      </Fieldset>
       <Fieldset>
         <FormGroup>
           <label htmlFor={`${id}-effectiveDate`}>Effective date:</label>
@@ -358,9 +341,33 @@ const MfrEntry = (props: MfrEntryProps) => {
         </FormGroup>
       </Fieldset>
       <style jsx>{`
+        .risk-assessment-link {
+          font-size: var(--font-size-sm);
+        }
+
         .ingredient-list,
         .required-ppe-list {
           margin-block: 0;
+        }
+
+        :global(.preset-labelling-options) {
+          font-size: var(--font-size-sm);
+          align-items: center;
+          margin-bottom: 1rem;
+          display: flex;
+          column-gap: 1rem;
+          margin-bottom: 1rem;
+          justify-content: end;
+        }
+
+        :global(.ref-number) {
+          font-size: var(--font-size-xl);
+          justify-content: end;
+        }
+
+        :global(.expected-yield) {
+          justify-content: end;
+          padding-right: 1rem;
         }
 
         :global(.ingredients-table) {
@@ -370,6 +377,26 @@ const MfrEntry = (props: MfrEntryProps) => {
       `}</style>
     </>
   )
+}
+
+const getRequiredPpeList = (riskAssessment: RiskAssessment) => {
+  const requiredPpe = []
+  if (riskAssessment?.ppeGlovesRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeGlovesType} gloves`))
+  }
+  if (riskAssessment?.ppeCoatRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeCoatType} coat`))
+  }
+  if (riskAssessment?.ppeMaskRequired) {
+    requiredPpe.push(capitalize(`${riskAssessment.ppeMaskType} mask`))
+  }
+  if (riskAssessment?.ppeEyeProtectionRequired) {
+    requiredPpe.push(capitalize(`Eye protection`))
+  }
+  if (riskAssessment?.ppeOther) {
+    requiredPpe.push(capitalize(riskAssessment.ppeOther))
+  }
+  return requiredPpe
 }
 
 export default MfrEntry

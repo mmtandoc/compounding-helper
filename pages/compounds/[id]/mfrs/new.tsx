@@ -8,10 +8,11 @@ import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullPartialMfrFields = {
   compoundId: NaN,
+  version: undefined,
   riskAssessmentId: null,
   quantities: [],
   expectedYield: null,
-  training: null,
+  training: [],
   requiredEquipment: [],
   calculations: null,
   compoundingMethod: null,
@@ -19,8 +20,8 @@ const defaultValues: NullPartialMfrFields = {
   packaging: null,
   beyondUseDate: null,
   storage: null,
-  labelling: null,
-  references: null,
+  labelling: [],
+  references: [],
   developedBy: null,
   verifiedBy: null,
   effectiveDate: new Date().toISOString().split("T")[0],
@@ -43,7 +44,9 @@ const NewMfr: NextPageWithLayout<NewMfrProps> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<NewMfrProps> = async (
+  context,
+) => {
   const compoundId = parseInt(context.query.id as string)
   const compound = await getCompoundById(compoundId)
 

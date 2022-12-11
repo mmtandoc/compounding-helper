@@ -5,6 +5,8 @@ import {
   PhysicalForm,
   PreparationFrequency,
   RiskLevel,
+  Storage,
+  TimeUnit,
   Unit,
 } from "@prisma/client"
 import { Merge, Simplify } from "type-fest"
@@ -224,39 +226,37 @@ export type NullPartialCompoundFields = Simplify<
 
 //==== MFR schema ====//
 
-const quantitySchema = z.object({
+export const quantitySchema = z.object({
   amount: z.number().positive(),
   unit: z.nativeEnum(Unit),
 })
 
+export type Quantity = z.output<typeof quantitySchema>
+
 export const mfrSchema = z.object({
   compoundId: z.number().int(),
+  version: z.number().int().min(0).optional(),
   riskAssessmentId: z.number().int(),
   quantities: quantitySchema.array().min(1),
   expectedYield: quantitySchema,
-  training: z
+  training: z.string().trim().min(1).array(),
+  requiredEquipment: z.string().trim().min(1).array(),
+  calculations: z
     .string()
     .trim()
     .transform((arg) => (arg === "" ? null : arg))
     .nullable()
     .default(null),
-  requiredEquipment: z.string().trim().min(1).array(),
-  calculations: z.string().trim().min(1),
   compoundingMethod: z.string().trim().min(1),
   qualityControl: z.string().trim().min(1),
   packaging: z.string().trim().min(1),
   beyondUseDate: z.object({
     value: z.number().int().positive(),
-    unit: z.enum(["days", "months"]), // z.nativeEnum(TimeUnit)
+    unit: z.nativeEnum(TimeUnit),
   }),
-  storage: z.enum(["room", "fridge", "freezer"]), // z.nativeEnum(Storage)
-  labelling: z.string().trim().min(1),
-  references: z
-    .string()
-    .trim()
-    .transform((arg) => (arg === "" ? null : arg))
-    .nullable()
-    .default(null),
+  storage: z.nativeEnum(Storage),
+  labelling: z.string().trim().min(1).array(),
+  references: z.string().trim().min(1).array(),
   developedBy: z.string().trim().min(1),
   verifiedBy: z
     .string()
@@ -268,10 +268,19 @@ export const mfrSchema = z.object({
 })
 
 export type MfrFields = Simplify<z.output<typeof mfrSchema>>
+
+const mfrSchemaWithVersion = mfrSchema.extend(
+  mfrSchema.pick({ version: true }).required().shape,
+)
+
+export type MfrFieldsWithVersion = Simplify<
+  z.output<typeof mfrSchemaWithVersion>
+>
+
 export type MfrFieldsInput = Simplify<z.input<typeof mfrSchema>>
 
 export type NullPartialMfrFields = Simplify<
-  NullPartialDeep<MfrFieldsInput, { ignoreKeys: "compoundId" }>
+  NullPartialDeep<MfrFieldsInput, { ignoreKeys: "compoundId" | "version" }>
 >
 
 //==== Risk Assessment schemas ====//
