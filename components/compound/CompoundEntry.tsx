@@ -115,15 +115,6 @@ const CompoundEntry = (props: Props) => {
             />
           </label>
           <FormGroup>
-            <label htmlFor="beyond-use-date">Beyond use date:</label>
-            <Input
-              id="beyond-use-date"
-              type="text"
-              {...register("beyondUseDate")}
-              size={40}
-            />
-          </FormGroup>
-          <FormGroup>
             <label htmlFor="notes">Notes:</label>
             <TextArea id="notes" {...register("notes")} />
           </FormGroup>

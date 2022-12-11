@@ -30,10 +30,6 @@ const CompoundDetails = (props: Props) => {
             <span className="label">Has master formulation record:</span>
             <span>{data.hasMasterFormulationRecord ? "Yes" : "No"}</span>
           </FormGroup>
-          <FormGroup row>
-            <span className="label">Beyond use date:</span>
-            <span>{data.beyondUseDate ?? "N/A"}</span>
-          </FormGroup>
           <FormGroup>
             <span className="label">Notes:</span>
             <textarea value={data.notes ?? "None"} readOnly={true} cols={20} />

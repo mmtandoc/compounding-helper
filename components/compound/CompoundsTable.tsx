@@ -79,15 +79,6 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     accessorPath: "hasMasterFormulationRecord",
   },
   {
-    label: "Beyond Use Date",
-    sortable: true,
-    compare: (a: string | null | undefined, b: string | null | undefined) =>
-      (a ?? "N/A").localeCompare(b ?? "N/A"),
-    renderCell: (value) => <>{value ?? "N/A"}</>,
-    accessorPath: "beyondUseDate",
-  },
-
-  {
     id: "actions",
     renderCell: (_, data) => (
       <div>
