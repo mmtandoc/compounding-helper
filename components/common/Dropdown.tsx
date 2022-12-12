@@ -7,14 +7,15 @@ import { BiChevronDown } from "react-icons/bi"
 //TODO: Update CSS to use custom properties
 
 type DropdownProps = {
+  className?: string
   children: React.ReactNode
   style?: CSSProperties
 }
 
 const Dropdown = (props: DropdownProps) => {
-  const { children, style } = props
+  const { className, children, style } = props
   return (
-    <div className="dropdown" style={style}>
+    <div className={`dropdown ${className ?? ""}`} style={style}>
       {children}
       <style jsx>{`
         .dropdown {
