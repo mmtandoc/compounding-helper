@@ -2,10 +2,14 @@ import { RiskAssessment } from "@prisma/client"
 import { capitalize } from "lodash"
 import Link from "next/link"
 import { useEffect, useId, useMemo } from "react"
-import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
+import {
+  Controller,
+  FieldPathValue,
+  UseFormReturn,
+  useFieldArray,
+} from "react-hook-form"
 import useSWR from "swr"
 
-import Button from "components/common/Button"
 import DotJotList from "components/common/forms/DotJotList"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
@@ -17,6 +21,7 @@ import { NullPartialMfrFields } from "lib/fields"
 import { CompoundWithIngredients } from "types/models"
 
 import { FormulaEntryTable } from "./FormulaEntryTable"
+import PresetDropdown from "./PresetDropdown"
 import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
 interface MfrEntryProps {
@@ -25,7 +30,7 @@ interface MfrEntryProps {
 
 const MfrEntry = (props: MfrEntryProps) => {
   const { formMethods } = props
-  const { register, watch, control, setValue, getValues } = formMethods
+  const { register, watch, control } = formMethods
   const id = useId()
 
   const [compoundId, riskAssessmentId, quantities] = watch([
@@ -76,22 +81,10 @@ const MfrEntry = (props: MfrEntryProps) => {
     }
   }, [compound, quantities, quantityArrayMethods])
 
-  console.log({ quantities })
-
-  console.log({ riskAssessment })
-
   const requiredPpe = useMemo(
     () => (riskAssessment ? getRequiredPpeList(riskAssessment) : []),
     [riskAssessment],
   )
-
-  const presetLabellingOptions = [
-    "External use only",
-    "Shake well",
-    "Store at room temperature",
-    "Store in fridge",
-    "Expiry date",
-  ]
 
   register("riskAssessmentId")
   return (
@@ -191,7 +184,10 @@ const MfrEntry = (props: MfrEntryProps) => {
           )}
         />
       </Fieldset>
-      <Fieldset legend="Required equipment:">
+      <Fieldset
+        legend="Required equipment:"
+        className="preset-options-fieldset"
+      >
         <Controller
           control={control}
           name="requiredEquipment"
@@ -205,6 +201,13 @@ const MfrEntry = (props: MfrEntryProps) => {
             />
           )}
         />
+        <PresetDropdown
+          name="requiredEquipment"
+          label="Add preset equipment"
+          options={presetOptions.requiredEquipment}
+          isArray
+          formMethods={formMethods}
+        />
       </Fieldset>
       <FormGroup>
         <label htmlFor={`${id}-calculations`}>Calculations:</label>
@@ -215,7 +218,17 @@ const MfrEntry = (props: MfrEntryProps) => {
         />
       </FormGroup>
       <FormGroup>
-        <label htmlFor={`${id}-compounding-method`}>Compounding method:</label>
+        <div className="label-preset-row">
+          <label className="label" htmlFor={`${id}-compounding-method`}>
+            Compounding method:
+          </label>
+          <PresetDropdown
+            name="compoundingMethod"
+            label="Set preset compounding method"
+            options={presetOptions.compoundingMethod}
+            formMethods={formMethods}
+          />
+        </div>
         <TextArea
           id={`${id}-compounding-method`}
           {...register("compoundingMethod")}
@@ -267,24 +280,7 @@ const MfrEntry = (props: MfrEntryProps) => {
         <label htmlFor={`${id}-packaging`}>Packaging:</label>
         <TextArea id={`${id}-packaging`} {...register("packaging")} />
       </FormGroup>
-      <Fieldset legend="Labelling:">
-        <FormGroup row className="preset-labelling-options">
-          <span>Add option:</span>
-          {presetLabellingOptions.map((option, i) => (
-            <Button
-              key={i}
-              size="small"
-              onClick={() =>
-                setValue("labelling", [
-                  ...(getValues("labelling") ?? []),
-                  option,
-                ])
-              }
-            >
-              {option}
-            </Button>
-          ))}
-        </FormGroup>
+      <Fieldset legend="Labelling:" className="preset-options-fieldset">
         <Controller
           control={control}
           name="labelling"
@@ -294,8 +290,16 @@ const MfrEntry = (props: MfrEntryProps) => {
               onChange={(items) => onChange(items.map((item) => item.text))}
               ref={ref}
               onBlur={onBlur}
+              size={60}
             />
           )}
+        />
+        <PresetDropdown
+          name="labelling"
+          label="Add preset labelling"
+          options={presetOptions.labelling}
+          isArray
+          formMethods={formMethods}
         />
       </Fieldset>
       <Fieldset legend="References:">
@@ -350,19 +354,33 @@ const MfrEntry = (props: MfrEntryProps) => {
           margin-block: 0;
         }
 
-        :global(.preset-labelling-options) {
-          font-size: var(--font-size-sm);
-          align-items: center;
-          margin-bottom: 1rem;
+        .label-preset-row {
           display: flex;
           column-gap: 1rem;
-          margin-bottom: 1rem;
-          justify-content: end;
+          align-items: center;
+          margin-top: 1rem;
+          > :global(.preset-dropdown) {
+            margin-left: auto;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+          }
         }
 
-        :global(.ref-number) {
-          font-size: var(--font-size-xl);
-          justify-content: end;
+        :global(.preset-options-fieldset) {
+          display: flex;
+          column-gap: 1rem;
+          > :global(.dot-jot-list) {
+            flex-grow: 1;
+          }
+
+          > :global(.preset-dropdown) {
+            margin-left: auto;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+            > :global(button) {
+              display: block;
+            }
+          }
         }
 
         :global(.expected-yield) {
@@ -397,6 +415,38 @@ const getRequiredPpeList = (riskAssessment: RiskAssessment) => {
     requiredPpe.push(capitalize(riskAssessment.ppeOther))
   }
   return requiredPpe
+}
+
+const presetOptions = {
+  labelling: [
+    { value: "External use only" },
+    { value: "Shake well" },
+    { value: "Store at room temperature" },
+    { value: "Store in fridge" },
+    { value: "Expiry date" },
+  ],
+  requiredEquipment: [
+    { value: "scale" },
+    { value: "weight paper/boat" },
+    { value: "spatula" },
+    { value: "ointment pad/slab" },
+    { value: "graduated cylinder" },
+    { value: "mortar and pestle" },
+    { value: "ointment jar" },
+    { value: "amber plastic bottle" },
+  ],
+  compoundingMethod: [
+    {
+      label: "Creams template",
+      value:
+        "1. Levigate creams together until uniform mixture is obtained.\n2. Transfer to ointment jar and label",
+    },
+    {
+      label: "Ointments template",
+      value:
+        "1. Levigate ointments together until uniform mixture is obtained.\n2. Transfer to ointment jar and label",
+    },
+  ],
 }
 
 export default MfrEntry
