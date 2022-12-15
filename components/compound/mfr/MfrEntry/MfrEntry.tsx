@@ -22,6 +22,7 @@ import { CompoundWithIngredients } from "types/models"
 
 import { FormulaEntryTable } from "./FormulaEntryTable"
 import PresetDropdown from "./PresetDropdown"
+import { QualityControlEntryTable } from "./QualityControlEntryTable"
 import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
 interface MfrEntryProps {
@@ -270,11 +271,18 @@ const MfrEntry = (props: MfrEntryProps) => {
         </div>
       </Fieldset>
       <FormGroup>
-        <label htmlFor={`${id}-quality-control`}>Quality control:</label>
-        <TextArea
-          id={`${id}-quality-control`}
-          {...register("qualityControl")}
-        />
+        <div className="label-preset-row">
+          <label className="label" htmlFor={`${id}-quality-control`}>
+            Quality controls:
+          </label>
+          <PresetDropdown
+            name="qualityControls"
+            label="Set preset quality controls"
+            options={presetOptions.qualityControls}
+            formMethods={formMethods}
+          />
+        </div>
+        <QualityControlEntryTable formMethods={formMethods} />
       </FormGroup>
       <FormGroup>
         <label htmlFor={`${id}-packaging`}>Packaging:</label>
@@ -447,6 +455,19 @@ const presetOptions = {
         "1. Levigate ointments together until uniform mixture is obtained.\n2. Transfer to ointment jar and label",
     },
   ],
+  qualityControls: ["cream", "ointment"].flatMap((form) =>
+    ["white", "yellow"].map((color) => ({
+      label: capitalize(`${color} smooth ${form}`),
+      value: [
+        {
+          name: "Final product appearance",
+          expectedSpecification: capitalize(
+            `${color} smooth homogenous ${form}`,
+          ),
+        },
+      ],
+    })),
+  ),
 }
 
 export default MfrEntry

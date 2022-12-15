@@ -243,7 +243,7 @@ model Mfr {
   requiredEquipment   String[]
   calculations        String?
   compoundingMethod   String
-  qualityControl      String
+  qualityControls     Json[] // {name: String, expectedSpecification: String}[]
 
   beyondUseDateValue Int
   beyondUseDateUnit  TimeUnit

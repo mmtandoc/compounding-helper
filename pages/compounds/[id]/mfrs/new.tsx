@@ -16,7 +16,7 @@ const defaultValues: NullPartialMfrFields = {
   requiredEquipment: [],
   calculations: null,
   compoundingMethod: null,
-  qualityControl: null,
+  qualityControls: [{ name: null, expectedSpecification: null }],
   packaging: null,
   beyondUseDate: null,
   storage: null,

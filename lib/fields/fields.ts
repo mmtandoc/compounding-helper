@@ -248,7 +248,12 @@ export const mfrSchema = z.object({
     .nullable()
     .default(null),
   compoundingMethod: z.string().trim().min(1),
-  qualityControl: z.string().trim().min(1),
+  qualityControls: z
+    .object({
+      name: z.string().trim().min(1),
+      expectedSpecification: z.string().trim().min(1),
+    })
+    .array(),
   packaging: z.string().trim().min(1),
   beyondUseDate: z.object({
     value: z.number().int().positive(),
