@@ -8,6 +8,7 @@ import IconButton from "../IconButton"
 type DotJotItem = { text: string; readOnly?: boolean }
 
 type DotJotListProps = {
+  className?: string
   readOnly?: boolean
   onChange?: (items: DotJotItem[]) => void
   onBlur?: () => void
@@ -19,7 +20,14 @@ type DotJotListProps = {
 
 const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
   (props, ref) => {
-    const { items = [], readOnly = false, onChange, onBlur, size } = props
+    const {
+      className,
+      items = [],
+      readOnly = false,
+      onChange,
+      onBlur,
+      size,
+    } = props
 
     const [newItemText, setNewItemText] = useState("")
 
@@ -33,7 +41,7 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
     }
 
     return (
-      <div>
+      <div className={`dot-jot-list ${className ?? ""}`}>
         <ul>
           {items.map((item, i) => (
             <DotJotItem
