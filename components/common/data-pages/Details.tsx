@@ -13,9 +13,8 @@ type DetailsComponentProps<TModel> = {
 
 //TODO: Allow passing additional props to DetailsComponent
 type DetailsProps<TModel> = {
-  id: number
   data: TModel
-  apiPath: string
+  apiEndpointPath: string
   urlPath: string
   detailsComponent: (
     props: Record<string, unknown> & DetailsComponentProps<TModel>,
@@ -26,9 +25,8 @@ type DetailsProps<TModel> = {
 
 const Details = <TModel,>(props: DetailsProps<TModel>) => {
   const {
-    id,
     data,
-    apiPath,
+    apiEndpointPath,
     urlPath,
     detailsComponent: DetailsComponent,
     dataLabel,
@@ -40,7 +38,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
   const router = useRouter()
 
   const handleDelete = () => {
-    axios.delete(`${apiPath}/${id}`).then(
+    axios.delete(apiEndpointPath).then(
       () => router.push(urlPath),
       (reason) => {
         //TODO: Handle errors
@@ -54,7 +52,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
       <DetailsComponent data={data} />
       <div className="action-row">
         {actions.edit && (
-          <Link href={`${urlPath}/${id}/edit`}>
+          <Link href={`${urlPath}/edit`}>
             <Button>Edit</Button>
           </Link>
         )}

@@ -17,11 +17,10 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
 
   return (
     <Details
-      id={data.id}
       data={data}
       dataLabel="chemical"
-      apiPath="/api/chemicals"
-      urlPath="/chemicals"
+      apiEndpointPath={`/api/chemicals/${data.id}`}
+      urlPath={`/api/chemicals/${data.id}`}
       detailsComponent={ChemicalDetails}
     />
   )

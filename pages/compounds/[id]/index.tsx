@@ -15,11 +15,10 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
 
   return (
     <Details
-      id={data.id}
       data={data}
       dataLabel="compound"
-      apiPath="/api/compounds"
-      urlPath="/compounds"
+      apiEndpointPath={`/api/compounds/${data.id}`}
+      urlPath={`/compounds/${data.id}`}
       detailsComponent={({ data }) => (
         <CompoundDetails data={data} display="all" />
       )}

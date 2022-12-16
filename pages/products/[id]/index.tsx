@@ -15,11 +15,10 @@ const ProductPage: NextPageWithLayout<Props> = (props: Props) => {
 
   return (
     <Details
-      id={data.id}
       data={data}
       dataLabel="product"
-      apiPath="/api/products"
-      urlPath="/products"
+      apiEndpointPath={`/api/products/${data.id}`}
+      urlPath={`/products/${data.id}`}
       detailsComponent={ProductDetails}
     />
   )
