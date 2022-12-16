@@ -310,7 +310,7 @@ const MfrEntry = (props: MfrEntryProps) => {
           formMethods={formMethods}
         />
       </Fieldset>
-      <Fieldset legend="References:">
+      <Fieldset legend="References:" className="preset-options-fieldset">
         <Controller
           control={control}
           name="references"
@@ -322,6 +322,13 @@ const MfrEntry = (props: MfrEntryProps) => {
               onBlur={onBlur}
             />
           )}
+        />
+        <PresetDropdown
+          name="references"
+          label="Add preset references"
+          options={presetOptions.references}
+          isArray
+          formMethods={formMethods}
         />
       </Fieldset>
       <Fieldset>
@@ -468,6 +475,18 @@ const presetOptions = {
       ],
     })),
   ),
+  references: [
+    {
+      label: "Based on historical use/pharmacist experience",
+      value:
+        "This formulation is not based on literature but based on historical use or pharmacist experience",
+    },
+    {
+      label: "USP795 - solid formulations, no stability data",
+      value:
+        "USP795 guidelines - solid formulations since no stability data available",
+    },
+  ],
 }
 
 export default MfrEntry
