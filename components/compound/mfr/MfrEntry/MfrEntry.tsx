@@ -90,13 +90,43 @@ const MfrEntry = (props: MfrEntryProps) => {
   register("riskAssessmentId")
   return (
     <>
-      <FormGroup row style={{ justifyContent: "space-between" }}>
-        <FormGroup className="row">
-          <label>Compound:</label>
-          {!isLoading.compound ? <span>{compound?.name}</span> : <Spinner />}
+      <FormGroup row>
+        <label>Compound:</label>
+        {!isLoading.compound ? <span>{compound?.name}</span> : <Spinner />}
+      </FormGroup>
+      <FormGroup className="form-group-table">
+        <FormGroup row>
+          <label htmlFor={`${id}-pharmaceutical-form`}>
+            Pharmaceutical form:
+          </label>
+          <Input
+            type="text"
+            id={`${id}-pharmaceutical-form`}
+            {...register("pharmaceuticalForm")}
+            list={`${id}-pharmacutical-forms-list`}
+          />
+          <datalist id={`${id}-pharmacutical-forms-list`}>
+            <option>Cream</option>
+            <option>Ointment</option>
+            <option>Lotion</option>
+            <option>Liquid</option>
+          </datalist>
+        </FormGroup>
+        <FormGroup row>
+          <label htmlFor={`${id}-route-of-administration`}>
+            Route of administration:
+          </label>
+          <Input
+            type="text"
+            id={`${id}-route-of-administration`}
+            {...register("routeOfAdministration")}
+            list={`${id}-administration-routes-list`}
+          />
+          <datalist id={`${id}-administration-routes-list`}>
+            <option>Topical</option>
+          </datalist>
         </FormGroup>
       </FormGroup>
-      <FormGroup row></FormGroup>
       <Fieldset legend="Formula:">
         <FormulaEntryTable
           isLoading={isLoading.compound}
@@ -360,6 +390,16 @@ const MfrEntry = (props: MfrEntryProps) => {
         </FormGroup>
       </Fieldset>
       <style jsx>{`
+        :global(.form-group-table) {
+          display: grid;
+          gap: 10px;
+          grid-template-columns: auto 1fr;
+        }
+
+        :global(.form-group-table > div) {
+          display: contents !important;
+        }
+
         .risk-assessment-link {
           font-size: var(--font-size-sm);
         }

@@ -9,6 +9,8 @@ import { NextPageWithLayout } from "types/common"
 const defaultValues: NullPartialMfrFields = {
   compoundId: NaN,
   version: undefined,
+  pharmaceuticalForm: null,
+  routeOfAdministration: null,
   riskAssessmentId: null,
   quantities: [],
   expectedYield: null,

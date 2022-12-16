@@ -234,6 +234,9 @@ model Mfr {
   compoundId Int
   version    Int
 
+  pharmaceuticalForm    String
+  routeOfAdministration String
+
   riskAssessment      RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
   riskAssessmentId    Int
   quantities          Json // {amount: Float, unit: Unit}[]

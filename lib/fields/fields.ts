@@ -236,6 +236,8 @@ export type Quantity = z.output<typeof quantitySchema>
 export const mfrSchema = z.object({
   compoundId: z.number().int(),
   version: z.number().int().min(0).optional(),
+  pharmaceuticalForm: z.string().trim().min(1),
+  routeOfAdministration: z.string().trim().min(1),
   riskAssessmentId: z.number().int(),
   quantities: quantitySchema.array().min(1),
   expectedYield: quantitySchema,
