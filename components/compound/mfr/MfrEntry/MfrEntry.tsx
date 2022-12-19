@@ -315,7 +315,15 @@ const MfrEntry = (props: MfrEntryProps) => {
         <QualityControlEntryTable formMethods={formMethods} />
       </FormGroup>
       <FormGroup>
-        <label htmlFor={`${id}-packaging`}>Packaging:</label>
+        <div className="label-preset-row">
+          <label htmlFor={`${id}-packaging`}>Packaging:</label>
+          <PresetDropdown
+            name="packaging"
+            label="Set preset packaging"
+            options={presetOptions.packaging}
+            formMethods={formMethods}
+          />
+        </div>
         <TextArea id={`${id}-packaging`} {...register("packaging")} />
       </FormGroup>
       <Fieldset legend="Labelling:" className="preset-options-fieldset">
@@ -515,6 +523,7 @@ const presetOptions = {
       ],
     })),
   ),
+  packaging: [{ value: "Ointment jar" }, { value: "Amber plastic bottle" }],
   references: [
     {
       label: "Based on historical use/pharmacist experience",
