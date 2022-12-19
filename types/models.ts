@@ -159,3 +159,12 @@ export const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
 export type RiskAssessmentAll = Prisma.RiskAssessmentGetPayload<
   typeof riskAssessmentAll
 >
+
+export const mfrAll = Prisma.validator<Prisma.MfrArgs>()({
+  include: {
+    compound: compoundWithIngredients,
+    riskAssessment: true,
+  },
+})
+
+export type MfrAll = Prisma.MfrGetPayload<typeof mfrAll>
