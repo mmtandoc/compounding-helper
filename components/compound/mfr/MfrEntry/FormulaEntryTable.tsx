@@ -55,6 +55,10 @@ export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
                   }`,
           },
           {
+            label: "Form",
+            accessorPath: "physicalForm",
+          },
+          {
             label: "Quantity",
             id: "quantity",
             cellStyle: {
