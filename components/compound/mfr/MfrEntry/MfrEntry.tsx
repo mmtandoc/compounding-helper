@@ -352,9 +352,11 @@ const MfrEntry = (props: MfrEntryProps) => {
         <Controller
           control={control}
           name="references"
-          render={({ field: { onChange, onBlur, value, ref } }) => (
+          render={({ field: { name, onChange, onBlur, value, ref } }) => (
             <DotJotList
+              name={name}
               items={value?.map((v) => ({ text: v })) ?? []}
+              editable
               onChange={(items) => onChange(items.map((item) => item.text))}
               ref={ref}
               onBlur={onBlur}

@@ -1,15 +1,19 @@
-import React, { useState } from "react"
+import { debounce } from "lodash"
+import React, { useEffect, useMemo, useState } from "react"
 import { MdClose } from "react-icons/md"
 
 import Button from "components/common/Button"
 
 import IconButton from "../IconButton"
+import Input from "./Input"
 
 type DotJotItem = { text: string; readOnly?: boolean }
 
 type DotJotListProps = {
+  name?: string
   className?: string
   readOnly?: boolean
+  editable?: boolean
   onChange?: (items: DotJotItem[]) => void
   onBlur?: () => void
   items?: DotJotItem[]
@@ -21,9 +25,11 @@ type DotJotListProps = {
 const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
   (props, ref) => {
     const {
+      name,
       className,
       items = [],
       readOnly = false,
+      editable = false,
       onChange,
       onBlur,
       size,
@@ -40,16 +46,24 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
       setNewItemText("")
     }
 
+    const handleItemChange = (index: number, text: string) => {
+      items[index] = { text, readOnly: false }
+      onChange?.([...items])
+    }
+
     return (
       <div className={`dot-jot-list ${className ?? ""}`}>
         <ul>
           {items.map((item, i) => (
             <DotJotItem
+              name={name ? `${name}.${i}` : undefined}
               key={i}
               index={i}
               readOnly={item?.readOnly}
+              editable={editable}
               text={item.text}
               onRemove={handleRemove}
+              onChange={handleItemChange}
             />
           ))}
           {!readOnly && (
@@ -85,8 +99,8 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
         </ul>
         <style jsx>{`
           ul {
-            margin-block-start: 0;
-            margin-block-end: 0;
+            margin-top: 0;
+            margin-bottom: 0;
           }
           .new-item-text-input {
             width: ${size ? "initial" : "100%"};
@@ -100,19 +114,63 @@ const DotJotList = React.forwardRef<HTMLInputElement, DotJotListProps>(
 DotJotList.displayName = "DotJotList"
 
 interface DotJotItemProps {
+  name?: string
   text: string
   readOnly?: boolean
+  editable?: boolean
   index: number
   onRemove?: (index: number) => void
+  onChange?: (index: number, text: string) => void
+  size?: number
 }
 
 const DotJotItem = (props: DotJotItemProps) => {
-  const { readOnly = false, text, index, onRemove } = props
+  const {
+    name,
+    readOnly = false,
+    editable = false,
+    text,
+    index,
+    onRemove,
+    onChange,
+    size,
+  } = props
+
+  const [itemText, setItemText] = useState(text)
+
+  useEffect(() => {
+    setItemText(text)
+  }, [text])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setItemText(e.target.value)
+
+    if (onChange) {
+      handleChangeDebounced?.(index, e.target.value)
+    }
+  }
+
+  const handleChangeDebounced = useMemo(
+    () => (onChange ? debounce(onChange, 300) : undefined),
+    [onChange],
+  )
+
   return (
     <li>
       <div className="item-container">
-        {text === undefined ? (
-          <input type="text" name="" id="" />
+        {!readOnly && editable ? (
+          <Input
+            name={name}
+            className="item-text-input"
+            type="text"
+            value={itemText}
+            onChange={handleChange}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+              onChange?.(index, e.target.value)
+            }
+            size={size}
+            fullWidth={!size}
+          />
         ) : (
           <span>{text}</span>
         )}
@@ -130,6 +188,11 @@ const DotJotItem = (props: DotJotItemProps) => {
         .item-container {
           display: flex;
           align-items: center;
+
+          > :global(.input-container) {
+            flex-grow: ${size ? "unset" : "1"};
+            margin: 0.1rem 0;
+          }
         }
         .item-container > .remove-item-button {
           display: flex;
