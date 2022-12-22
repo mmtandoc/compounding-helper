@@ -23,6 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const latestVersion = (
     await prisma.mfr.aggregate({
+      where: { compoundId },
       _max: {
         version: true,
       },
