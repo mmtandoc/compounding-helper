@@ -1,8 +1,9 @@
 import { RiskAssessment } from "@prisma/client"
 import { capitalize } from "lodash"
 import Link from "next/link"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
+import Button from "components/common/Button"
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
 import TextArea from "components/common/forms/TextArea"
@@ -19,6 +20,8 @@ interface MfrEntryProps {
 
 const MfrDetails = (props: MfrEntryProps) => {
   const { data } = props
+
+  const [showPlainText, setShowPlainText] = useState(false)
 
   const requiredPpe = useMemo(
     () => (data.riskAssessment ? getRequiredPpeList(data.riskAssessment) : []),
@@ -181,6 +184,27 @@ const MfrDetails = (props: MfrEntryProps) => {
           <span>{data.verifiedBy ?? "N/A"}</span>
         </FormGroup>
       </Fieldset>
+      <Fieldset className="plain-text">
+        <div className="row">
+          <Button size="small" onClick={() => setShowPlainText(!showPlainText)}>
+            {showPlainText ? "Hide" : "Show"} plain text
+          </Button>
+          <Button
+            size="small"
+            onClick={() =>
+              navigator.clipboard.writeText(convertToPlainText(data))
+            }
+          >
+            Copy plain text to clipboard
+          </Button>
+        </div>
+        <TextArea
+          hidden={!showPlainText}
+          readOnly
+          autoResize
+          value={convertToPlainText(data)}
+        />
+      </Fieldset>
       <style jsx>{`
         ul {
           margin-block: 0;
@@ -222,6 +246,14 @@ const MfrDetails = (props: MfrEntryProps) => {
           width: 100%;
           margin-bottom: 1rem;
         }
+
+        .plain-text {
+          > textarea {
+            margin-top: 1rem;
+            width: 100%;
+            font-family: monospace;
+          }
+        }
       `}</style>
     </div>
   )
@@ -245,6 +277,72 @@ const getRequiredPpeList = (riskAssessment: RiskAssessment) => {
     requiredPpe.push(capitalize(riskAssessment.ppeOther))
   }
   return requiredPpe
+}
+
+const convertToPlainText = (data: MfrAll): string => {
+  const refNumber = `MFR-${String(data.compoundId).padStart(3, "0")}-${String(
+    data.version,
+  ).padStart(2, "0")}`
+
+  const riskAssessmentTitle = `ID #${
+    data.riskAssessment.id
+  } - ${toIsoDateString(data.riskAssessment.dateAssessed)}`
+
+  const arrayToTextList = (array: string[]) =>
+    array.map((val) => ` - ${val}`).join("\n")
+
+  const text = `COMPOUND NAME: ${data.compound.name}
+REF #: ${refNumber}
+
+REFERENCED RISK ASSESSMENT: ${riskAssessmentTitle}
+RISK LEVEL: ${data.riskAssessment.riskLevel}
+
+REQUIRED PPE:
+${arrayToTextList(getRequiredPpeList(data.riskAssessment))}
+
+TRAINING:
+${arrayToTextList(data.training)}
+
+REQUIRED EQUIPMENT:
+${arrayToTextList(data.requiredEquipment)}
+
+${
+  data.calculations
+    ? `CALCULATIONS:
+${data.calculations}\n`
+    : ""
+}
+COMPOUNDING METHOD:
+${data.compoundingMethod}
+
+BUD: ${data.beyondUseDateValue} ${data.beyondUseDateUnit} / STORAGE: ${
+    data.storage
+  }
+
+QUALITY CONTROLS:
+${arrayToTextList(
+  (
+    data.qualityControls as {
+      name: string
+      expectedSpecification: string
+    }[]
+  ).map((qc) => `${qc.name}: ${qc.expectedSpecification}`),
+)}
+
+PACKAGING:
+${data.packaging}
+
+LABELLING:
+${arrayToTextList(data.labelling)}
+
+REFERENCES:
+${arrayToTextList(data.references)}
+
+EFFECTIVE DATE: ${toIsoDateString(data.effectiveDate)} / DEVELOPED BY: ${
+    data.developedBy
+  }${data.verifiedBy ? `/ VERIFIED BY: ${data.verifiedBy}` : ""}`
+
+  return text.toUpperCase()
 }
 
 export default MfrDetails
