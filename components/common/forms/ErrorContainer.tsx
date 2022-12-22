@@ -56,12 +56,18 @@ const ErrorContainer = <
 
   const { error } =
     fieldState ??
-    formMethods.getFieldState(fieldName, formState ?? formMethods.formState)
+    (formMethods
+      ? formMethods.getFieldState(fieldName, formState ?? formMethods.formState)
+      : { undefined })
   const hasError = !!error
 
   useEffect(() => {
     setIsInvalid(hasError)
   }, [hasError])
+
+  if (!formMethods) {
+    return inputElement
+  }
 
   const handleFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
     setIsTooltipVisible(true)
