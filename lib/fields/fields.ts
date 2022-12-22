@@ -242,7 +242,7 @@ export const mfrSchema = z.object({
   quantities: quantitySchema.array().min(1),
   expectedYield: quantitySchema,
   training: z.string().trim().min(1).array(),
-  requiredEquipment: z.string().trim().min(1).array(),
+  requiredEquipment: z.string().trim().min(1).array().min(1),
   calculations: z
     .string()
     .trim()
@@ -255,15 +255,16 @@ export const mfrSchema = z.object({
       name: z.string().trim().min(1),
       expectedSpecification: z.string().trim().min(1),
     })
-    .array(),
+    .array()
+    .min(1),
   packaging: z.string().trim().min(1),
   beyondUseDate: z.object({
     value: z.number().int().positive(),
     unit: z.nativeEnum(TimeUnit),
   }),
   storage: z.nativeEnum(Storage),
-  labelling: z.string().trim().min(1).array(),
-  references: z.string().trim().min(1).array(),
+  labelling: z.string().trim().min(1).array().min(1),
+  references: z.string().trim().min(1).array().min(1),
   developedBy: z.string().trim().min(1),
   verifiedBy: z
     .string()
