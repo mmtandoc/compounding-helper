@@ -5,6 +5,7 @@ import { useMemo } from "react"
 
 import Fieldset from "components/common/forms/Fieldset"
 import { FormGroup } from "components/common/forms/FormGroup"
+import TextArea from "components/common/forms/TextArea"
 import Table from "components/common/Table"
 import { Quantity } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
@@ -106,11 +107,15 @@ const MfrDetails = (props: MfrEntryProps) => {
       </Fieldset>
       <FormGroup>
         <label>Calculations:</label>
-        <textarea value={data.calculations ?? "None"} readOnly={true} />
+        <TextArea value={data.calculations ?? "None"} readOnly autoResize />
       </FormGroup>
       <FormGroup>
         <label>Compounding method:</label>
-        <textarea value={data.compoundingMethod ?? "None"} readOnly={true} />
+        <TextArea
+          value={data.compoundingMethod ?? "None"}
+          readOnly
+          autoResize
+        />
       </FormGroup>
       <Fieldset legend="Stability and storage:">
         <FormGroup row>
@@ -146,7 +151,7 @@ const MfrDetails = (props: MfrEntryProps) => {
       </FormGroup>
       <FormGroup>
         <label>Packaging:</label>
-        <textarea value={data.packaging ?? "None"} readOnly={true} />
+        <TextArea value={data.packaging ?? "None"} readOnly autoResize />
       </FormGroup>
       <Fieldset legend="Labelling:" className="preset-options-fieldset">
         <ul>
@@ -177,25 +182,30 @@ const MfrDetails = (props: MfrEntryProps) => {
         </FormGroup>
       </Fieldset>
       <style jsx>{`
+        ul {
+          margin-block: 0;
+        }
+      `}</style>
+      <style jsx global>{`
         .mfr-details {
           position: relative;
 
-          > :global(.form-group) {
+          > .form-group {
             padding-inline: 0.75em;
           }
 
-          > :global(*) {
+          > * {
             margin-bottom: 0.5rem;
           }
         }
 
-        :global(.info) {
+        .info {
           position: absolute;
           right: 0;
           top: 0;
         }
 
-        :global(.ref-number) {
+        .ref-number {
           font-size: var(--font-size-xl);
         }
 
@@ -203,20 +213,12 @@ const MfrDetails = (props: MfrEntryProps) => {
           font-size: var(--font-size-sm);
         }
 
-        ul {
-          margin-block: 0;
-        }
-
-        textarea {
-          resize: none;
-        }
-
-        :global(.expected-yield) {
+        .expected-yield {
           justify-content: end;
           padding-right: 1rem;
         }
 
-        :global(.ingredients-table) {
+        .ingredients-table {
           width: 100%;
           margin-bottom: 1rem;
         }
