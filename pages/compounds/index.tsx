@@ -1,11 +1,10 @@
-import Button from "components/common/Button"
 import CompoundsTable from "components/compound/CompoundsTable"
-import { getCompounds } from "pages/api/compounds"
+import { prisma } from "lib/prisma"
 import { NextPageWithLayout } from "types/common"
-import { CompoundWithIngredients } from "types/models"
+import { CompoundWithMfrCount, compoundWithMfrCount } from "types/models"
 
 type Props = {
-  data: CompoundWithIngredients[]
+  data: CompoundWithMfrCount[]
 }
 
 const Compounds: NextPageWithLayout<Props> = (props: Props) => {
@@ -41,7 +40,8 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
 }
 
 export async function getServerSideProps() {
-  const data: CompoundWithIngredients[] = (await getCompounds()) ?? []
+  const data: CompoundWithMfrCount[] =
+    (await prisma.compound.findMany(compoundWithMfrCount)) ?? []
 
   return { props: { title: "Compounds", data } }
 }
