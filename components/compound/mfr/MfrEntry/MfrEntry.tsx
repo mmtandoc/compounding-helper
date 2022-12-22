@@ -537,6 +537,10 @@ const presetOptions = {
       value:
         "USP795 guidelines - solid formulations since no stability data available",
     },
+    {
+      label: "Vigilance",
+      value: "Vigilance Reference #: ______ Date: YYYY-MM-DD",
+    },
   ],
 }
 
