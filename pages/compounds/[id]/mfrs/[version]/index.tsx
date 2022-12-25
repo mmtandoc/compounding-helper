@@ -31,6 +31,7 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
         apiEndpointPath={`/api/compounds/${compoundId}/mfrs/${version}`}
         urlPath={`/compounds/${compoundId}/mfrs/${version}`}
         detailsComponent={MfrDetails}
+        actions={{ print: true }}
       />
     </>
   )

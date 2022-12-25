@@ -184,7 +184,7 @@ const MfrDetails = (props: MfrEntryProps) => {
           <span>{data.verifiedBy ?? "N/A"}</span>
         </FormGroup>
       </Fieldset>
-      <Fieldset className="plain-text">
+      <Fieldset className="plain-text print-hide">
         <div className="row">
           <Button size="small" onClick={() => setShowPlainText(!showPlainText)}>
             {showPlainText ? "Hide" : "Show"} plain text
