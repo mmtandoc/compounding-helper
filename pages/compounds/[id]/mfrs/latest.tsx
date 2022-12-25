@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next"
 
-import { prisma } from "lib/prisma"
 import { getCompoundById } from "pages/api/compounds/[id]"
+import { getLatestMfrVersion } from "pages/api/compounds/[id]/mfrs"
 import { NextPageWithLayout } from "types/common"
 
 const LastestMfr: NextPageWithLayout = () => {
@@ -21,14 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true }
   }
 
-  const latestVersion = (
-    await prisma.mfr.aggregate({
-      where: { compoundId },
-      _max: {
-        version: true,
-      },
-    })
-  )._max.version
+  const latestVersion = await getLatestMfrVersion(compoundId)
 
   if (latestVersion === null) {
     return { notFound: true }

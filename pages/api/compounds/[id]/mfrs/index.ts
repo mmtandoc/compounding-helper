@@ -44,8 +44,9 @@ export default async function handler(
         return
       }
 
-      const nextVersion =
-        (await prisma.mfr.count({ where: { compoundId } })) ?? 0
+      const latestVersion = await getLatestMfrVersion(compoundId)
+
+      const nextVersion = latestVersion ? latestVersion + 1 : 0
 
       const mfrData = MfrMapper.toModel({ version: nextVersion, ...fields })
 
@@ -104,3 +105,13 @@ export const getMfrsByCompoundId = async (compoundId: number) =>
       },
     },
   })
+
+export const getLatestMfrVersion = async (compoundId: number) =>
+  (
+    await prisma.mfr.aggregate({
+      where: { compoundId },
+      _max: {
+        version: true,
+      },
+    })
+  )._max.version
