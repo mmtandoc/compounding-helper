@@ -1,9 +1,12 @@
 import axios from "axios"
 import { useRouter } from "next/dist/client/router"
 import Link from "next/link"
-import React, { useState } from "react"
+import { useContext, useState } from "react"
+import { useReactToPrint } from "react-to-print"
 
 import Button from "components/common/Button"
+import { PageRefContext } from "lib/contexts/PageRefContext"
+import { useDocument } from "lib/hooks/useDocument"
 
 import Modal from "../Modal"
 
@@ -20,7 +23,7 @@ type DetailsProps<TModel> = {
     props: Record<string, unknown> & DetailsComponentProps<TModel>,
   ) => JSX.Element
   dataLabel: string
-  actions?: { delete: boolean; edit: boolean }
+  actions?: { delete?: boolean; edit?: boolean; print?: boolean }
 }
 
 const Details = <TModel,>(props: DetailsProps<TModel>) => {
@@ -30,12 +33,76 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     urlPath,
     detailsComponent: DetailsComponent,
     dataLabel,
-    actions = { edit: true, delete: true, ...props.actions },
   } = props
+
+  const actions = { edit: true, delete: true, print: false, ...props.actions }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const router = useRouter()
+
+  const pageRef = useContext(PageRefContext)
+
+  const printStyle = `
+    @media print {
+      html {
+        font-size: 52%;
+      }
+      button {
+        display: none;
+      }
+      textarea {
+        border: 1px solid black;
+      }
+      input[type="radio"] {
+        height: 1rem !important;
+        width: 1rem !important;
+      }
+      textarea,
+      select,
+      input {
+        font-size: 1.2rem;
+      }
+      body {
+        background-color: white !important;
+      }
+      .details fieldset,
+      .details .form-group {
+        page-break-inside: avoid;
+        display: block;
+      }
+
+      .details a {
+        color: currentColor !important;
+        text-decoration: none !important;
+        text-decoration-line: none;
+        outline: none !important;
+      }
+
+      .print-hide {
+        display: none;
+      }
+    }
+    @page {
+      margin: 1.5cm;
+      font-size: 12px;
+      print-color-adjust: exact;
+    }
+    .print-hide {
+      display: none;
+    }
+  `
+
+  const doc = useDocument()
+
+  //TODO: Handle error when attempting to print and pageRef is null
+  const handlePrint = useReactToPrint({
+    content: () => pageRef?.current ?? null,
+    copyStyles: true,
+    documentTitle: doc?.title ?? undefined,
+    bodyClass: "print-body",
+    pageStyle: printStyle,
+  })
 
   const handleDelete = () => {
     axios.delete(apiEndpointPath).then(
@@ -48,9 +115,10 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
   }
 
   return (
-    <div>
+    <div className="details">
       <DetailsComponent data={data} />
       <div className="action-row">
+        {actions.print && <Button onClick={handlePrint}>Print</Button>}
         {actions.edit && (
           <Link href={`${urlPath}/edit`}>
             <Button>Edit</Button>
@@ -86,6 +154,63 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
           column-gap: 1rem;
           margin-left: 0.5rem;
           margin-top: 1.5rem;
+        }
+      `}</style>
+      <style jsx global>{`
+        @media print {
+          html {
+            font-size: 52%;
+          }
+
+          .page {
+            border: none !important;
+            max-width: none !important;
+          }
+
+          textarea {
+            border: 1px solid black;
+          }
+
+          input[type="radio"] {
+            height: 1rem !important;
+            width: 1rem !important;
+          }
+
+          textarea,
+          select,
+          input {
+            //font-size: 3rem;
+          }
+
+          body {
+            background-color: white !important;
+          }
+
+          .print-hide,
+          .action-row,
+          button {
+            display: none !important;
+          }
+        }
+        @page {
+          margin: 1.5cm;
+          font-size: 12px;
+          print-color-adjust: exact;
+        }
+
+        .print-body {
+          .details fieldset,
+          .details .form-group {
+            page-break-inside: avoid;
+            display: block;
+          }
+
+          .details a {
+            color: currentColor !important;
+            text-decoration: none !important;
+            text-decoration-line: none;
+            outline: none !important;
+          }
         }
       `}</style>
     </div>
