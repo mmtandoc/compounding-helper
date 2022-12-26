@@ -150,6 +150,19 @@ export type CompoundWithIngredients = Prisma.CompoundGetPayload<
   typeof compoundWithIngredients
 >
 
+export const compoundWithMfrCount =
+  Prisma.validator<Prisma.CompoundFindManyArgs>()({
+    orderBy: { id: "asc" },
+    include: {
+      ...compoundWithIngredients.include,
+      _count: { select: { mfrs: true } },
+    },
+  })
+
+export type CompoundWithMfrCount = Prisma.CompoundGetPayload<
+  typeof compoundWithMfrCount
+>
+
 export const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
   include: {
     compound: compoundWithIngredients,
@@ -159,3 +172,12 @@ export const riskAssessmentAll = Prisma.validator<Prisma.RiskAssessmentArgs>()({
 export type RiskAssessmentAll = Prisma.RiskAssessmentGetPayload<
   typeof riskAssessmentAll
 >
+
+export const mfrAll = Prisma.validator<Prisma.MfrArgs>()({
+  include: {
+    compound: compoundWithIngredients,
+    riskAssessment: true,
+  },
+})
+
+export type MfrAll = Prisma.MfrGetPayload<typeof mfrAll>

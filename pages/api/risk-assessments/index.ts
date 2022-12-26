@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
 
@@ -24,10 +25,35 @@ export default async function handler(
   //TODO: Implement filtering
   switch (method) {
     case "GET": {
+      const findManyArgs: Prisma.RiskAssessmentFindManyArgs = {
+        orderBy: { id: "asc" },
+      }
+
+      if (query.compoundId) {
+        findManyArgs.orderBy = [{ id: "asc" }, { dateAssessed: "desc" }]
+        if (typeof query.compoundId === "string") {
+          findManyArgs.where = {
+            compoundId: {
+              equals: parseInt(query.compoundId),
+            },
+            ...findManyArgs.where,
+          }
+        } else {
+          findManyArgs.where = {
+            compoundId: {
+              in: query.compoundId.map((id) => parseInt(id)),
+            },
+            ...findManyArgs.where,
+          }
+        }
+      }
+
+      console.log(findManyArgs)
+
       let riskAssessments
 
       try {
-        riskAssessments = await getRiskAssessments()
+        riskAssessments = await getRiskAssessments(findManyArgs)
       } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -98,9 +124,18 @@ export default async function handler(
   }
 }
 
-export const getRiskAssessments = async () => {
-  return await prisma.riskAssessment.findMany({
+export const getRiskAssessments = async (
+  args?: Omit<Prisma.RiskAssessmentFindManyArgs, "select" | "include">,
+) => {
+  const defaultArgs: Omit<
+    Prisma.RiskAssessmentFindManyArgs,
+    "select" | "include"
+  > = {
     orderBy: { id: "asc" },
+  }
+  return await prisma.riskAssessment.findMany({
+    ...defaultArgs,
+    ...args,
     ...includeAllNested,
   })
 }

@@ -14,7 +14,6 @@ const CompoundMapper = {
         .map(IngredientMapper.toFieldValues)
         .sort((a, b) => a.order - b.order),
       hasMasterFormulationRecord: data.hasMasterFormulationRecord,
-      beyondUseDate: data.beyondUseDate,
       notes: data.notes,
     }
     return compoundSchema.parse(values)
@@ -30,7 +29,6 @@ const CompoundMapper = {
       id: values.id ?? undefined,
       name: values.name,
       hasMasterFormulationRecord: values.hasMasterFormulationRecord,
-      beyondUseDate: values.beyondUseDate,
       notes: values.notes,
     }
   },

@@ -151,6 +151,7 @@ model RiskAssessment {
   dateAssessed          DateTime  @db.Date
   compoundingSupervisor String
   updatedAt             DateTime  @default(now()) @updatedAt
+  mfrs                  Mfr[]
 
   @@map("risk_assessments")
 }
@@ -196,8 +197,9 @@ model Compound {
   ingredients                Ingredient[]
   riskAssessments            RiskAssessment[]
   hasMasterFormulationRecord Boolean          @default(false)
-  beyondUseDate              String?
+  beyondUseDate              String?          @ignore
   notes                      String?
+  mfrs                       Mfr[]
 
   @@map("compounds")
 }
@@ -225,6 +227,54 @@ enum PhysicalForm {
   powder
   liquid
   solid
+}
+
+model Mfr {
+  compound   Compound @relation(fields: [compoundId], references: [id])
+  compoundId Int
+  version    Int
+
+  pharmaceuticalForm    String
+  routeOfAdministration String
+
+  riskAssessment      RiskAssessment @relation(fields: [riskAssessmentId], references: [id])
+  riskAssessmentId    Int
+  quantities          Json // {amount: Float, unit: Unit}[]
+  expectedYieldAmount Float
+  expectedYieldUnit   Unit
+  training            String[]
+  requiredEquipment   String[]
+  calculations        String?
+  compoundingMethod   String
+  qualityControls     Json[] // {name: String, expectedSpecification: String}[]
+
+  beyondUseDateValue Int
+  beyondUseDateUnit  TimeUnit
+  storage            Storage
+
+  packaging  String
+  labelling  String[]
+  references String[]
+
+  developedBy   String
+  verifiedBy    String?
+  effectiveDate DateTime @db.Date
+
+  updatedAt DateTime @updatedAt
+
+  @@id([compoundId, version])
+  @@map("mfrs")
+}
+
+enum TimeUnit {
+  days
+  months
+}
+
+enum Storage {
+  room
+  fridge
+  freezer
 }
 
 model Link {

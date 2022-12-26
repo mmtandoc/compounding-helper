@@ -4,13 +4,13 @@ import Button from "components/common/Button"
 import Table from "components/common/Table"
 import { TableColumn } from "components/common/Table/Table"
 import filterFns from "lib/table/filterFns"
-import { CompoundWithIngredients, IngredientAll } from "types/models"
+import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
 type Props = {
-  data: CompoundWithIngredients[]
+  data: CompoundWithMfrCount[]
 }
 
-const columns: TableColumn<CompoundWithIngredients, any>[] = [
+const columns: TableColumn<CompoundWithMfrCount, any>[] = [
   {
     label: "ID",
     sortable: true,
@@ -79,15 +79,6 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
     accessorPath: "hasMasterFormulationRecord",
   },
   {
-    label: "Beyond Use Date",
-    sortable: true,
-    compare: (a: string | null | undefined, b: string | null | undefined) =>
-      (a ?? "N/A").localeCompare(b ?? "N/A"),
-    renderCell: (value) => <>{value ?? "N/A"}</>,
-    accessorPath: "beyondUseDate",
-  },
-
-  {
     id: "actions",
     renderCell: (_, data) => (
       <div>
@@ -100,6 +91,30 @@ const columns: TableColumn<CompoundWithIngredients, any>[] = [
         <Link href={`/risk-assessments/${data.id}`}>
           <Button size="small">View Risk Assessment</Button>
         </Link>
+        <style jsx>{`
+          div {
+            display: flex;
+            column-gap: 0.3rem;
+            flex-wrap: nowrap;
+            margin: 0.2rem 0;
+          }
+        `}</style>
+      </div>
+    ),
+  },
+  {
+    id: "mfr-actions",
+    renderCell: (_, data) => (
+      <div>
+        {data._count.mfrs > 0 ? (
+          <Link href={`/compounds/${data.id}/mfrs/latest`}>
+            <Button size="small">View MFR</Button>
+          </Link>
+        ) : (
+          <Link href={`/compounds/${data.id}/mfrs/new`}>
+            <Button size="small">Create MFR</Button>
+          </Link>
+        )}
         <style jsx>{`
           div {
             display: flex;

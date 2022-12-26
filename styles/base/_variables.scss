@@ -22,6 +22,10 @@ $font-size-xl: $font-size-base * 1.75 !default;
   // --color-accent-subtle:
   --color-accent-muted: lightblue;
 
+  --color-danger-fg: #cf222e;
+  --color-danger-subtle: #ffc8c8;
+  --color-danger-muted: #ff9b9b;
+
   --color-neutral-strong-emphasis: var(--color-scale-gray-350);
   --color-neutral-emphasis: var(--color-scale-gray-300);
   --color-neutral-muted: var(--color-scale-gray-150);
@@ -47,7 +51,7 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --dropdown-border: var(--border-default);
 
   // Fields
-  --color-field-invalid-bg: #ffc8c8;
+  --color-field-invalid-bg: var(--color-danger-subtle);
 
   --color-field-bg: var(--color-canvas-default);
   --color-field-border: var(--color-border-default);
@@ -73,7 +77,7 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --color-radio-disabled-bg: var(--color-canvas-inset);
 
   // Select
-  --color-select-invalid-bg: #ffc8c8;
+  --color-select-invalid-bg: var(--color-danger-subtle);
 
   --color-select-bg: var(--color-neutral-muted);
   --color-select-border: var(--color-border-default);

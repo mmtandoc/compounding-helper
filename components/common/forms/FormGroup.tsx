@@ -78,6 +78,7 @@ const style = css.global`
 
     > :where(label, .label) {
       @extend %form-group-label;
+      width: fit-content;
     }
 
     &.row > :where(label, .label) {

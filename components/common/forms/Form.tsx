@@ -8,8 +8,14 @@ const Form = (props: Props) => {
     <form {...formProps}>
       {children}
       <style jsx>{`
-        form > :global(.form-group) {
-          padding-inline: 0.75em;
+        form {
+          > :global(.form-group) {
+            padding-inline: 0.75em;
+          }
+
+          > :global(*) {
+            margin-bottom: 0.5rem;
+          }
         }
       `}</style>
     </form>
