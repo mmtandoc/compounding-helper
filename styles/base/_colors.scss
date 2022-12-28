@@ -4,8 +4,8 @@
 $color-white: #fff;
 $color-black: #1d1d21;
 
-$lighten-percentage: 15%;
-$darken-percentage: 15%;
+$lighten-percentage: 8%;
+$darken-percentage: 8%;
 
 $palettes: (
   "gray": (
@@ -59,8 +59,16 @@ $color-primary: color-get("blue", 600); // #3165b9;
       $color-primary,
       $lightness: $lighten-percentage
     )};
+  --color-primary-lighter: #{color.adjust(
+      $color-primary,
+      $lightness: $lighten-percentage * 2
+    )};
   --color-primary-dark: #{color.adjust(
       $color-primary,
       $lightness: -$darken-percentage
+    )};
+  --color-primary-darker: #{color.adjust(
+      $color-primary,
+      $lightness: - ($darken-percentage * 2)
     )};
 }

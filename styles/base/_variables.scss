@@ -92,14 +92,16 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --color-select-disabled-bg: var(--color-neutral-subtle);
   --color-select-disabled-fg: var(--color-fg-muted);
 
-  // Buttons
-  --color-button-border: var(--color-scale-gray-400);
-  --color-button-bg: var(--color-neutral-muted);
-  --color-button-fg: var(--color-fg-default);
+  // =========== Buttons ============
 
   --button-font-size: var(--font-size-base);
   --button-font-size-small: var(--font-size-sm);
   --button-font-size-large: var(--font-size-lg);
+
+  // Default
+  --color-button-border: var(--color-scale-gray-400);
+  --color-button-bg: var(--color-neutral-muted);
+  --color-button-fg: var(--color-fg-default);
 
   --color-button-hover-border: var(--color-scale-gray-600);
   --color-button-hover-bg: var(--color-neutral-emphasis);
@@ -110,6 +112,21 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --color-button-disabled-border: var(--color-scale-gray-300);
   --color-button-disabled-bg: var(--color-neutral-subtle);
   --color-button-disabled-fg: var(--color-fg-muted);
+
+  // Primary
+  --color-button-primary-border: var(--color-primary);
+  --color-button-primary-bg: var(--color-primary);
+  --color-button-primary-fg: var(--color-white);
+
+  --color-button-primary-hover-border: var(--color-primary-darker);
+  --color-button-primary-hover-bg: var(--color-primary-dark);
+
+  --color-button-primary-active-border: var(--color-primary-darker);
+  --color-button-primary-active-bg: var(--color-primary-darker);
+
+  --color-button-primary-disabled-border: var(--color-scale-blue-300);
+  --color-button-primary-disabled-bg: var(--color-scale-blue-300);
+  --color-button-primary-disabled-fg: var(--color-scale-blue-100);
 
   // Fieldset
   --color-fieldset-bg: var(--color-scale-gray-150);

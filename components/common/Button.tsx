@@ -44,7 +44,7 @@ const Button = (props: ButtonProps) => {
           display: inline-block;
           border-radius: 0.5rem;
           line-height: 2rem;
-          font-weight: 500;
+          font-weight: normal;
           font-family: inherit;
           white-space: nowrap;
           vertical-align: middle;
@@ -90,14 +90,25 @@ const Button = (props: ButtonProps) => {
           }
 
           &.primary {
-            background-color: var(--color-primary);
-            color: var(--color-white);
-            border-color: var(--color-primary);
+            border: var(--border-default);
+            border-color: var(--color-button-primary-border);
+            background-color: var(--color-button-primary-bg);
+            color: var(--color-button-primary-fg);
 
-            &:hover:not(:disabled) {
-              background-color: var(--color-primary-light);
-              color: var(--color-white);
-              border-color: var(--color-primary-light);
+            &:hover {
+              background-color: var(--color-button-primary-hover-bg);
+              border-color: var(--color-button-primary-hover-border);
+            }
+
+            &:active {
+              background-color: var(--color-button-primary-active-bg);
+              border-color: var(--color-button-primary-active-border);
+            }
+
+            &:disabled {
+              background-color: var(--color-button-primary-disabled-bg);
+              color: var(--color-button-primary-disabled-fg);
+              border-color: var(--color-button-primary-disabled-border);
             }
           }
         }
