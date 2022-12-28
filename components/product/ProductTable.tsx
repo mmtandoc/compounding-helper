@@ -62,7 +62,9 @@ const ProductTable = (props: Props) => {
             renderCell: (_, data) => (
               <div>
                 <Link href={`/products/${data.id}`}>
-                  <Button size="small">View</Button>
+                  <Button size="small" theme="primary">
+                    View
+                  </Button>
                 </Link>
                 <Link href={`/products/${data.id}/edit`}>
                   <Button size="small">Edit</Button>

@@ -50,7 +50,9 @@ const MfrTable = (props: Props) => {
           renderCell: (_, data) => (
             <div>
               <Link href={`/compounds/${data.compoundId}/mfrs/${data.version}`}>
-                <Button size="small">View</Button>
+                <Button size="small" theme="primary">
+                  View
+                </Button>
               </Link>
               <Link
                 href={`/compounds/${data.compoundId}/mfrs/${data.version}/edit`}

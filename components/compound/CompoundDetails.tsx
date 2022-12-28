@@ -84,7 +84,9 @@ const MfrsActions = (props: { data: CompoundWithIngredients }) => {
           {mfrs && mfrs.length > 0 ? (
             <>
               <Link href={`/compounds/${data.id}/mfrs/latest`}>
-                <Button size="small">View latest MFR</Button>
+                <Button size="small" theme="primary">
+                  View latest MFR
+                </Button>
               </Link>
               <Link href={`/compounds/${data.id}/mfrs`}>
                 <Button size="small">View all MFRs</Button>

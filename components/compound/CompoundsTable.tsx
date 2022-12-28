@@ -83,7 +83,9 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
     renderCell: (_, data) => (
       <div>
         <Link href={`/compounds/${data.id}`}>
-          <Button size="small">View</Button>
+          <Button size="small" theme="primary">
+            View
+          </Button>
         </Link>
         <Link href={`/compounds/${data.id}/edit`}>
           <Button size="small">Edit</Button>
@@ -108,7 +110,9 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
       <div>
         {data._count.mfrs > 0 ? (
           <Link href={`/compounds/${data.id}/mfrs/latest`}>
-            <Button size="small">View MFR</Button>
+            <Button size="small" theme="primary">
+              View MFR
+            </Button>
           </Link>
         ) : (
           <Link href={`/compounds/${data.id}/mfrs/new`}>

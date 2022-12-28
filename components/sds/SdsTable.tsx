@@ -72,7 +72,9 @@ const SdsTable = (props: Props) => {
             renderCell: (_, data) => (
               <div>
                 <Link href={`/sds/${data.id}`}>
-                  <Button size="small">View</Button>
+                  <Button size="small" theme="primary">
+                    View
+                  </Button>
                 </Link>
                 <Link href={`/sds/${data.id}/edit`}>
                   <Button size="small">Edit</Button>
