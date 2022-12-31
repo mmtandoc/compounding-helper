@@ -7,6 +7,7 @@ import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { prisma } from "lib/prisma"
+import { deleteCompoundById } from "pages/api/compounds/[id]"
 import { ApiBody } from "types/common"
 import { RiskAssessmentAll, compoundWithIngredients } from "types/models"
 
@@ -111,7 +112,9 @@ export default async function handler(
     }
     case "DELETE": {
       try {
-        await deleteRiskAssessmentById(id)
+        const { compoundId } = await deleteRiskAssessmentById(id)
+        //Delete associated compound, as currently a one-to-one relationship
+        await deleteCompoundById(compoundId)
       } catch (error) {
         console.log(error)
         res.status(500).json({
