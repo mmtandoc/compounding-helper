@@ -35,7 +35,7 @@
     "superjson": "^1.11.0",
     "swr": "^1.3.0",
     "type-fest": "^2.19.0",
-    "zod": "^3.19.1"
+    "zod": "^3.20.2"
   },
   "devDependencies": {
     "@styled-jsx/plugin-sass": "^4.0.2",
