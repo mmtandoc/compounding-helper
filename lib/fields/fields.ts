@@ -419,3 +419,65 @@ export type LinkDirectoryFields = z.output<typeof linkDirectorySchema>
 export type LinkDirectoryFieldsInput = z.input<typeof linkDirectorySchema>
 
 export type NullPartialLinkDirectoryFields = { links: NullPartialLinkFields[] }
+
+//======= Settings schema =========
+
+const createFieldPresetSchema = <T extends z.ZodTypeAny>(fieldSchema: T) =>
+  z
+    .object({
+      label: z.string().trim().optional(),
+      value: fieldSchema,
+    })
+    .refine(
+      (arg) =>
+        !(
+          (arg.label?.length ?? 0) === 0 &&
+          typeof (arg as any).value !== "string"
+        ),
+      "Label is required if value is not a string.",
+    )
+
+const createFieldArrayPresetSchema = <
+  T extends z.ZodTypeAny,
+  TMultiple extends boolean,
+>(
+  fieldSchema: z.ZodArray<T, any>,
+  multiple?: TMultiple,
+) => {
+  return multiple
+    ? z.object({
+        label: z.string().trim(),
+        value: fieldSchema,
+      })
+    : createFieldPresetSchema(fieldSchema.element)
+}
+
+export const settingsSchema = z.object({
+  id: z.number().int().optional(),
+  //TODO: Implement creating field preset schemas dynamically
+  mfrFieldPresets: z.object({
+    requiredEquipment: createFieldArrayPresetSchema(
+      mfrSchema.shape.requiredEquipment,
+    ).array(),
+    compoundingMethod: createFieldPresetSchema(
+      mfrSchema.shape.compoundingMethod,
+    ).array(),
+    qualityControls: createFieldArrayPresetSchema(
+      mfrSchema.shape.qualityControls,
+      true,
+    ).array(),
+    packaging: createFieldPresetSchema(mfrSchema.shape.packaging).array(),
+    labelling: createFieldArrayPresetSchema(mfrSchema.shape.labelling).array(),
+    references: createFieldArrayPresetSchema(
+      mfrSchema.shape.references,
+    ).array(),
+  }),
+})
+
+export type SettingsFields = z.output<typeof settingsSchema>
+export type SettingsFieldsInput = z.input<typeof settingsSchema>
+
+export type NullPartialSettingsFields = Merge<
+  NullPartialDeep<SettingsFieldsInput, { ignoreKeys: "id" }>,
+  { mfrFieldPresets: NullPartialDeep<SettingsFieldsInput["mfrFieldPresets"]> }
+>
