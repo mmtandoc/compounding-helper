@@ -102,6 +102,9 @@ const Header = () => {
           <Link href="/links" data-active={isActive("/links")}>
             Link Directory
           </Link>
+          <Link href="/settings" data-active={isActive("/settings")}>
+            Settings
+          </Link>
         </DropdownMenu>
       </Dropdown>
       <style jsx>{`
