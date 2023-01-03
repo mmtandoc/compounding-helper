@@ -18,10 +18,15 @@ type Props = (
   | Merge<TextAreaAttributes, Partial<UseFormRegisterReturn>>
 ) & {
   autoResize?: boolean
+  fullWidth?: boolean
 }
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
-  const { autoResize = false, ...textAreaProps } = _.omit(props, "ref")
+  const {
+    autoResize = false,
+    fullWidth = false,
+    ...textAreaProps
+  } = _.omit(props, "ref")
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
 
   useImperativeHandle(ref, () => textAreaRef.current as HTMLTextAreaElement)
@@ -66,6 +71,10 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
     textAreaProps.className = `${textAreaProps.className ?? ""} autoresize`
   }
 
+  if (fullWidth) {
+    textAreaProps.className = `${textAreaProps.className ?? ""} full-width`
+  }
+
   return (
     <>
       <ConditionalWrapper condition={hasFormContext} wrapper={ErrorContainer}>
@@ -77,9 +86,10 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
             resize: none;
             overflow: hidden;
           }
-        textarea.autoresize {
-          resize: none;
-          overflow: hidden;
+
+          &.full-width {
+            width: 100%;
+          }
         }
       `}</style>
     </>
