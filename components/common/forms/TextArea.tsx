@@ -1,11 +1,9 @@
 import _ from "lodash"
 import React, {
-  ReactElement,
   ReactNode,
+  useCallback,
   useEffect,
   useImperativeHandle,
-  useLayoutEffect,
-  useMemo,
   useState,
 } from "react"
 import { UseFormRegisterReturn, useFormContext } from "react-hook-form"
@@ -33,13 +31,16 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
     textAreaRef.current?.scrollHeight ?? null,
   )
 
-  const onChange = autoResize
-    ? (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (autoResize) {
         setValue(e.target.value)
         setCurrentScrollHeight(e.target.scrollHeight)
-        return textAreaProps?.onChange?.(e)
       }
-    : undefined
+      return textAreaProps?.onChange?.(e)
+    },
+    [autoResize, textAreaProps],
+  )
 
   useEffect(() => {
     const MIN_TEXTAREA_HEIGHT = 20
@@ -61,16 +62,6 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
 
   const hasFormContext = !!useFormContext() as boolean
 
-  const ConditionalWrapper = ({
-    condition,
-    wrapper: Wrapper,
-    children,
-  }: {
-    condition: boolean
-    wrapper: React.ElementType
-    children: ReactNode
-  }) => (condition ? <Wrapper>{children}</Wrapper> : <>{children}</>)
-
   if (autoResize) {
     textAreaProps.className = `${textAreaProps.className ?? ""} autoresize`
   }
@@ -81,6 +72,11 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
         <textarea {...textAreaProps} onChange={onChange} ref={textAreaRef} />
       </ConditionalWrapper>
       <style jsx global>{`
+        textarea {
+          &.autoresize {
+            resize: none;
+            overflow: hidden;
+          }
         textarea.autoresize {
           resize: none;
           overflow: hidden;
@@ -91,5 +87,15 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
 })
 
 TextArea.displayName = "TextArea"
+
+const ConditionalWrapper = ({
+  condition,
+  wrapper: Wrapper,
+  children,
+}: {
+  condition: boolean
+  wrapper: React.ElementType
+  children: ReactNode
+}) => (condition ? <Wrapper>{children}</Wrapper> : <>{children}</>)
 
 export default TextArea
