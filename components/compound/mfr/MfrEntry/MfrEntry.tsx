@@ -17,11 +17,11 @@ import Input from "components/common/forms/Input"
 import RhfSelect from "components/common/forms/RhfSelect"
 import TextArea from "components/common/forms/TextArea"
 import Spinner from "components/common/Spinner"
-import { NullPartialMfrFields } from "lib/fields"
+import { NullPartialMfrFields, NullPartialSettingsFields } from "lib/fields"
 import { CompoundWithIngredients } from "types/models"
 
 import { FormulaEntryTable } from "./FormulaEntryTable"
-import PresetDropdown from "./PresetDropdown"
+import PresetDropdown, { PresetType } from "./PresetDropdown"
 import { QualityControlEntryTable } from "./QualityControlEntryTable"
 import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
@@ -45,6 +45,9 @@ const MfrEntry = (props: MfrEntryProps) => {
     name: "quantities",
   })
 
+  const { data: settings, error: settingsError } =
+    useSWR<NullPartialSettingsFields>("/api/settings")
+
   const { data: compound, error: compoundError } =
     useSWR<CompoundWithIngredients>(`/api/compounds/${compoundId}`)
 
@@ -54,6 +57,9 @@ const MfrEntry = (props: MfrEntryProps) => {
     )
 
   //TODO: Improve error handling
+  if (settingsError) {
+    console.error(settingsError)
+  }
   if (riskAssessmentError) {
     console.error(riskAssessmentError)
   }
@@ -64,7 +70,10 @@ const MfrEntry = (props: MfrEntryProps) => {
   const isLoading = {
     compound: !compound && !compoundError,
     riskAssessment: !riskAssessment && !riskAssessmentError,
+    settings: !settings && !settingsError,
   }
+
+  const presetOptions = settings?.mfrFieldPresets
 
   useEffect(() => {
     if (
@@ -235,8 +244,8 @@ const MfrEntry = (props: MfrEntryProps) => {
         <PresetDropdown
           name="requiredEquipment"
           label="Add preset equipment"
-          options={presetOptions.requiredEquipment}
-          isArray
+          options={presetOptions?.requiredEquipment ?? []}
+          type={PresetType.Array}
           formMethods={formMethods}
         />
       </Fieldset>
@@ -256,7 +265,8 @@ const MfrEntry = (props: MfrEntryProps) => {
           <PresetDropdown
             name="compoundingMethod"
             label="Set preset compounding method"
-            options={presetOptions.compoundingMethod}
+            type={PresetType.Single}
+            options={presetOptions?.compoundingMethod ?? []}
             formMethods={formMethods}
           />
         </div>
@@ -308,7 +318,8 @@ const MfrEntry = (props: MfrEntryProps) => {
           <PresetDropdown
             name="qualityControls"
             label="Set preset quality controls"
-            options={presetOptions.qualityControls}
+            options={presetOptions?.qualityControls ?? []}
+            type={PresetType.MultiArray}
             formMethods={formMethods}
           />
         </div>
@@ -320,7 +331,8 @@ const MfrEntry = (props: MfrEntryProps) => {
           <PresetDropdown
             name="packaging"
             label="Set preset packaging"
-            options={presetOptions.packaging}
+            type={PresetType.Single}
+            options={presetOptions?.packaging ?? []}
             formMethods={formMethods}
           />
         </div>
@@ -343,8 +355,8 @@ const MfrEntry = (props: MfrEntryProps) => {
         <PresetDropdown
           name="labelling"
           label="Add preset labelling"
-          options={presetOptions.labelling}
-          isArray
+          options={presetOptions?.labelling ?? []}
+          type={PresetType.Array}
           formMethods={formMethods}
         />
       </Fieldset>
@@ -366,8 +378,8 @@ const MfrEntry = (props: MfrEntryProps) => {
         <PresetDropdown
           name="references"
           label="Add preset references"
-          options={presetOptions.references}
-          isArray
+          options={presetOptions?.references ?? []}
+          type={PresetType.Array}
           formMethods={formMethods}
         />
       </Fieldset>
@@ -480,68 +492,6 @@ const getRequiredPpeList = (riskAssessment: RiskAssessment) => {
     requiredPpe.push(capitalize(riskAssessment.ppeOther))
   }
   return requiredPpe
-}
-
-const presetOptions = {
-  labelling: [
-    { value: "External use only" },
-    { value: "Shake well" },
-    { value: "Store at room temperature" },
-    { value: "Store in fridge" },
-    { value: "Expiry date" },
-  ],
-  requiredEquipment: [
-    { value: "scale" },
-    { value: "weight paper/boat" },
-    { value: "spatula" },
-    { value: "ointment pad/slab" },
-    { value: "graduated cylinder" },
-    { value: "mortar and pestle" },
-    { value: "ointment jar" },
-    { value: "amber plastic bottle" },
-  ],
-  compoundingMethod: [
-    {
-      label: "Creams template",
-      value:
-        "1. Levigate creams together until uniform mixture is obtained.\n2. Transfer to ointment jar and label",
-    },
-    {
-      label: "Ointments template",
-      value:
-        "1. Levigate ointments together until uniform mixture is obtained.\n2. Transfer to ointment jar and label",
-    },
-  ],
-  qualityControls: ["cream", "ointment"].flatMap((form) =>
-    ["white", "yellow"].map((color) => ({
-      label: capitalize(`${color} smooth ${form}`),
-      value: [
-        {
-          name: "Final product appearance",
-          expectedSpecification: capitalize(
-            `${color} smooth homogenous ${form}`,
-          ),
-        },
-      ],
-    })),
-  ),
-  packaging: [{ value: "Ointment jar" }, { value: "Amber plastic bottle" }],
-  references: [
-    {
-      label: "Based on historical use/pharmacist experience",
-      value:
-        "This formulation is not based on literature but based on historical use or pharmacist experience",
-    },
-    {
-      label: "USP795 - solid formulations, no stability data",
-      value:
-        "USP795 guidelines - solid formulations since no stability data available",
-    },
-    {
-      label: "Vigilance",
-      value: "Vigilance Reference #: ______ Date: YYYY-MM-DD",
-    },
-  ],
 }
 
 export default MfrEntry
