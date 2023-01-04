@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CoatType,
   Complexity,
@@ -425,31 +426,76 @@ export type NullPartialLinkDirectoryFields = { links: NullPartialLinkFields[] }
 const createFieldPresetSchema = <T extends z.ZodTypeAny>(fieldSchema: T) =>
   z
     .object({
-      label: z.string().trim().optional(),
+      label: z
+        .string()
+        .trim()
+        .transform((arg) => (arg === "" ? undefined : arg))
+        .optional(),
       value: fieldSchema,
     })
-    .refine(
-      (arg) =>
-        !(
-          (arg.label?.length ?? 0) === 0 &&
-          typeof (arg as any).value !== "string"
-        ),
-      "Label is required if value is not a string.",
-    )
+    .partial({ label: true })
+    .refine((arg) => {
+      console.log({ arg })
+      return !(
+        ((arg as { label?: string }).label?.length ?? 0) === 0 &&
+        typeof (arg as { value: any }).value !== "string"
+      )
+    }, "Label is required if value is not a string.")
 
-const createFieldArrayPresetSchema = <
-  T extends z.ZodTypeAny,
-  TMultiple extends boolean,
->(
+const createFieldArrayPresetSingleSchema = <T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T, any>,
-  multiple?: TMultiple,
-) => {
-  return multiple
-    ? z.object({
-        label: z.string().trim(),
-        value: fieldSchema,
-      })
-    : createFieldPresetSchema(fieldSchema.element)
+) => createFieldPresetSchema(fieldSchema.element)
+
+export type FieldPresetFields<T = any> = z.infer<
+  ReturnType<typeof createFieldPresetSchema<z.ZodType<T>>>
+>
+
+export type NullPartialFieldPresetFields<T = any> = NullPartialDeep<
+  FieldPresetFields<T>
+>
+
+export type FieldArrayPresetSingleFields<T = any> = z.infer<
+  ReturnType<typeof createFieldArrayPresetSingleSchema<z.ZodType<T>>>
+>
+export type NullPartialFieldArrayPresetSingleFields<T = any> = NullPartialDeep<
+  FieldArrayPresetSingleFields<T>
+>
+
+export type FieldArrayPresetMultipleFields<T = any> = z.infer<
+  ReturnType<typeof createFieldArrayPresetMultipleSchema<z.ZodType<T>>>
+>
+export type NullPartialFieldArrayPresetMultipleFields<T = any> =
+  NullPartialDeep<FieldArrayPresetMultipleFields<T>>
+
+const createFieldArrayPresetMultipleSchema = <T extends z.ZodTypeAny>(
+  fieldSchema: z.ZodArray<T, any>,
+) =>
+  z.object({
+    label: z.string().trim(),
+    value: fieldSchema,
+  })
+
+function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+  fieldSchema: z.ZodArray<T, any>,
+  multiple: true,
+): ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>
+
+function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+  fieldSchema: z.ZodArray<T, any>,
+  multiple?: false | undefined,
+): ReturnType<typeof createFieldArrayPresetSingleSchema<T>>
+
+function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+  fieldSchema: z.ZodArray<T, any>,
+  multiple?: boolean,
+):
+  | ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>
+  | ReturnType<typeof createFieldArrayPresetSingleSchema<T>> {
+  if (multiple) {
+    return createFieldArrayPresetMultipleSchema(fieldSchema)
+  } else {
+    return createFieldArrayPresetSingleSchema(fieldSchema)
+  }
 }
 
 export const settingsSchema = z.object({
@@ -479,5 +525,7 @@ export type SettingsFieldsInput = z.input<typeof settingsSchema>
 
 export type NullPartialSettingsFields = Merge<
   NullPartialDeep<SettingsFieldsInput, { ignoreKeys: "id" }>,
-  { mfrFieldPresets: NullPartialDeep<SettingsFieldsInput["mfrFieldPresets"]> }
+  {
+    mfrFieldPresets: NullPartialDeep<SettingsFieldsInput["mfrFieldPresets"]>
+  }
 >
