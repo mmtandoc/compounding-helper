@@ -287,3 +287,8 @@ model Link {
 
   @@map("directory")
 }
+
+model Settings {
+  id              Int  @id @default(autoincrement())
+  mfrFieldPresets Json //{[fieldName]: {label?: String, value: any}|{label?: String, value: any}[]}
+}

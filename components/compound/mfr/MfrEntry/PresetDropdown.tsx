@@ -2,6 +2,7 @@ import {
   FieldPath,
   FieldPathValue,
   FieldValues,
+  PathValue,
   UseFormReturn,
 } from "react-hook-form"
 
@@ -10,6 +11,18 @@ import Dropdown, {
   DropdownMenu,
   DropdownToggle,
 } from "components/common/Dropdown"
+import {
+  NullPartialFieldArrayPresetMultipleFields,
+  NullPartialFieldArrayPresetSingleFields,
+  NullPartialFieldPresetFields,
+} from "lib/fields"
+import { GetElementType } from "types/util"
+
+export enum PresetType {
+  Array,
+  Single,
+  MultiArray,
+}
 
 type PresetDropdownPropsBase<
   TFieldValues extends FieldValues,
@@ -25,26 +38,32 @@ interface ArrayPresetDropdownProps<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
-  isArray: true
-  options: {
-    label?: string
-    value: FieldPathValue<TFieldValues, TFieldName> extends
-      | (Array<infer U> | null)
-      | Array<infer U>
-      ? U
-      : never
-  }[]
+  type: PresetType.Array
+  options: NullPartialFieldArrayPresetSingleFields<GetElementType<
+    FieldPathValue<TFieldValues, TFieldName>
+  > | null>[]
 }
+
+interface ArrayMultiPresetDropdownProps<
+  TFieldValues extends FieldValues,
+  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
+  type: PresetType.MultiArray
+  options: NullPartialFieldArrayPresetMultipleFields<GetElementType<
+    FieldPathValue<TFieldValues, TFieldName>
+  > | null>[]
+}
+
+type x = NullPartialFieldArrayPresetSingleFields<GetElementType<string[]>>
 
 interface NonArrayPresetDropdownProps<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
-  isArray?: false
-  options: {
-    label?: string
-    value: FieldPathValue<TFieldValues, TFieldName>
-  }[]
+  type: PresetType.Single
+  options: NullPartialFieldPresetFields<
+    FieldPathValue<TFieldValues, TFieldName>
+  >[]
 }
 
 type PresetDropdownProps<
@@ -53,6 +72,7 @@ type PresetDropdownProps<
 > =
   | NonArrayPresetDropdownProps<TFieldValues, TFieldName>
   | ArrayPresetDropdownProps<TFieldValues, TFieldName>
+  | ArrayMultiPresetDropdownProps<TFieldValues, TFieldName>
 
 const PresetDropdown = <
   TFieldValues extends FieldValues,
@@ -60,7 +80,7 @@ const PresetDropdown = <
 >(
   props: PresetDropdownProps<TFieldValues, TFieldName>,
 ) => {
-  const { className, name, label, formMethods, isArray, options } = props
+  const { className, name, label, formMethods, type, options } = props
 
   const currentValue = formMethods.watch(name)
 
@@ -71,29 +91,43 @@ const PresetDropdown = <
           <DropdownToggle>{label}</DropdownToggle>
         </Button>
         <DropdownMenu>
-          {options.map((option, i) => (
-            <Button
-              key={i}
-              onClick={() => {
-                if (props.isArray) {
-                  formMethods.setValue(name, [
-                    ...(formMethods.getValues(name) ?? []),
-                    option.value,
-                  ] as any)
-                } else {
-                  formMethods.setValue(name, option.value as any)
+          {options.map((option, i) => {
+            const optionValue = (option as { value: any }).value
+            const optionLabel = (option as { label?: string }).label
+            return (
+              <Button
+                key={i}
+                onClick={() => {
+                  if (type !== PresetType.Single) {
+                    const newValue = [
+                      ...(formMethods.getValues(name) ?? []),
+                    ] as any[]
+
+                    if (type === PresetType.MultiArray) {
+                      newValue.push(...optionValue)
+                    } else {
+                      newValue.push(optionValue)
+                    }
+
+                    formMethods.setValue(
+                      name,
+                      newValue as PathValue<TFieldValues, TFieldName>,
+                    )
+                  } else {
+                    formMethods.setValue(name, optionValue)
+                  }
+                }}
+                size="small"
+                disabled={
+                  Array.isArray(currentValue)
+                    ? currentValue.includes(optionValue)
+                    : false
                 }
-              }}
-              size="small"
-              disabled={
-                Array.isArray(currentValue)
-                  ? currentValue.includes(option.value)
-                  : false
-              }
-            >
-              {option.label ?? (option.value as string)}
-            </Button>
-          ))}
+              >
+                {optionLabel ?? (optionValue as string)}
+              </Button>
+            )
+          })}
         </DropdownMenu>
       </Dropdown>
       <style jsx>{`
