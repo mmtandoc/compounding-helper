@@ -1,4 +1,4 @@
-import { ComponentPropsWithRef } from "react"
+import { ChangeEvent, ComponentPropsWithRef } from "react"
 import {
   ControllerProps,
   FieldPathByValue,
@@ -7,7 +7,6 @@ import {
 } from "react-hook-form"
 
 import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
 import Input from "components/common/forms/Input"
 import TextArea from "components/common/forms/TextArea"
 import { NullPartialSettingsFields } from "lib/fields"
@@ -45,9 +44,17 @@ const SettingsEntry = (props: SettingsEntryProps) => {
           formMethods={formMethods}
           valueInput={PresetValueInput}
         />
-        {
-          //TODO: Implement Quality Controls preset fields
-        }
+        <FieldPresetFieldArray
+          label="Quality Controls"
+          name="mfrFieldPresets.qualityControls"
+          emptyPresetField={{
+            label: null,
+            value: [{ name: null, expectedSpecification: null }],
+          }}
+          allowMultiple
+          formMethods={formMethods}
+          valueInput={PresetValueQcInput as any} //TODO: Fix typing
+        />
         <FieldPresetFieldArray
           label="References"
           name="mfrFieldPresets.references"
@@ -80,5 +87,48 @@ const PresetValueTextArea = <TFieldValues extends FieldValues = FieldValues>(
     fullWidth
   />
 )
+
+const PresetValueQcInput = <TFieldValues extends FieldValues = FieldValues>(
+  props: ComponentPropsWithRef<
+    ControllerProps<
+      TFieldValues,
+      FieldPathByValue<
+        TFieldValues,
+        NullPartialSettingsFields["mfrFieldPresets"]["qualityControls"]
+      >
+    >["render"]
+  >,
+) => {
+  const { field } = props
+
+  return (
+    <div className="row">
+      <Input
+        name={`${field.name}.name`}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          field.onChange({
+            name: e.target.value,
+            expectedSpecification: field.value.expectedSpecification,
+          })
+        }
+        value={(field?.value?.name as string | null) ?? ""}
+        placeholder="Quality control"
+        fullWidth
+      />
+      <Input
+        name={`${field.name}.expectedSpecification`}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          field.onChange({
+            name: field.value.name,
+            expectedSpecification: e.target.value,
+          })
+        }
+        value={(field?.value?.expectedSpecification as string | null) ?? ""}
+        placeholder="Expected specification"
+        fullWidth
+      />
+    </div>
+  )
+}
 
 export default SettingsEntry
