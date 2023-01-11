@@ -1,10 +1,12 @@
 import { useEffect } from "react"
 import { Controller, UseFormReturn } from "react-hook-form"
 
-import DotJotList from "components/common/forms/DotJotList"
-import { LabelFormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import { RhfRadioGroup } from "components/RadioGroup"
+import {
+  DotJotList,
+  Input,
+  LabelFormGroup,
+  RhfRadioGroup,
+} from "components/ui/forms"
 import { NullPartialChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { DataEntryComponent } from "types/common"

@@ -2,8 +2,8 @@ import { UseFormReturn, useFieldArray } from "react-hook-form"
 import { BiCaretDown, BiCaretUp, BiPlus } from "react-icons/bi"
 import { MdClose } from "react-icons/md"
 
-import Input from "components/common/forms/Input"
-import IconButton from "components/common/IconButton"
+import { IconButton } from "components/ui"
+import { Input } from "components/ui/forms"
 import { NullPartialMfrFields } from "lib/fields"
 
 type Props = {

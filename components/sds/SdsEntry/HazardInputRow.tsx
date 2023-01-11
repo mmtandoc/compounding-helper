@@ -6,9 +6,8 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import Button from "components/common/Button"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
+import { Button } from "components/ui"
+import { Input, RhfSelect } from "components/ui/forms"
 import { NullPartialSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { HazardClassesWithCategories } from "types/models"

@@ -7,7 +7,7 @@ import {
 import { BiCaretDown, BiCaretUp } from "react-icons/bi"
 import { MdClose } from "react-icons/md"
 
-import IconButton from "components/common/IconButton"
+import { IconButton } from "components/ui"
 
 type Props<
   TFieldValues extends FieldValues = FieldValues,

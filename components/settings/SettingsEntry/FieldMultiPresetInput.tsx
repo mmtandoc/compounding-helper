@@ -11,9 +11,8 @@ import {
 import { BiPlus } from "react-icons/bi"
 import { MdClose } from "react-icons/md"
 
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import IconButton from "components/common/IconButton"
+import { IconButton } from "components/ui"
+import { FormGroup, Input } from "components/ui/forms"
 import { NullPartialFieldPresetFields } from "lib/fields"
 
 type FieldMultiPresetInputProps<

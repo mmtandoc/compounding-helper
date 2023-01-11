@@ -9,7 +9,7 @@ import React, {
 import { UseFormRegisterReturn, useFormContext } from "react-hook-form"
 import { Merge } from "type-fest"
 
-import ErrorContainer from "./ErrorContainer"
+import { ErrorContainer } from "components/ui/forms"
 
 type TextAreaAttributes = JSX.IntrinsicElements["textarea"]
 

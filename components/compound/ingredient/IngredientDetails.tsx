@@ -1,8 +1,6 @@
 import Link from "next/link"
 
-import { BooleanRadioGroup } from "components/BooleanRadioGroup"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
+import { BooleanRadioGroup, Fieldset, FormGroup } from "components/ui/forms"
 import { capitalize, toIsoDateString } from "lib/utils"
 import { IngredientAll } from "types/models"
 

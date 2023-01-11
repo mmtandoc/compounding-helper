@@ -8,9 +8,8 @@ import { BiCaretDown, BiCaretUp, BiPlus } from "react-icons/bi"
 import { MdClose } from "react-icons/md"
 import { Simplify } from "type-fest"
 
-import { LabelFormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import IconButton from "components/common/IconButton"
+import { IconButton } from "components/ui"
+import { Input, LabelFormGroup } from "components/ui/forms"
 import { NullPartialLinkDirectoryFields } from "lib/fields"
 
 type Props = {

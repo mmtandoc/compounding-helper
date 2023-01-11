@@ -2,11 +2,9 @@ import Link from "next/link"
 import React from "react"
 import useSWR from "swr"
 
-import Button from "components/common/Button"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Spinner from "components/common/Spinner"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
+import { Button, Spinner } from "components/ui"
+import { Fieldset, FormGroup } from "components/ui/forms"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
 type Props = {

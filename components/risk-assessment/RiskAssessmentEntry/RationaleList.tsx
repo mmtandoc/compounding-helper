@@ -12,7 +12,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import DotJotList from "components/common/forms/DotJotList"
+import { DotJotList } from "components/ui/forms"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { SdsWithRelations } from "types/models"

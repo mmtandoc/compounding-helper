@@ -2,7 +2,7 @@ import React from "react"
 import { UseFormRegisterReturn } from "react-hook-form"
 import { Merge } from "type-fest"
 
-import ErrorContainer from "./ErrorContainer"
+import { ErrorContainer } from "components/ui/forms"
 
 type InputAttributes = JSX.IntrinsicElements["input"]
 

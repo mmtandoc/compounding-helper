@@ -1,7 +1,7 @@
 import Head from "next/head"
 import React, { ReactNode, useRef } from "react"
 
-import Header from "components/Header"
+import Header from "components/common/Header"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 
 type Props = {

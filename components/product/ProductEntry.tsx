@@ -3,9 +3,7 @@ import { UseFormReturn } from "react-hook-form"
 import useSWR from "swr"
 
 import ChemicalSearch from "components/chemical/ChemicalSearch"
-import { LabelFormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
+import { Input, LabelFormGroup, RhfSelect } from "components/ui/forms"
 import { NullPartialProductFields } from "lib/fields"
 import { DataEntryComponent } from "types/common"
 

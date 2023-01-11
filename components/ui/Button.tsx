@@ -1,21 +1,46 @@
 import React from "react"
+import { IconBaseProps, IconType } from "react-icons"
 
 type HtmlButtonAttributes = JSX.IntrinsicElements["button"]
 
 export interface ButtonProps extends HtmlButtonAttributes {
+  startIcon?: IconType
+  startIconProps?: IconBaseProps
+  endIcon?: IconType
+  endIconProps?: IconBaseProps
   size?: "extra-small" | "small" | "medium" | "large"
   theme?: "primary" | "secondary" | "tertiary" | "neutral"
 }
 
 const Button = (props: ButtonProps) => {
-  const { size, theme, children, className, ...buttonProps } = props
+  const {
+    size,
+    theme,
+    children,
+    className,
+    startIcon: StartIcon,
+    startIconProps,
+    endIcon: EndIcon,
+    endIconProps,
+    ...buttonProps
+  } = props
   return (
     <button
       {...buttonProps}
       type={buttonProps.type ?? "button"}
       className={`button ${className ?? ""} ${size ?? ""} ${theme ?? ""}`}
     >
+      {StartIcon && (
+        <span className="start-icon">
+          <StartIcon {...startIconProps} />
+        </span>
+      )}
       {children}
+      {EndIcon && (
+        <span className="end-icon">
+          <EndIcon {...endIconProps} />
+        </span>
+      )}
       <style jsx>{`
         %button-extra-small {
           font-size: var(--button-font-size-small);
@@ -30,6 +55,14 @@ const Button = (props: ButtonProps) => {
         %button-medium {
           font-size: var(--button-font-size);
           padding: 0.3rem 1.2rem;
+        }
+
+        .start-icon {
+          margin-right: 0.3rem;
+        }
+
+        .end-icon {
+          margin-left: 0.3rem;
         }
 
         %button-large {

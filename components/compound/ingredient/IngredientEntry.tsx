@@ -9,14 +9,16 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
-import Button from "components/common/Button"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
-import TextArea from "components/common/forms/TextArea"
+import { Button } from "components/ui"
+import {
+  Fieldset,
+  FormGroup,
+  Input,
+  RhfBooleanRadioGroup,
+  RhfSelect,
+  TextArea,
+} from "components/ui/forms"
 import { NullPartialIngredientFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { NestedForm } from "lib/rhf/nestedForm"

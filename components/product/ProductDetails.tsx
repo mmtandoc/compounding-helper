@@ -1,7 +1,7 @@
 import Link from "next/link"
 import React from "react"
 
-import { FormGroup } from "components/common/forms/FormGroup"
+import { FormGroup } from "components/ui/forms"
 import { ProductAll } from "types/models"
 
 type Props = {

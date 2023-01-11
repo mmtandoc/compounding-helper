@@ -3,10 +3,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import React from "react"
 
-import Dropdown, {
-  DropdownMenu,
-  DropdownToggle,
-} from "components/common/Dropdown"
+import { Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
 import Logo from "public/logo.svg"
 
 const Header = () => {

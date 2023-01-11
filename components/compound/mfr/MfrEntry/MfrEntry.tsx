@@ -10,13 +10,15 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import DotJotList from "components/common/forms/DotJotList"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
-import TextArea from "components/common/forms/TextArea"
-import Spinner from "components/common/Spinner"
+import { Spinner } from "components/ui"
+import {
+  DotJotList,
+  Fieldset,
+  FormGroup,
+  Input,
+  RhfSelect,
+  TextArea,
+} from "components/ui/forms"
 import { NullPartialMfrFields, NullPartialSettingsFields } from "lib/fields"
 import { CompoundWithIngredients } from "types/models"
 

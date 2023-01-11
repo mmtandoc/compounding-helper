@@ -11,10 +11,9 @@ import {
   useForm,
 } from "react-hook-form"
 
-import Button from "components/common/Button"
+import { Button } from "components/ui"
+import { Form } from "components/ui/forms"
 import { DataEntryComponent } from "types/common"
-
-import Form from "../forms/Form"
 
 type EditFormProps<
   TSchema extends Zod.ZodTypeAny,

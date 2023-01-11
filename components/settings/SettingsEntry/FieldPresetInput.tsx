@@ -7,8 +7,7 @@ import {
   UseFormReturn,
 } from "react-hook-form"
 
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
+import { FormGroup, Input } from "components/ui/forms"
 
 type FieldPresetInputProps<
   TFieldValues extends FieldValues = FieldValues,

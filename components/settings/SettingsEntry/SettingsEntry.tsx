@@ -6,9 +6,7 @@ import {
   UseFormReturn,
 } from "react-hook-form"
 
-import Fieldset from "components/common/forms/Fieldset"
-import Input from "components/common/forms/Input"
-import TextArea from "components/common/forms/TextArea"
+import { Fieldset, Input, TextArea } from "components/ui/forms"
 import { NullPartialSettingsFields } from "lib/fields"
 
 import FieldPresetFieldArray from "./FieldPresetFieldArray"

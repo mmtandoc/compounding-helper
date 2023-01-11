@@ -2,7 +2,7 @@ import { RiskAssessment } from "@prisma/client"
 import { Control } from "react-hook-form"
 import useSWR from "swr"
 
-import RhfSelect from "components/common/forms/RhfSelect"
+import { RhfSelect } from "components/ui/forms"
 import { NullPartialMfrFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 

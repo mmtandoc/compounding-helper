@@ -1,6 +1,6 @@
 import React from "react"
 
-import { FormGroup } from "components/common/forms/FormGroup"
+import { FormGroup } from "components/ui/forms"
 import { toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 

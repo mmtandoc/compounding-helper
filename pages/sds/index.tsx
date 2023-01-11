@@ -1,7 +1,7 @@
 import Link from "next/link"
 
-import Button from "components/common/Button"
 import SdsTable from "components/sds/SdsTable"
+import { Button } from "components/ui"
 import { getSafetyDataSheets } from "pages/api/sds"
 import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"

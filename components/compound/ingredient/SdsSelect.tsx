@@ -2,7 +2,7 @@ import { Vendor } from "@prisma/client"
 import React from "react"
 import { Control } from "react-hook-form"
 
-import RhfSelect from "components/common/forms/RhfSelect"
+import { RhfSelect } from "components/ui/forms"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { ChemicalAll, SdsWithRelations } from "types/models"

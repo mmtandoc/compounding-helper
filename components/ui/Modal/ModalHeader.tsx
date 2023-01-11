@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { MdClose } from "react-icons/md"
 
-import IconButton from "../IconButton"
+import { IconButton } from "components/ui"
 
 type ModalHeaderProps = {
   children: ReactNode

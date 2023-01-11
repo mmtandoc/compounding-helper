@@ -54,7 +54,11 @@
         }
       }
     ],
-    "import/newline-after-import": ["error"]
+    "import/newline-after-import": ["error"],
+    "import/no-duplicates": ["warn"]
+    /* "import/no-internal-modules": [ "error", {
+      "forbid": [ "components/ui/forms/*", "components/ui/*" ]
+    } ] */
   },
   "env": {
     "jest/globals": true

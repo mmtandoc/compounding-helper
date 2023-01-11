@@ -8,9 +8,8 @@ import {
   useFieldArray,
 } from "react-hook-form"
 
-import Button from "components/common/Button"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
+import { Button } from "components/ui"
+import { Fieldset, FormGroup } from "components/ui/forms"
 import { NullPartialFieldPresetFields } from "lib/fields"
 
 import FieldArrayActions from "./FieldArrayActions"

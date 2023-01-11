@@ -1,10 +1,8 @@
 import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form"
 
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
-import Spinner from "components/common/Spinner"
-import Table, { TableColumn } from "components/common/Table"
+import { Spinner, Table } from "components/ui"
+import { FormGroup, Input, RhfSelect } from "components/ui/forms"
+import { TableColumn } from "components/ui/Table"
 import { NullPartialMfrFields } from "lib/fields"
 import { CompoundWithIngredients, IngredientAll } from "types/models"
 

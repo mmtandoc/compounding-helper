@@ -2,10 +2,8 @@ import { debounce } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import { MdClose } from "react-icons/md"
 
-import Button from "components/common/Button"
-
-import IconButton from "../IconButton"
-import Input from "./Input"
+import { Button, IconButton } from "components/ui"
+import { Input } from "components/ui/forms"
 
 type DotJotItem = { text: string; readOnly?: boolean }
 
@@ -208,4 +206,4 @@ const DotJotItem = (props: DotJotItemProps) => {
   )
 }
 
-export { DotJotList as default, DotJotItem }
+export default DotJotList

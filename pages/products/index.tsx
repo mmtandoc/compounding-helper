@@ -1,8 +1,8 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 
-import Button from "components/common/Button"
 import ProductTable from "components/product/ProductTable"
+import { Button } from "components/ui"
 import { getProducts } from "pages/api/products"
 import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"

@@ -1,15 +1,17 @@
 import { useEffect } from "react"
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 
-import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
-import Button from "components/common/Button"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
-import TextArea from "components/common/forms/TextArea"
 import IngredientEntry from "components/compound/ingredient/IngredientEntry"
-import { RhfRadioGroup } from "components/RadioGroup"
+import { Button } from "components/ui"
+import {
+  Fieldset,
+  FormGroup,
+  Input,
+  RhfBooleanRadioGroup,
+  RhfRadioGroup,
+  RhfSelect,
+  TextArea,
+} from "components/ui/forms"
 import {
   NullPartialIngredientFields,
   NullPartialRiskAssessmentFields,

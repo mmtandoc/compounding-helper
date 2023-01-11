@@ -7,8 +7,7 @@ import {
   useFormContext,
 } from "react-hook-form"
 
-import ErrorContainer from "./common/forms/ErrorContainer"
-import RadioButton from "./common/forms/RadioButton"
+import { ErrorContainer, RadioButton } from "components/ui/forms"
 
 interface RhfRadioGroupProps<T extends FieldValues>
   extends UseControllerProps<T>,

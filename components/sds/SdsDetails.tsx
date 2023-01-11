@@ -1,8 +1,7 @@
 import Link from "next/link"
 import React from "react"
 
-import { BooleanRadioGroup } from "components/BooleanRadioGroup"
-import { FormGroup } from "components/common/forms/FormGroup"
+import { BooleanRadioGroup, FormGroup } from "components/ui/forms"
 import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 

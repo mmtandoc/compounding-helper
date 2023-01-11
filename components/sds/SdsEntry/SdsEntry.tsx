@@ -1,12 +1,14 @@
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
 
-import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
 import ChemicalSearch from "components/chemical/ChemicalSearch"
-import Button from "components/common/Button"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
+import { Button } from "components/ui"
+import {
+  FormGroup,
+  Input,
+  RhfBooleanRadioGroup,
+  RhfSelect,
+} from "components/ui/forms"
 import { NullPartialHazardFields, NullPartialSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { ProductWithVendor } from "types/models"

@@ -9,8 +9,10 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import AutocompleteInput, { withAsync } from "components/AutocompleteInput"
-import ErrorContainer from "components/common/forms/ErrorContainer"
+import AutocompleteInput, {
+  withAsync,
+} from "components/common/AutocompleteInput"
+import { ErrorContainer } from "components/ui/forms"
 import { JsonError } from "types/common"
 
 interface ChemicalSearchProps<TFieldValues extends FieldValues>

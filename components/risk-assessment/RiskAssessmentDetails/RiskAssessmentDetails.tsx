@@ -1,10 +1,12 @@
 import React from "react"
 
-import { BooleanRadioGroup } from "components/BooleanRadioGroup"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
-import { RadioGroup } from "components/RadioGroup"
+import {
+  BooleanRadioGroup,
+  Fieldset,
+  FormGroup,
+  RadioGroup,
+} from "components/ui/forms"
 import { capitalize, toIsoDateString } from "lib/utils"
 import { RiskAssessmentAll } from "types/models"
 

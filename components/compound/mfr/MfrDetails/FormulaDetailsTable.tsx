@@ -1,14 +1,6 @@
-import { Mfr } from "@prisma/client"
-import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form"
-
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import RhfSelect from "components/common/forms/RhfSelect"
-import Spinner from "components/common/Spinner"
-import Table, { TableColumn } from "components/common/Table"
-import { NullPartialMfrFields, ingredientSchema } from "lib/fields"
+import { Table } from "components/ui"
 import type { Quantity } from "lib/fields"
-import { CompoundWithIngredients, IngredientAll } from "types/models"
+import { CompoundWithIngredients } from "types/models"
 
 type FormulaDetailsTableProps = {
   compound: CompoundWithIngredients

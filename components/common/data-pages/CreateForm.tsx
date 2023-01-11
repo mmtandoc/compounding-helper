@@ -10,10 +10,9 @@ import {
   useForm,
 } from "react-hook-form"
 
+import { Button } from "components/ui"
+import { Form } from "components/ui/forms"
 import { DataEntryComponent } from "types/common"
-
-import Button from "../Button"
-import Form from "../forms/Form"
 
 type CreateFormProps<
   TSchema extends Zod.ZodTypeAny,

@@ -1,8 +1,7 @@
 import Link from "next/link"
 
-import Button from "components/common/Button"
-import Table from "components/common/Table"
-import { TableColumn } from "components/common/Table/Table"
+import { Button, Table } from "components/ui"
+import { TableColumn } from "components/ui/Table"
 import filterFns from "lib/table/filterFns"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 

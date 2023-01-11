@@ -4,11 +4,9 @@ import Link from "next/link"
 import { useContext, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 
-import Button from "components/common/Button"
+import { Button, Modal } from "components/ui"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 import { useDocument } from "lib/hooks/useDocument"
-
-import Modal from "../Modal"
 
 type DetailsComponentProps<TModel> = {
   data: TModel

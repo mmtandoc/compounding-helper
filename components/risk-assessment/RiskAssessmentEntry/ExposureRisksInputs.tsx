@@ -8,10 +8,12 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
-import { RhfBooleanRadioGroup } from "components/BooleanRadioGroup"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
+import {
+  Fieldset,
+  FormGroup,
+  Input,
+  RhfBooleanRadioGroup,
+} from "components/ui/forms"
 import { NullPartialRiskAssessmentFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 

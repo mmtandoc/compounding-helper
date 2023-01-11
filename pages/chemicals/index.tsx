@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import ChemicalTable from "components/chemical/ChemicalTable"
-import Button from "components/common/Button"
+import { Button } from "components/ui"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 

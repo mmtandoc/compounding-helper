@@ -4,9 +4,7 @@ import Link from "next/link"
 import { BiEdit } from "react-icons/bi"
 import useSWR from "swr"
 
-import Button from "components/common/Button"
-import Input from "components/common/forms/Input"
-import IconButton from "components/common/IconButton"
+import { IconButton } from "components/ui"
 import { getLinks } from "pages/api/links"
 import { NextPageWithLayout } from "types/common"
 

@@ -1,7 +1,6 @@
 import Link from "next/link"
 
-import Button from "components/common/Button"
-import Table from "components/common/Table"
+import { Button, Table } from "components/ui"
 import filterFns from "lib/table/filterFns"
 import { toIsoDateString } from "lib/utils"
 import { IngredientAll, MfrAll } from "types/models"

@@ -9,8 +9,7 @@ import {
 } from "react-hook-form"
 import { Merge } from "type-fest"
 
-import ErrorContainer from "./ErrorContainer"
-import Select from "./Select"
+import { ErrorContainer, Select } from "components/ui/forms"
 
 interface Props<TFieldValues extends FieldValues>
   extends Merge<

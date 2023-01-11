@@ -1,11 +1,8 @@
 import { useEffect } from "react"
 import { UseFormReturn, useFieldArray } from "react-hook-form"
 
-import Button from "components/common/Button"
-import Fieldset from "components/common/forms/Fieldset"
-import { FormGroup } from "components/common/forms/FormGroup"
-import Input from "components/common/forms/Input"
-import TextArea from "components/common/forms/TextArea"
+import { Button } from "components/ui"
+import { Fieldset, FormGroup, Input, TextArea } from "components/ui/forms"
 import {
   NullPartialCompoundFields,
   NullPartialIngredientFields,
