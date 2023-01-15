@@ -1,109 +1,111 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React from "react"
 
 import { Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
 import Logo from "public/logo.svg"
 
-const Header = () => {
+type NavItem = { label: string; url?: string; children?: NavItem[] }
+
+type NavMenuProps = {
+  items: NavItem[]
+}
+
+const NavMenu = (props: NavMenuProps) => {
+  const { items } = props
+
   const router = useRouter()
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname
 
+  //TODO: Handle submenus in dropdown
+  const NavLink = ({ item }: { item: NavItem }) =>
+    item.url ? (
+      <Link href={item.url} data-active={isActive(item.url)}>
+        {item.label}
+      </Link>
+    ) : (
+      <a>{item.label}</a>
+    )
+
+  return (
+    <>
+      {items.map((item, i) => {
+        const { children } = item
+        const rootLink = <NavLink item={item} />
+
+        if (!children || !children.length) {
+          return rootLink
+        }
+
+        return (
+          <Dropdown key={i}>
+            <DropdownToggle>{rootLink}</DropdownToggle>
+            <DropdownMenu>
+              {children.map((menuItem, i2) => (
+                <NavLink item={menuItem} key={i2} />
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        )
+      })}
+    </>
+  )
+}
+
+const Header = () => {
   const left = (
     <div className="left">
-      <Link href="/" data-active={isActive("/")}>
-        Home
-      </Link>
-      <Dropdown>
-        <DropdownToggle>
-          <Link
-            href="/risk-assessments"
-            data-active={isActive("/risk-assessments")}
-          >
-            Risk Assessments
-          </Link>
-        </DropdownToggle>
-        <DropdownMenu>
-          <Link
-            href="/risk-assessments"
-            data-active={isActive("/risk-assessments")}
-          >
-            View Risk Assessments
-          </Link>
-          <Link
-            href="/risk-assessments/new"
-            data-active={isActive("/risk-assessments/new")}
-          >
-            Create New Risk Assessment
-          </Link>
-        </DropdownMenu>
-      </Dropdown>
-      <Link href="/compounds" data-active={isActive("/compounds")}>
-        Compounds
-      </Link>
-      <Dropdown>
-        <DropdownToggle>
-          <Link href="/sds" data-active={isActive("/sds")}>
-            Safety Data Sheets
-          </Link>
-        </DropdownToggle>
-        <DropdownMenu>
-          <Link href="/sds" data-active={isActive("/sds")}>
-            View Safety Data Sheets
-          </Link>
-          <Link href="/sds/new" data-active={isActive("/sds/new")}>
-            Create New Safety Data Sheet
-          </Link>
-        </DropdownMenu>
-      </Dropdown>
-      <Dropdown>
-        <DropdownToggle>
-          <Link href="/chemicals" data-active={isActive("/chemicals")}>
-            Chemicals
-          </Link>
-        </DropdownToggle>
-        <DropdownMenu>
-          <Link href="/chemicals" data-active={isActive("/chemicals")}>
-            View chemicals
-          </Link>
-          <Link href="/chemicals/new" data-active={isActive("/chemicals/new")}>
-            Add new chemical
-          </Link>
-        </DropdownMenu>
-      </Dropdown>
-      <Dropdown>
-        <DropdownToggle>
-          <Link href="/products" data-active={isActive("/products")}>
-            Products
-          </Link>
-        </DropdownToggle>
-        <DropdownMenu>
-          <Link href="/products" data-active={isActive("/products")}>
-            View products
-          </Link>
-          <Link href="/products/new" data-active={isActive("/products/new")}>
-            Add new product
-          </Link>
-        </DropdownMenu>
-      </Dropdown>
-      <Dropdown>
-        <DropdownToggle>
-          <a>Misc.</a>
-        </DropdownToggle>
-        <DropdownMenu>
-          <Link href="/hazards" data-active={isActive("/hazards")}>
-            Health hazards table
-          </Link>
-          <Link href="/links" data-active={isActive("/links")}>
-            Link Directory
-          </Link>
-          <Link href="/settings" data-active={isActive("/settings")}>
-            Settings
-          </Link>
-        </DropdownMenu>
-      </Dropdown>
+      <NavMenu
+        items={[
+          { label: "Home", url: "/" },
+          {
+            label: "Risk assessments",
+            url: "/risk-assessments",
+            children: [
+              { label: "View risk assessments", url: "/risk-assessments" },
+              {
+                label: "Create new risk assessment",
+                url: "/risk-assessments/new",
+              },
+            ],
+          },
+          { label: "Compounds", url: "/compounds" },
+          {
+            label: "Safety Data Sheets",
+            url: "/sds",
+            children: [
+              { label: "View Safety Data Sheets", url: "/sds" },
+              { label: "Create new Safety Data Sheet", url: "/sds/new" },
+            ],
+          },
+          {
+            label: "Products",
+            url: "/products",
+            children: [
+              { label: "View products", url: "/products" },
+              { label: "Create new product", url: "/products/new" },
+            ],
+          },
+          {
+            label: "Chemicals",
+            url: "/chemicals",
+            children: [
+              { label: "View chemicals", url: "/chemicals" },
+              { label: "Create chemical", url: "/chemicals/new" },
+            ],
+          },
+          {
+            label: "Misc.",
+            children: [
+              { label: "Health hazards table", url: "/hazards" },
+              { label: "Link directory", url: "/links" },
+              { label: "Settings", url: "/settings" },
+            ],
+          },
+        ]}
+      />
       <style jsx>{`
         .left {
           display: flex;
