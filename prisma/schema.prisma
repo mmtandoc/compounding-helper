@@ -198,6 +198,9 @@ model Compound {
   riskAssessments            RiskAssessment[]
   hasMasterFormulationRecord Boolean          @default(false)
   notes                      String?
+  hasShortcut                Boolean          @default(false)
+  shortcutVariations         Json? //{code: String, name: String}[]
+  shortcutSuffix             String?
   mfrs                       Mfr[]
 
   @@map("compounds")
