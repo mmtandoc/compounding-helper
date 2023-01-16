@@ -1,11 +1,13 @@
 import Link from "next/link"
-import React from "react"
+import React, { useMemo } from "react"
 import useSWR from "swr"
 
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { Button, Spinner } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
 import { CompoundWithIngredients, MfrAll } from "types/models"
+
+import { getHwngShortcutString, shortcutSuffixMap } from "./helpers"
 
 type Props = {
   data: CompoundWithIngredients
@@ -15,11 +17,64 @@ type Props = {
 const CompoundDetails = (props: Props) => {
   const { data, display = "all" } = props
 
+  const shortcutVariations = useMemo(
+    () => data.shortcutVariations as { code: string; name: string }[] | null,
+    [data.shortcutVariations],
+  )
+
+  const shortcutString = useMemo(
+    () =>
+      getHwngShortcutString(data.id, shortcutVariations, data.shortcutSuffix),
+    [data.id, shortcutVariations, data.shortcutSuffix],
+  )
+
   return (
     <div className="compound-details">
-      <FormGroup row>
-        <label>Name:</label>
-        <span>{data.name}</span>
+      <FormGroup row className="name-shortcut-group">
+        <FormGroup row>
+          <label>Name:</label>
+          <span>{data.name}</span>
+        </FormGroup>
+        {display === "all" && data.hasShortcut && (
+          <Fieldset>
+            <FormGroup row className="shortcut">
+              <span className="label">HWNG Shortcut:</span>
+              <span className="shortcut">{shortcutString}</span>
+            </FormGroup>
+            <div style={{ marginLeft: "2rem" }}>
+              <FormGroup>
+                <span className="label">Variations:</span>
+                {shortcutVariations ? (
+                  <ul className="shortcut-variations-list">
+                    {shortcutVariations.map((v, i) => (
+                      <li key={i}>
+                        {v.code} - {v.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  "N/A"
+                )}
+              </FormGroup>
+              <FormGroup row>
+                <span className="label">Suffix:</span>
+                <FormGroup row>
+                  <span>
+                    {data.shortcutSuffix ? `${data.shortcutSuffix}` : "N/A"}
+                  </span>
+
+                  {data.shortcutSuffix &&
+                    shortcutSuffixMap.has(data.shortcutSuffix) && (
+                      <span>
+                        {" "}
+                        - {shortcutSuffixMap.get(data.shortcutSuffix)}
+                      </span>
+                    )}
+                </FormGroup>
+              </FormGroup>
+            </div>
+          </Fieldset>
+        )}
       </FormGroup>
       <Fieldset legend="Ingredients:">
         {data.ingredients.map((ingredient, index) => (
@@ -57,6 +112,14 @@ const CompoundDetails = (props: Props) => {
         .radio-group label {
           display: flex;
           align-items: center;
+        }
+
+        .name-shortcut-group {
+          justify-content: space-between;
+        }
+
+        .shortcut-variations-list {
+          margin-block: 0;
         }
       `}</style>
     </div>
@@ -103,15 +166,4 @@ const MfrsActions = (props: { data: CompoundWithIngredients }) => {
   )
 }
 
-type ExposureRisksInputsProps = {
-  category: string
-  values: {
-    skin: boolean
-    eye: boolean
-    inhalation: boolean
-    oral: boolean
-    other: string | null
-  }
-  disabled?: boolean
-}
 export default CompoundDetails
