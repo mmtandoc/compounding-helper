@@ -199,11 +199,107 @@ export type NullPartialIngredientFields = Simplify<
   NullPartialDeep<IngredientFieldsInput, { ignoreKeys: "order" }>
 >
 
+const shortcutSchema = z
+  .discriminatedUnion("hasShortcut", [
+    z.object({
+      hasShortcut: z.literal(false),
+      variations: z.undefined(),
+      suffix: z.undefined(),
+    }),
+    z.object({
+      hasShortcut: z.literal(true),
+      //TODO: Simplify shortcut variations validation code
+      variations: z
+        .object({
+          code: z
+            .string()
+            .trim()
+            .transform((arg) => (arg === "" ? null : arg.toUpperCase()))
+            .nullable(),
+          name: z
+            .string()
+            .trim()
+            .transform((arg) => (arg === "" ? null : arg))
+            .nullable(),
+        })
+        .array()
+        .transform((arr) =>
+          arr.filter((v) => !(v.code === null && v.name === null)),
+        )
+        .superRefine((arg, ctx) => {
+          for (const i in arg) {
+            const variation = arg[i]
+            if (!variation.code) {
+              ctx.addIssue({
+                code: "custom",
+                message: "Required.",
+                path: [i, "code"],
+              })
+            }
+
+            if (!variation.name) {
+              ctx.addIssue({
+                code: "custom",
+                message: "Required.",
+                path: [i, "name"],
+              })
+            }
+          }
+        })
+        .superRefine((arg, ctx) => {
+          const codes = arg.map((v) => v.code)
+
+          const duplicateIndexes = codes.reduce((dupeMap, code, i) => {
+            if (!code) {
+              return dupeMap
+            }
+
+            const duplicates = dupeMap.get(code)
+            if (duplicates) {
+              dupeMap.set(code, [...duplicates, i])
+            } else if (codes.lastIndexOf(code) !== i) {
+              dupeMap.set(code, [i])
+            }
+            return dupeMap
+          }, new Map<string, number[]>())
+
+          console.log({ duplicateIndexes })
+
+          for (const duplicate of Array.from(duplicateIndexes.entries())) {
+            for (const duplicateIndex of duplicate[1]) {
+              ctx.addIssue({
+                code: "custom",
+                message: "No duplicates",
+                path: [duplicateIndex, "code"],
+              })
+            }
+          }
+        })
+        .pipe(
+          z
+            .object({
+              code: z.string().trim().min(1),
+              name: z.string().trim().min(1),
+            })
+            .array(),
+        ),
+      suffix: z
+        .string()
+        .trim()
+        .transform((arg) => (arg === "" ? null : arg))
+        .nullable()
+        .default(null),
+    }),
+  ])
+  .nullable()
+  .default({ hasShortcut: false })
+
 export const compoundSchema = z.object({
   id: z.number().int().optional(),
   name: z.string().trim().min(1),
   ingredients: z.array(ingredientSchema).min(1),
   hasMasterFormulationRecord: z.boolean().default(false),
+  shortcut: shortcutSchema,
   notes: z
     .string()
     .trim()
@@ -221,7 +317,13 @@ export type NullPartialCompoundFields = Simplify<
       NullPartialDeep<CompoundFieldsInput>,
       Pick<CompoundFieldsInput, "id">
     >,
-    { ingredients: NullPartialIngredientFields[] }
+    {
+      shortcut?: NullPartialDeep<
+        z.input<typeof shortcutSchema>,
+        { ignoreKeys: "hasShortcut" }
+      >
+      ingredients: NullPartialIngredientFields[]
+    }
   >
 >
 
