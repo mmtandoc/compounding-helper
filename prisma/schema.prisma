@@ -199,7 +199,7 @@ model Compound {
   hasMasterFormulationRecord Boolean          @default(false)
   notes                      String?
   hasShortcut                Boolean          @default(false)
-  shortcutVariations         Json? //{code: String, name: String}[]
+  shortcutVariations         Json             @default("[]") //{code: String, name: String}[]
   shortcutSuffix             String?
   mfrs                       Mfr[]
 

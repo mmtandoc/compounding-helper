@@ -16,7 +16,7 @@ const CompoundMapper = {
       hasMasterFormulationRecord: data.hasMasterFormulationRecord,
       shortcut: {
         hasShortcut: data.hasShortcut,
-        variations: data.shortcutVariations ?? [],
+        variations: data.shortcutVariations,
         suffix: data.shortcutSuffix ?? undefined,
       },
       notes: data.notes,

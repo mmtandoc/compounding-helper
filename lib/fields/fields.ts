@@ -203,7 +203,14 @@ const shortcutSchema = z
   .discriminatedUnion("hasShortcut", [
     z.object({
       hasShortcut: z.literal(false),
-      variations: z.undefined(),
+      variations: z
+        .object({
+          code: z.string().trim().min(1),
+          name: z.string().trim().min(1),
+        })
+        .array()
+        .max(0)
+        .default([]),
       suffix: z.undefined(),
     }),
     z.object({
