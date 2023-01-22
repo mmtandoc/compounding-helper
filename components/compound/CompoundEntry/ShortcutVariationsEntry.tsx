@@ -18,18 +18,16 @@ const ShortcutVariationsEntry = (props: {
 }) => {
   const { control, register } = props.formMethods
 
-  const { fields, append, remove, swap, update } = useFieldArray({
+  const { fields, append, remove, swap, update, replace } = useFieldArray({
     control,
     name: "shortcut.variations",
   })
 
   useEffect(() => {
     if (fields.length === 0) {
-      append(emptyVariationValues, {
-        shouldFocus: false,
-      })
+      replace(emptyVariationValues)
     }
-  }, [append, fields])
+  }, [replace, fields])
 
   return (
     <Fieldset legend="Variations:" className="shortcut-variations">
