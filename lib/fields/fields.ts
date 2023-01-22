@@ -270,8 +270,6 @@ const shortcutSchema = z
             return dupeMap
           }, new Map<string, number[]>())
 
-          console.log({ duplicateIndexes })
-
           for (const duplicate of Array.from(duplicateIndexes.entries())) {
             for (const duplicateIndex of duplicate[1]) {
               ctx.addIssue({
@@ -544,7 +542,6 @@ const createFieldPresetSchema = <T extends z.ZodTypeAny>(fieldSchema: T) =>
     })
     .partial({ label: true })
     .refine((arg) => {
-      console.log({ arg })
       return !(
         ((arg as { label?: string }).label?.length ?? 0) === 0 &&
         typeof (arg as { value: any }).value !== "string"
