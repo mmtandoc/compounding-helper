@@ -298,14 +298,17 @@ REQUIRED PPE:
 ${arrayToTextList(getRequiredPpeList(data.riskAssessment))}
 
 TRAINING:
-${arrayToTextList(data.training)}
+${arrayToTextList(
+  data.training.length > 0
+    ? data.training
+    : ["NO SPECIALIZED TRAINING REQUIRED."],
+)}
 
 REQUIRED EQUIPMENT:
 ${arrayToTextList(data.requiredEquipment)}
-
 ${
   data.calculations
-    ? `CALCULATIONS:
+    ? `\nCALCULATIONS:
 ${data.calculations}\n`
     : ""
 }
@@ -337,7 +340,7 @@ ${arrayToTextList(data.references)}
 
 EFFECTIVE DATE: ${toIsoDateString(data.effectiveDate)} / DEVELOPED BY: ${
     data.developedBy
-  }${data.verifiedBy ? `/ VERIFIED BY: ${data.verifiedBy}` : ""}`
+  }${data.verifiedBy ? ` / VERIFIED BY: ${data.verifiedBy}` : ""}`
 
   return text.toUpperCase()
 }
