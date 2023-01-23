@@ -21,14 +21,30 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
   },
   {
     label: "HWNG Shortcut",
-    renderCell: (_, data) =>
-      data.hasShortcut
-        ? getHwngShortcutString(
-            data.id,
-            data.shortcutVariations as { code: string; name: string }[],
-            data.shortcutSuffix,
-          )
-        : "",
+    renderCell: (_, data) => {
+      const variations = data.shortcutVariations as {
+        code: string
+        name: string
+      }[]
+      if (!data.hasShortcut) return ""
+
+      if (variations.length > 0) {
+        return (
+          <>
+            <div>
+              {getHwngShortcutString(
+                data.id,
+                [{ code: "__", name: "placeholder" }],
+                data.shortcutSuffix,
+              )}
+            </div>
+            <div>{variations.map((v) => v.code).join("/")}</div>
+          </>
+        )
+      } else {
+        return getHwngShortcutString(data.id, variations, data.shortcutSuffix)
+      }
+    },
     cellStyle: { whiteSpace: "nowrap" },
   },
   {

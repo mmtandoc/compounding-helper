@@ -18,6 +18,10 @@ export const getHwngShortcutString = (
     ? shortcutVariations.map((v) => v.code)
     : []
   return `#${compoundId ?? "ID"}${
-    variationCodes.length > 0 ? `[${variationCodes.join("/")}]` : ""
+    variationCodes.length > 0
+      ? variationCodes.length === 1
+        ? variationCodes.join("/")
+        : `[${variationCodes.join("/")}]`
+      : ""
   }${shortcutSuffix ? `-${shortcutSuffix}` : ""}`.toUpperCase()
 }
