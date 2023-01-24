@@ -83,10 +83,6 @@ const CompoundDetails = (props: Props) => {
       </Fieldset>
       {display === "all" && (
         <>
-          <FormGroup row>
-            <span className="label">Has master formulation record:</span>
-            <span>{data.hasMasterFormulationRecord ? "Yes" : "No"}</span>
-          </FormGroup>
           <FormGroup>
             <span className="label">Notes:</span>
             <textarea value={data.notes ?? "None"} readOnly={true} cols={20} />

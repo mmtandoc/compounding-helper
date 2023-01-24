@@ -174,13 +174,6 @@ const CompoundEntry = (props: Props) => {
               </FormGroup>
             </Fieldset>
           )}
-          <label className="form-group row">
-            <span>Has MFR:</span>
-            <input
-              type="checkbox"
-              {...register("hasMasterFormulationRecord")}
-            />
-          </label>
           <FormGroup>
             <label htmlFor="notes">Notes:</label>
             <TextArea id="notes" {...register("notes")} />

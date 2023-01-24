@@ -303,7 +303,6 @@ export const compoundSchema = z.object({
   id: z.number().int().optional(),
   name: z.string().trim().min(1),
   ingredients: z.array(ingredientSchema).min(1),
-  hasMasterFormulationRecord: z.boolean().default(false),
   shortcut: shortcutSchema,
   notes: z
     .string()

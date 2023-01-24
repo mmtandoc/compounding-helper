@@ -192,16 +192,15 @@ enum PreparationFrequency {
 }
 
 model Compound {
-  id                         Int              @id @default(autoincrement())
-  name                       String
-  ingredients                Ingredient[]
-  riskAssessments            RiskAssessment[]
-  hasMasterFormulationRecord Boolean          @default(false)
-  notes                      String?
-  hasShortcut                Boolean          @default(false)
-  shortcutVariations         Json             @default("[]") //{code: String, name: String}[]
-  shortcutSuffix             String?
-  mfrs                       Mfr[]
+  id                 Int              @id @default(autoincrement())
+  name               String
+  ingredients        Ingredient[]
+  riskAssessments    RiskAssessment[]
+  notes              String?
+  hasShortcut        Boolean          @default(false)
+  shortcutVariations Json             @default("[]") //{code: String, name: String}[]
+  shortcutSuffix     String?
+  mfrs               Mfr[]
 
   @@map("compounds")
 }

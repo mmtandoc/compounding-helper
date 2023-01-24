@@ -101,13 +101,6 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
     filterFn: filterFns.ingredients,
   },
   {
-    label: "Has MFR",
-    sortable: true,
-    compare: (a: boolean, b: boolean) => Number(a) - Number(b),
-    renderCell: (value) => <>{value ? "Yes" : "No"}</>,
-    accessorPath: "hasMasterFormulationRecord",
-  },
-  {
     id: "actions",
     renderCell: (_, data) => (
       <div>

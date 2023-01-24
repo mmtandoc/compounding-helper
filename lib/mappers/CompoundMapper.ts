@@ -13,7 +13,6 @@ const CompoundMapper = {
       ingredients: data.ingredients
         .map(IngredientMapper.toFieldValues)
         .sort((a, b) => a.order - b.order),
-      hasMasterFormulationRecord: data.hasMasterFormulationRecord,
       shortcut: {
         hasShortcut: data.hasShortcut,
         variations: data.shortcutVariations,
@@ -32,7 +31,6 @@ const CompoundMapper = {
     return {
       id: values.id,
       name: values.name,
-      hasMasterFormulationRecord: values.hasMasterFormulationRecord,
       notes: values.notes,
       hasShortcut: values.shortcut?.hasShortcut,
       shortcutVariations: values.shortcut?.variations,
