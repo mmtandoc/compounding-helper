@@ -5,6 +5,8 @@ import { TableColumn } from "components/ui/Table"
 import filterFns from "lib/table/filterFns"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
+import { getHwngShortcutString } from "./helpers"
+
 type Props = {
   data: CompoundWithMfrCount[]
 }
@@ -16,6 +18,34 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
     compare: (a: number, b: number) => a - b,
     accessorPath: "id",
     cellStyle: { width: "3em" },
+  },
+  {
+    label: "HWNG Shortcut",
+    renderCell: (_, data) => {
+      const variations = data.shortcutVariations as {
+        code: string
+        name: string
+      }[]
+      if (!data.hasShortcut) return ""
+
+      if (variations.length > 0) {
+        return (
+          <>
+            <div>
+              {getHwngShortcutString(
+                data.id,
+                [{ code: "__", name: "placeholder" }],
+                data.shortcutSuffix,
+              )}
+            </div>
+            <div>{variations.map((v) => v.code).join("/")}</div>
+          </>
+        )
+      } else {
+        return getHwngShortcutString(data.id, variations, data.shortcutSuffix)
+      }
+    },
+    cellStyle: { whiteSpace: "nowrap" },
   },
   {
     label: "Name",

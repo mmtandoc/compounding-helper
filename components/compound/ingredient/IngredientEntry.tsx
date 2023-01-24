@@ -27,19 +27,25 @@ import { ChemicalAll, SdsWithRelations } from "types/models"
 
 import SdsSelect from "./SdsSelect"
 
-interface IngredientEntryProps<TFieldValues extends FieldValues> {
+interface IngredientEntryProps<
+  TFieldValues extends FieldValues,
+  TFieldArrayName extends FieldArrayPath<TFieldValues>,
+> {
   id?: string
   error?: FieldError
-  name: FieldArrayPath<TFieldValues>
-  field: FieldArrayWithId<TFieldValues>
+  name: TFieldArrayName
+  field: FieldArrayWithId<TFieldValues, TFieldArrayName>
   index: number
   formMethods: NestedForm<NullPartialIngredientFields>
-  arrayMethods: UseFieldArrayReturn<TFieldValues>
+  arrayMethods: UseFieldArrayReturn<TFieldValues, TFieldArrayName>
   showPastSdsRevisions?: boolean
   reset: () => void
 }
 
-const IngredientEntry = <TFieldValues extends FieldValues>({
+const IngredientEntry = <
+  TFieldValues extends FieldValues,
+  TFieldArrayName extends FieldArrayPath<TFieldValues>,
+>({
   name,
   field,
   index,
@@ -47,7 +53,7 @@ const IngredientEntry = <TFieldValues extends FieldValues>({
   formMethods,
   arrayMethods,
   showPastSdsRevisions = false,
-}: IngredientEntryProps<TFieldValues>) => {
+}: IngredientEntryProps<TFieldValues, TFieldArrayName>) => {
   const { register, setValue, watch, trigger, getFieldState } = formMethods
 
   const { fields, move, remove } = arrayMethods
