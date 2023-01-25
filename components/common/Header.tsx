@@ -122,9 +122,10 @@ const Header = () => {
           &:hover {
             color: var(--color-nav-link-hover-fg);
           }
-          &[data-active="true"] {
-            color: var(--color-nav-link-current-fg);
-          }
+        }
+
+        .left :global(a[data-active="true"]) {
+          color: var(--color-nav-link-current-fg);
         }
       `}</style>
     </div>
