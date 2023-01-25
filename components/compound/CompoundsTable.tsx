@@ -112,6 +112,21 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
         <Link href={`/compounds/${data.id}/edit`}>
           <Button size="small">Edit</Button>
         </Link>
+        <style jsx>{`
+          div {
+            display: flex;
+            column-gap: 0.3rem;
+            flex-wrap: nowrap;
+            margin: 0.2rem 0;
+          }
+        `}</style>
+      </div>
+    ),
+  },
+  {
+    id: "ra-actions",
+    renderCell: (_, data) => (
+      <div>
         <Link href={`/risk-assessments/${data.id}`}>
           <Button size="small">View Risk Assessment</Button>
         </Link>
