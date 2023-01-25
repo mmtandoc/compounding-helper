@@ -28,7 +28,7 @@ const NewSafetyDataSheet: NextPageWithLayout = () => {
 
 export const getStaticProps: GetStaticProps = async () => ({
   props: {
-    title: "New Safety Data Sheet",
+    title: "New SDS summary",
   },
 })
 

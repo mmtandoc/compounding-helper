@@ -73,11 +73,11 @@ const Header = () => {
           },
           { label: "Compounds", url: "/compounds" },
           {
-            label: "Safety Data Sheets",
+            label: "SDS summaries",
             url: "/sds",
             children: [
-              { label: "View Safety Data Sheets", url: "/sds" },
-              { label: "Create new Safety Data Sheet", url: "/sds/new" },
+              { label: "View SDS summaries", url: "/sds" },
+              { label: "Create new SDS summary", url: "/sds/new" },
             ],
           },
           {

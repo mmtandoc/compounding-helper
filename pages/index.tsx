@@ -20,13 +20,13 @@ const Home: NextPageWithLayout = () => {
           </ul>
         </div>
         <div className="data-links">
-          <h2>Safety Data Sheets</h2>
+          <h2>SDS Summaries</h2>
           <ul>
             <li>
-              <Link href="/sds">View Safety Data Sheets</Link>
+              <Link href="/sds">View SDS Summaries</Link>
             </li>
             <li>
-              <Link href="/sds/new">New Safety Data Sheet</Link>
+              <Link href="/sds/new">New SDS Summary</Link>
             </li>
           </ul>
         </div>

@@ -88,7 +88,7 @@ export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
     return { notFound: true }
   }
 
-  const title = `SDS: ${data.product.name} - ${
+  const title = `SDS Summary: ${data.product.name} - ${
     data.product.vendor.name
   } (${toIsoDateString(data.revisionDate)})`
 

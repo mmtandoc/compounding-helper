@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
 
   return {
     props: {
-      title: `Edit SDS: ${data.product.name} - ${
+      title: `Edit SDS Summary: ${data.product.name} - ${
         data.product.vendor.name
       } (${toIsoDateString(data.revisionDate)})`,
       values: SdsMapper.toFieldValues(data),

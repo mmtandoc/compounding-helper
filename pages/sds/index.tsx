@@ -18,7 +18,7 @@ const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
   const actionBar = (
     <div className="action-bar">
       <Link href="/sds/new">
-        <Button>New Safety Data Sheet</Button>
+        <Button>New SDS summary</Button>
       </Link>
       <style jsx>{`
         .action-bar {
@@ -48,7 +48,7 @@ export async function getServerSideProps() {
   const data: SdsWithRelations[] =
     (await getSafetyDataSheets({ orderBy: { id: "asc" } })) ?? []
 
-  return { props: { title: "Safety Data Sheets", data } }
+  return { props: { title: "SDS Summaries", data } }
 }
 
 export default SafetyDataSheets
