@@ -14,7 +14,7 @@ jobs:
         run: |
           curl --request GET \
           --url 'https://grymjstlzdtkyqfygjtq.supabase.co/rest/v1/chemicals?select=name' \
-          --header "apikey: $SUPABASE_DB_PROD_API_KEY"\
+          --header "apikey: $SUPABASE_DB_PROD_API_KEY" \
           --header "Authorization: Bearer $SUPABASE_DB_PROD_API_KEY"
       - name: Call Supabase (Dev)
         shell: bash
@@ -23,5 +23,5 @@ jobs:
         run: |
           curl --request GET \
           --url 'https://iwnoybxepxvedtmkduvo.supabase.co/rest/v1/chemicals?select=name' \
-          --header "apikey: $SUPABASE_DB_DEV_API_KEY"\
+          --header "apikey: $SUPABASE_DB_DEV_API_KEY" \
           --header "Authorization: Bearer $SUPABASE_DB_DEV_API_KEY"
