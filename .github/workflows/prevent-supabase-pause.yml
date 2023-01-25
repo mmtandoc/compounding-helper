@@ -1,0 +1,20 @@
+name: Prevent Supabase Pausing
+on:
+  schedule:
+    - cron: '0 12 * * 5'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Supabase (Production)
+        run: |
+          curl --request GET \
+          --url 'https://grymjstlzdtkyqfygjtq.supabase.co/rest/v1/chemicals?select=name' \
+          --header 'apikey: ${{ secrets.SUPABASE_DB_PROD_API_KEY }}'\
+          --header 'Authorization: Bearer ${{ secrets.SUPABASE_DB_PROD_API_KEY }}'
+      - name: Call Supabase (Dev)
+        run: |
+          curl --request GET \
+          --url 'https://iwnoybxepxvedtmkduvo.supabase.co/rest/v1/chemicals?select=name' \
+          --header 'apikey: ${{ secrets.SUPABASE_DB_DEV_API_KEY }}'\
+          --header 'Authorization: Bearer ${{ secrets.SUPABASE_DB_DEV_API_KEY }}'
