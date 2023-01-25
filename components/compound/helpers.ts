@@ -1,5 +1,5 @@
 export const shortcutSuffixMap = new Map([
-  ["HC", "Hydrocordisone powder"],
+  ["HC", "Hydrocortisone powder"],
   ["SA", "Salicylic acid"],
   ["CL", "Clindamycin powder"],
   ["MC", "Menthol & camphor"],
