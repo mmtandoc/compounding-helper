@@ -12,7 +12,7 @@ import { Button } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
 import { NullPartialFieldPresetFields } from "lib/fields"
 
-import FieldArrayActions from "./FieldArrayActions"
+import FieldArrayActions from "../FieldArrayActions"
 import FieldMultiPresetInput from "./FieldMultiPresetInput"
 import FieldPresetInput from "./FieldPresetInput"
 
