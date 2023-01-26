@@ -60,6 +60,7 @@ const Header = () => {
       <NavMenu
         items={[
           { label: "Home", url: "/" },
+          { label: "Compounds", url: "/compounds" },
           {
             label: "Risk assessments",
             url: "/risk-assessments",
@@ -71,7 +72,6 @@ const Header = () => {
               },
             ],
           },
-          { label: "Compounds", url: "/compounds" },
           {
             label: "SDS summaries",
             url: "/sds",
