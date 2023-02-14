@@ -5,9 +5,10 @@ import useSWR from "swr"
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { Button, Spinner } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
+import { SettingsFields } from "lib/fields"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
-import { getHwngShortcutString, shortcutSuffixMap } from "./helpers"
+import { getHwngShortcutString } from "./helpers"
 
 type Props = {
   data: CompoundWithIngredients
@@ -27,6 +28,15 @@ const CompoundDetails = (props: Props) => {
       getHwngShortcutString(data.id, shortcutVariations, data.shortcutSuffix),
     [data.id, shortcutVariations, data.shortcutSuffix],
   )
+
+  const { data: settings, error: settingsError } =
+    useSWR<SettingsFields>("/api/settings")
+
+  if (settingsError) {
+    console.error(settingsError)
+  }
+
+  const shortcutSuffixes = useMemo(() => settings?.shortcutSuffixes, [settings])
 
   return (
     <div className="compound-details">
@@ -62,12 +72,18 @@ const CompoundDetails = (props: Props) => {
                   <span>
                     {data.shortcutSuffix ? `${data.shortcutSuffix}` : "N/A"}
                   </span>
-
                   {data.shortcutSuffix &&
-                    shortcutSuffixMap.has(data.shortcutSuffix) && (
+                    shortcutSuffixes?.find(
+                      (s) => s.code === data.shortcutSuffix,
+                    ) && (
                       <span>
                         {" "}
-                        - {shortcutSuffixMap.get(data.shortcutSuffix)}
+                        -{" "}
+                        {
+                          shortcutSuffixes?.find(
+                            (s) => s.code === data.shortcutSuffix,
+                          )?.description
+                        }
                       </span>
                     )}
                 </FormGroup>

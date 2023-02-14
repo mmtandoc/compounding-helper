@@ -290,8 +290,9 @@ model Link {
 }
 
 model Settings {
-  id              Int  @id @default(autoincrement())
-  mfrFieldPresets Json //{[fieldName]: {label?: String, value: any}|{label?: String, value: any}[]}
+  id               Int  @id @default(autoincrement())
+  mfrFieldPresets  Json //{[fieldName]: {label?: String, value: any}|{label?: String, value: any}[]}
+  shortcutSuffixes Json @default("[]") //{code: String, description: String}[]
 
   @@map("settings")
 }

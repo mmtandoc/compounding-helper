@@ -654,6 +654,24 @@ export const settingsSchema = z.object({
     labelling: createFieldArrayPresetsSchema(mfrSchema.shape.labelling),
     references: createFieldArrayPresetsSchema(mfrSchema.shape.references),
   }),
+  shortcutSuffixes: z
+    .object({
+      code: z
+        .string()
+        .trim()
+        .min(1)
+        .transform((arg) => arg.toUpperCase()),
+      description: z.string().trim().min(1),
+    })
+    .array()
+    .superRefine((arg, ctx) =>
+      refineNoDuplicates(
+        arg,
+        ctx,
+        "code",
+        (v: GetElementType<typeof arg>) => v.code,
+      ),
+    ),
 })
 
 export type SettingsFields = z.output<typeof settingsSchema>

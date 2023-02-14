@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { UseFormReturn, useFieldArray, useWatch } from "react-hook-form"
+import useSWR from "swr"
 
 import { Button } from "components/ui"
 import {
@@ -12,10 +13,11 @@ import {
 import {
   NullPartialCompoundFields,
   NullPartialIngredientFields,
+  SettingsFields,
 } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
 
-import { getHwngShortcutString, shortcutSuffixMap } from "../helpers"
+import { getHwngShortcutString } from "../helpers"
 import IngredientEntry from "../ingredient/IngredientEntry"
 import ShortcutVariationsEntry from "./ShortcutVariationsEntry"
 
@@ -86,6 +88,15 @@ const CompoundEntry = (props: Props) => {
     [compoundId, shortcutSuffix, shortcutVariations],
   )
 
+  const { data: settings, error: settingsError } =
+    useSWR<SettingsFields>("/api/settings")
+
+  if (settingsError) {
+    console.error(settingsError)
+  }
+
+  const shortcutSuffixes = useMemo(() => settings?.shortcutSuffixes, [settings])
+
   register("id")
   return (
     <>
@@ -153,20 +164,26 @@ const CompoundEntry = (props: Props) => {
                     {...register("shortcut.suffix")}
                     list={`shortcut-suffixes-list`}
                   />
-                  {shortcutSuffix && shortcutSuffixMap.has(shortcutSuffix) && (
-                    <span>{shortcutSuffixMap.get(shortcutSuffix)}</span>
-                  )}
-                </FormGroup>
-                <datalist id={`shortcut-suffixes-list`}>
-                  {Array.from(shortcutSuffixMap.entries()).map(
-                    ([code, label]) => (
+                  {shortcutSuffix &&
+                    shortcutSuffixes?.find((s) => s.code === shortcutSuffix) !==
+                      undefined && (
+                      <span>
+                        {
+                          shortcutSuffixes.find(
+                            (s) => s.code === shortcutSuffix,
+                          )?.description
+                        }
+                      </span>
+                    )}
+                  <datalist id={`shortcut-suffixes-list`}>
+                    {shortcutSuffixes?.map(({ code, description }) => (
                       <option
                         value={code}
                         key={code}
-                      >{`${code} - ${label}`}</option>
-                    ),
-                  )}
-                </datalist>
+                      >{`${code} - ${description}`}</option>
+                    ))}
+                  </datalist>
+                </FormGroup>
               </FormGroup>
               <FormGroup row className="shortcut-preview">
                 <span className="label">Shortcut preview:</span>
