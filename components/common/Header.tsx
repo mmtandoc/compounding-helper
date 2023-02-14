@@ -33,15 +33,16 @@ const NavMenu = (props: NavMenuProps) => {
     <>
       {items.map((item, i) => {
         const { children } = item
-        const rootLink = <NavLink item={item} />
 
         if (!children || !children.length) {
-          return rootLink
+          return <NavLink item={item} key={i} />
         }
 
         return (
           <Dropdown key={i}>
-            <DropdownToggle>{rootLink}</DropdownToggle>
+            <DropdownToggle>
+              <NavLink item={item} />
+            </DropdownToggle>
             <DropdownMenu>
               {children.map((menuItem, i2) => (
                 <NavLink item={menuItem} key={i2} />
