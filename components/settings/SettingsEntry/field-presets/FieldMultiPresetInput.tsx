@@ -1,3 +1,5 @@
+import _ from "lodash"
+import { useMemo } from "react"
 import {
   Controller,
   ControllerProps,
@@ -61,11 +63,25 @@ const FieldMultiPresetInput = <
     control: formMethods.control,
   })
 
+  const arrayPath = useMemo(
+    () => name.match("/(.*).d+/")?.[0] as string,
+    [name],
+  )
+
   return (
     <>
       <FormGroup className="field-multipreset" row>
         <Input
-          {...formMethods.register(`${name}.label` as Path<TFieldValues>)}
+          {...formMethods.register(`${name}.label` as Path<TFieldValues>, {
+            deps: _.range(arrayMethods.fields.length).reduce(
+              (arr, i2) => [
+                ...arr,
+                `${arrayPath}.${i2}.label`,
+                `${arrayPath}.${i2}.value`,
+              ],
+              [] as string[],
+            ),
+          })}
           fullWidth
         />
         <div className="multipreset-value-list">
@@ -75,6 +91,16 @@ const FieldMultiPresetInput = <
                 control={formMethods.control}
                 name={`${name}.value.${index}` as Path<TFieldValues>}
                 render={ValueInput}
+                rules={{
+                  deps: _.range(arrayMethods.fields.length).reduce(
+                    (arr, i2) => [
+                      ...arr,
+                      `${arrayPath}.${i2}.label`,
+                      `${arrayPath}.${i2}.value`,
+                    ],
+                    [] as string[],
+                  ),
+                }}
               />
               <div className="row-actions">
                 <IconButton

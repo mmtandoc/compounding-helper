@@ -41,6 +41,7 @@ type FieldPresetFieldArrayProps<
   allowMultiple?: boolean
   valueInput: ControllerProps<TFieldValues>["render"]
 }
+
 const FieldPresetFieldArray = <
   TValue = unknown,
   TFieldValues extends FieldValues = FieldValues,
@@ -93,6 +94,7 @@ const FieldPresetFieldArray = <
                 <FieldPresetInput
                   name={`${name}.${index}`}
                   formMethods={formMethods}
+                  arrayMethods={arrayMethods as any} //TODO: Fix typing
                   valueInput={valueInput}
                 />
               )}
