@@ -532,6 +532,23 @@ const createFieldPresetSchema = <T extends z.ZodTypeAny>(fieldSchema: T) =>
       )
     }, "Label is required if value is not a string.")
 
+const createFieldPresetsSchema = <T extends z.ZodTypeAny>(fieldSchema: T) =>
+  createFieldPresetSchema(fieldSchema)
+    .array()
+    .superRefine((arg, ctx) =>
+      refineNoDuplicates(
+        arg as { label?: string; value: unknown }[],
+        ctx,
+        "label",
+        (v: { label?: string; value: unknown }) => {
+          if (typeof v.value === "string" && v.value && !v.label) {
+            return v.value
+          }
+          return v.label
+        },
+      ),
+    )
+
 const createFieldArrayPresetSingleSchema = <T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T, any>,
 ) => createFieldPresetSchema(fieldSchema.element)
@@ -565,26 +582,57 @@ const createFieldArrayPresetMultipleSchema = <T extends z.ZodTypeAny>(
     value: fieldSchema,
   })
 
-function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+function createFieldArrayPresetsSchema<T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T, any>,
   multiple: true,
-): ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>
+): z.ZodEffects<
+  z.ZodArray<ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>>
+>
 
-function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+function createFieldArrayPresetsSchema<T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T, any>,
   multiple?: false | undefined,
-): ReturnType<typeof createFieldArrayPresetSingleSchema<T>>
+): z.ZodEffects<
+  z.ZodArray<ReturnType<typeof createFieldArrayPresetSingleSchema<T>>>
+>
 
-function createFieldArrayPresetSchema<T extends z.ZodTypeAny>(
+function createFieldArrayPresetsSchema<T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T, any>,
   multiple?: boolean,
 ):
-  | ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>
-  | ReturnType<typeof createFieldArrayPresetSingleSchema<T>> {
+  | z.ZodEffects<
+      z.ZodArray<ReturnType<typeof createFieldArrayPresetMultipleSchema<T>>>
+    >
+  | z.ZodEffects<
+      z.ZodArray<ReturnType<typeof createFieldArrayPresetSingleSchema<T>>>
+    > {
   if (multiple) {
     return createFieldArrayPresetMultipleSchema(fieldSchema)
+      .array()
+      .superRefine((arg, ctx) =>
+        refineNoDuplicates(
+          arg,
+          ctx,
+          "label",
+          (v: GetElementType<typeof arg>) => v.label,
+        ),
+      )
   } else {
     return createFieldArrayPresetSingleSchema(fieldSchema)
+      .array()
+      .superRefine((arg, ctx) =>
+        refineNoDuplicates(
+          arg as { label?: string; value: unknown }[],
+          ctx,
+          "label",
+          (v: { label?: string; value: unknown }) => {
+            if (typeof v.value === "string" && v.label === undefined) {
+              return v.value
+            }
+            return v.label
+          },
+        ),
+      )
   }
 }
 
@@ -592,21 +640,19 @@ export const settingsSchema = z.object({
   id: z.number().int().optional(),
   //TODO: Implement creating field preset schemas dynamically
   mfrFieldPresets: z.object({
-    requiredEquipment: createFieldArrayPresetSchema(
+    requiredEquipment: createFieldArrayPresetsSchema(
       mfrSchema.shape.requiredEquipment,
-    ).array(),
-    compoundingMethod: createFieldPresetSchema(
+    ),
+    compoundingMethod: createFieldPresetsSchema(
       mfrSchema.shape.compoundingMethod,
-    ).array(),
-    qualityControls: createFieldArrayPresetSchema(
+    ),
+    qualityControls: createFieldArrayPresetsSchema(
       mfrSchema.shape.qualityControls,
       true,
-    ).array(),
-    packaging: createFieldPresetSchema(mfrSchema.shape.packaging).array(),
-    labelling: createFieldArrayPresetSchema(mfrSchema.shape.labelling).array(),
-    references: createFieldArrayPresetSchema(
-      mfrSchema.shape.references,
-    ).array(),
+    ),
+    packaging: createFieldPresetsSchema(mfrSchema.shape.packaging),
+    labelling: createFieldArrayPresetsSchema(mfrSchema.shape.labelling),
+    references: createFieldArrayPresetsSchema(mfrSchema.shape.references),
   }),
 })
 
