@@ -111,3 +111,42 @@ export const deepNullPartialifyWithIds = <
 export const utcDateZodString = z
   .string()
   .regex(/\d{4}-[01]\d-[0-3]\d/, "Date is invalid.") //UTC Date without time
+
+export const refineNoDuplicates = <
+  T,
+  TProperty extends string | number | undefined | null,
+>(
+  arg: Array<T>,
+  ctx: z.RefinementCtx,
+  propertyPath: string,
+  duplicateAccessorFn: (item: T) => TProperty,
+) => {
+  const values = arg.map(duplicateAccessorFn)
+
+  const duplicateIndexes: Map<TProperty, number[]> = values.reduce(
+    (dupeMap, value, i) => {
+      if (!value) {
+        return dupeMap
+      }
+
+      const duplicates = dupeMap.get(value)
+      if (duplicates) {
+        dupeMap.set(value, [...duplicates, i])
+      } else if (values.lastIndexOf(value) !== i) {
+        dupeMap.set(value, [i])
+      }
+      return dupeMap
+    },
+    new Map<TProperty, number[]>(),
+  )
+
+  for (const duplicate of Array.from(duplicateIndexes.entries())) {
+    for (const duplicateIndex of duplicate[1]) {
+      ctx.addIssue({
+        code: "custom",
+        message: "No duplicates",
+        path: [duplicateIndex, propertyPath],
+      })
+    }
+  }
+}

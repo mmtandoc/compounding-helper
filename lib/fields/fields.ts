@@ -13,9 +13,13 @@ import {
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { GetElementType, NullPartialDeep } from "types/util"
 
-import { transformStringToNumber, utcDateZodString } from "./utils"
+import {
+  refineNoDuplicates,
+  transformStringToNumber,
+  utcDateZodString,
+} from "./utils"
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (
@@ -253,33 +257,14 @@ const shortcutSchema = z
             }
           }
         })
-        .superRefine((arg, ctx) => {
-          const codes = arg.map((v) => v.code)
-
-          const duplicateIndexes = codes.reduce((dupeMap, code, i) => {
-            if (!code) {
-              return dupeMap
-            }
-
-            const duplicates = dupeMap.get(code)
-            if (duplicates) {
-              dupeMap.set(code, [...duplicates, i])
-            } else if (codes.lastIndexOf(code) !== i) {
-              dupeMap.set(code, [i])
-            }
-            return dupeMap
-          }, new Map<string, number[]>())
-
-          for (const duplicate of Array.from(duplicateIndexes.entries())) {
-            for (const duplicateIndex of duplicate[1]) {
-              ctx.addIssue({
-                code: "custom",
-                message: "No duplicates",
-                path: [duplicateIndex, "code"],
-              })
-            }
-          }
-        })
+        .superRefine((arg, ctx) =>
+          refineNoDuplicates(
+            arg,
+            ctx,
+            "code",
+            (v: GetElementType<typeof arg>) => v.code,
+          ),
+        )
         .pipe(
           z
             .object({
