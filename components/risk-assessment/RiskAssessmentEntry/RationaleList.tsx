@@ -54,7 +54,7 @@ const RationaleList = ({
   const { data: safetyDatasheets, error: sdsesError } = useSWR<
     SdsWithRelations[],
     JsonError
-  >(sdsUrls.length > 0 ? [sdsUrls] : null)
+  >(sdsUrls.length > 0 ? sdsUrls : null)
 
   if (sdsesError) {
     console.log(sdsesError)

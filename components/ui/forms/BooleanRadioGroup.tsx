@@ -38,8 +38,11 @@ export const RhfBooleanRadioGroup = <TFieldValues extends FieldValues>(
   } = props
 
   let customValidate:
-    | Validate<PathValue<TFieldValues, Path<TFieldValues>>>
-    | Record<string, Validate<PathValue<TFieldValues, Path<TFieldValues>>>>
+    | Validate<PathValue<TFieldValues, Path<TFieldValues>>, TFieldValues>
+    | Record<
+        string,
+        Validate<PathValue<TFieldValues, Path<TFieldValues>>, TFieldValues>
+      >
     | undefined
 
   // If rules.required is true, then create custom validate function for workaround

@@ -41,7 +41,6 @@ axios.interceptors.response.use((originalResponse) => {
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data)
 
-//TODO: Convert to (...args)
 const multiFetcher = (urls: Record<string, string> | string[] | string) => {
   if (typeof urls === "string") {
     return fetcher(urls)

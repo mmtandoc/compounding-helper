@@ -39,9 +39,17 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
     control: control,
   })
 
-  const { data: sdses, error: sdsError } = useSWR<SdsWithRelations[]>(
-    !sdsIds ? null : [sdsIds.map((id) => `/api/sds/${id}`)],
+  const {
+    data: sdses,
+    error: sdsError,
+    isLoading,
+  } = useSWR<SdsWithRelations[]>(
+    !sdsIds ? null : sdsIds.map((id) => `/api/sds/${id}`),
   )
+
+  if (sdsError) {
+    console.error(sdsError)
+  }
 
   const getHazardCategoriesByClasses = (...classNames: string[]) => {
     if (sdses === undefined) {
