@@ -8,6 +8,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
+import { Spinner } from "components/ui"
 import {
   Fieldset,
   FormGroup,
@@ -108,14 +109,22 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           />
         </div>
         <div className="health-hazards">
-          {sdses?.map((sds, i) => (
-            <ul key={i}>
-              <span className="label">{sds.product.name}</span>
-              {sds.healthHazards.map((h, i) => (
-                <li key={i}>{hazardToString(h)}</li>
-              ))}
-            </ul>
-          ))}
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            sdses?.map((sds, i) => (
+              <ul key={i}>
+                <span className="label">{sds.product.name}</span>
+                {sds.healthHazards.length > 0 ? (
+                  sds.healthHazards.map((h, i) => (
+                    <li key={i}>{hazardToString(h)}</li>
+                  ))
+                ) : (
+                  <li>No health hazards</li>
+                )}
+              </ul>
+            ))
+          )}
           <style jsx global>{`
             .health-hazards {
               display: flex;
