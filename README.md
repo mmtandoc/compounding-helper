@@ -2,6 +2,37 @@
 
 Compounding Helper is a web app in development meant to assist with the creation and maintenance of risk assessments for non-sterile compounding in Canadian pharmacies.
 
+## Diagrams
+
+### ER diagram
+
+```mermaid
+erDiagram
+    RiskAssessment }o--|| Compound : "for"
+    MFR }o--|| Compound : "for"
+    MFR }o--|| RiskAssessment : "references"
+    Compound ||--o{ Ingredient : "made from"
+    Ingredient }o--o| SDS : "uses"
+    Product }o--|| Chemical : "consists of"
+    Product }o--|| Vendor : "sold by"
+    SDS }o--|| Product : "for"
+    HazardClass ||--o{ HazardCategory : "contains"
+    HazardCategory |o--o| HazardCategory : "parent of"
+    SDS ||--o{ hazard_category_to_sds : ""
+    hazard_category_to_sds {
+        String additionalInfo  "nullable"
+    }
+    hazard_category_to_sds }o--|| HazardCategory : ""
+```
+
+### Workflow
+```mermaid
+flowchart LR
+    subgraph "Data Entry (if doesn't exist already)"
+    A[Enter chemical] -.-> B[Enter product] -.-> C[Enter SDS summary]
+    end
+    C[Enter SDS summary] -.-> D[Create risk assessment] --> E[Create MFR]
+```
 
 ## Referenced documents
 
