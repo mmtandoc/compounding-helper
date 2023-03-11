@@ -12,7 +12,22 @@ type HazardsProps = {
 const Hazards: NextPageWithLayout<HazardsProps> = (props: HazardsProps) => {
   const { data } = props
 
-  return <HazardsTable data={data} />
+  return (
+    <>
+      <HazardsTable data={data} />
+      <p>
+        <span style={{ fontWeight: 550 }}>Reference: </span>
+        <a
+          href="https://unece.org/sites/default/files/2021-09/GHS_Rev9E_0.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Globally Harmonized System of Classification and Labelling of
+          Chemicals (GHS Rev. 9, 2021)
+        </a>
+      </p>
+    </>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps<
