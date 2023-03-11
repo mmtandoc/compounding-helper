@@ -15,6 +15,7 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     nioshRevisionDate: data.nioshRevisionDate
       ? toIsoDateString(data.nioshRevisionDate)
       : null,
+    additionalInfo: data.additionalInfo,
   })
 }
 
@@ -30,6 +31,7 @@ const toModel = (
     nioshRevisionDate: values.nioshRevisionDate
       ? new Date(values.nioshRevisionDate)
       : null,
+    additionalInfo: values.additionalInfo,
   }
 }
 

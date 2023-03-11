@@ -3,9 +3,11 @@ import { Controller, UseFormReturn } from "react-hook-form"
 
 import {
   DotJotList,
+  FormGroup,
   Input,
   LabelFormGroup,
   RhfRadioGroup,
+  TextArea,
 } from "components/ui/forms"
 import { NullPartialChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
@@ -92,6 +94,14 @@ const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
           ]}
         />
       </LabelFormGroup>
+      <FormGroup>
+        <label htmlFor="additionalInfo">Additional Info:</label>
+        <TextArea
+          id="additionalInfo"
+          {...register("additionalInfo")}
+          autoResize
+        />
+      </FormGroup>
     </>
   )
 }

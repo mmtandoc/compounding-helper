@@ -15,6 +15,7 @@ model Chemical {
   products          Product[]
   nioshTable        Int       @default(-1)
   nioshRevisionDate DateTime? @db.Date
+  additionalInfo    String?
   updatedAt         DateTime  @default(now()) @updatedAt
 
   //@@index([synonyms(ops: ArrayOps)], type: Gin)

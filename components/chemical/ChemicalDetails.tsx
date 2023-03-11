@@ -1,6 +1,6 @@
 import React from "react"
 
-import { FormGroup } from "components/ui/forms"
+import { FormGroup, TextArea } from "components/ui/forms"
 import { toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
@@ -35,6 +35,14 @@ const ChemicalDetails = (props: Props) => {
         {data.nioshRevisionDate
           ? toIsoDateString(data.nioshRevisionDate)
           : "N/A"}
+      </FormGroup>
+      <FormGroup>
+        <span className="label">Additional info:</span>
+        {data.additionalInfo ? (
+          <TextArea value={data.additionalInfo} cols={20} readOnly autoResize />
+        ) : (
+          <span>None</span>
+        )}
       </FormGroup>
       <style jsx>{`
         .health-hazard-list {

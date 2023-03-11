@@ -47,6 +47,12 @@ export const chemicalSchema = z.object({
   synonyms: z.array(z.string().trim().min(1)).nullable(),
   nioshTable: z.number().int().min(1).max(3).or(z.literal(-1)),
   nioshRevisionDate: utcDateZodString.nullable(), //TODO: Check that date is not in the future
+  additionalInfo: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
 })
 
 export type ChemicalFields = z.output<typeof chemicalSchema>
