@@ -20,7 +20,7 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
       data={data}
       dataLabel="chemical"
       apiEndpointPath={`/api/chemicals/${data.id}`}
-      urlPath={`/api/chemicals/${data.id}`}
+      urlPath={`/chemicals/${data.id}`}
       detailsComponent={ChemicalDetails}
     />
   )
