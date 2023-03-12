@@ -28,19 +28,25 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
     ...textAreaProps
   } = _.omit(props, "ref")
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null)
-
-  useImperativeHandle(ref, () => textAreaRef.current as HTMLTextAreaElement)
-
-  const [value, setValue] = useState(textAreaProps.value)
   const [currentScrollHeight, setCurrentScrollHeight] = useState(
     textAreaRef.current?.scrollHeight ?? null,
   )
+
+  useImperativeHandle(ref, () => {
+    if (textAreaRef.current) {
+      console.log("setCurrentScrollHeight")
+      setCurrentScrollHeight(textAreaRef.current.scrollHeight)
+    }
+
+    return textAreaRef.current as HTMLTextAreaElement
+  })
+
+  const [value, setValue] = useState(textAreaProps.value)
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (autoResize) {
         setValue(e.target.value)
-        setCurrentScrollHeight(e.target.scrollHeight)
       }
       return textAreaProps?.onChange?.(e)
     },
@@ -48,22 +54,18 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   )
 
   useEffect(() => {
-    const MIN_TEXTAREA_HEIGHT = 20
-    if (!autoResize || !textAreaRef.current) {
+    const MIN_TEXTAREA_HEIGHT = 40
+    if (!autoResize || !textAreaRef.current || !currentScrollHeight) {
       return
     }
+
     // Reset height - important to shrink on delete
     textAreaRef.current.style.height = "inherit"
     // Set height
     textAreaRef.current.style.height = `${
-      Math.max(textAreaRef.current.scrollHeight, MIN_TEXTAREA_HEIGHT) + 1
+      Math.max(textAreaRef.current.scrollHeight, MIN_TEXTAREA_HEIGHT) + 2
     }px`
-  }, [
-    autoResize,
-    value,
-    currentScrollHeight,
-    textAreaRef.current?.scrollHeight,
-  ])
+  }, [autoResize, value, currentScrollHeight])
 
   const hasFormContext = !!useFormContext() as boolean
 
