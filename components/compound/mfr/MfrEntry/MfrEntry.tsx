@@ -256,6 +256,7 @@ const MfrEntry = (props: MfrEntryProps) => {
         <TextArea
           id={`${id}-calculations`}
           {...register("calculations")}
+          autoResize
           rows={2}
         />
       </FormGroup>
@@ -275,7 +276,7 @@ const MfrEntry = (props: MfrEntryProps) => {
         <TextArea
           id={`${id}-compounding-method`}
           {...register("compoundingMethod")}
-          rows={6}
+          autoResize
         />
       </FormGroup>
       <Fieldset legend="Stability and storage:">
@@ -338,7 +339,11 @@ const MfrEntry = (props: MfrEntryProps) => {
             formMethods={formMethods}
           />
         </div>
-        <TextArea id={`${id}-packaging`} {...register("packaging")} />
+        <TextArea
+          id={`${id}-packaging`}
+          {...register("packaging")}
+          autoResize
+        />
       </FormGroup>
       <Fieldset legend="Labelling:" className="preset-options-fieldset">
         <Controller

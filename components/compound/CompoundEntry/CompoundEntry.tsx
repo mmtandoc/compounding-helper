@@ -193,7 +193,7 @@ const CompoundEntry = (props: Props) => {
           )}
           <FormGroup>
             <label htmlFor="notes">Notes:</label>
-            <TextArea id="notes" {...register("notes")} />
+            <TextArea id="notes" {...register("notes")} autoResize rows={4} />
           </FormGroup>
         </>
       )}

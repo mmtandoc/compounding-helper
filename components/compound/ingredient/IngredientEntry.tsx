@@ -336,8 +336,9 @@ const IngredientEntry = <
                   },
                 )}
                 id={`i${index}-commercial-product-concerns-desc`}
-                cols={30}
                 readOnly={!hasProductMonographConcerns}
+                autoResize
+                rows={3}
               />
             </div>
           </div>

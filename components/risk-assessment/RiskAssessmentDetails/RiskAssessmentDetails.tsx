@@ -6,6 +6,7 @@ import {
   Fieldset,
   FormGroup,
   RadioGroup,
+  TextArea,
 } from "components/ui/forms"
 import { capitalize, toIsoDateString } from "lib/utils"
 import { RiskAssessmentAll } from "types/models"
@@ -133,10 +134,10 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               If no, describe your processes to address the situation in order
               to meet standards:
             </label>
-            <textarea
+            <TextArea
               value={data.workflowStandardsProcess ?? ""}
-              readOnly={true}
-              cols={20}
+              readOnly
+              autoResize
             />
           </div>
         )}

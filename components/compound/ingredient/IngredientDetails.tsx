@@ -1,6 +1,11 @@
 import Link from "next/link"
 
-import { BooleanRadioGroup, Fieldset, FormGroup } from "components/ui/forms"
+import {
+  BooleanRadioGroup,
+  Fieldset,
+  FormGroup,
+  TextArea,
+} from "components/ui/forms"
 import { capitalize, toIsoDateString } from "lib/utils"
 import { IngredientAll } from "types/models"
 
@@ -107,11 +112,11 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               <span className="label">
                 Please describe health concerns on the product monograph:
               </span>
-              <textarea
-                cols={30}
-                readOnly={true}
+              <TextArea
+                readOnly
+                autoResize
                 value={ingredient.concernsDescription ?? undefined}
-              ></textarea>
+              />
             </div>
           </div>
         )}

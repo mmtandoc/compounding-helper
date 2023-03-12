@@ -283,8 +283,9 @@ const RiskAssessmentEntry = (props: Props) => {
             deps: "isWorkflowUninterrupted",
           })}
           id="interrupted-workflow-process"
-          cols={30}
+          autoResize
           rows={7}
+          fullWidth
         />
       </FormGroup>
       <Fieldset legend="Is there a risk of microbial contamination?">

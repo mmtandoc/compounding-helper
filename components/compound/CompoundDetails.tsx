@@ -4,7 +4,7 @@ import useSWR from "swr"
 
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { Button, Spinner } from "components/ui"
-import { Fieldset, FormGroup } from "components/ui/forms"
+import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
 import { SettingsFields } from "lib/fields"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
@@ -101,7 +101,7 @@ const CompoundDetails = (props: Props) => {
         <>
           <FormGroup>
             <span className="label">Notes:</span>
-            <textarea value={data.notes ?? "None"} readOnly={true} cols={20} />
+            <TextArea value={data.notes ?? "None"} readOnly autoResize />
           </FormGroup>
           <MfrsActions data={data} />
         </>
