@@ -3,7 +3,7 @@ import * as z from "zod"
 
 import { NullPartialDeep } from "types/util"
 
-import { utcDateZodString } from "./utils"
+import { isoDateZodString } from "./utils"
 
 //==== Chemical schema =====
 
@@ -46,7 +46,7 @@ export const chemicalSchema = z.object({
   hasNoCasNumber: z.boolean(),
   synonyms: z.array(z.string().trim().min(1)).nullable(),
   nioshTable: z.number().int().min(1).max(3).or(z.literal(-1)),
-  nioshRevisionDate: utcDateZodString.nullable(), //TODO: Check that date is not in the future
+  nioshRevisionDate: isoDateZodString().nullable(), //TODO: Check that date is not in the future
   additionalInfo: z
     .string()
     .trim()

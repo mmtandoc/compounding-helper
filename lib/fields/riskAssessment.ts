@@ -12,7 +12,7 @@ import * as z from "zod"
 import { NullPartialDeep } from "types/util"
 
 import { NullPartialCompoundFields, compoundSchema } from "./compound"
-import { utcDateZodString } from "./utils"
+import { isoDateZodString } from "./utils"
 
 export const exposureRisksSchema = z
   .object({
@@ -100,7 +100,7 @@ export const riskAssessmentSchema = z.object({
     additional: z.string().trim().min(1).array(),
   }),
   compoundingSupervisor: z.string().trim().min(1),
-  dateAssessed: utcDateZodString, //TODO: Check that date is not in the future
+  dateAssessed: isoDateZodString(), //TODO: Check that date is not in the future
 })
 
 export type RiskAssessmentFields = z.output<typeof riskAssessmentSchema>

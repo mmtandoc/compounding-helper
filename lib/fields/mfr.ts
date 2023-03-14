@@ -4,7 +4,7 @@ import * as z from "zod"
 
 import { NullPartialDeep } from "types/util"
 
-import { utcDateZodString } from "./utils"
+import { isoDateZodString } from "./utils"
 
 //==== MFR schema ====//
 
@@ -54,7 +54,7 @@ export const mfrSchema = z.object({
     .transform((arg) => (arg === "" ? null : arg))
     .nullable()
     .default(null),
-  effectiveDate: utcDateZodString,
+  effectiveDate: isoDateZodString(),
 })
 
 export type MfrFields = Simplify<z.output<typeof mfrSchema>>

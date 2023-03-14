@@ -3,7 +3,7 @@ import * as z from "zod"
 
 import { NullPartialDeep } from "types/util"
 
-import { transformStringToNumber, utcDateZodString } from "./utils"
+import { isoDateZodString, transformStringToNumber } from "./utils"
 
 //==== SDS & Hazard schemas =====
 
@@ -35,7 +35,7 @@ export const sdsSchema = z.object({
       .min(0, "HMIS health hazard level must a number from 0 to 4.")
       .max(4, "HMIS health hazard level must a number from 0 to 4."),
   ),
-  revisionDate: utcDateZodString,
+  revisionDate: isoDateZodString(),
   requireVentilation: z.boolean(),
   hazards: z.array(hazardSchema),
 })

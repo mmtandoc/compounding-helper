@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Zod, * as z from "zod"
+import { errorUtil } from "zod/lib/helpers/errorUtil"
 
 export type ZodDeepNullPartial<T extends Zod.ZodTypeAny> =
   T extends Zod.ZodObject<infer Shape, infer Params, infer Catchall>
@@ -108,9 +109,13 @@ export const deepNullPartialifyWithIds = <
     schema.pick(ids ?? (Object.hasOwn(schema.shape, "id") ? { id: true } : {})),
   )
 
-export const utcDateZodString = z
-  .string()
-  .regex(/\d{4}-[01]\d-[0-3]\d/, "Date is invalid.") //UTC Date without time
+export const isoDateZodString = (
+  params?: Parameters<typeof z.string>[0],
+  invalidDateError?: errorUtil.ErrMessage,
+) =>
+  z
+    .string(params)
+    .regex(/\d{4}-[01]\d-[0-3]\d/, invalidDateError ?? "Date is invalid.") //ISO Date without time
 
 export const refineNoDuplicates = <
   T,
