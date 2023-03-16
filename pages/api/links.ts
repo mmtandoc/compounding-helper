@@ -1,7 +1,7 @@
 import { Link, Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
-import { linkDirectorySchema, linkSchema } from "lib/fields"
+import { linkDirectorySchema } from "lib/fields"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 

@@ -11,7 +11,6 @@ type Props = {
 
 const SdsDetails = (props: Props) => {
   const {
-    id: sdsId,
     productId,
     hmisHealthHazard,
     revisionDate,

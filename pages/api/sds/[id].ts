@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import _, { update } from "lodash"
+import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
 
 import { SdsFields, sdsSchema } from "lib/fields"

@@ -16,7 +16,7 @@ const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
 ) => {
   const { formMethods } = props
 
-  const { register, control } = formMethods
+  const { register } = formMethods
 
   const { data: vendors, error: vendorsError } =
     useSWR<Vendor[]>("/api/vendors")

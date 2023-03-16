@@ -15,7 +15,7 @@ import CompoundMapper from "./CompoundMapper"
 type FilterByKeyPrefix<
   T,
   Prefix extends string,
-> = keyof T extends `${Prefix}${infer _X}` ? never : keyof T
+> = keyof T extends `${Prefix}${infer _}` ? never : keyof T
 
 type ExposureRiskPrefix = "sds" | "pm"
 type ExposureRiskType = "Skin" | "Eye" | "Inhalation" | "Oral" | "Other"

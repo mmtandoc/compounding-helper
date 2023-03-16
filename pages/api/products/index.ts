@@ -1,4 +1,4 @@
-import { Prisma, Product } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
 import { ProductFields, productSchema } from "lib/fields"

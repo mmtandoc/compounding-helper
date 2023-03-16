@@ -1,9 +1,8 @@
 import Link from "next/link"
 
 import { Button, Table } from "components/ui"
-import filterFns from "lib/table/filterFns"
 import { toIsoDateString } from "lib/utils"
-import { IngredientAll, MfrAll } from "types/models"
+import { MfrAll } from "types/models"
 
 type Props = {
   data: MfrAll[]

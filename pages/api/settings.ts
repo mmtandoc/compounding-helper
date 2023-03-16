@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next"
 
 import { settingsSchema } from "lib/fields"
 import { prisma } from "lib/prisma"
-import { capitalize } from "lib/utils"
 import { ApiBody } from "types/common"
 
 const BASE_ID = 0

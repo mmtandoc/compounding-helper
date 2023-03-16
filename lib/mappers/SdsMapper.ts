@@ -1,5 +1,4 @@
-import { Prisma, SDS } from "@prisma/client"
-import { SetOptional } from "type-fest"
+import { Prisma } from "@prisma/client"
 
 import { SdsFields, sdsSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"

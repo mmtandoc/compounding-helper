@@ -2,12 +2,7 @@ import { RiskAssessment } from "@prisma/client"
 import { capitalize } from "lodash"
 import Link from "next/link"
 import { useEffect, useId, useMemo } from "react"
-import {
-  Controller,
-  FieldPathValue,
-  UseFormReturn,
-  useFieldArray,
-} from "react-hook-form"
+import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
 import useSWR from "swr"
 
 import { Spinner } from "components/ui"

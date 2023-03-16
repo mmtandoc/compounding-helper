@@ -52,7 +52,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
     console.error(sdsError)
   }
 
-  const getHazardCategoriesByClasses = (...classNames: string[]) => {
+  /* const getHazardCategoriesByClasses = (...classNames: string[]) => {
     if (sdses === undefined) {
       return
     }
@@ -67,7 +67,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
       hazardCategoriesMap.set(sds.product.chemical.name, hazards)
     }
     return hazardCategoriesMap
-  }
+  } */
 
   return (
     <Fieldset legend={`${category}:`} className="exposure-risks">

@@ -26,7 +26,7 @@ const HazardInputRow = ({
   formMethods,
   arrayMethods,
 }: HazardInputRowProps) => {
-  const { register, setValue, watch, control } = formMethods
+  const { register, setValue, watch } = formMethods
 
   const { remove } = arrayMethods
 

@@ -47,7 +47,6 @@ const IngredientEntry = <
   TFieldArrayName extends FieldArrayPath<TFieldValues>,
 >({
   name,
-  field,
   index,
   reset,
   formMethods,

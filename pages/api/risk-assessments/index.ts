@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client"
 import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
 
-import { RiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
+import { riskAssessmentSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
@@ -14,7 +14,7 @@ import {
 } from "types/models"
 
 import { createCompound } from "../compounds"
-import { getCompoundById, updateCompoundById } from "../compounds/[id]"
+import { updateCompoundById } from "../compounds/[id]"
 
 export default async function handler(
   req: NextApiRequest,

@@ -50,8 +50,6 @@ interface ArrayMultiPresetDropdownProps<
   > | null>[]
 }
 
-type x = NullPartialFieldArrayPresetSingleFields<GetElementType<string[]>>
-
 interface NonArrayPresetDropdownProps<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,

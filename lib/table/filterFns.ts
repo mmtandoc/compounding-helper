@@ -1,4 +1,4 @@
-import { ChemicalAll, IngredientAll } from "types/models"
+import { IngredientAll } from "types/models"
 
 const filterFns = {
   string: (val: string, _: unknown, query: string) =>

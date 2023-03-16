@@ -16,7 +16,7 @@ export default async function handler(
     ApiBody<CompoundWithIngredients[] | CompoundWithIngredients>
   >,
 ) {
-  const { query, method } = req
+  const { method } = req
 
   //TODO: Implement filtering
   switch (method) {

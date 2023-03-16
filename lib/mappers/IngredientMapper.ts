@@ -1,5 +1,4 @@
 import { Ingredient } from "@prisma/client"
-import { SetOptional } from "type-fest"
 
 import { IngredientFields, ingredientSchema } from "lib/fields"
 import { IngredientAll } from "types/models"

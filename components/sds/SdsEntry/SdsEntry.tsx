@@ -31,7 +31,7 @@ const SdsEntry = (props: Props) => {
 
   const { register, control, watch, setValue } = formMethods
 
-  const [chemicalId, productId] = watch(["chemicalId", "productId"])
+  const chemicalId = watch("chemicalId")
 
   const hazardsArrayMethods = useFieldArray({
     control: control,
