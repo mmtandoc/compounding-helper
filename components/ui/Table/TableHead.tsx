@@ -10,8 +10,8 @@ import { ColumnFilter, TableColumn } from "./Table"
 
 type Props<TData> = {
   columns: TableColumn<TData>[]
-  onSortChange: (sort: { path: string; order: "asc" | "desc" }) => void
-  currentSort?: { path: string; order: "asc" | "desc" }
+  onSortChange: (sort: { id: string; order: "asc" | "desc" }) => void
+  currentSort?: { id: string; order: "asc" | "desc" }
   backgroundColor?: CSSProperty.Color
   onColumnFiltersChange?: (columnFilters: ColumnFilter[]) => void
   columnFilters: ColumnFilter[]
@@ -34,12 +34,12 @@ const TableHead = <TData,>(props: Props<TData>) => {
     setColWidths([...colWidthsRef.current])
   }, [])
 
-  const handleSortChange = (path: string) => {
+  const handleSortChange = (id: string) => {
     let order: "asc" | "desc" = "asc"
-    if (currentSort?.path === path) {
+    if (currentSort?.id === id) {
       order = currentSort?.order === "asc" ? "desc" : "asc"
     }
-    onSortChange({ path, order })
+    onSortChange({ id, order })
   }
 
   const setFilterValue = (id: string, value: string) => {
@@ -55,6 +55,7 @@ const TableHead = <TData,>(props: Props<TData>) => {
       <tr>
         {columns.map((col, i) => {
           const { label, accessorPath, sortable, enableColumnFilter } = col
+          const id = accessorPath ?? col.id
           return (
             <th
               key={i}
@@ -66,15 +67,11 @@ const TableHead = <TData,>(props: Props<TData>) => {
             >
               <div
                 className="head-label"
-                onClick={
-                  sortable && accessorPath
-                    ? () => handleSortChange(accessorPath)
-                    : undefined
-                }
+                onClick={sortable ? () => handleSortChange(id) : undefined}
               >
                 <span>{label ?? ""}</span>
                 {sortable &&
-                  (currentSort?.path === accessorPath ? (
+                  (currentSort?.id === id ? (
                     currentSort?.order === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -84,14 +81,12 @@ const TableHead = <TData,>(props: Props<TData>) => {
                     <TiArrowUnsorted />
                   ))}
               </div>
-              {enableColumnFilter && accessorPath && (
+              {enableColumnFilter && (
                 <div className="filter">
                   <input
                     type="text"
                     placeholder="Search..."
-                    onChange={(e) =>
-                      setFilterValue(accessorPath, e.target.value)
-                    }
+                    onChange={(e) => setFilterValue(id, e.target.value)}
                   />
                 </div>
               )}

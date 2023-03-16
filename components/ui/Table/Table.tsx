@@ -1,7 +1,6 @@
 import { Property as CSSProperty } from "csstype"
 import _ from "lodash"
 import React, { ReactNode, useEffect, useMemo, useState } from "react"
-import { Simplify } from "type-fest"
 
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
@@ -9,22 +8,47 @@ import TableHead from "./TableHead"
 export type ColumnFilter = { id: string; value: string }
 
 export type BaseColumn<TData, T = any> = {
-  id?: string
   label?: string
-  accessorPath?: string
-  sortable?: boolean
-
-  compare?: (a: T, b: T) => number
   renderCell?: (value: T, item: TData) => ReactNode
   cellStyle?: React.CSSProperties
 }
 
-export type FilterColumn<TData, T = any> = Simplify<{
-  enableColumnFilter?: boolean
-  filterFn?: (cellValue: T, item: TData, query: string) => boolean
-}>
+type SortableColumn<T> =
+  | {
+      sortable: true
+      compare?: (a: T, b: T) => number
+    }
+  | {
+      sortable?: false
+      compare?: never
+    }
+
+type AccessorColumn<TData, T = any> = SortableColumn<T> &
+  (
+    | {
+        accessorPath: string
+        id?: never
+        accessorFn?: never
+      }
+    | {
+        accessorPath?: never
+        id: string
+        accessorFn?: (item: TData) => T
+      }
+  )
+
+export type FilterColumn<TData, T = any> =
+  | {
+      enableColumnFilter: true
+      filterFn: (cellValue: T, item: TData, query: string) => boolean
+    }
+  | {
+      enableColumnFilter?: false
+      filterFn?: never
+    }
 
 export type TableColumn<TData, T = any> = BaseColumn<TData, T> &
+  AccessorColumn<TData, T> &
   FilterColumn<TData, T>
 
 type Props<TData> = {
@@ -33,40 +57,21 @@ type Props<TData> = {
   data: TData[]
   limit?: number
   offset?: number
-  defaultSort?: { path: string; order: "asc" | "desc" }
-  backgroundColors?: { head: CSSProperty.Color; body: CSSProperty.Color }
-  //onColumnFiltersChange?: (columnFilters: ColumnFilter[]) => void
-  //columnFilters?: ColumnFilter[]
+  defaultSort?: { id: string; order: "asc" | "desc" }
+  backgroundColors?: { head?: CSSProperty.Color; body?: CSSProperty.Color }
 }
 
 //TODO: Implement optional external filter management
 
 const Table = <TData,>(props: Props<TData>) => {
-  const {
-    columns,
-    data,
-    defaultSort,
-    className,
-    backgroundColors,
-    //onColumnFiltersChange,
-    //columnFilters = [],
-  } = props
+  const { columns, data, defaultSort, className, backgroundColors } = props
   const [tableData, setTableData] = useState<TData[]>(data)
 
   const [currentSort, setCurrentSort] = useState<
-    { path: string; order: "asc" | "desc" } | undefined
+    { id: string; order: "asc" | "desc" } | undefined
   >(defaultSort)
 
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
-
-  /* const filteredData = useMemo(() => {
-    return columnFilters.reduce((data, cf) => {
-      const filterFn = columns.find((c) => c.accessorPath === cf.id)?.filterFn
-      return cf.value && filterFn
-        ? data.filter((val) => filterFn(_.get(val, cf.id), val, cf.value))
-        : data
-    }, data)
-  }, [columnFilters, columns, data]) */
 
   const filteredData = useMemo(() => {
     if (!columnFilters.length) {
@@ -74,9 +79,13 @@ const Table = <TData,>(props: Props<TData>) => {
     }
 
     return columnFilters.reduce((data, cf) => {
-      const filterFn = columns.find((c) => c.accessorPath === cf.id)?.filterFn
+      const col = columns.find((c) => (c.accessorPath ?? c.id) === cf.id)
+
+      const filterFn = col?.filterFn
+
+      const accessorFn = col?.accessorFn ?? ((item) => _.get(item, cf.id))
       return cf.value && filterFn
-        ? data.filter((val) => filterFn(_.get(val, cf.id), val, cf.value))
+        ? data.filter((val) => filterFn(accessorFn(val), val, cf.value))
         : data
     }, data)
   }, [columnFilters, columns, data])
@@ -93,15 +102,17 @@ const Table = <TData,>(props: Props<TData>) => {
       return
     }
 
-    const { path, order } = currentSort
-    const column = columns.find((c) => c.accessorPath === path)
+    const { id, order } = currentSort
+    const column = columns.find((c) => (c.accessorPath ?? c.id) === id)
     if (!column?.compare) {
       return
     }
 
+    const accessorFn = column.accessorFn ?? ((item) => _.get(item, id))
+
     const sortedData = Array.from(filteredData).sort(
       (a, b) =>
-        (column?.compare?.(_.get(a, path), _.get(b, path)) ?? 0) *
+        (column?.compare?.(accessorFn(a), accessorFn(b)) ?? 0) *
         (order === "asc" ? 1 : -1),
     )
 
@@ -109,7 +120,7 @@ const Table = <TData,>(props: Props<TData>) => {
   }, [columns, currentSort, filteredData])
 
   return (
-    <table className={`sortable-table ${className ?? ""}`}>
+    <table className={className}>
       <TableHead
         columns={columns}
         currentSort={currentSort}

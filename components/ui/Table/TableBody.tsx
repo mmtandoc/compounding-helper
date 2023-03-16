@@ -16,15 +16,19 @@ const TableBody = <TData,>(props: Props<TData>) => {
   const renderRow = (rowData: TData | null, index: number) => {
     return (
       <tr key={index}>
-        {columns.map((c, i) => (
-          <td key={i} style={c.cellStyle}>
-            {rowData !== null &&
-              (c?.renderCell ?? ((v: any) => v?.toString()))?.(
-                _.get(rowData, c.accessorPath ?? ""),
-                rowData,
-              )}
-          </td>
-        ))}
+        {columns.map((c, i) => {
+          const accessorFn =
+            c.accessorFn ?? ((item) => _.get(item, c.accessorPath as string))
+          return (
+            <td key={i} style={c.cellStyle}>
+              {rowData !== null &&
+                (c?.renderCell ?? ((v: any) => v?.toString()))?.(
+                  accessorFn(rowData),
+                  rowData,
+                )}
+            </td>
+          )
+        })}
       </tr>
     )
   }

@@ -20,6 +20,7 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
     cellStyle: { width: "3em" },
   },
   {
+    id: "shortcut",
     label: "HWNG Shortcut",
     renderCell: (_, data) => {
       const variations = data.shortcutVariations as {
