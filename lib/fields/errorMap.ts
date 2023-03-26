@@ -20,4 +20,6 @@ const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   return { message: ctx.defaultError }
 }
 
-z.setErrorMap(customErrorMap)
+export const setupErrorMap = () => {
+  z.setErrorMap(customErrorMap)
+}
