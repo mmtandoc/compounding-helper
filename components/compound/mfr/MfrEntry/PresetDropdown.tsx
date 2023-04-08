@@ -127,6 +127,7 @@ const PresetDropdown = <
       <style jsx>{`
         :global(.dropdown) {
           width: fit-content;
+          height: min-content;
 
           :global(.dropdown-menu) {
             min-width: 100%;
