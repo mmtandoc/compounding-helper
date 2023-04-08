@@ -64,6 +64,15 @@ const RoutineTable = (props: Props) => {
             cellStyle: { fontWeight: 550 },
           },
           {
+            accessorPath: "category",
+            label: "Category",
+            sortable: true,
+            compare: (a: string | null, b: string | null) =>
+              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
+            /* enableColumnFilter: true,
+            filterFn: filterFns.string, */
+          },
+          {
             id: "rrule",
             accessorFn: (routine) => routine.getRRule(),
             label: "Occurs",

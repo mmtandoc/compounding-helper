@@ -5,6 +5,7 @@ import { NullPartialRoutineFields } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
 import { DataEntryComponent } from "types/common"
 
+import { useRoutineCategories } from "./hooks"
 import RecurrenceEntry from "./RecurrenceEntry"
 
 type Props = {
@@ -18,6 +19,8 @@ const RoutineEntry: DataEntryComponent<NullPartialRoutineFields, Props> = (
 
   const { register } = formMethods
 
+  const categories = useRoutineCategories()
+
   register("id")
   return (
     <>
@@ -30,6 +33,25 @@ const RoutineEntry: DataEntryComponent<NullPartialRoutineFields, Props> = (
           Description:
         </label>
         <TextArea id="description" {...register("description")} autoResize />
+      </FormGroup>
+      <FormGroup>
+        <label htmlFor="category" className="optional">
+          Category:
+        </label>
+        <Input
+          id="category"
+          type="text"
+          {...register("category")}
+          size={30}
+          list="categories-list"
+        />
+        <datalist id="categories-list">
+          {categories?.map((cat) => (
+            <option value={cat} key={cat}>
+              {cat}
+            </option>
+          ))}
+        </datalist>
       </FormGroup>
       <RecurrenceEntry
         nestedFormMethods={nestedForm(formMethods, "recurrenceRule")}

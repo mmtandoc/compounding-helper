@@ -37,6 +37,10 @@ const RoutineDetails = (props: Props) => {
         <TextArea value={data.description ?? "None"} readOnly autoResize />
       </FormGroup>
       <FormGroup row>
+        <span className="label">Category:</span>
+        {data.category ?? "None"}
+      </FormGroup>
+      <FormGroup row>
         <span className="label">Repeats:</span>
         {rrule.toText()}
       </FormGroup>
