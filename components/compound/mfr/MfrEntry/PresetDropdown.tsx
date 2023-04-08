@@ -86,7 +86,9 @@ const PresetDropdown = <
         </Button>
         <DropdownMenu>
           {options.map((option, i) => {
-            const optionValue = (option as { value: any }).value
+            const optionValue = (
+              option as { value: FieldPathValue<TFieldValues, TFieldName> }
+            ).value
             const optionLabel = (option as { label?: string }).label
             return (
               <Button
@@ -95,7 +97,7 @@ const PresetDropdown = <
                   if (type !== PresetType.Single) {
                     const newValue = [
                       ...(formMethods.getValues(name) ?? []),
-                    ] as any[]
+                    ] as FieldPathValue<TFieldValues, TFieldName>
 
                     if (type === PresetType.MultiArray) {
                       newValue.push(...optionValue)
@@ -103,12 +105,17 @@ const PresetDropdown = <
                       newValue.push(optionValue)
                     }
 
-                    formMethods.setValue(
-                      name,
-                      newValue as PathValue<TFieldValues, TFieldName>,
-                    )
+                    formMethods.setValue(name, newValue)
                   } else {
-                    formMethods.setValue(name, optionValue)
+                    const newValue =
+                      typeof optionValue === "object"
+                        ? {
+                            // Keep previous values that are undefined in the preset option
+                            ...(formMethods.getValues(name) ?? {}),
+                            ...optionValue,
+                          }
+                        : optionValue
+                    formMethods.setValue(name, newValue)
                   }
                 }}
                 size="small"
