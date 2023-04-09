@@ -48,10 +48,11 @@ const RoutineTable = (props: Props) => {
         data={routines}
         columns={[
           {
-            accessorPath: "id",
-            label: "ID",
+            accessorPath: "category",
+            label: "Category",
             sortable: true,
-            compare: (a: number, b: number) => a - b,
+            compare: (a: string | null, b: string | null) =>
+              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
           },
           {
             accessorPath: "name",
@@ -64,15 +65,6 @@ const RoutineTable = (props: Props) => {
             cellStyle: { fontWeight: 550 },
           },
           {
-            accessorPath: "category",
-            label: "Category",
-            sortable: true,
-            compare: (a: string | null, b: string | null) =>
-              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
-            /* enableColumnFilter: true,
-            filterFn: filterFns.string, */
-          },
-          {
             id: "rrule",
             accessorFn: (routine) => routine.getRRule(),
             label: "Occurs",
@@ -81,14 +73,6 @@ const RoutineTable = (props: Props) => {
               a.toText().localeCompare(b.toText(), "en-CA", { numeric: true }),
             renderCell: (rule: RRule) => rule.toText(),
           },
-          /* {
-            accessorPath: "startDate",
-            label: "Start Date",
-            sortable: true,
-            compare: (a: Date, b: Date) =>
-              a.toISOString().localeCompare(b.toISOString()),
-            renderCell: (date: Date) => toIsoDateString(date),
-          }, */
           {
             id: "lastCompleted",
             accessorFn: (item) => item.getLastCompleted(),

@@ -12,92 +12,22 @@ type Props = {
   initialData: RoutineWithHistory[]
 }
 
-/*
-.$extends({
-    result: {
-      routine: {
-        getLastCompleted: {
-          needs: { id: true },
-          compute(routine) {
-            return () =>
-              basePrisma.routine
-                .findUniqueOrThrow({
-                  where: { id: routine.id },
-                })
-                .completionHistory({ orderBy: { date: "desc" }, take: 1 })
-                .then((val) =>
-                  val.length > 0 ? _.omit(val[0], "routineId") : null,
-                )
-          },
-        },
-        markCompleted: {
-          needs: { id: true },
-          compute(routine) {
-            return (date: Date | string, employeeName: string) => {
-              basePrisma.routineCompletion.create({
-                data: { routineId: routine.id, date, name: employeeName },
-              })
-            }
-          },
-        },
-      },
-    },
-  })
-  .$extends({
-    result: {
-      routine: {
-        getRRule: {
-          needs: {
-            startDate: true,
-            getLastCompleted: true,
-            recurrenceRule: true,
-          },
-          async compute(routine) {
-            const lastCompleted = await routine.getLastCompleted()
-            return new RRule({
-              ...RRule.parseString(routine.recurrenceRule),
-              dtstart: lastCompleted?.date ?? routine.startDate,
-            })
-          },
-        },
-      },
-    },
-  })
-  .$extends({
-    result: {
-      routine: {
-        nextDue: {
-          needs: { startDate: true, getLastCompleted: true, getRRule: true },
-          async compute(routine) {
-            const lastCompleted = await routine.getLastCompleted()
-            const rrule = await routine.getRRule
-            return rrule.after(
-              lastCompleted?.date ?? routine.startDate,
-              !lastCompleted,
-            ) as Date
-          },
-        },
-      },
-    },
-  })
-*/
-
 const Routines: NextPageWithLayout<Props> = (props) => {
   const { initialData } = props
 
   const { data: routines, error } = useSWR<RoutineWithHistory[]>(
-    "/api/routines",
+    "/api/routines?sort=category:asc,name:asc",
     {
       fallbackData: initialData,
     },
   )
 
-  if (!routines) {
-    return null
-  }
-
   if (error) {
     console.error(error)
+  }
+
+  if (!routines) {
+    return null
   }
 
   const actionBar = (
@@ -130,7 +60,9 @@ const Routines: NextPageWithLayout<Props> = (props) => {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = await getRoutines()
+  const data = await getRoutines({
+    orderBy: [{ category: "asc" }, { name: "asc" }],
+  })
 
   return {
     props: {
