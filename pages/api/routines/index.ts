@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
+import {
+  PrismaOrderByWithoutRelationInput,
+  parseSortQuery,
+} from "lib/api/utils"
 import { RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { prisma } from "lib/prisma"
@@ -13,12 +17,27 @@ export default async function handler(
 ) {
   const { method } = req
 
+  //TODO: Validate that column name is valid
+  let orderBy:
+    | PrismaOrderByWithoutRelationInput<Prisma.RoutineOrderByWithRelationInput>[]
+    | undefined
+
+  try {
+    orderBy = parseSortQuery<Prisma.RoutineOrderByWithRelationInput>(req.query)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({
+      error: { code: 400, message: "Invalid sort parameter." },
+    })
+    return
+  }
+
   switch (method) {
     case "GET": {
       let routines: RoutineWithHistory[]
 
       try {
-        routines = await getRoutines()
+        routines = await getRoutines({ orderBy })
       } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -69,12 +88,19 @@ export default async function handler(
   }
 }
 
-export const getRoutines = async (where?: Prisma.RoutineWhereInput) =>
-  prisma.routine.findMany({
-    where,
+export const getRoutines = async (
+  args?: Omit<Prisma.RoutineFindManyArgs, "select" | "include">,
+) => {
+  const defaultArgs: Omit<Prisma.RoutineFindManyArgs, "select" | "include"> = {
     orderBy: { id: "asc" },
+  }
+
+  return await prisma.routine.findMany({
+    ...defaultArgs,
+    ...args,
     ...routineWithHistory,
   })
+}
 
 export const createRoutine = async (values: RoutineFields) =>
   await prisma.routine.create({
