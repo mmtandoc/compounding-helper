@@ -1,11 +1,12 @@
 import { RoutineCompletion } from "@prisma/client"
 import axios from "axios"
+import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useMemo, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { RRule } from "rrule"
-import { mutate, useSWRConfig } from "swr"
+import { mutate } from "swr"
 
 import { Button, Modal, Table } from "components/ui"
 import { Form, FormGroup, Input } from "components/ui/forms"
@@ -22,8 +23,6 @@ type Props = {
 //TODO: Implement searching
 const RoutineTable = (props: Props) => {
   const { data } = props
-
-  const { mutate } = useSWRConfig()
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [currentRoutine, setCurrentRoutine] = useState<RoutineEntity>()
@@ -97,21 +96,24 @@ const RoutineTable = (props: Props) => {
             sortable: true,
             compare: (a: Date | null, b: Date | null) =>
               (a?.toISOString() ?? "").localeCompare(b?.toISOString() ?? ""),
-            renderCell: (date: Date | null) =>
-              date ? toIsoDateString(date) : null,
+            renderCell: (dueDate: Date | null, item) =>
+              dueDate ? (
+                <span
+                  style={{
+                    color: item.isOverdue() ? "#cc0000" : "initial",
+                  }}
+                >
+                  {`${toIsoDateString(dueDate)} (${formatDistanceToNow(
+                    dueDate,
+                    {
+                      addSuffix: true,
+                    },
+                  )})`}
+                </span>
+              ) : null,
           },
           {
-            id: "isOverdue",
-            label: "Overdue?",
-            accessorFn: (item) => item.isOverdue(),
-            renderCell: (isOverdue) => (
-              <span style={{ color: isOverdue ? "red" : "initial" }}>
-                {isOverdue ? "Yes" : "No"}
-              </span>
-            ),
-          },
-          {
-            id: "actions",
+            id: "mark-complete",
             renderCell: (_, data) => (
               <>
                 <Button

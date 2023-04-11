@@ -1,4 +1,5 @@
 import { Routine, RoutineCompletion } from "@prisma/client"
+import { isPast } from "date-fns"
 import { RRule } from "rrule"
 
 import { RoutineWithHistory } from "types/models"
@@ -39,11 +40,7 @@ export default class RoutineEntity implements Routine {
   }
 
   isOverdue() {
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(today.getDate() - 1)
-
     const dueDate = this.getDueDate()
-    return dueDate ? dueDate < yesterday : false
+    return dueDate ? isPast(dueDate) : false
   }
 }
