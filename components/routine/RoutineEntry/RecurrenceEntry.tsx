@@ -174,6 +174,23 @@ const RecurrenceEntry = ({ nestedFormMethods }: RecurrenceEntryProps) => {
         formMethods={nestedFormMethods}
       />
       <style jsx global>{`
+        details {
+          margin-top: 1rem;
+
+          border: var(--border-default);
+          padding: 0.5rem 1rem;
+
+          > summary {
+            font-weight: 600;
+            cursor: pointer;
+            width: fit-content;
+            user-select: none;
+            &:hover {
+              color: var(--color-fg-muted);
+            }
+          }
+        }
+
         .example {
           margin-top: 2rem;
 
