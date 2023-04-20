@@ -5,7 +5,9 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react"
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
 
-export type ColumnFilter = { id: string; value: string }
+export type ColumnFilter = { id: string; value: string | null }
+
+//TODO: Fix typings for column data
 
 export type BaseColumn<TData, T = any> = {
   label?: string
@@ -41,6 +43,10 @@ export type FilterColumn<TData, T = any> =
   | {
       enableColumnFilter: true
       filterFn: (cellValue: T, item: TData, query: string) => boolean
+      renderFilterInput?: (props: {
+        filter: ColumnFilter | undefined
+        setFilterValue: (value: string | null) => void
+      }) => JSX.Element
     }
   | {
       enableColumnFilter?: false
@@ -82,11 +88,14 @@ const Table = <TData,>(props: Props<TData>) => {
       const col = columns.find((c) => (c.accessorPath ?? c.id) === cf.id)
 
       const filterFn = col?.filterFn
-
       const accessorFn = col?.accessorFn ?? ((item) => _.get(item, cf.id))
-      return cf.value && filterFn
-        ? data.filter((val) => filterFn(accessorFn(val), val, cf.value))
-        : data
+      const filterValue = cf.value
+
+      if (!filterValue || !filterFn) {
+        return data
+      }
+
+      return data.filter((val) => filterFn(accessorFn(val), val, filterValue))
     }, data)
   }, [columnFilters, columns, data])
 

@@ -42,7 +42,7 @@ const TableHead = <TData,>(props: Props<TData>) => {
     onSortChange({ id, order })
   }
 
-  const setFilterValue = (id: string, value: string) => {
+  const setFilterValue = (id: string, value: string | null) => {
     const newColumnFilters = [
       ...columnFilters.filter((colFilter) => colFilter.id !== id),
       { id, value },
@@ -56,6 +56,13 @@ const TableHead = <TData,>(props: Props<TData>) => {
         {columns.map((col, i) => {
           const { label, accessorPath, sortable, enableColumnFilter } = col
           const id = accessorPath ?? col.id
+
+          const FilterInput = enableColumnFilter
+            ? col.renderFilterInput !== undefined
+              ? col.renderFilterInput
+              : TextFilterInput
+            : null
+
           return (
             <th
               key={i}
@@ -81,12 +88,11 @@ const TableHead = <TData,>(props: Props<TData>) => {
                     <TiArrowUnsorted />
                   ))}
               </div>
-              {enableColumnFilter && (
+              {enableColumnFilter && FilterInput && (
                 <div className="filter">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    onChange={(e) => setFilterValue(id, e.target.value)}
+                  <FilterInput
+                    filter={columnFilters.find((f) => f.id === id)}
+                    setFilterValue={(value) => setFilterValue(id, value)}
                   />
                 </div>
               )}
@@ -136,14 +142,76 @@ const TableHead = <TData,>(props: Props<TData>) => {
           border-top: var(--table-border);
           padding: 0.5rem 1rem;
         }
+      `}</style>
+    </thead>
+  )
+}
 
-        .filter > input {
+const TextFilterInput = (props: {
+  filter: ColumnFilter | undefined
+  setFilterValue: (value: string | null) => void
+}) => {
+  const { filter, setFilterValue } = props
+
+  return (
+    <>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={filter?.value ?? ""}
+        onChange={(e) =>
+          setFilterValue(e.target.value === "" ? e.target.value : null)
+        }
+      />
+      <style jsx>{`
+        input {
           width: 100%;
           min-width: 5rem;
         }
       `}</style>
-    </thead>
+    </>
   )
+
+  //TODO: Implement clear button
+  /*  return (
+    <div className="input-wrapper">
+      <input
+        type="text"
+        placeholder="Search..."
+        value={filter?.value ?? ""}
+        onChange={(e) => setFilterValue(e.target.value)}
+      />
+      {filter?.value && (
+        <IconButton
+          title="Clear"
+          className="clear-button"
+          icon={MdClose}
+          onClick={() => setFilterValue("")}
+          size="small"
+        />
+      )}
+
+      <style jsx>{`
+        .input-wrapper {
+          position: relative;
+        }
+
+        :global(input) {
+          width: 100%;
+          min-width: 5rem;
+          //position: relative;
+        }
+
+        //:global(.clear-button) {
+        //  position: absolute;
+        //  color: #555;
+        //  font-size: 28px;
+        //  top: 6px;
+        //  right: -15px;
+        //}
+      `}</style>
+    </div>
+  ) */
 }
 
 export default TableHead
