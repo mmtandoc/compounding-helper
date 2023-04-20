@@ -9,7 +9,13 @@ import { RRule } from "rrule"
 import { mutate } from "swr"
 
 import { Button, Modal, Table } from "components/ui"
-import { Form, FormGroup, Input } from "components/ui/forms"
+import {
+  BooleanRadioGroup,
+  Form,
+  FormGroup,
+  Input,
+  Select,
+} from "components/ui/forms"
 import { RoutineEntity } from "lib/entities"
 import { CompletionFields, NullPartialCompletionFields } from "lib/fields"
 import filterFns from "lib/table/filterFns"
@@ -111,6 +117,29 @@ const RoutineTable = (props: Props) => {
                   )})`}
                 </span>
               ) : null,
+          },
+          {
+            accessorPath: "isActive",
+            label: "Active",
+            sortable: true,
+            enableColumnFilter: true,
+            //TODO: Support filtering on values other than string?
+            /* filterFn: (cellValue: boolean, item, query: boolean | null) =>
+              query === null ? true : cellValue === query, */
+            filterFn: (cellValue: boolean, item, query) =>
+              query === "" ? true : (query === "yes") === cellValue,
+            renderFilterInput: ({ filter, setFilterValue }) => (
+              <Select
+                value={filter?.value ?? ""}
+                onChange={(e) => setFilterValue(e.target.value)}
+              >
+                <option value="">Any</option>
+                <option value="yes">Active</option>
+                <option value="no">Inactive</option>
+              </Select>
+            ),
+            compare: (a: boolean, b: boolean) => Number(a) - Number(b),
+            renderCell: (isActive: boolean) => (isActive ? "Yes" : "No"),
           },
           {
             id: "mark-complete",

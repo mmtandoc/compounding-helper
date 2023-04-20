@@ -1,6 +1,11 @@
 import { UseFormReturn } from "react-hook-form"
 
-import { FormGroup, Input, TextArea } from "components/ui/forms"
+import {
+  FormGroup,
+  Input,
+  RhfBooleanRadioGroup,
+  TextArea,
+} from "components/ui/forms"
 import { NullPartialRoutineFields } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
 import { DataEntryComponent } from "types/common"
@@ -10,12 +15,13 @@ import RecurrenceEntry from "./RecurrenceEntry"
 
 type Props = {
   formMethods: UseFormReturn<NullPartialRoutineFields>
+  type: "full" | "partial"
 }
 
 const RoutineEntry: DataEntryComponent<NullPartialRoutineFields, Props> = (
   props: Props,
 ) => {
-  const { formMethods } = props
+  const { formMethods, type = "full" } = props
 
   const { register } = formMethods
 
@@ -53,6 +59,12 @@ const RoutineEntry: DataEntryComponent<NullPartialRoutineFields, Props> = (
           ))}
         </datalist>
       </FormGroup>
+      {type === "full" && (
+        <FormGroup>
+          <label htmlFor="is-active">Is active?</label>
+          <RhfBooleanRadioGroup id="is-active" name="isActive" />
+        </FormGroup>
+      )}
       <RecurrenceEntry
         nestedFormMethods={nestedForm(formMethods, "recurrenceRule")}
       />

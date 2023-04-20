@@ -31,7 +31,7 @@ const EditRoutine: NextPageWithLayout<EditRoutineProps> = (
       values={values as NullPartialRoutineFields}
       apiEndpointPath={`/api/routines/${id}`}
       urlPath={`/routines/${id}`}
-      entryComponent={RoutineEntry}
+      entryComponent={(props) => <RoutineEntry {...props} type="full" />}
     />
   )
 }

@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { RRule, rrulestr } from "rrule"
 
-import { FormGroup, TextArea } from "components/ui/forms"
+import { BooleanRadioGroup, FormGroup, TextArea } from "components/ui/forms"
 import { toIsoDateString } from "lib/utils"
 import { RoutineWithHistory } from "types/models"
 
@@ -39,6 +39,10 @@ const RoutineDetails = (props: Props) => {
       <FormGroup row>
         <span className="label">Category:</span>
         {data.category ?? "None"}
+      </FormGroup>
+      <FormGroup>
+        <span className="label">Is active?</span>
+        <BooleanRadioGroup readOnly={true} selectedValue={data.isActive} />
       </FormGroup>
       <FormGroup row>
         <span className="label">Repeats:</span>

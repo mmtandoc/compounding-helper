@@ -24,7 +24,7 @@ const NewRoutine: NextPageWithLayout = () => {
       dataName="routine"
       defaultValues={defaultValues}
       apiEndpointPath="/api/routines"
-      entryComponent={RoutineEntry}
+      entryComponent={(props) => <RoutineEntry {...props} type="partial" />}
     />
   )
 }
