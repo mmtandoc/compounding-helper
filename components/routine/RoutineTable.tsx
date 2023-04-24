@@ -133,11 +133,12 @@ const RoutineTable = (props: Props) => {
                 value={filter?.value ?? ""}
                 onChange={(e) => setFilterValue(e.target.value)}
               >
-                <option value="">Any</option>
+                <option value=""></option>
                 <option value="yes">Active</option>
                 <option value="no">Inactive</option>
               </Select>
             ),
+            defaultFilterValue: "yes",
             compare: (a: boolean, b: boolean) => Number(a) - Number(b),
             renderCell: (isActive: boolean) => (isActive ? "Yes" : "No"),
           },
