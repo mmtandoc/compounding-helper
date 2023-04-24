@@ -160,7 +160,7 @@ const TextFilterInput = (props: {
         placeholder="Search..."
         value={filter?.value ?? ""}
         onChange={(e) =>
-          setFilterValue(e.target.value === "" ? e.target.value : null)
+          setFilterValue(e.target.value === "" ? null : e.target.value)
         }
       />
       <style jsx>{`
