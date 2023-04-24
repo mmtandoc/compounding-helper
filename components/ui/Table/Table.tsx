@@ -1,11 +1,17 @@
 import { Property as CSSProperty } from "csstype"
-import _ from "lodash"
-import React, { ReactNode, useEffect, useMemo, useState } from "react"
+import _, { debounce } from "lodash"
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import TableBody from "./TableBody"
 import TableHead from "./TableHead"
 
-export type ColumnFilter = { id: string; value: string | null }
+export type ColumnFilter = { id: string; value: string }
 
 //TODO: Fix typings for column data
 
@@ -71,20 +77,17 @@ type Props<TData> = {
 
 const Table = <TData,>(props: Props<TData>) => {
   const { columns, data, defaultSort, className, backgroundColors } = props
-  const [tableData, setTableData] = useState<TData[]>(data)
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
 
   const [currentSort, setCurrentSort] = useState<
     { id: string; order: "asc" | "desc" } | undefined
   >(defaultSort)
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
+  const [filteredData, setFilteredData] = useState(filterData(columnFilters))
 
-  const filteredData = useMemo(() => {
-    if (!columnFilters.length) {
-      return data
-    }
-
-    return columnFilters.reduce((data, cf) => {
+  function filterData(filters: ColumnFilter[]) {
+    return filters.reduce((data, cf) => {
       const col = columns.find((c) => (c.accessorPath ?? c.id) === cf.id)
 
       const filterFn = col?.filterFn
@@ -97,24 +100,37 @@ const Table = <TData,>(props: Props<TData>) => {
 
       return data.filter((val) => filterFn(accessorFn(val), val, filterValue))
     }, data)
-  }, [columnFilters, columns, data])
+  }
+
+  const debounceFilterData = useCallback(
+    debounce((filters: ColumnFilter[]) => {
+      setFilteredData(filterData(filters))
+    }, 300),
+    [],
+  )
 
   useEffect(() => {
-    if (defaultSort) {
-      setCurrentSort(defaultSort)
-    }
-  }, [defaultSort])
-
-  useEffect(() => {
-    if (!currentSort) {
-      setTableData(filteredData)
+    if (columnFilters.length === 0) {
       return
+    }
+
+    debounceFilterData(columnFilters)
+
+    //? Cancelling debounce stops blank filter input from updating
+    /* return () => {
+      debounceFilterData.cancel()
+    } */
+  }, [columnFilters, data, debounceFilterData])
+
+  const sortedData = useMemo(() => {
+    if (!currentSort) {
+      return filteredData
     }
 
     const { id, order } = currentSort
     const column = columns.find((c) => (c.accessorPath ?? c.id) === id)
     if (!column?.compare) {
-      return
+      return filteredData
     }
 
     const accessorFn = column.accessorFn ?? ((item) => _.get(item, id))
@@ -125,7 +141,7 @@ const Table = <TData,>(props: Props<TData>) => {
         (order === "asc" ? 1 : -1),
     )
 
-    setTableData(sortedData)
+    return sortedData
   }, [columns, currentSort, filteredData])
 
   return (
@@ -140,7 +156,7 @@ const Table = <TData,>(props: Props<TData>) => {
       />
       <TableBody
         columns={columns}
-        data={tableData}
+        data={sortedData}
         backgroundColor={backgroundColors?.body}
       />
       <style jsx global>{`

@@ -43,10 +43,16 @@ const TableHead = <TData,>(props: Props<TData>) => {
   }
 
   const setFilterValue = (id: string, value: string | null) => {
+    // If value is null, filter is removed.
+
     const newColumnFilters = [
       ...columnFilters.filter((colFilter) => colFilter.id !== id),
-      { id, value },
     ]
+
+    if (value !== null) {
+      newColumnFilters.push({ id, value })
+    }
+
     onColumnFiltersChange?.(newColumnFilters)
   }
 
