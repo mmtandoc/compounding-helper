@@ -102,6 +102,7 @@ const Header = () => {
             children: [
               { label: "Health hazards table", url: "/hazards" },
               { label: "Link directory", url: "/links" },
+              { label: "Routines", url: "/routines" },
               { label: "Settings", url: "/settings" },
             ],
           },

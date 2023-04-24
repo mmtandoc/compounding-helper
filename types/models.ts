@@ -181,3 +181,16 @@ export const mfrAll = Prisma.validator<Prisma.MfrArgs>()({
 })
 
 export type MfrAll = Prisma.MfrGetPayload<typeof mfrAll>
+
+export const routineWithHistory = Prisma.validator<Prisma.RoutineArgs>()({
+  include: {
+    completionHistory: {
+      select: { date: true, name: true },
+      orderBy: { date: "desc" },
+    },
+  },
+})
+
+export type RoutineWithHistory = Prisma.RoutineGetPayload<
+  typeof routineWithHistory
+>
