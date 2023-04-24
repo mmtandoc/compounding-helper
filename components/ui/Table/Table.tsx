@@ -49,6 +49,7 @@ export type FilterColumn<TData, T = any> =
   | {
       enableColumnFilter: true
       filterFn: (cellValue: T, item: TData, query: string) => boolean
+      defaultFilterValue?: string
       renderFilterInput?: (props: {
         filter: ColumnFilter | undefined
         setFilterValue: (value: string | null) => void
@@ -78,7 +79,21 @@ type Props<TData> = {
 const Table = <TData,>(props: Props<TData>) => {
   const { columns, data, defaultSort, className, backgroundColors } = props
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>(
+    columns.reduce(
+      (arr, col) =>
+        col?.enableColumnFilter && col?.defaultFilterValue
+          ? [
+              ...arr,
+              {
+                id: col.accessorPath ?? col.id,
+                value: col.defaultFilterValue,
+              },
+            ]
+          : arr,
+      [] as ColumnFilter[],
+    ),
+  )
 
   const [currentSort, setCurrentSort] = useState<
     { id: string; order: "asc" | "desc" } | undefined
