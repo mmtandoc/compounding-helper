@@ -12,6 +12,7 @@ import {
 
 import { Button } from "components/ui"
 import { Form } from "components/ui/forms"
+import { formErrorMap } from "lib/formErrorMap"
 import { DataEntryComponent } from "types/common"
 
 type CreateFormProps<
@@ -50,7 +51,11 @@ const CreateForm = <
     resolver: schema
       ? async (values, context, options) => {
           console.log("formData", values)
-          const result = await zodResolver(schema)(values, context, options)
+          const result = await zodResolver(schema, { errorMap: formErrorMap })(
+            values,
+            context,
+            options,
+          )
           console.log("validation", result)
           return result
         }

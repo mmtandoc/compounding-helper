@@ -2,7 +2,7 @@
 
 import * as z from "zod"
 
-const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
+export const formErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (
     issue.code === z.ZodIssueCode.invalid_type &&
     ["null", "nan", "undefined"].includes(issue.received)
@@ -18,8 +18,4 @@ const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   }
 
   return { message: ctx.defaultError }
-}
-
-export const setupErrorMap = () => {
-  z.setErrorMap(customErrorMap)
 }

@@ -1,7 +1,3 @@
-import { setupErrorMap } from "./errorMap"
-
-setupErrorMap()
-
 export * from "./chemical"
 export * from "./compound"
 export * from "./linkDirectory"
