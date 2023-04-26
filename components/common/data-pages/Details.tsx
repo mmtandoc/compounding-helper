@@ -38,59 +38,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const router = useRouter()
-
   const pageRef = useContext(PageRefContext)
-
-  const printStyle = `
-    @media print {
-      html {
-        font-size: 52%;
-      }
-      button {
-        display: none;
-      }
-      textarea {
-        border: 1px solid black;
-      }
-      input[type="radio"] {
-        height: 1rem !important;
-        width: 1rem !important;
-      }
-      textarea,
-      select,
-      input {
-        font-size: 1.2rem;
-      }
-      body {
-        background-color: white !important;
-      }
-      .details fieldset,
-      .details .form-group {
-        page-break-inside: avoid;
-        display: block;
-      }
-
-      .details a {
-        color: currentColor !important;
-        text-decoration: none !important;
-        text-decoration-line: none;
-        outline: none !important;
-      }
-
-      .print-hide {
-        display: none;
-      }
-    }
-    @page {
-      margin: 1.5cm;
-      font-size: 12px;
-      print-color-adjust: exact;
-    }
-    .print-hide {
-      display: none;
-    }
-  `
-
   const doc = useDocument()
 
   //TODO: Handle error when attempting to print and pageRef is null
@@ -99,7 +47,6 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     copyStyles: true,
     documentTitle: doc?.title ?? undefined,
     bodyClass: "print-body",
-    pageStyle: printStyle,
   })
 
   const handleDelete = () => {
@@ -160,6 +107,10 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
             font-size: 52%;
           }
 
+          h1 {
+            margin: 0 0 2rem;
+          }
+
           .page {
             border: none !important;
             max-width: none !important;
@@ -190,8 +141,9 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
             display: none !important;
           }
         }
+
         @page {
-          margin: 1.5cm;
+          margin: 1.5cm 0.5cm;
           font-size: 12px;
           print-color-adjust: exact;
         }
