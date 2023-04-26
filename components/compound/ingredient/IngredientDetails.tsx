@@ -139,16 +139,20 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
             <span className="label">SDS health hazards:</span>
             {sds ? (
               <ul className="health-hazard-list">
-                {sds.healthHazards.map((h, i) => (
-                  <li key={i}>
-                    {h.hazardCategory.hazardClass.name} - Category{" "}
-                    {h.hazardCategory.level}
-                    {h.hazardCategory.shortDescription
-                      ? ` - ${h.hazardCategory.shortDescription}`
-                      : ""}
-                    {!h.additionalInfo ? "" : ` (${h.additionalInfo})`}
-                  </li>
-                ))}
+                {sds.healthHazards.length > 0 ? (
+                  sds.healthHazards.map((h, i) => (
+                    <li key={i}>
+                      {h.hazardCategory.hazardClass.name} - Category{" "}
+                      {h.hazardCategory.level}
+                      {h.hazardCategory.shortDescription
+                        ? ` - ${h.hazardCategory.shortDescription}`
+                        : ""}
+                      {!h.additionalInfo ? "" : ` (${h.additionalInfo})`}
+                    </li>
+                  ))
+                ) : (
+                  <li>No health hazards</li>
+                )}
               </ul>
             ) : (
               "N/A"
