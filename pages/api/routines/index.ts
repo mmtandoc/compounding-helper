@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import {
   PrismaOrderByWithoutRelationInput,
   parseSortQuery,
+  sendJsonError,
 } from "lib/api/utils"
 import { RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
@@ -18,18 +19,14 @@ export default async function handler(
   const { method } = req
 
   //TODO: Validate that column name is valid
-  let orderBy:
-    | PrismaOrderByWithoutRelationInput<Prisma.RoutineOrderByWithRelationInput>[]
-    | undefined
+
+  let orderBy: Prisma.RoutineOrderByWithRelationInput[] | undefined
 
   try {
     orderBy = parseSortQuery<Prisma.RoutineOrderByWithRelationInput>(req.query)
   } catch (error) {
     console.log(error)
-    res.status(400).json({
-      error: { code: 400, message: "Invalid sort parameter." },
-    })
-    return
+    return sendJsonError(res, 400, "Invalid sort parameter.")
   }
 
   switch (method) {
@@ -39,15 +36,11 @@ export default async function handler(
       try {
         routines = await getRoutines({ orderBy })
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(routines)
-      return
+      return res.status(200).json(routines)
     }
     case "POST": {
       let fields
@@ -55,10 +48,7 @@ export default async function handler(
         fields = routineSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let result: RoutineWithHistory
@@ -67,10 +57,7 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       res
@@ -80,11 +67,11 @@ export default async function handler(
       return
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

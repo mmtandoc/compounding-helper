@@ -1,23 +1,26 @@
-import { Prisma, RoutineCompletion } from "@prisma/client"
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
+import { Prisma } from "@prisma/client"
+import type { NextApiHandler } from "next"
+import { z } from "zod"
 
-import { completionSchema, routineSchema } from "lib/fields"
+import { sendJsonError, sendZodError } from "lib/api/utils"
+import { completionSchema } from "lib/fields"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 
 import { getRoutineById } from "."
 
+const querySchema = z.object({
+  id: z.string().pipe(z.coerce.number()),
+})
+
 const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
-  const { query, method } = req
+  const { method } = req
 
-  const routineId = parseInt(query.id as string)
+  const results = querySchema.safeParse(req.query)
 
-  if (isNaN(routineId)) {
-    res.status(500).json({
-      error: { code: 400, message: "Routine ID must be an integer." },
-    })
-    return
-  }
+  if (!results.success) return sendZodError(res, results.error)
+
+  const routineId = results.data.id
 
   switch (method) {
     case "PUT": {
@@ -26,10 +29,7 @@ const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
         data = completionSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       try {
@@ -37,34 +37,27 @@ const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
           ?.completionHistory[0]?.date
 
         if (lastCompleted && lastCompleted > new Date(data.date)) {
-          res.status(422).json({
-            error: {
-              code: 422,
-              message:
-                "Completion date must be after the routine was last completed.",
-            },
-          })
-          return
+          return sendJsonError(
+            res,
+            422,
+            "Completion date must be after the routine was last completed.",
+          )
         }
 
         await createRoutineCompletion({ routineId, ...data })
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(204).send(undefined)
-      return
+      return res.status(204).send(undefined)
     }
     default:
-      res
-        .setHeader("Allow", ["PUT"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["PUT"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

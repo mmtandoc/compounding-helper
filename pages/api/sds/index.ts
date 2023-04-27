@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
+import { sendJsonError } from "lib/api/utils"
 import { SdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { prisma } from "lib/prisma"
@@ -63,14 +64,10 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(safetyDatasheets)
-      return
+      return res.status(200).json(safetyDatasheets)
     }
     case "POST": {
       let fields
@@ -79,10 +76,7 @@ export default async function handler(
       } catch (error) {
         console.log(req.body)
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let result
@@ -91,21 +85,18 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       res.setHeader("Location", `/sds/${result.id}`).status(201).json(result)
       return
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

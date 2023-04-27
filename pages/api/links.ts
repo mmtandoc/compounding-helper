@@ -1,6 +1,7 @@
 import { Link, Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
+import { sendJsonError } from "lib/api/utils"
 import { linkDirectorySchema } from "lib/fields"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
@@ -18,15 +19,11 @@ export default async function handler(
       try {
         links = await getLinks()
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(links)
-      return
+      return res.status(200).json(links)
     }
     case "PUT": {
       let data
@@ -34,32 +31,25 @@ export default async function handler(
         data = linkDirectorySchema.parse(body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let result
       try {
         result = await setLinks(data.links)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(result)
-      return
+      return res.status(200).json(result)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client"
+import { NextApiResponse } from "next"
 import { ConditionalExcept, ConditionalKeys } from "type-fest"
+import { z } from "zod"
+import { fromZodError } from "zod-validation-error"
 
 export type PrismaOrderByWithRelationInput = Record<
   PropertyKey,
@@ -49,4 +52,40 @@ export const parseSortQuery = <TOrderBy extends PrismaOrderByWithRelationInput>(
         ],
     )
     .map((e) => Object.fromEntries([e])) as any
+}
+
+/**
+ * Sends a JSON error response with the specified status code, message, and details.
+ *
+ * @param {NextApiResponse} res - The Next.js HTTP response object.
+ * @param {number} statusCode - The HTTP status code to set in the response.
+ * @param {string} message - The error message to send in the response.
+ * @param {unknown} [details] - Optional details about the error to send in the response.
+ */
+export const sendJsonError = (
+  res: NextApiResponse,
+  statusCode: number,
+  message: string,
+  details?: unknown,
+) => res.status(statusCode).json({ code: statusCode, message, details })
+
+/**
+ * Sends a JSON error response with the details of a Zod validation error.
+ *
+ * @param {NextApiResponse} res - The Next.js HTTP response object.
+ * @param {z.ZodError} zodError - The Zod validation error to send in the response.
+ * @param {number} [statusCode=400] - The HTTP status code to set in the response. Defaults to 400.
+ */
+export const sendZodError = (
+  res: NextApiResponse,
+  zodError: z.ZodError,
+  statusCode = 400,
+) => {
+  const validationError = fromZodError(zodError)
+  sendJsonError(
+    res,
+    statusCode,
+    validationError.message,
+    validationError.details,
+  )
 }

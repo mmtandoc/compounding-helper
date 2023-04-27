@@ -1,7 +1,9 @@
 import { Prisma } from "@prisma/client"
 import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
+import { z } from "zod"
 
+import { sendJsonError, sendZodError } from "lib/api/utils"
 import { SdsFields, sdsSchema } from "lib/fields"
 import SdsHazardMapper from "lib/mappers/SdsHazardMapper"
 import SdsMapper from "lib/mappers/SdsMapper"
@@ -9,20 +11,22 @@ import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { SdsWithRelations, sdsWithRelations } from "types/models"
 
+const querySchema = z.object({
+  id: z.string().pipe(z.coerce.number()),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<SdsWithRelations | undefined>>,
 ) {
-  const { query, method } = req
+  const { method } = req
+  const results = querySchema.safeParse(req.query)
 
-  const id = query.id ? parseInt(query.id as string) : undefined
-
-  if (id === undefined) {
-    res.status(404).json({
-      error: { code: 404, message: "Missing required query parameter 'id'." },
-    })
-    return
+  if (!results.success) {
+    return sendZodError(res, results.error)
   }
+
+  const id = results.data.id
 
   switch (method) {
     case "GET": {
@@ -31,22 +35,15 @@ export default async function handler(
       try {
         sds = await getSdsById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       if (sds === null) {
-        res.status(500).json({
-          error: { code: 404, message: `SDS ${id} not found.` },
-        })
-        return
+        return sendJsonError(res, 404, `SDS ${id} not found.`)
       }
 
-      res.status(200).json(sds)
-      return
+      return res.status(200).json(sds)
     }
     case "PUT": {
       let fields
@@ -54,10 +51,7 @@ export default async function handler(
         fields = sdsSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let result
@@ -66,35 +60,27 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(result)
-      return
+      return res.status(200).json(result)
     }
     case "DELETE": {
       try {
         await deleteSdsById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(204).send(undefined)
-      return
+      return res.status(204).send(undefined)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "PUT", "DELETE"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

@@ -1,41 +1,48 @@
 import { Chemical, Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
+import * as z from "zod"
 
+import { sendJsonError } from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 
+const querySchema = z.object({
+  query: z.string().optional(),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<Chemical[] | Chemical>>,
 ) {
-  const { query: queryValues, method } = req
+  const { method } = req
 
-  const queryString =
-    queryValues.query === undefined
-      ? undefined
-      : typeof queryValues.query === "string"
-      ? queryValues.query
-      : queryValues.query?.[0]
+  const results = querySchema.safeParse(req.query)
+
+  if (!results.success)
+    return res.status(400).json({
+      error: {
+        code: 400,
+        message: `Invalid query: ${results.error.flatten().fieldErrors.query}`,
+      },
+    })
+
+  const query = results.data.query
 
   switch (method) {
     case "GET": {
       let chemicals
 
       try {
-        chemicals = await getChemicals(queryString)
+        chemicals = await getChemicals(query)
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(chemicals)
-      return
+      return res.status(200).json(chemicals)
     }
     case "POST": {
       let data
@@ -43,10 +50,7 @@ export default async function handler(
         data = chemicalSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let chemical
@@ -55,10 +59,7 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       res
@@ -68,11 +69,11 @@ export default async function handler(
       return
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

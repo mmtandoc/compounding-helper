@@ -1,33 +1,32 @@
 import { NextApiRequest, NextApiResponse } from "next"
+import { z } from "zod"
+import { fromZodError } from "zod-validation-error"
 
+import { sendJsonError, sendZodError } from "lib/api/utils"
 import { MfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { MfrAll, mfrAll } from "types/models"
 
+const querySchema = z.object({
+  compoundId: z.string().pipe(z.coerce.number()),
+  version: z.string().pipe(z.coerce.number()),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<MfrAll | undefined>>,
 ) {
-  const { query, method } = req
+  const { method } = req
 
-  const compoundId = parseInt(query.id as string)
-  const version = parseInt(query.version as string)
+  const results = querySchema.safeParse(req.query)
 
-  if (isNaN(compoundId)) {
-    res.status(500).json({
-      error: { code: 500, message: "Compound ID must be an integer." },
-    })
-    return
+  if (!results.success) {
+    return sendZodError(res, results.error)
   }
 
-  if (isNaN(version)) {
-    res.status(500).json({
-      error: { code: 500, message: "MFR version must be an integer." },
-    })
-    return
-  }
+  const { compoundId, version } = results.data
 
   switch (method) {
     case "GET": {
@@ -35,11 +34,8 @@ export default async function handler(
       try {
         mfr = await getMfr(compoundId, version)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       if (mfr === null) {
@@ -64,46 +60,35 @@ export default async function handler(
         data = mfrSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let updatedMfr
       try {
         updatedMfr = await updateMfr(compoundId, version, data)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(updatedMfr)
-      return
+      return res.status(200).json(updatedMfr)
     }
     case "DELETE": {
       try {
         await deleteMfr(compoundId, version)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(204).send(undefined)
-      return
+      return res.status(204).send(undefined)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "PUT", "DELETE"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

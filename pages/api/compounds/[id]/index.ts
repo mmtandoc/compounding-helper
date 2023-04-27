@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
+import { z } from "zod"
 
+import { sendJsonError, sendZodError } from "lib/api/utils"
 import { compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -8,20 +10,23 @@ import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { CompoundWithIngredients } from "types/models"
 
+const querySchema = z.object({
+  id: z.string().pipe(z.coerce.number()),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<CompoundWithIngredients> | string>,
 ) {
-  const { query, body, method } = req
+  const { body, method } = req
 
-  const id = parseInt(query.id as string)
+  const results = querySchema.safeParse(req.query)
 
-  if (isNaN(id)) {
-    res.status(500).json({
-      error: { code: 400, message: "Risk assessment ID must be integer." },
-    })
-    return
+  if (!results.success) {
+    return sendZodError(res, results.error)
   }
+
+  const id = results.data.id
 
   switch (method) {
     case "GET": {
@@ -29,22 +34,15 @@ export default async function handler(
       try {
         compound = await getCompoundById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       if (compound === null) {
-        res.status(500).json({
-          error: { code: 404, message: `Compound ${id} not found.` },
-        })
-        return
+        return sendJsonError(res, 404, `Compound ${id} not found.`)
       }
 
-      res.status(200).json(compound)
-      return
+      return res.status(200).json(compound)
     }
     case "PUT": {
       let fields
@@ -52,10 +50,7 @@ export default async function handler(
         fields = compoundSchema.parse(body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       const ingredients = fields.ingredients.map(IngredientMapper.toModel)
@@ -72,43 +67,32 @@ export default async function handler(
           ...CompoundMapper.toModel(fields),
         })
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       if (compound === null) {
-        res.status(500).json({
-          error: { code: 404, message: `Compound ${id} not found.` },
-        })
-        return
+        return sendJsonError(res, 404, `Compound ${id} not found.`)
       }
 
-      res.status(200).json(compound)
-      return
+      return res.status(200).json(compound)
     }
     case "DELETE": {
       try {
         await deleteCompoundById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).send(`Compound ${id} deleted.`)
-      return
+      return res.status(200).send(`Compound ${id} deleted.`)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "PUT", "DELETE"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

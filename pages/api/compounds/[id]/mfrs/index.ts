@@ -1,19 +1,31 @@
 import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
+import { z } from "zod"
 
+import { sendJsonError, sendZodError } from "lib/api/utils"
 import { mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { MfrAll, mfrAll as includeAllNested } from "types/models"
 
+const querySchema = z.object({
+  id: z.string().pipe(z.coerce.number()),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<MfrAll[] | MfrAll>>,
 ) {
-  const { query, method } = req
+  const { method } = req
 
-  const compoundId = parseInt(query.id as string)
+  const results = querySchema.safeParse(req.query)
+
+  if (!results.success) {
+    return sendZodError(res, results.error, 400, { prefix: "Invalid ID" })
+  }
+
+  const compoundId = results.data.id
 
   switch (method) {
     case "GET": {
@@ -22,15 +34,11 @@ export default async function handler(
       try {
         mfrs = await getMfrsByCompoundId(compoundId)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(mfrs)
-      return
+      return res.status(200).json(mfrs)
     }
     case "POST": {
       let fields
@@ -38,10 +46,7 @@ export default async function handler(
         fields = mfrSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       const latestVersion = await getLatestMfrVersion(compoundId)
@@ -65,7 +70,7 @@ export default async function handler(
           .status(201)
           .json(result)
       } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
           error: { code: 500, message: "Encountered error with database." },
         })
@@ -74,11 +79,11 @@ export default async function handler(
       return
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

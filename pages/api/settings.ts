@@ -1,6 +1,7 @@
 import { Prisma, Settings } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
+import { sendJsonError } from "lib/api/utils"
 import { settingsSchema } from "lib/fields"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
@@ -20,15 +21,11 @@ export default async function handler(
       try {
         settings = await getSettings()
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(settings)
-      return
+      return res.status(200).json(settings)
     }
     case "PUT": {
       let data
@@ -36,10 +33,7 @@ export default async function handler(
         data = settingsSchema.parse(body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 404, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let result
@@ -49,22 +43,18 @@ export default async function handler(
             ? await updateSettings(data)
             : await createSettings(data)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(result)
-      return
+      return res.status(200).json(result)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "POST"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "POST"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

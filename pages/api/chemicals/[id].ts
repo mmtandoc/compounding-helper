@@ -1,48 +1,46 @@
 import { NextApiRequest, NextApiResponse } from "next"
+import * as z from "zod"
 
+import { sendJsonError, sendZodError } from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { ChemicalAll, chemicalAll } from "types/models"
 
+const querySchema = z.object({
+  id: z.string().pipe(z.coerce.number()),
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBody<ChemicalAll | undefined>>,
 ) {
-  const { query, method } = req
+  const { method } = req
 
-  const id = parseInt(query.id as string)
+  const results = querySchema.safeParse(req.query)
 
-  if (isNaN(id)) {
-    res.status(500).json({
-      error: { code: 400, message: "Risk assessment ID must be integer." },
-    })
-    return
+  if (!results.success) {
+    return sendZodError(res, results.error)
   }
-  //TODO: Implement other User methods
+
+  const id = results.data.id
+
   switch (method) {
     case "GET": {
       let chemical
       try {
         chemical = await getChemicalById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
       if (chemical === null) {
-        res.status(500).json({
-          error: { code: 404, message: `Chemical ${id} not found.` },
-        })
-        return
+        return sendJsonError(res, 404, `Chemical ${id} not found.`)
       }
 
-      res.status(200).json(chemical)
-      return
+      return res.status(200).json(chemical)
     }
     case "PUT": {
       let data
@@ -50,48 +48,39 @@ export default async function handler(
         data = chemicalSchema.parse(req.body)
       } catch (error) {
         console.error(error)
-        res.status(400).json({
-          error: { code: 400, message: "Body is invalid." },
-        })
-        return
+        return sendJsonError(res, 400, "Body is invalid.")
       }
 
       let updatedChemical
       try {
         updatedChemical = await updateChemicalById(id, data)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(updatedChemical)
-      return
+      return res.status(200).json(updatedChemical)
     }
     case "DELETE": {
       try {
         await deleteChemicalById(id)
       } catch (error) {
-        console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        console.error(error)
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(204).send(undefined)
-      return
+      return res.status(204).send(undefined)
     }
     default:
-      res
-        .setHeader("Allow", ["GET", "PUT", "DELETE"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
+
+//test
 
 export const getChemicalById = async (id: number) =>
   await prisma.chemical.findUnique({

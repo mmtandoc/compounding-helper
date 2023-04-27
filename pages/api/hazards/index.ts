@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
 
+import { sendJsonError } from "lib/api/utils"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
@@ -18,21 +19,17 @@ export default async function handler(
       } catch (error) {
         //TODO: HANDLE ERROR
         console.log(error)
-        res.status(500).json({
-          error: { code: 500, message: "Encountered error with database." },
-        })
-        return
+        return sendJsonError(res, 500, "Encountered error with database.")
       }
 
-      res.status(200).json(hazards)
-      return
+      return res.status(200).json(hazards)
     }
     default:
-      res
-        .setHeader("Allow", ["GET"])
-        .status(405)
-        .json({ error: { code: 405, message: `Method ${method} Not Allowed` } })
-      break
+      return sendJsonError(
+        res.setHeader("Allow", ["GET"]),
+        405,
+        `Method ${method} Not Allowed`,
+      )
   }
 }
 

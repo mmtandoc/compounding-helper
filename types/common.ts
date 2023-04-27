@@ -7,6 +7,7 @@ import { Simplify } from "type-fest"
 export type JsonError = {
   code: number
   message: string
+  details?: unknown
 }
 
 export type ApiBody<T> = T | { error: Simplify<JsonError> }
