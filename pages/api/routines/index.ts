@@ -1,11 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 
-import {
-  PrismaOrderByWithoutRelationInput,
-  parseSortQuery,
-  sendJsonError,
-} from "lib/api/utils"
+import { parseSortQuery, sendJsonError } from "lib/api/utils"
 import { RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { prisma } from "lib/prisma"
