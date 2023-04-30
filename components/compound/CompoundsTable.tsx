@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { useMemo } from "react"
 
 import { Button, Table } from "components/ui"
 import { TableColumn } from "components/ui/Table"
@@ -9,6 +10,7 @@ import { getHwngShortcutString } from "./helpers"
 
 type Props = {
   data: CompoundWithMfrCount[]
+  options?: { showShortcuts?: boolean }
 }
 
 const columns: TableColumn<CompoundWithMfrCount, any>[] = [
@@ -172,7 +174,17 @@ const columns: TableColumn<CompoundWithMfrCount, any>[] = [
 
 const CompoundsTable = (props: Props) => {
   const { data } = props
-  return <Table className="compound-table" data={data} columns={columns} />
+  const { showShortcuts = false } = props.options ?? {}
+
+  const visibleColumns = useMemo(
+    () =>
+      showShortcuts ? columns : columns.filter((col) => col.id !== "shortcut"),
+    [showShortcuts],
+  )
+
+  return (
+    <Table className="compound-table" data={data} columns={visibleColumns} />
+  )
 }
 
 export default CompoundsTable
