@@ -7,14 +7,22 @@ export const middleware: NextMiddleware = (req: NextRequest) => {
     return NextResponse.next()
   }
 
-  const [validUser, validPassword] = basicAuthCredentials.split(":")
+  const validCredentials = basicAuthCredentials.split(";").map((cred) => {
+    const [username, password] = cred.split(":")
+    return { username, password }
+  })
 
   const basicAuth = req.headers.get("authorization")
 
   if (basicAuth) {
     const credentials = basicAuth.split(" ")[1]
     const [user, password] = atob(credentials).split(":")
-    if (user === validUser && password === validPassword) {
+    if (
+      validCredentials.some(
+        ({ username: validUsername, password: validPassword }) =>
+          user === validUsername && password === validPassword,
+      )
+    ) {
       return NextResponse.next()
     }
   }
