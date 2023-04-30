@@ -10,7 +10,7 @@ type HomeGridItem = {
   links: { label: string; url: string }[]
 }
 
-const homeLinks: HomeGridItem[] = [
+const mainGridItems: HomeGridItem[] = [
   {
     id: "compounds",
     header: "Compounds & MFRs",
@@ -22,17 +22,20 @@ const homeLinks: HomeGridItem[] = [
     links: [
       { label: "View all", url: "/risk-assessments" },
       {
-        label: "Create",
+        label: "Create new",
         url: "/risk-assessments/new",
       },
     ],
   },
+]
+
+const dataGridItems: HomeGridItem[] = [
   {
     id: "sds-summaries",
     header: "SDS summaries",
     links: [
       { label: "View all", url: "/sds" },
-      { label: "Create", url: "/sds/new" },
+      { label: "Create new", url: "/sds/new" },
     ],
   },
   {
@@ -40,7 +43,7 @@ const homeLinks: HomeGridItem[] = [
     header: "Products",
     links: [
       { label: "View all", url: "/products" },
-      { label: "Create", url: "/products/new" },
+      { label: "Create new", url: "/products/new" },
     ],
   },
   {
@@ -48,10 +51,11 @@ const homeLinks: HomeGridItem[] = [
     header: "Chemicals",
     links: [
       { label: "View all", url: "/chemicals" },
-      { label: "Create", url: "/chemicals/new" },
+      { label: "Create new", url: "/chemicals/new" },
     ],
   },
 ]
+
 /* {
   header: "Misc.",
   links: [
@@ -71,9 +75,88 @@ const HomeCell = ({ item }: { item: HomeGridItem }) => (
         </Link>
       ))}
     </div>
-    <style jsx>{`
+    <style jsx global>{`
       .home-cell {
-        grid-area: ${item.id};
+        flex: 1;
+        border: var(--border-default);
+        display: flex;
+        flex-direction: column;
+        > .header {
+          margin-block: 0;
+          font-size: var(--font-size-lg);
+          font-weight: 600;
+          background: var(--color-canvas-subtle);
+          border-bottom: var(--border-default);
+          text-align: center;
+          padding: 0.3rem 3rem;
+          white-space: nowrap;
+        }
+
+        > .links {
+          display: flex;
+          height: 100%;
+          > * {
+            flex: 1;
+            font-size: var(--font-size-base);
+            text-align: center;
+            padding: 0.3rem 0.6rem;
+          }
+
+          > :not(:last-child) {
+            border-right: var(--border-default);
+          }
+        }
+      }
+
+      @media (min-width: 850px) {
+        .home-cell {
+          > .header {
+            font-size: var(--font-size-lg);
+            white-space: nowrap;
+          }
+
+          > .links > * {
+            font-size: var(--font-size-base);
+            padding: 1.5rem 1rem;
+          }
+        }
+      }
+
+      @media (min-width: 1000px) {
+        .home-cell {
+          > .header {
+            font-size: var(--font-size-xl);
+          }
+
+          > .links > * {
+            font-size: var(--font-size-lg);
+            padding: 1.5rem 1rem;
+          }
+        }
+      }
+    `}</style>
+  </div>
+)
+
+const HomeSection = (props: { className?: string; items: HomeGridItem[] }) => (
+  <div className={`home-grid ${props.className ?? ""}`}>
+    {props.items.map((item, i) => (
+      <HomeCell key={i} item={item} />
+    ))}
+    <style jsx global>{`
+      .home-grid {
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-inline: auto;
+      }
+
+      @media (min-width: 500) {
+        .home-grid {
+          flex-direction: column;
+        }
       }
     `}</style>
   </div>
@@ -81,95 +164,40 @@ const HomeCell = ({ item }: { item: HomeGridItem }) => (
 
 const Home: NextPageWithLayout = () => {
   return (
-    <>
-      <div className="home-grid">
-        {homeLinks.map((item, i) => (
-          <HomeCell key={i} item={item} />
-        ))}
-      </div>
+    <div className="home-page">
+      <HomeSection className="main-section" items={mainGridItems} />
+      <details className="data-collapsible">
+        <summary>Data Management</summary>
+        <HomeSection className="data-section" items={dataGridItems} />
+      </details>
+
       <style jsx global>{`
-        .home-grid {
-          margin-top: 5rem;
-          padding: 0.5rem;
-          display: grid;
-          grid-template-columns: 1fr;
-          grid-template-areas:
-            "compounds"
-            "risk-assessments"
-            "sds-summaries"
-            "products"
-            "chemicals";
-          gap: 1rem;
-          margin-inline: auto;
-
-          > div {
-            border: var(--border-default);
-            display: flex;
-            flex-direction: column;
-            > .header {
-              margin-block: 0;
-              font-size: var(--font-size-lg);
-              font-weight: 600;
-              background: var(--color-canvas-subtle);
-              border-bottom: var(--border-default);
-              text-align: center;
-              padding: 0.3rem 3rem;
-            }
-
-            > .links {
-              display: flex;
-              height: 100%;
-              > * {
-                flex: 1;
-                font-size: var(--font-size-base);
-                text-align: center;
-                padding: 0.3rem 0.6rem;
-              }
-
-              > :not(:last-child) {
-                border-right: var(--border-default);
-              }
-            }
+        .data-collapsible {
+          margin-top: 1rem;
+          border: var(--border-default);
+          padding: 0.5rem 1rem;
+          > summary {
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+            cursor: pointer;
+            //width: fit-content;
+            user-select: none;
           }
         }
 
         @media (min-width: 850px) {
-          .home-grid {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            grid-template-areas:
-              "compounds risk-assessments sds-summaries"
-              ". . products"
-              ". . chemicals";
-
-            width: fit-content;
-
-            > div {
-              > .header {
-                font-size: var(--font-size-lg);
-                white-space: nowrap;
-              }
-
-              > .links > * {
-                font-size: var(--font-size-base);
-              }
-            }
+          .data-collapsible > summary {
+            font-size: var(--font-size-xl);
           }
         }
 
         @media (min-width: 1000px) {
-          .home-grid > div {
-            > .header {
-              font-size: var(--font-size-xl);
-            }
-
-            > .links > * {
-              font-size: var(--font-size-lg);
-            }
+          .data-collapsible > summary {
+            font-size: var(--font-size-xl);
           }
         }
       `}</style>
-    </>
+    </div>
   )
 }
 
