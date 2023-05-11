@@ -10,10 +10,10 @@ import { Simplify } from "type-fest"
 
 import { IconButton } from "components/ui"
 import { Input, LabelFormGroup } from "components/ui/forms"
-import { NullPartialLinkDirectoryFields } from "lib/fields"
+import { NullableLinkDirectoryFields } from "lib/fields"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialLinkDirectoryFields>
+  formMethods: UseFormReturn<NullableLinkDirectoryFields>
 }
 
 const LinkDirectoryEntry = (props: Props) => {
@@ -82,8 +82,8 @@ const LinkDirectoryEntry = (props: Props) => {
 }
 
 type LinkInputProps = Simplify<{
-  formMethods: UseFormReturn<NullPartialLinkDirectoryFields>
-  arrayMethods: UseFieldArrayReturn<NullPartialLinkDirectoryFields, "links">
+  formMethods: UseFormReturn<NullableLinkDirectoryFields>
+  arrayMethods: UseFieldArrayReturn<NullableLinkDirectoryFields, "links">
   index: number
 }>
 

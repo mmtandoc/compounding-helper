@@ -1,6 +1,6 @@
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { NullableDeep } from "types/util"
 
 //======== Link schema =======
 
@@ -19,7 +19,7 @@ export const linkSchema = z.object({
 export type LinkFields = z.output<typeof linkSchema>
 export type LinkFieldsInput = z.input<typeof linkSchema>
 
-export type NullPartialLinkFields = NullPartialDeep<
+export type NullableLinkFields = NullableDeep<
   LinkFieldsInput,
   { ignoreKeys: "id" }
 >
@@ -28,4 +28,4 @@ export const linkDirectorySchema = z.object({ links: linkSchema.array() })
 export type LinkDirectoryFields = z.output<typeof linkDirectorySchema>
 export type LinkDirectoryFieldsInput = z.input<typeof linkDirectorySchema>
 
-export type NullPartialLinkDirectoryFields = { links: NullPartialLinkFields[] }
+export type NullableLinkDirectoryFields = { links: NullableLinkFields[] }

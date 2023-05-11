@@ -3,14 +3,14 @@ import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form"
 import { Spinner, Table } from "components/ui"
 import { FormGroup, Input, RhfSelect } from "components/ui/forms"
 import { TableColumn } from "components/ui/Table"
-import { NullPartialMfrFields } from "lib/fields"
+import { NullableMfrFields } from "lib/fields"
 import { CompoundWithIngredients, IngredientAll } from "types/models"
 
 type FormulaEntryTableProps = {
   isLoading?: boolean
-  formMethods: UseFormReturn<NullPartialMfrFields>
+  formMethods: UseFormReturn<NullableMfrFields>
   compound?: CompoundWithIngredients
-  fields: UseFieldArrayReturn<NullPartialMfrFields, "quantities">["fields"]
+  fields: UseFieldArrayReturn<NullableMfrFields, "quantities">["fields"]
 }
 export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
   const {

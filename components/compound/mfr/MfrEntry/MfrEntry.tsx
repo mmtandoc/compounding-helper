@@ -14,7 +14,7 @@ import {
   RhfSelect,
   TextArea,
 } from "components/ui/forms"
-import { NullPartialMfrFields, NullPartialSettingsFields } from "lib/fields"
+import { NullableMfrFields, NullableSettingsFields } from "lib/fields"
 import { CompoundWithIngredients } from "types/models"
 
 import { FormulaEntryTable } from "./FormulaEntryTable"
@@ -23,7 +23,7 @@ import { QualityControlEntryTable } from "./QualityControlEntryTable"
 import RiskAssessmentSelect from "./RiskAssessmentSelect"
 
 interface MfrEntryProps {
-  formMethods: UseFormReturn<NullPartialMfrFields>
+  formMethods: UseFormReturn<NullableMfrFields>
 }
 
 const MfrEntry = (props: MfrEntryProps) => {
@@ -43,7 +43,7 @@ const MfrEntry = (props: MfrEntryProps) => {
   })
 
   const { data: settings, error: settingsError } =
-    useSWR<NullPartialSettingsFields>("/api/settings")
+    useSWR<NullableSettingsFields>("/api/settings")
 
   const { data: compound, error: compoundError } =
     useSWR<CompoundWithIngredients>(`/api/compounds/${compoundId}`)

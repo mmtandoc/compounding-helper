@@ -15,19 +15,19 @@ import {
   Input,
   RhfBooleanRadioGroup,
 } from "components/ui/forms"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { NullableRiskAssessmentFields } from "lib/fields"
 import { SdsWithRelations } from "types/models"
 
 type ExposureRisksInputsProps = {
-  name: Path<NullPartialRiskAssessmentFields>
+  name: Path<NullableRiskAssessmentFields>
   category: string
   sdsIds?: number[]
-  register: UseFormRegister<NullPartialRiskAssessmentFields>
-  control?: Control<NullPartialRiskAssessmentFields>
+  register: UseFormRegister<NullableRiskAssessmentFields>
+  control?: Control<NullableRiskAssessmentFields>
 }
 
 const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
-  const formMethods = useFormContext<NullPartialRiskAssessmentFields>()
+  const formMethods = useFormContext<NullableRiskAssessmentFields>()
   const {
     name,
     category,
@@ -36,7 +36,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
     control = formMethods.control,
   } = props
   const isOtherRisk = useWatch({
-    name: `${name}.other` as Path<NullPartialRiskAssessmentFields>,
+    name: `${name}.other` as Path<NullableRiskAssessmentFields>,
     control: control,
   })
 
@@ -75,7 +75,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
         <div>
           <ExposureRiskRow
             riskName="Skin"
-            name={`${name}.skin` as Path<NullPartialRiskAssessmentFields>}
+            name={`${name}.skin` as Path<NullableRiskAssessmentFields>}
             control={control}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Dermal",
@@ -84,7 +84,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           />
           <ExposureRiskRow
             riskName="Eye"
-            name={`${name}.eye` as Path<NullPartialRiskAssessmentFields>}
+            name={`${name}.eye` as Path<NullableRiskAssessmentFields>}
             control={control}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Serious eye damage/eye irritation",
@@ -92,7 +92,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           />
           <ExposureRiskRow
             riskName="Inhalation"
-            name={`${name}.inhalation` as Path<NullPartialRiskAssessmentFields>}
+            name={`${name}.inhalation` as Path<NullableRiskAssessmentFields>}
             control={control}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Inhalation",
@@ -101,7 +101,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           />
           <ExposureRiskRow
             riskName="Oral"
-            name={`${name}.oral` as Path<NullPartialRiskAssessmentFields>}
+            name={`${name}.oral` as Path<NullableRiskAssessmentFields>}
             control={control}
             /* relatedHazardMap={getHazardCategoriesByClasses(
               "Acute toxicity - Oral",
@@ -153,7 +153,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
         <FormGroup>
           <label>Other:</label>
           <RhfBooleanRadioGroup
-            name={`${name}.other` as Path<NullPartialRiskAssessmentFields>}
+            name={`${name}.other` as Path<NullableRiskAssessmentFields>}
             control={control}
             rules={{ deps: `${name}.otherDescription` }}
           />
@@ -165,7 +165,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           <Input
             type="text"
             {...register(
-              `${name}.otherDescription` as Path<NullPartialRiskAssessmentFields>,
+              `${name}.otherDescription` as Path<NullableRiskAssessmentFields>,
               { disabled: isOtherRisk !== true },
             )}
             style={{ width: "100%" }}
@@ -178,8 +178,8 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
 
 type ExposureRiskRowProps = {
   riskName: string
-  name: Path<NullPartialRiskAssessmentFields>
-  control: Control<NullPartialRiskAssessmentFields>
+  name: Path<NullableRiskAssessmentFields>
+  control: Control<NullableRiskAssessmentFields>
   deps?: string | string[]
   relatedHazardMap?: Map<string, SdsWithRelations["healthHazards"]>
 }

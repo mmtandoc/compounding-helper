@@ -2,10 +2,10 @@ import { GetStaticProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import CompoundEntry from "components/compound/CompoundEntry"
-import { NullPartialCompoundFields, riskAssessmentSchema } from "lib/fields"
+import { NullableCompoundFields, riskAssessmentSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialCompoundFields = {
+const defaultValues: NullableCompoundFields = {
   name: null,
   ingredients: [
     {
@@ -28,7 +28,7 @@ const defaultValues: NullPartialCompoundFields = {
 const NewCompound: NextPageWithLayout = () => {
   return (
     <CreateForm
-      defaultValues={defaultValues as NullPartialCompoundFields}
+      defaultValues={defaultValues as NullableCompoundFields}
       schema={riskAssessmentSchema}
       entryComponent={CompoundEntry}
       apiEndpointPath="/api/compounds"

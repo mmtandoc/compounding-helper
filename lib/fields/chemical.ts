@@ -1,7 +1,7 @@
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { NullableDeep } from "types/util"
 
 import { isoDateZodString } from "./utils"
 
@@ -58,6 +58,6 @@ export const chemicalSchema = z.object({
 export type ChemicalFields = z.output<typeof chemicalSchema>
 export type ChemicalFieldsInput = z.input<typeof chemicalSchema>
 
-export type NullPartialChemicalFields = Simplify<
-  Merge<NullPartialDeep<ChemicalFieldsInput>, Pick<ChemicalFieldsInput, "id">>
+export type NullableChemicalFields = Simplify<
+  Merge<NullableDeep<ChemicalFieldsInput>, Pick<ChemicalFieldsInput, "id">>
 >

@@ -2,10 +2,10 @@ import { GetStaticProps } from "next"
 
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
-import { NullPartialChemicalFields, chemicalSchema } from "lib/fields"
+import { NullableChemicalFields, chemicalSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialChemicalFields = {
+const defaultValues: NullableChemicalFields = {
   name: null,
   casNumber: null,
   hasNoCasNumber: null,

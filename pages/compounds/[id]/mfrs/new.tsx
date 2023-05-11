@@ -2,11 +2,11 @@ import { GetServerSideProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
-import { NullPartialMfrFields, mfrSchema } from "lib/fields"
+import { NullableMfrFields, mfrSchema } from "lib/fields"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialMfrFields = {
+const defaultValues: NullableMfrFields = {
   compoundId: NaN,
   version: undefined,
   pharmaceuticalForm: null,
@@ -37,7 +37,7 @@ const NewMfr: NextPageWithLayout<NewMfrProps> = (props) => {
   const { compoundId } = props
   return (
     <CreateForm
-      defaultValues={{ ...defaultValues, compoundId } as NullPartialMfrFields}
+      defaultValues={{ ...defaultValues, compoundId } as NullableMfrFields}
       schema={mfrSchema}
       entryComponent={MfrEntry}
       apiEndpointPath={`/api/compounds/${compoundId}/mfrs`}

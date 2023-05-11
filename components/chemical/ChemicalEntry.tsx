@@ -9,15 +9,15 @@ import {
   RhfRadioGroup,
   TextArea,
 } from "components/ui/forms"
-import { NullPartialChemicalFields } from "lib/fields"
+import { NullableChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialChemicalFields>
+  formMethods: UseFormReturn<NullableChemicalFields>
 }
 
-const ChemicalEntry: DataEntryComponent<NullPartialChemicalFields, Props> = (
+const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   props: Props,
 ) => {
   const { formMethods } = props

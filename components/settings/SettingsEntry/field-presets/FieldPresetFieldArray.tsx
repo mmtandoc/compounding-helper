@@ -10,7 +10,7 @@ import {
 
 import { Button } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
-import { NullPartialFieldPresetFields } from "lib/fields"
+import { NullableFieldPresetFields } from "lib/fields"
 import { GetElementType } from "types/util"
 
 import FieldArrayActions from "../FieldArrayActions"
@@ -22,7 +22,7 @@ type GetPresetFieldValue<
   TFieldArrayPath extends FieldArrayPath<TFieldValues>,
 > = GetElementType<
   Exclude<FieldArrayPathValue<TFieldValues, TFieldArrayPath>, null>
-> extends NullPartialFieldPresetFields<infer O>
+> extends NullableFieldPresetFields<infer O>
   ? O
   : never
 
@@ -31,12 +31,9 @@ type FieldPresetFieldArrayProps<
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<unknown>[] | null
+      NullableFieldPresetFields<unknown>[] | null
     > = FieldArrayPath<TFieldValues> &
-    FieldPathByValue<
-      TFieldValues,
-      NullPartialFieldPresetFields<unknown>[] | null
-    >,
+    FieldPathByValue<TFieldValues, NullableFieldPresetFields<unknown>[] | null>,
 > = {
   label: string
   name: TFieldArrayName
@@ -51,12 +48,9 @@ const FieldPresetFieldArray = <
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<unknown>[] | null
+      NullableFieldPresetFields<unknown>[] | null
     > = FieldArrayPath<TFieldValues> &
-    FieldPathByValue<
-      TFieldValues,
-      NullPartialFieldPresetFields<unknown>[] | null
-    >,
+    FieldPathByValue<TFieldValues, NullableFieldPresetFields<unknown>[] | null>,
 >(
   props: FieldPresetFieldArrayProps<TFieldValues, TFieldArrayName>,
 ) => {

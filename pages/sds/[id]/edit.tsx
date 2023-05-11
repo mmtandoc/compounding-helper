@@ -3,14 +3,14 @@ import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import SdsEntry from "components/sds/SdsEntry"
-import { NullPartialSdsFields, sdsSchema } from "lib/fields"
+import { NullableSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 
 type EditSdsPageProps = {
-  values: NullPartialSdsFields
+  values: NullableSdsFields
 }
 
 const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
@@ -24,7 +24,7 @@ const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
   return (
     <EditForm
       schema={sdsSchema}
-      values={values as NullPartialSdsFields}
+      values={values as NullableSdsFields}
       apiEndpointPath={`/api/sds/${id}`}
       urlPath={`/sds/${id}`}
       entryComponent={SdsEntry}

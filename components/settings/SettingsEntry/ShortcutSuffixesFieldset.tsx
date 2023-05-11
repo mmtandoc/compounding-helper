@@ -3,12 +3,12 @@ import { UseFormReturn, useFieldArray } from "react-hook-form"
 
 import { Button } from "components/ui"
 import { Fieldset, FormGroup, Input } from "components/ui/forms"
-import { NullPartialSettingsFields } from "lib/fields"
+import { NullableSettingsFields } from "lib/fields"
 
 import FieldArrayActions from "./FieldArrayActions"
 
 type ShortcutSuffixesFieldsetProps = {
-  formMethods: UseFormReturn<NullPartialSettingsFields>
+  formMethods: UseFormReturn<NullableSettingsFields>
 }
 const ShortcutSuffixesFieldset = (props: ShortcutSuffixesFieldsetProps) => {
   const {

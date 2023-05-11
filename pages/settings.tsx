@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next"
 import EditForm from "components/common/data-pages/EditForm"
 import SettingsEntry from "components/settings/SettingsEntry"
 import {
-  NullPartialSettingsFields,
+  NullableSettingsFields,
   SettingsFields,
   settingsSchema,
 } from "lib/fields"
@@ -16,7 +16,7 @@ const Settings: NextPageWithLayout<Props> = (props) => {
   const { values } = props
   return (
     <EditForm
-      values={values as NullPartialSettingsFields}
+      values={values as NullableSettingsFields}
       schema={settingsSchema}
       apiEndpointPath={`/api/settings`}
       urlPath={`/settings`}

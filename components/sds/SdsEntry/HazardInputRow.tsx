@@ -8,17 +8,17 @@ import useSWR from "swr"
 
 import { Button } from "components/ui"
 import { Input, RhfSelect } from "components/ui/forms"
-import { NullPartialSdsFields } from "lib/fields"
+import { NullableSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
 
 interface HazardInputRowProps {
   id?: string
   error?: FieldError
-  field: FieldArrayWithId<NullPartialSdsFields>
+  field: FieldArrayWithId<NullableSdsFields>
   index: number
-  formMethods: UseFormReturn<NullPartialSdsFields>
-  arrayMethods: UseFieldArrayReturn<NullPartialSdsFields>
+  formMethods: UseFormReturn<NullableSdsFields>
+  arrayMethods: UseFieldArrayReturn<NullableSdsFields>
 }
 
 const HazardInputRow = ({

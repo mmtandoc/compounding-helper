@@ -6,7 +6,7 @@ import {
   RhfBooleanRadioGroup,
   TextArea,
 } from "components/ui/forms"
-import { NullPartialRoutineFields } from "lib/fields"
+import { NullableRoutineFields } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
 import { DataEntryComponent } from "types/common"
 
@@ -14,11 +14,11 @@ import { useRoutineCategories } from "./hooks"
 import RecurrenceEntry from "./RecurrenceEntry"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialRoutineFields>
+  formMethods: UseFormReturn<NullableRoutineFields>
   type: "full" | "partial"
 }
 
-const RoutineEntry: DataEntryComponent<NullPartialRoutineFields, Props> = (
+const RoutineEntry: DataEntryComponent<NullableRoutineFields, Props> = (
   props: Props,
 ) => {
   const { formMethods, type = "full" } = props

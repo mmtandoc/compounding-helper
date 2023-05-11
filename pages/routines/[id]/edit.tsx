@@ -3,11 +3,7 @@ import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RoutineEntry from "components/routine/RoutineEntry"
-import {
-  NullPartialRoutineFields,
-  RoutineFields,
-  routineSchema,
-} from "lib/fields"
+import { NullableRoutineFields, RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -28,7 +24,7 @@ const EditRoutine: NextPageWithLayout<EditRoutineProps> = (
   return (
     <EditForm
       schema={routineSchema}
-      values={values as NullPartialRoutineFields}
+      values={values as NullableRoutineFields}
       apiEndpointPath={`/api/routines/${id}`}
       urlPath={`/routines/${id}`}
       entryComponent={(props) => <RoutineEntry {...props} type="full" />}

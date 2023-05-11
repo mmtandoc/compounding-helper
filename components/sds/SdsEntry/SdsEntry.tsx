@@ -9,17 +9,17 @@ import {
   RhfBooleanRadioGroup,
   RhfSelect,
 } from "components/ui/forms"
-import { NullPartialHazardFields, NullPartialSdsFields } from "lib/fields"
+import { NullableHazardFields, NullableSdsFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { ProductWithVendor } from "types/models"
 
 import HazardInputRow from "./HazardInputRow"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialSdsFields>
+  formMethods: UseFormReturn<NullableSdsFields>
 }
 
-const emptyHazardValues: NullPartialHazardFields | null = {
+const emptyHazardValues: NullableHazardFields | null = {
   categoryId: null,
   classId: null,
   additionalInfo: null,
@@ -122,7 +122,7 @@ const SdsEntry = (props: Props) => {
             size="small"
             onClick={() => {
               hazardsArrayMethods.append(
-                emptyHazardValues as NullPartialHazardFields,
+                emptyHazardValues as NullableHazardFields,
               )
             }}
           >

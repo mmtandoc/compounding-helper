@@ -2,11 +2,7 @@ import { GetServerSideProps } from "next"
 
 import EditForm from "components/common/data-pages/EditForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
-import {
-  MfrFieldsWithVersion,
-  NullPartialMfrFields,
-  mfrSchema,
-} from "lib/fields"
+import { MfrFieldsWithVersion, NullableMfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
@@ -24,7 +20,7 @@ const EditMfr: NextPageWithLayout<EditMfrProps> = (props: EditMfrProps) => {
   return (
     <EditForm
       schema={mfrSchema}
-      values={values as NullPartialMfrFields}
+      values={values as NullableMfrFields}
       apiEndpointPath={`/api/compounds/${compoundId}/mfrs/${version}`}
       urlPath={`/compounds/${compoundId}/mfrs/${version}`}
       entryComponent={MfrEntry}

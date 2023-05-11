@@ -13,21 +13,21 @@ import {
 import useSWR from "swr"
 
 import { DotJotList } from "components/ui/forms"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { NullableRiskAssessmentFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { SdsWithRelations } from "types/models"
 
 interface RationaleListProps
-  extends Omit<UseControllerProps<NullPartialRiskAssessmentFields>, "name"> {
+  extends Omit<UseControllerProps<NullableRiskAssessmentFields>, "name"> {
   id?: string
   error?: FieldError
   readOnly?: boolean
   disabled?: boolean
   className?: string
 
-  register: UseFormRegister<NullPartialRiskAssessmentFields>
-  setValue: UseFormSetValue<NullPartialRiskAssessmentFields>
-  getValues: UseFormGetValues<NullPartialRiskAssessmentFields>
+  register: UseFormRegister<NullableRiskAssessmentFields>
+  setValue: UseFormSetValue<NullableRiskAssessmentFields>
+  getValues: UseFormGetValues<NullableRiskAssessmentFields>
 }
 
 const RationaleList = ({
@@ -36,10 +36,10 @@ const RationaleList = ({
   setValue,
   getValues,
 }: RationaleListProps) => {
-  const allValues = useWatch<NullPartialRiskAssessmentFields>({
+  const allValues = useWatch<NullableRiskAssessmentFields>({
     control,
     defaultValue:
-      control?._defaultValues as DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
+      control?._defaultValues as DeepPartialSkipArrayKey<NullableRiskAssessmentFields>,
   })
   const ingredients = allValues.compound?.ingredients
 
@@ -137,7 +137,7 @@ const RationaleList = ({
 }
 
 const autoRationalesFunctions: ((
-  values: DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
+  values: DeepPartialSkipArrayKey<NullableRiskAssessmentFields>,
   sdses: SdsWithRelations[],
 ) => string | null)[] = [
   (values, sdses) => {
@@ -248,7 +248,7 @@ const autoRationalesFunctions: ((
 ]
 
 const determineAutoRationale = (
-  fields: DeepPartialSkipArrayKey<NullPartialRiskAssessmentFields>,
+  fields: DeepPartialSkipArrayKey<NullableRiskAssessmentFields>,
   safetyDatasheets: SdsWithRelations[],
   hidden: number[] = [],
 ) => {

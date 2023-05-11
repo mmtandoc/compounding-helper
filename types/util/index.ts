@@ -1,4 +1,4 @@
 export type { GetElementType } from "./GetElementType"
-export type { NullPartialDeep } from "./NullPartialDeep"
-export type { NullPartial } from "./NullPartial"
+export type { NullableDeep } from "./NullableDeep"
+export type { Nullable } from "./Nullable"
 export type { Overwrite } from "./Overwrite"

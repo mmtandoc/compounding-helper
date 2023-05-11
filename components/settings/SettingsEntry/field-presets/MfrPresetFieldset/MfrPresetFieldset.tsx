@@ -1,7 +1,7 @@
 import { UseFormReturn } from "react-hook-form"
 
 import { Fieldset } from "components/ui/forms"
-import { NullPartialSettingsFields } from "lib/fields"
+import { NullableSettingsFields } from "lib/fields"
 
 import FieldPresetFieldArray from "../FieldPresetFieldArray"
 import PresetValueInput from "../PresetValueInput"
@@ -9,7 +9,7 @@ import PresetValueTextArea from "../PresetValueTextArea"
 import PresetValueQcInput from "./PresetValueQcInput"
 
 type MfrPresetFieldsetProps = {
-  formMethods: UseFormReturn<NullPartialSettingsFields>
+  formMethods: UseFormReturn<NullableSettingsFields>
 }
 
 const MfrPresetFieldset = (props: MfrPresetFieldsetProps) => (

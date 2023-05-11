@@ -15,7 +15,7 @@ import { MdClose } from "react-icons/md"
 
 import { IconButton } from "components/ui"
 import { FormGroup, Input } from "components/ui/forms"
-import { NullPartialFieldPresetFields } from "lib/fields"
+import { NullableFieldPresetFields } from "lib/fields"
 
 type FieldMultiPresetInputProps<
   TValue = unknown,
@@ -23,12 +23,9 @@ type FieldMultiPresetInputProps<
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullableFieldPresetFields<TValue>[] | null
     > = FieldArrayPath<TFieldValues> &
-    FieldPathByValue<
-      TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
-    >,
+    FieldPathByValue<TFieldValues, NullableFieldPresetFields<TValue>[] | null>,
 > = {
   name: `${TFieldArrayName}.${number}`
   formMethods: UseFormReturn<TFieldValues>
@@ -42,12 +39,9 @@ const FieldMultiPresetInput = <
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullableFieldPresetFields<TValue>[] | null
     > = FieldArrayPath<TFieldValues> &
-    FieldPathByValue<
-      TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
-    >,
+    FieldPathByValue<TFieldValues, NullableFieldPresetFields<TValue>[] | null>,
 >(
   props: FieldMultiPresetInputProps<TValue, TFieldValues, TFieldArrayName>,
 ) => {

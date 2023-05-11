@@ -3,7 +3,7 @@ import React from "react"
 import { Control } from "react-hook-form"
 
 import { RhfSelect } from "components/ui/forms"
-import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { NullableRiskAssessmentFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 
@@ -15,7 +15,7 @@ type SdsSelectProps = {
   ingredientIndex: number
   disabled?: boolean
   required?: boolean
-  control?: Control<NullPartialRiskAssessmentFields>
+  control?: Control<NullableRiskAssessmentFields>
 }
 
 const SdsSelect = ({

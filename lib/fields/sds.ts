@@ -1,7 +1,7 @@
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { NullableDeep } from "types/util"
 
 import { isoDateZodString, transformStringToNumber } from "./utils"
 
@@ -18,9 +18,7 @@ export const hazardSchema = z.object({
 export type HazardFields = Simplify<z.output<typeof hazardSchema>>
 export type HazardFieldsInput = Simplify<z.input<typeof hazardSchema>>
 
-export type NullPartialHazardFields = Simplify<
-  NullPartialDeep<HazardFieldsInput>
->
+export type NullableHazardFields = Simplify<NullableDeep<HazardFieldsInput>>
 
 export const sdsSchema = z.object({
   id: z.number().int().optional(),
@@ -43,6 +41,6 @@ export const sdsSchema = z.object({
 export type SdsFields = z.output<typeof sdsSchema>
 export type SdsFieldsInput = z.input<typeof sdsSchema>
 
-export type NullPartialSdsFields = Simplify<
-  Merge<NullPartialDeep<SdsFieldsInput>, Pick<SdsFieldsInput, "id">>
+export type NullableSdsFields = Simplify<
+  Merge<NullableDeep<SdsFieldsInput>, Pick<SdsFieldsInput, "id">>
 >

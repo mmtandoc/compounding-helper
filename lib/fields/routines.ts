@@ -2,7 +2,7 @@ import { Frequency, Weekday, rrulestr } from "rrule"
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartial, NullPartialDeep } from "types/util"
+import { Nullable, NullableDeep } from "types/util"
 
 import { isoDateZodString } from "./utils"
 
@@ -65,9 +65,9 @@ export const recurrenceRuleSchema = z.object({
 export type RecurrenceRuleFields = z.output<typeof recurrenceRuleSchema>
 export type RecurrenceRuleFieldsInput = z.input<typeof recurrenceRuleSchema>
 
-export type NullPartialRecurrenceRuleFields = Merge<
-  NullPartialDeep<RecurrenceRuleFields, { ignoreKeys: "byWeekday" }>,
-  NullPartial<Pick<RecurrenceRuleFields, "byWeekday">>
+export type NullableRecurrenceRuleFields = Merge<
+  NullableDeep<RecurrenceRuleFields, { ignoreKeys: "byWeekday" }>,
+  Nullable<Pick<RecurrenceRuleFields, "byWeekday">>
 >
 
 //==== Routine schema =====
@@ -80,7 +80,7 @@ export const completionSchema = z.object({
 export type CompletionFields = z.output<typeof completionSchema>
 export type CompletionFieldsInput = z.input<typeof completionSchema>
 
-export type NullPartialCompletionFields = NullPartialDeep<CompletionFieldsInput>
+export type NullableCompletionFields = NullableDeep<CompletionFieldsInput>
 
 export const routineSchema = z.object({
   id: z.number().int().optional(),
@@ -105,10 +105,10 @@ export const routineSchema = z.object({
 export type RoutineFields = z.output<typeof routineSchema>
 export type RoutineFieldsInput = z.input<typeof routineSchema>
 
-export type NullPartialRoutineFields = Simplify<
+export type NullableRoutineFields = Simplify<
   Merge<
-    Merge<NullPartialDeep<RoutineFieldsInput>, Pick<RoutineFieldsInput, "id">>,
-    { recurrenceRule: NullPartialRecurrenceRuleFields }
+    Merge<NullableDeep<RoutineFieldsInput>, Pick<RoutineFieldsInput, "id">>,
+    { recurrenceRule: NullableRecurrenceRuleFields }
   >
 >
 
@@ -121,7 +121,7 @@ export type NullPartialRoutineFields = Simplify<
 export type TaskFields = z.output<typeof taskSchema>
 export type TaskFieldsInput = z.input<typeof taskSchema>
 
-export type NullPartialTaskFields = Simplify<
-  Merge<NullPartialDeep<RoutineFieldsInput>, Pick<RoutineFieldsInput, "id">>
+export type NullableTaskFields = Simplify<
+  Merge<NullableDeep<RoutineFieldsInput>, Pick<RoutineFieldsInput, "id">>
 >
  */

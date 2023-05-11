@@ -4,10 +4,10 @@ import { MdClose } from "react-icons/md"
 
 import { IconButton } from "components/ui"
 import { Input } from "components/ui/forms"
-import { NullPartialMfrFields } from "lib/fields"
+import { NullableMfrFields } from "lib/fields"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialMfrFields>
+  formMethods: UseFormReturn<NullableMfrFields>
 }
 export const QualityControlEntryTable = (props: Props) => {
   const {

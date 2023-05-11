@@ -2,10 +2,10 @@ import { GetStaticProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import ProductEntry from "components/product/ProductEntry"
-import { NullPartialProductFields, productSchema } from "lib/fields"
+import { NullableProductFields, productSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialProductFields = {
+const defaultValues: NullableProductFields = {
   name: null,
   vendorId: null,
   chemicalId: null,

@@ -2,10 +2,10 @@ import { GetStaticProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import SdsEntry from "components/sds/SdsEntry"
-import { NullPartialSdsFields, sdsSchema } from "lib/fields"
+import { NullableSdsFields, sdsSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialSdsFields = {
+const defaultValues: NullableSdsFields = {
   chemicalId: null,
   productId: null,
   hmisHazardLevel: null,

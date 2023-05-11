@@ -2,7 +2,7 @@ import { Storage, TimeUnit, Unit } from "@prisma/client"
 import { Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { NullableDeep } from "types/util"
 
 import { isoDateZodString } from "./utils"
 
@@ -68,6 +68,6 @@ export type MfrFieldsWithVersion = Simplify<
 
 export type MfrFieldsInput = Simplify<z.input<typeof mfrSchema>>
 
-export type NullPartialMfrFields = Simplify<
-  NullPartialDeep<MfrFieldsInput, { ignoreKeys: "compoundId" | "version" }>
+export type NullableMfrFields = Simplify<
+  NullableDeep<MfrFieldsInput, { ignoreKeys: "compoundId" | "version" }>
 >

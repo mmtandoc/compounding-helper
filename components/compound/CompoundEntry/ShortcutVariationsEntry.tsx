@@ -6,7 +6,7 @@ import { MdClose } from "react-icons/md"
 
 import { IconButton } from "components/ui"
 import { Fieldset, Input } from "components/ui/forms"
-import { NullPartialCompoundFields } from "lib/fields"
+import { NullableCompoundFields } from "lib/fields"
 
 const emptyVariationValues = {
   code: null,
@@ -14,7 +14,7 @@ const emptyVariationValues = {
 }
 
 const ShortcutVariationsEntry = (props: {
-  formMethods: UseFormReturn<NullPartialCompoundFields>
+  formMethods: UseFormReturn<NullableCompoundFields>
 }) => {
   const { control, register } = props.formMethods
 

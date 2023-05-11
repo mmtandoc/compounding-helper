@@ -4,7 +4,7 @@ import EditForm from "components/common/data-pages/EditForm"
 import LinkDirectoryEntry from "components/links/LinkDirectoryEntry"
 import {
   LinkDirectoryFields,
-  NullPartialLinkDirectoryFields,
+  NullableLinkDirectoryFields,
   linkDirectorySchema,
 } from "lib/fields"
 import { getLinks } from "pages/api/links"
@@ -16,7 +16,7 @@ const EditLinks: NextPageWithLayout<Props> = (props) => {
   const { values } = props
   return (
     <EditForm
-      values={values as NullPartialLinkDirectoryFields}
+      values={values as NullableLinkDirectoryFields}
       schema={linkDirectorySchema}
       apiEndpointPath={`/api/links`}
       urlPath={`/links`}

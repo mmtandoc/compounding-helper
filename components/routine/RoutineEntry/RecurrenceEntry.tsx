@@ -7,7 +7,7 @@ import PresetDropdown, {
 } from "components/compound/mfr/MfrEntry/PresetDropdown"
 import { Fieldset, FormGroup, Input, RhfRadioGroup } from "components/ui/forms"
 import {
-  NullPartialRecurrenceRuleFields,
+  NullableRecurrenceRuleFields,
   monthNames,
   recurrenceRuleSchema,
   weekdayNames,
@@ -16,7 +16,7 @@ import { NestedForm } from "lib/rhf/nestedForm"
 import { toIsoDateString } from "lib/utils"
 
 interface RecurrenceEntryProps {
-  nestedFormMethods: NestedForm<NullPartialRecurrenceRuleFields>
+  nestedFormMethods: NestedForm<NullableRecurrenceRuleFields>
 }
 
 const RecurrenceEntry = ({ nestedFormMethods }: RecurrenceEntryProps) => {
@@ -161,14 +161,14 @@ const RecurrenceEntry = ({ nestedFormMethods }: RecurrenceEntryProps) => {
             value: {
               frequency: Frequency.MONTHLY,
               interval: 6,
-            } as NullPartialRecurrenceRuleFields,
+            } as NullableRecurrenceRuleFields,
           },
           {
             label: "Every year",
             value: {
               frequency: Frequency.YEARLY,
               interval: 1,
-            } as NullPartialRecurrenceRuleFields,
+            } as NullableRecurrenceRuleFields,
           },
         ]}
         formMethods={nestedFormMethods}

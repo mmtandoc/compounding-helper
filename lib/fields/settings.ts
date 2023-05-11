@@ -1,7 +1,7 @@
 import { Merge } from "type-fest"
 import * as z from "zod"
 
-import { GetElementType, NullPartialDeep } from "types/util"
+import { GetElementType, NullableDeep } from "types/util"
 
 import { mfrSchema } from "./mfr"
 import { refineNoDuplicates } from "./utils"
@@ -32,7 +32,7 @@ export type FieldPresetFields<T = any> = z.infer<
   ReturnType<typeof createFieldPresetSchema<z.ZodType<T>>>
 >
 
-export type NullPartialFieldPresetFields<T = any> = NullPartialDeep<
+export type NullableFieldPresetFields<T = any> = NullableDeep<
   FieldPresetFields<T>
 >
 
@@ -66,10 +66,10 @@ export type FieldArrayPresetFields<
       ReturnType<typeof createFieldArrayPresetMultipleSchema<z.ZodType<T>>>
     >
 
-export type NullPartialFieldArrayPresetFields<
+export type NullableFieldArrayPresetFields<
   T = any,
   Multiple extends boolean = false,
-> = NullPartialDeep<FieldArrayPresetFields<T, Multiple>>
+> = NullableDeep<FieldArrayPresetFields<T, Multiple>>
 
 const createFieldArrayPresetMultipleSchema = <T extends z.ZodTypeAny>(
   fieldSchema: z.ZodArray<T>,
@@ -175,9 +175,9 @@ export const settingsSchema = z.object({
 export type SettingsFields = z.output<typeof settingsSchema>
 export type SettingsFieldsInput = z.input<typeof settingsSchema>
 
-export type NullPartialSettingsFields = Merge<
-  NullPartialDeep<SettingsFieldsInput, { ignoreKeys: "id" }>,
+export type NullableSettingsFields = Merge<
+  NullableDeep<SettingsFieldsInput, { ignoreKeys: "id" }>,
   {
-    mfrFieldPresets: NullPartialDeep<SettingsFieldsInput["mfrFieldPresets"]>
+    mfrFieldPresets: NullableDeep<SettingsFieldsInput["mfrFieldPresets"]>
   }
 >

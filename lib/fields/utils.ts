@@ -2,56 +2,59 @@
 import Zod, * as z from "zod"
 import { errorUtil } from "zod/lib/helpers/errorUtil"
 
-export type ZodDeepNullPartial<T extends Zod.ZodTypeAny> =
-  T extends Zod.ZodObject<infer Shape, infer Params, infer Catchall>
-    ? Zod.ZodObject<
-        {
-          [k in keyof Shape]: Zod.ZodNullable<ZodDeepNullPartial<Shape[k]>>
-        },
-        Params,
-        Catchall
-      >
-    : T extends Zod.ZodArray<infer Type, infer Card>
-    ? Zod.ZodArray<ZodDeepNullPartial<Type>, Card>
-    : T extends Zod.ZodOptional<infer Type>
-    ? Zod.ZodOptional<ZodDeepNullPartial<Type>>
-    : T extends Zod.ZodNullable<infer Type>
-    ? Zod.ZodNullable<ZodDeepNullPartial<Type>>
-    : T extends Zod.ZodTuple<infer Items>
-    ? {
-        [k in keyof Items]: Items[k] extends Zod.ZodTypeAny
-          ? ZodDeepNullPartial<Items[k]>
-          : never
-      } extends infer PI
-      ? PI extends Zod.ZodTupleItems
-        ? Zod.ZodTuple<PI>
+export type ZodDeepNullable<T extends Zod.ZodTypeAny> = T extends Zod.ZodObject<
+  infer Shape,
+  infer Params,
+  infer Catchall
+>
+  ? Zod.ZodObject<
+      {
+        [k in keyof Shape]: Zod.ZodNullable<ZodDeepNullable<Shape[k]>>
+      },
+      Params,
+      Catchall
+    >
+  : T extends Zod.ZodArray<infer Type, infer Card>
+  ? Zod.ZodArray<ZodDeepNullable<Type>, Card>
+  : T extends Zod.ZodOptional<infer Type>
+  ? Zod.ZodOptional<ZodDeepNullable<Type>>
+  : T extends Zod.ZodNullable<infer Type>
+  ? Zod.ZodNullable<ZodDeepNullable<Type>>
+  : T extends Zod.ZodTuple<infer Items>
+  ? {
+      [k in keyof Items]: Items[k] extends Zod.ZodTypeAny
+        ? ZodDeepNullable<Items[k]>
         : never
+    } extends infer PI
+    ? PI extends Zod.ZodTupleItems
+      ? Zod.ZodTuple<PI>
       : never
-    : T
+    : never
+  : T
 
-export function deepNullPartialify<T extends Zod.ZodTypeAny>(
+export function deepNullableify<T extends Zod.ZodTypeAny>(
   schema: T,
-): ZodDeepNullPartial<T> {
+): ZodDeepNullable<T> {
   if (schema instanceof Zod.ZodObject) {
     const newShape: any = {}
 
     for (const key in schema.shape) {
       const fieldSchema = schema.shape[key]
-      newShape[key] = Zod.ZodNullable.create(deepNullPartialify(fieldSchema))
+      newShape[key] = Zod.ZodNullable.create(deepNullableify(fieldSchema))
     }
     return new Zod.ZodObject({
       ...schema._def,
       shape: () => newShape,
     }) as any
   } else if (schema instanceof Zod.ZodArray) {
-    return Zod.ZodArray.create(deepNullPartialify(schema.element)) as any
+    return Zod.ZodArray.create(deepNullableify(schema.element)) as any
   } else if (schema instanceof Zod.ZodOptional) {
-    return Zod.ZodOptional.create(deepNullPartialify(schema.unwrap())) as any
+    return Zod.ZodOptional.create(deepNullableify(schema.unwrap())) as any
   } else if (schema instanceof Zod.ZodNullable) {
-    return Zod.ZodNullable.create(deepNullPartialify(schema.unwrap())) as any
+    return Zod.ZodNullable.create(deepNullableify(schema.unwrap())) as any
   } else if (schema instanceof Zod.ZodTuple) {
     return Zod.ZodTuple.create(
-      schema.items.map((item: any) => deepNullPartialify(item)),
+      schema.items.map((item: any) => deepNullableify(item)),
     ) as any
   } else {
     return schema as any
@@ -96,7 +99,7 @@ export const transformStringToNumber = (
  * @param schema Zod schema object
  * @param ids Optional. If not provided, will to use `{id: true}` if "id" property exists. Otherwise, defaults to empty object.
  */
-export const deepNullPartialifyWithIds = <
+export const deepNullableifyWithIds = <
   T extends Zod.ZodRawShape,
   Mask extends {
     [k in keyof T]?: true
@@ -105,7 +108,7 @@ export const deepNullPartialifyWithIds = <
   schema: Zod.ZodObject<T>,
   ids?: Mask,
 ) =>
-  deepNullPartialify(schema).merge(
+  deepNullableify(schema).merge(
     schema.pick(ids ?? (Object.hasOwn(schema.shape, "id") ? { id: true } : {})),
   )
 

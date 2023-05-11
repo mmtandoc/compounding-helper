@@ -9,9 +9,9 @@ import {
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullPartialDeep } from "types/util"
+import { NullableDeep } from "types/util"
 
-import { NullPartialCompoundFields, compoundSchema } from "./compound"
+import { NullableCompoundFields, compoundSchema } from "./compound"
 import { isoDateZodString } from "./utils"
 
 export const exposureRisksSchema = z
@@ -106,9 +106,9 @@ export const riskAssessmentSchema = z.object({
 export type RiskAssessmentFields = z.output<typeof riskAssessmentSchema>
 export type RiskAssessmentFieldsInput = z.input<typeof riskAssessmentSchema>
 
-export type NullPartialRiskAssessmentFields = Simplify<
+export type NullableRiskAssessmentFields = Simplify<
   Merge<
-    NullPartialDeep<RiskAssessmentFieldsInput, { ignoreKeys: "id" }>,
-    { compound: NullPartialCompoundFields }
+    NullableDeep<RiskAssessmentFieldsInput, { ignoreKeys: "id" }>,
+    { compound: NullableCompoundFields }
   >
 >

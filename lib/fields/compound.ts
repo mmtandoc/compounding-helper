@@ -2,7 +2,7 @@ import { PhysicalForm } from "@prisma/client"
 import { Merge, Simplify } from "type-fest"
 import * as z from "zod"
 
-import { GetElementType, NullPartialDeep } from "types/util"
+import { GetElementType, NullableDeep } from "types/util"
 
 import { refineNoDuplicates, transformStringToNumber } from "./utils"
 
@@ -46,8 +46,8 @@ export const ingredientSchema = z.discriminatedUnion("isCommercialProduct", [
 export type IngredientFields = Simplify<z.output<typeof ingredientSchema>>
 export type IngredientFieldsInput = Simplify<z.input<typeof ingredientSchema>>
 
-export type NullPartialIngredientFields = Simplify<
-  NullPartialDeep<IngredientFieldsInput, { ignoreKeys: "order" }>
+export type NullableIngredientFields = Simplify<
+  NullableDeep<IngredientFieldsInput, { ignoreKeys: "order" }>
 >
 const shortcutSchema = z
   .discriminatedUnion("hasShortcut", [
@@ -146,18 +146,15 @@ export const compoundSchema = z.object({
 export type CompoundFields = z.output<typeof compoundSchema>
 export type CompoundFieldsInput = z.input<typeof compoundSchema>
 
-export type NullPartialCompoundFields = Simplify<
+export type NullableCompoundFields = Simplify<
   Merge<
-    Merge<
-      NullPartialDeep<CompoundFieldsInput>,
-      Pick<CompoundFieldsInput, "id">
-    >,
+    Merge<NullableDeep<CompoundFieldsInput>, Pick<CompoundFieldsInput, "id">>,
     {
-      shortcut?: NullPartialDeep<
+      shortcut?: NullableDeep<
         z.input<typeof shortcutSchema>,
         { ignoreKeys: "hasShortcut" }
       >
-      ingredients: NullPartialIngredientFields[]
+      ingredients: NullableIngredientFields[]
     }
   >
 >

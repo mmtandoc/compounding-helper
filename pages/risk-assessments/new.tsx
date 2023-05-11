@@ -2,14 +2,11 @@ import { GetStaticProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
-import {
-  NullPartialRiskAssessmentFields,
-  riskAssessmentSchema,
-} from "lib/fields"
+import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { NextPageWithLayout } from "types/common"
 
-const defaultValues: NullPartialRiskAssessmentFields = {
+const defaultValues: NullableRiskAssessmentFields = {
   compound: {
     name: null,
     ingredients: [
@@ -73,7 +70,7 @@ const defaultValues: NullPartialRiskAssessmentFields = {
 const NewRiskAssessment: NextPageWithLayout = () => {
   return (
     <CreateForm
-      defaultValues={defaultValues as NullPartialRiskAssessmentFields}
+      defaultValues={defaultValues as NullableRiskAssessmentFields}
       schema={riskAssessmentSchema}
       entryComponent={RiskAssessmentEntry}
       apiEndpointPath="/api/risk-assessments"

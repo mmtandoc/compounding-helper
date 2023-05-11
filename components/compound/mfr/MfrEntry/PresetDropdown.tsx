@@ -7,8 +7,8 @@ import {
 
 import { Button, Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
 import {
-  NullPartialFieldArrayPresetFields,
-  NullPartialFieldPresetFields,
+  NullableFieldArrayPresetFields,
+  NullableFieldPresetFields,
 } from "lib/fields"
 import { GetElementType } from "types/util"
 
@@ -33,7 +33,7 @@ interface ArrayPresetDropdownProps<
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
   type: PresetType.Array
-  options: NullPartialFieldArrayPresetFields<
+  options: NullableFieldArrayPresetFields<
     GetElementType<FieldPathValue<TFieldValues, TFieldName>>,
     false
   >[]
@@ -44,7 +44,7 @@ interface ArrayMultiPresetDropdownProps<
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
   type: PresetType.MultiArray
-  options: NullPartialFieldArrayPresetFields<
+  options: NullableFieldArrayPresetFields<
     GetElementType<FieldPathValue<TFieldValues, TFieldName>>,
     true
   >[]
@@ -53,7 +53,7 @@ interface ArrayMultiPresetDropdownProps<
 type GetPresetFieldPathValue<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues>,
-> = NullPartialFieldPresetFields<
+> = NullableFieldPresetFields<
   FieldPathValue<TFieldValues, TFieldName>
 > extends infer O
   ? O

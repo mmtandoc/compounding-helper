@@ -11,8 +11,8 @@ import {
   TextArea,
 } from "components/ui/forms"
 import {
-  NullPartialCompoundFields,
-  NullPartialIngredientFields,
+  NullableCompoundFields,
+  NullableIngredientFields,
   SettingsFields,
 } from "lib/fields"
 import { nestedForm } from "lib/rhf/nestedForm"
@@ -22,12 +22,12 @@ import IngredientEntry from "../ingredient/IngredientEntry"
 import ShortcutVariationsEntry from "./ShortcutVariationsEntry"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialCompoundFields>
+  formMethods: UseFormReturn<NullableCompoundFields>
   showPastSdsRevisions?: boolean
   display?: "all" | "partial"
 }
 
-const emptyIngredientValues: NullPartialIngredientFields = {
+const emptyIngredientValues: NullableIngredientFields = {
   order: NaN,
   chemicalId: null,
   physicalForm: null,

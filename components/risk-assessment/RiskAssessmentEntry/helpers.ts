@@ -1,14 +1,14 @@
 import { Chemical } from "@prisma/client"
 
-import { NullPartialRiskAssessmentFields } from "lib/fields"
+import { NullableRiskAssessmentFields } from "lib/fields"
 import { SdsWithHazards } from "types/models"
 
 export const calculateSuggestedRiskLevel = (
   chemicals: Chemical[],
   selectedSdses: (SdsWithHazards | null)[],
-  riskAssessmentFields: NullPartialRiskAssessmentFields,
+  riskAssessmentFields: NullableRiskAssessmentFields,
   requireGreaterPrecaution: boolean,
-): NullPartialRiskAssessmentFields["riskLevel"] | null => {
+): NullableRiskAssessmentFields["riskLevel"] | null => {
   let step = 1
   while (true) {
     switch (step) {

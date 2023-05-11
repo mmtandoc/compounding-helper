@@ -8,9 +8,9 @@ import { Merge, Primitive, Simplify } from "type-fest"
 type BuiltIns = Primitive | Date | RegExp
 
 /**
-@see NullPartialDeep
+@see NullableDeep
 */
-export interface NullPartialDeepOptions {
+export interface NullableDeepOptions {
   /**
 	Whether to affect the individual elements of arrays and tuples.
 
@@ -26,7 +26,7 @@ export interface NullPartialDeepOptions {
   readonly ignoreKeys?: unknown
 }
 
-interface DefaultNullPartialDeepOptions extends NullPartialDeepOptions {
+interface DefaultNullableDeepOptions extends NullableDeepOptions {
   recurseIntoArrays: true
   makeArrayTypeNullable: false
   ignoreKeys: never
@@ -41,7 +41,7 @@ Use-cases:
 
 @example
 ```
-import type {NullPartialDeep} from 'type-fest';
+import type {NullableDeep} from 'type-fest';
 
 const settings: Settings = {
 	textEditor: {
@@ -81,23 +81,23 @@ If this is undesirable, you can pass `{recurseIntoArrays: false}` as the second 
 @category Set
 @category Map
 */
-export type NullPartialDeep<
+export type NullableDeep<
   T,
-  Options extends NullPartialDeepOptions = DefaultNullPartialDeepOptions,
-  MergedOptions extends NullPartialDeepOptions = Merge<
-    DefaultNullPartialDeepOptions,
+  Options extends NullableDeepOptions = DefaultNullableDeepOptions,
+  MergedOptions extends NullableDeepOptions = Merge<
+    DefaultNullableDeepOptions,
     Options
   >,
 > = T extends BuiltIns
   ? T
   : T extends Map<infer KeyType, infer ValueType>
-  ? NullPartialMapDeep<KeyType, ValueType, MergedOptions>
+  ? NullableMapDeep<KeyType, ValueType, MergedOptions>
   : T extends Set<infer ItemType>
-  ? NullPartialSetDeep<ItemType, MergedOptions>
+  ? NullableSetDeep<ItemType, MergedOptions>
   : T extends ReadonlyMap<infer KeyType, infer ValueType>
-  ? NullPartialReadonlyMapDeep<KeyType, ValueType, MergedOptions>
+  ? NullableReadonlyMapDeep<KeyType, ValueType, MergedOptions>
   : T extends ReadonlySet<infer ItemType>
-  ? NullPartialReadonlySetDeep<ItemType, MergedOptions>
+  ? NullableReadonlySetDeep<ItemType, MergedOptions>
   : T extends (...args: any[]) => unknown
   ? T | null
   : T extends object
@@ -107,59 +107,59 @@ export type NullPartialDeep<
       : ItemType[] extends T // Test for arrays (non-tuples) specifically
       ? readonly ItemType[] extends T // Differentiate readonly and mutable arrays
         ? MergedOptions["makeArrayTypeNullable"] extends false
-          ? ReadonlyArray<NullPartialDeep<ItemType, MergedOptions>>
-          : ReadonlyArray<NullPartialDeep<ItemType | null, MergedOptions>>
+          ? ReadonlyArray<NullableDeep<ItemType, MergedOptions>>
+          : ReadonlyArray<NullableDeep<ItemType | null, MergedOptions>>
         : MergedOptions["makeArrayTypeNullable"] extends false
-        ? Array<NullPartialDeep<ItemType, MergedOptions>>
-        : Array<NullPartialDeep<ItemType | null, MergedOptions>>
-      : NullPartialObjectDeep<T, MergedOptions> // Tuples behave properly
-    : NullPartialObjectDeep<T, MergedOptions>
+        ? Array<NullableDeep<ItemType, MergedOptions>>
+        : Array<NullableDeep<ItemType | null, MergedOptions>>
+      : NullableObjectDeep<T, MergedOptions> // Tuples behave properly
+    : NullableObjectDeep<T, MergedOptions>
   : unknown
 
 /**
 Same as `PartialDeep`, but accepts only `Map`s and as inputs. Internal helper for `PartialDeep`.
 */
-type NullPartialMapDeep<
+type NullableMapDeep<
   KeyType,
   ValueType,
-  Options extends NullPartialDeepOptions,
-> = Map<NullPartialDeep<KeyType, Options>, NullPartialDeep<ValueType, Options>>
+  Options extends NullableDeepOptions,
+> = Map<NullableDeep<KeyType, Options>, NullableDeep<ValueType, Options>>
 
 /**
 Same as `PartialDeep`, but accepts only `Set`s as inputs. Internal helper for `PartialDeep`.
 */
-type NullPartialSetDeep<T, Options extends NullPartialDeepOptions> = Set<
-  NullPartialDeep<T, Options>
+type NullableSetDeep<T, Options extends NullableDeepOptions> = Set<
+  NullableDeep<T, Options>
 >
 
 /**
 Same as `PartialDeep`, but accepts only `ReadonlyMap`s as inputs. Internal helper for `PartialDeep`.
 */
-type NullPartialReadonlyMapDeep<
+type NullableReadonlyMapDeep<
   KeyType,
   ValueType,
-  Options extends NullPartialDeepOptions,
+  Options extends NullableDeepOptions,
 > = ReadonlyMap<
-  NullPartialDeep<KeyType, Options>,
-  NullPartialDeep<ValueType, Options>
+  NullableDeep<KeyType, Options>,
+  NullableDeep<ValueType, Options>
 >
 
 /**
 Same as `PartialDeep`, but accepts only `ReadonlySet`s as inputs. Internal helper for `PartialDeep`.
 */
-type NullPartialReadonlySetDeep<
+type NullableReadonlySetDeep<
   T,
-  Options extends NullPartialDeepOptions,
-> = ReadonlySet<NullPartialDeep<T, Options>>
+  Options extends NullableDeepOptions,
+> = ReadonlySet<NullableDeep<T, Options>>
 
 /**
 Same as `PartialDeep`, but accepts only `object`s as inputs. Internal helper for `PartialDeep`.
 */
-type NullPartialObjectDeep<
+type NullableObjectDeep<
   ObjectType extends object,
-  Options extends NullPartialDeepOptions,
+  Options extends NullableDeepOptions,
 > = Simplify<{
   [KeyType in keyof ObjectType]: KeyType extends Options["ignoreKeys"]
     ? ObjectType[KeyType]
-    : NullPartialDeep<ObjectType[KeyType], Options> | null
+    : NullableDeep<ObjectType[KeyType], Options> | null
 }>

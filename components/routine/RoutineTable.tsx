@@ -17,7 +17,7 @@ import {
   Select,
 } from "components/ui/forms"
 import { RoutineEntity } from "lib/entities"
-import { CompletionFields, NullPartialCompletionFields } from "lib/fields"
+import { CompletionFields, NullableCompletionFields } from "lib/fields"
 import filterFns from "lib/table/filterFns"
 import { toIsoDateString } from "lib/utils"
 import { RoutineWithHistory } from "types/models"
@@ -204,7 +204,7 @@ const MarkCompleteModal = (props: {
 }) => {
   const { routine, isOpen, onClose } = props
 
-  const formMethods = useForm<NullPartialCompletionFields>({
+  const formMethods = useForm<NullableCompletionFields>({
     defaultValues: {
       date: toIsoDateString(new Date()),
       name: null,

@@ -13,8 +13,8 @@ import {
   TextArea,
 } from "components/ui/forms"
 import {
-  NullPartialIngredientFields,
-  NullPartialRiskAssessmentFields,
+  NullableIngredientFields,
+  NullableRiskAssessmentFields,
 } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { nestedForm } from "lib/rhf/nestedForm"
@@ -23,11 +23,11 @@ import ExposureRisksInputs from "./ExposureRisksInputs"
 import RationaleList from "./RationaleList"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialRiskAssessmentFields>
+  formMethods: UseFormReturn<NullableRiskAssessmentFields>
   showPastSdsRevisions?: boolean
 }
 
-const emptyIngredientValues: NullPartialIngredientFields = {
+const emptyIngredientValues: NullableIngredientFields = {
   order: NaN,
   chemicalId: null,
   physicalForm: null,

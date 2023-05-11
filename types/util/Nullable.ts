@@ -1,3 +1,3 @@
-export type NullPartial<T> = {
+export type Nullable<T> = {
   [P in keyof T]: T[P] | null
 }

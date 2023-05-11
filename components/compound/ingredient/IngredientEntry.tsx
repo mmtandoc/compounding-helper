@@ -19,7 +19,7 @@ import {
   RhfSelect,
   TextArea,
 } from "components/ui/forms"
-import { NullPartialIngredientFields } from "lib/fields"
+import { NullableIngredientFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { NestedForm } from "lib/rhf/nestedForm"
 import { JsonError } from "types/common"
@@ -36,7 +36,7 @@ interface IngredientEntryProps<
   name: TFieldArrayName
   field: FieldArrayWithId<TFieldValues, TFieldArrayName>
   index: number
-  formMethods: NestedForm<NullPartialIngredientFields>
+  formMethods: NestedForm<NullableIngredientFields>
   arrayMethods: UseFieldArrayReturn<TFieldValues, TFieldArrayName>
   showPastSdsRevisions?: boolean
   reset: () => void

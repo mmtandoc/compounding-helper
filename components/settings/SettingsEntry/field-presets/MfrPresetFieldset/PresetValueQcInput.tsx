@@ -2,7 +2,7 @@ import { ChangeEvent, ComponentPropsWithRef } from "react"
 import { ControllerProps, FieldPathByValue, FieldValues } from "react-hook-form"
 
 import { Input } from "components/ui/forms"
-import { NullPartialSettingsFields } from "lib/fields"
+import { NullableSettingsFields } from "lib/fields"
 
 const PresetValueQcInput = <TFieldValues extends FieldValues = FieldValues>(
   props: ComponentPropsWithRef<
@@ -10,7 +10,7 @@ const PresetValueQcInput = <TFieldValues extends FieldValues = FieldValues>(
       TFieldValues,
       FieldPathByValue<
         TFieldValues,
-        NullPartialSettingsFields["mfrFieldPresets"]["qualityControls"]
+        NullableSettingsFields["mfrFieldPresets"]["qualityControls"]
       >
     >["render"]
   >,

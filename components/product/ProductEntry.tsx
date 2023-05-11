@@ -4,14 +4,14 @@ import useSWR from "swr"
 
 import ChemicalSearch from "components/chemical/ChemicalSearch"
 import { Input, LabelFormGroup, RhfSelect } from "components/ui/forms"
-import { NullPartialProductFields } from "lib/fields"
+import { NullableProductFields } from "lib/fields"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
-  formMethods: UseFormReturn<NullPartialProductFields>
+  formMethods: UseFormReturn<NullableProductFields>
 }
 
-const ProductEntry: DataEntryComponent<NullPartialProductFields, Props> = (
+const ProductEntry: DataEntryComponent<NullableProductFields, Props> = (
   props,
 ) => {
   const { formMethods } = props

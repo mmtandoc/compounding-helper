@@ -3,7 +3,7 @@ import { Control } from "react-hook-form"
 import useSWR from "swr"
 
 import { RhfSelect } from "components/ui/forms"
-import { NullPartialMfrFields } from "lib/fields"
+import { NullableMfrFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   compoundId?: number
   showAllRevisions?: boolean
   disabled?: boolean
-  control?: Control<NullPartialMfrFields>
+  control?: Control<NullableMfrFields>
 }
 
 const RiskAssessmentSelect = (props: Props) => {
