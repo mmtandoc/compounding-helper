@@ -1,6 +1,7 @@
 import _ from "lodash"
 import React, { ReactNode } from "react"
 import {
+  FieldPath,
   FieldValues,
   RegisterOptions,
   UseControllerProps,
@@ -11,19 +12,24 @@ import { Merge } from "type-fest"
 
 import { ErrorContainer, Select } from "components/ui/forms"
 
-interface Props<TFieldValues extends FieldValues>
-  extends Merge<
+interface Props<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> extends Merge<
     JSX.IntrinsicElements["select"],
-    UseControllerProps<TFieldValues>
+    UseControllerProps<TFieldValues, TName>
   > {
   children: ReactNode
-  rules?: Omit<RegisterOptions<TFieldValues>, "valueAsDate">
+  rules?: Omit<RegisterOptions<TFieldValues, TName>, "valueAsDate">
   initialOption?: { value: string; label: string; disabled?: boolean } | boolean
   fullWidth?: boolean
 }
 
-const RhfSelect = <TFieldValues extends FieldValues>(
-  props: Props<TFieldValues>,
+const RhfSelect = <
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>(
+  props: Props<TFieldValues, TName>,
 ) => {
   const formMethods = useFormContext<TFieldValues>()
   const {

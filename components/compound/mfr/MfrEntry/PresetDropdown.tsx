@@ -2,14 +2,12 @@ import {
   FieldPath,
   FieldPathValue,
   FieldValues,
-  PathValue,
   UseFormReturn,
 } from "react-hook-form"
 
 import { Button, Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
 import {
-  NullPartialFieldArrayPresetMultipleFields,
-  NullPartialFieldArrayPresetSingleFields,
+  NullPartialFieldArrayPresetFields,
   NullPartialFieldPresetFields,
 } from "lib/fields"
 import { GetElementType } from "types/util"
@@ -35,9 +33,10 @@ interface ArrayPresetDropdownProps<
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
   type: PresetType.Array
-  options: NullPartialFieldArrayPresetSingleFields<GetElementType<
-    FieldPathValue<TFieldValues, TFieldName>
-  > | null>[]
+  options: NullPartialFieldArrayPresetFields<
+    GetElementType<FieldPathValue<TFieldValues, TFieldName>>,
+    false
+  >[]
 }
 
 interface ArrayMultiPresetDropdownProps<
@@ -45,19 +44,27 @@ interface ArrayMultiPresetDropdownProps<
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
   type: PresetType.MultiArray
-  options: NullPartialFieldArrayPresetMultipleFields<GetElementType<
-    FieldPathValue<TFieldValues, TFieldName>
-  > | null>[]
+  options: NullPartialFieldArrayPresetFields<
+    GetElementType<FieldPathValue<TFieldValues, TFieldName>>,
+    true
+  >[]
 }
+
+type GetPresetFieldPathValue<
+  TFieldValues extends FieldValues,
+  TFieldName extends FieldPath<TFieldValues>,
+> = NullPartialFieldPresetFields<
+  FieldPathValue<TFieldValues, TFieldName>
+> extends infer O
+  ? O
+  : never // "extends infer O ? O : never" prevents "Type instantiation is excessively deep and possibly infinite" error (https://stackoverflow.com/a/75531743)
 
 interface NonArrayPresetDropdownProps<
   TFieldValues extends FieldValues,
   TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends PresetDropdownPropsBase<TFieldValues, TFieldName> {
   type: PresetType.Single
-  options: NullPartialFieldPresetFields<
-    FieldPathValue<TFieldValues, TFieldName>
-  >[]
+  options: GetPresetFieldPathValue<TFieldValues, TFieldName>[]
 }
 
 type PresetDropdownProps<
@@ -89,6 +96,7 @@ const PresetDropdown = <
             const optionValue = (
               option as { value: FieldPathValue<TFieldValues, TFieldName> }
             ).value
+
             const optionLabel = (option as { label?: string }).label
             return (
               <Button
@@ -100,7 +108,12 @@ const PresetDropdown = <
                     ] as FieldPathValue<TFieldValues, TFieldName>
 
                     if (type === PresetType.MultiArray) {
-                      newValue.push(...optionValue)
+                      newValue.push(
+                        ...(optionValue as FieldPathValue<
+                          TFieldValues,
+                          TFieldName
+                        >[]),
+                      )
                     } else {
                       newValue.push(optionValue)
                     }

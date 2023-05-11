@@ -1,7 +1,7 @@
 import {
   ControllerProps,
-  FieldArray,
   FieldArrayPath,
+  FieldArrayPathValue,
   FieldPathByValue,
   FieldValues,
   UseFormReturn,
@@ -11,57 +11,60 @@ import {
 import { Button } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
 import { NullPartialFieldPresetFields } from "lib/fields"
+import { GetElementType } from "types/util"
 
 import FieldArrayActions from "../FieldArrayActions"
 import FieldMultiPresetInput from "./FieldMultiPresetInput"
 import FieldPresetInput from "./FieldPresetInput"
 
+type GetPresetFieldValue<
+  TFieldValues extends FieldValues,
+  TFieldArrayPath extends FieldArrayPath<TFieldValues>,
+> = GetElementType<
+  Exclude<FieldArrayPathValue<TFieldValues, TFieldArrayPath>, null>
+> extends NullPartialFieldPresetFields<infer O>
+  ? O
+  : never
+
 type FieldPresetFieldArrayProps<
-  TValue = unknown,
   TFieldValues extends FieldValues = FieldValues,
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullPartialFieldPresetFields<unknown>[] | null
     > = FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullPartialFieldPresetFields<unknown>[] | null
     >,
 > = {
   label: string
   name: TFieldArrayName
   formMethods: UseFormReturn<TFieldValues>
-  emptyPresetField: FieldArray<
-    TFieldValues,
-    TFieldArrayName
-  > extends NullPartialFieldPresetFields<TValue>
-    ? FieldArray<TFieldValues, TFieldArrayName>
-    : never
+  emptyPresetValue?: GetPresetFieldValue<TFieldValues, TFieldArrayName>
   allowMultiple?: boolean
   valueInput: ControllerProps<TFieldValues>["render"]
 }
 
 const FieldPresetFieldArray = <
-  TValue = unknown,
   TFieldValues extends FieldValues = FieldValues,
   TFieldArrayName extends FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullPartialFieldPresetFields<unknown>[] | null
     > = FieldArrayPath<TFieldValues> &
     FieldPathByValue<
       TFieldValues,
-      NullPartialFieldPresetFields<TValue>[] | null
+      NullPartialFieldPresetFields<unknown>[] | null
     >,
 >(
-  props: FieldPresetFieldArrayProps<TValue, TFieldValues, TFieldArrayName>,
+  props: FieldPresetFieldArrayProps<TFieldValues, TFieldArrayName>,
 ) => {
   const {
     label,
     name,
     formMethods,
-    emptyPresetField,
+    emptyPresetValue = null,
     allowMultiple = false,
     valueInput,
   } = props
@@ -85,9 +88,7 @@ const FieldPresetFieldArray = <
                 <FieldMultiPresetInput
                   name={`${name}.${index}` as any}
                   formMethods={formMethods}
-                  emptyPresetValueField={
-                    (emptyPresetField as { value: TValue }).value ?? null
-                  }
+                  emptyPresetValueField={emptyPresetValue}
                   valueInput={valueInput}
                 />
               ) : (
@@ -110,7 +111,13 @@ const FieldPresetFieldArray = <
         <div className="actions">
           <Button
             size="small"
-            onClick={() => arrayMethods.append(emptyPresetField)}
+            onClick={
+              () =>
+                arrayMethods.append({
+                  label: null,
+                  value: emptyPresetValue,
+                } as any) // TODO: Fix typing
+            }
           >
             Add new preset
           </Button>
