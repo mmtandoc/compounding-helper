@@ -1,8 +1,8 @@
 import { Frequency, Weekday, rrulestr } from "rrule"
-import { Merge, Simplify } from "type-fest"
+import { Simplify } from "type-fest"
 import * as z from "zod"
 
-import { Nullable, NullableDeep } from "types/util"
+import { Merge, Nullable, NullableDeep } from "types/util"
 
 import { isoDateZodString } from "./utils"
 

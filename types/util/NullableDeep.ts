@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Merge, Primitive, Simplify } from "type-fest"
+import { Primitive, Simplify } from "type-fest"
+
+import { Merge } from "types/util"
 
 //Based off of PartialDeep from type-fest (https://github.com/sindresorhus/type-fest)
 

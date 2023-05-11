@@ -8,9 +8,9 @@ import {
   useController,
   useFormContext,
 } from "react-hook-form"
-import { Merge } from "type-fest"
 
 import { ErrorContainer, Select } from "components/ui/forms"
+import { Merge } from "types/util"
 
 interface Props<
   TFieldValues extends FieldValues,

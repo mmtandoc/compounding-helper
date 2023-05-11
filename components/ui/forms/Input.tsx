@@ -1,8 +1,8 @@
 import React from "react"
 import { UseFormRegisterReturn } from "react-hook-form"
-import { Merge } from "type-fest"
 
 import { ErrorContainer } from "components/ui/forms"
+import { Merge } from "types/util"
 
 type InputAttributes = JSX.IntrinsicElements["input"]
 

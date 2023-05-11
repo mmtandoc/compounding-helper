@@ -1,7 +1,7 @@
-import { Merge, Simplify } from "type-fest"
+import { Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullableDeep } from "types/util"
+import { Merge, NullableDeep } from "types/util"
 
 //==== Product schema =====
 

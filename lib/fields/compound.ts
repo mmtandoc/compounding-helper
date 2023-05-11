@@ -1,8 +1,8 @@
 import { PhysicalForm } from "@prisma/client"
-import { Merge, Simplify } from "type-fest"
+import { Simplify } from "type-fest"
 import * as z from "zod"
 
-import { GetElementType, NullableDeep } from "types/util"
+import { GetElementType, Merge, NullableDeep } from "types/util"
 
 import { refineNoDuplicates, transformStringToNumber } from "./utils"
 

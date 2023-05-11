@@ -1,7 +1,6 @@
-import { Merge } from "type-fest"
 import * as z from "zod"
 
-import { GetElementType, NullableDeep } from "types/util"
+import { GetElementType, Merge, NullableDeep } from "types/util"
 
 import { mfrSchema } from "./mfr"
 import { refineNoDuplicates } from "./utils"

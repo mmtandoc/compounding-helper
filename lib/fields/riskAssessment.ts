@@ -6,10 +6,10 @@ import {
   RiskLevel,
   Unit,
 } from "@prisma/client"
-import { Merge, Simplify } from "type-fest"
+import { Simplify } from "type-fest"
 import * as z from "zod"
 
-import { NullableDeep } from "types/util"
+import { Merge, NullableDeep } from "types/util"
 
 import { NullableCompoundFields, compoundSchema } from "./compound"
 import { isoDateZodString } from "./utils"
