@@ -59,7 +59,6 @@ export default async function handler(
       try {
         result = await createProduct(fields)
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }

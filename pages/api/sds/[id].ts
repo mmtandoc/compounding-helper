@@ -58,7 +58,6 @@ export default async function handler(
       try {
         result = await updateSdsById(id, fields)
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }

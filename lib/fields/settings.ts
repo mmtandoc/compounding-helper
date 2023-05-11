@@ -136,7 +136,6 @@ function createFieldArrayPresetsSchema<T extends z.ZodTypeAny>(
 
 export const settingsSchema = z.object({
   id: z.number().int().optional(),
-  //TODO: Implement creating field preset schemas dynamically
   mfrFieldPresets: z.object({
     requiredEquipment: createFieldArrayPresetsSchema(
       mfrSchema.shape.requiredEquipment,

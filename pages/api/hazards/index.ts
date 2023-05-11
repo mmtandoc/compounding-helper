@@ -17,7 +17,6 @@ export default async function handler(
       try {
         hazards = await getHazards()
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }

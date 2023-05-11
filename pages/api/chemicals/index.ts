@@ -37,7 +37,6 @@ export default async function handler(
       try {
         chemicals = await getChemicals(query)
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }
@@ -57,7 +56,6 @@ export default async function handler(
       try {
         chemical = await createChemical(data)
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }

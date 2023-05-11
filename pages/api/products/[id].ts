@@ -32,7 +32,6 @@ export default async function handler(
       try {
         product = await getProductById(id)
       } catch (error) {
-        //TODO: HANDLE ERROR
         console.log(error)
         return sendJsonError(res, 500, "Encountered error with database.")
       }
