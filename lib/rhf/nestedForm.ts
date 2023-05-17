@@ -12,12 +12,12 @@ export type NestedForm<TFieldValues extends FieldValues> = UseFormReturn<{
     this: void,
     p?: TPath,
   ): `__nested__.${TPath}`
-  get<TObj>(this: void, obj: TObj): Get<TObj, `__nested__`>
+  get<TObj>(this: void, obj: TObj): Get<TObj, `__nested__`, { strict: false }>
   get<TPath extends FieldPath<TFieldValues>, TObj>(
     this: void,
     obj: TObj,
     p?: TPath,
-  ): Get<TObj, `__nested__.${TPath}`>
+  ): Get<TObj, `__nested__.${TPath}`, { strict: false }>
 }
 
 export function nestedForm<TFieldValues extends FieldValues>(
@@ -29,7 +29,7 @@ export function nestedForm<
 >(
   form: UseFormReturn<TFieldValues> | NestedForm<TFieldValues>,
   path: TPath,
-): NestedForm<Get<TFieldValues, TPath>>
+): NestedForm<Get<TFieldValues, TPath, { strict: false }>>
 export function nestedForm(
   form: UseFormReturn<any> | NestedForm<any>,
   path?: string | number,

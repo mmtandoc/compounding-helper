@@ -2,6 +2,7 @@ import {
   FieldPath,
   FieldPathValue,
   FieldValues,
+  PathValue,
   UseFormReturn,
 } from "react-hook-form"
 
@@ -94,7 +95,7 @@ const PresetDropdown = <
         <DropdownMenu>
           {options.map((option, i) => {
             const optionValue = (
-              option as { value: FieldPathValue<TFieldValues, TFieldName> }
+              option as { value: PathValue<TFieldValues, TFieldName> }
             ).value
 
             const optionLabel = (option as { label?: string }).label
@@ -105,11 +106,11 @@ const PresetDropdown = <
                   if (type !== PresetType.Single) {
                     const newValue = [
                       ...(formMethods.getValues(name) ?? []),
-                    ] as FieldPathValue<TFieldValues, TFieldName>
+                    ] as PathValue<TFieldValues, TFieldName>
 
                     if (type === PresetType.MultiArray) {
                       newValue.push(
-                        ...(optionValue as FieldPathValue<
+                        ...(optionValue as PathValue<
                           TFieldValues,
                           TFieldName
                         >[]),
