@@ -21,6 +21,8 @@ type Props = (
   fullWidth?: boolean
 }
 
+//TODO: Refactor/Use library
+
 const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   const {
     autoResize = false,
@@ -34,7 +36,6 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
 
   useImperativeHandle(ref, () => {
     if (textAreaRef.current) {
-      console.log("setCurrentScrollHeight")
       setCurrentScrollHeight(textAreaRef.current.scrollHeight)
     }
 
@@ -55,9 +56,11 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
 
   useEffect(() => {
     const MIN_TEXTAREA_HEIGHT = 40
-    if (!autoResize || !textAreaRef.current || !currentScrollHeight) {
+    if (!autoResize || !textAreaRef.current) {
       return
     }
+
+    //TODO: Don't resize if already correct height
 
     // Reset height - important to shrink on delete
     textAreaRef.current.style.height = "inherit"
@@ -65,7 +68,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
     textAreaRef.current.style.height = `${
       Math.max(textAreaRef.current.scrollHeight, MIN_TEXTAREA_HEIGHT) + 2
     }px`
-  }, [autoResize, value, currentScrollHeight])
+  }, [autoResize, value, currentScrollHeight, textAreaProps])
 
   const hasFormContext = !!useFormContext() as boolean
 
