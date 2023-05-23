@@ -1,4 +1,5 @@
 import { GetStaticProps } from "next"
+import Link from "next/link"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
@@ -75,6 +76,16 @@ const NewRiskAssessment: NextPageWithLayout = () => {
       entryComponent={RiskAssessmentEntry}
       apiEndpointPath="/api/risk-assessments"
       dataName="risk assessment"
+      renderCustomAfterSaveActions={(props: { resourceUrl: string }) => {
+        const compoundId = props.resourceUrl.match(
+          /^\/risk-assessments\/(?<compoundId>\d+)$/,
+        )?.groups?.compoundId
+        return (
+          <Link href={`/compounds/${compoundId}/mfrs/new`}>
+            Create associated MFR
+          </Link>
+        )
+      }}
     />
   )
 }

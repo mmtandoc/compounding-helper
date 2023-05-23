@@ -24,6 +24,11 @@ type CreateFormProps<
   apiEndpointPath: string | ((values: TFieldValues) => string)
   entryComponent: DataEntryComponent<TFieldValues>
   dataName: string
+  renderCustomAfterSaveActions?: (props: {
+    values: TFieldValues
+    dataName: string
+    resourceUrl: string
+  }) => JSX.Element
 }
 
 const CreateForm = <
@@ -38,9 +43,11 @@ const CreateForm = <
     entryComponent: EntryComponent,
     dataName,
     schema,
+    renderCustomAfterSaveActions,
   } = props
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
+  const [savedPayload, setSavedPayload] = useState<TFieldValues | undefined>()
   const [resourceUrl, setResourceUrl] = useState<string | undefined>()
 
   const formMethods = useForm<TFieldValues>({
@@ -78,6 +85,7 @@ const CreateForm = <
       )
       .then((res) => {
         setSaveSuccessful(true)
+        setSavedPayload(data)
         setResourceUrl(res.headers["location"])
       })
       .catch((reason) => {
@@ -116,6 +124,7 @@ const CreateForm = <
               href={""}
               onClick={() => {
                 setSaveSuccessful(undefined)
+                setSavedPayload(undefined)
                 setResourceUrl(undefined)
                 reset()
               }}
@@ -123,6 +132,11 @@ const CreateForm = <
               Add another {dataName}
             </Link>
             <Link href={resourceUrl}>View created {dataName}</Link>
+            {renderCustomAfterSaveActions?.({
+              values: savedPayload as TFieldValues,
+              dataName,
+              resourceUrl,
+            })}
           </div>
         </div>
       )}
