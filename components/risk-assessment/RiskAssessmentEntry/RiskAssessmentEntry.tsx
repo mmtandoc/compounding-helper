@@ -45,8 +45,15 @@ const emptyIngredientValues: NullableIngredientFields = {
 const RiskAssessmentEntry = (props: Props) => {
   const { formMethods, showPastSdsRevisions = false } = props
 
-  const { register, control, watch, setValue, getValues, clearErrors } =
-    formMethods
+  const {
+    register,
+    unregister,
+    control,
+    watch,
+    setValue,
+    getValues,
+    clearErrors,
+  } = formMethods
 
   const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
     watch([
@@ -117,6 +124,12 @@ const RiskAssessmentEntry = (props: Props) => {
     register,
     setValue,
   })
+
+  useEffect(() => {
+    if (usesCommercialProduct === false) {
+      unregister("exposureRisks.productMonograph")
+    }
+  }, [unregister, usesCommercialProduct])
 
   register("id")
   return (
