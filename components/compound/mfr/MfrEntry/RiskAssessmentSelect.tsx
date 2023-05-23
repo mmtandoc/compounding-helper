@@ -2,6 +2,7 @@ import { RiskAssessment } from "@prisma/client"
 import { Control } from "react-hook-form"
 import useSWR from "swr"
 
+import { Spinner } from "components/ui"
 import { RhfSelect } from "components/ui/forms"
 import { NullableMfrFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
@@ -17,13 +18,21 @@ type Props = {
 const RiskAssessmentSelect = (props: Props) => {
   const { id, compoundId, showAllRevisions = false, disabled, control } = props
 
-  const { data: riskAssessments, error } = useSWR<RiskAssessment[]>(
+  const {
+    data: riskAssessments,
+    error,
+    isLoading,
+  } = useSWR<RiskAssessment[]>(
     compoundId ? `/api/risk-assessments?compoundId=${compoundId}` : null,
   )
 
   //TODO: Improve error handling
   if (error) {
     console.error(error)
+  }
+
+  if (isLoading) {
+    return <Spinner />
   }
 
   return (
@@ -35,7 +44,6 @@ const RiskAssessmentSelect = (props: Props) => {
       }}
       id={id}
       className="risk-assessment-select"
-      initialOption={true}
       control={control}
     >
       {riskAssessments !== undefined &&
