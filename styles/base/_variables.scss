@@ -3,6 +3,8 @@ $font-size-sm: $font-size-base * 0.875 !default;
 $font-size-lg: $font-size-base * 1.25 !default;
 $font-size-xl: $font-size-base * 1.75 !default;
 
+// Based on https://github.com/primer/css
+
 :root {
   --font-size-base: #{$font-size-base};
   --font-size-sm: #{$font-size-sm};
@@ -18,13 +20,27 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --color-canvas-subtle: var(--color-scale-gray-100);
   --color-canvas-inset: var(--color-scale-gray-100);
 
-  // --color-accent-emphasis:
-  // --color-accent-subtle:
-  --color-accent-muted: lightblue;
+  // ?: Should maybe merge with --color-primary
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-accent-muted: #54aeff66;
+  --color-accent-subtle: #ddf4ff;
+
+  // --color-accent-muted: lightblue;
 
   --color-danger-fg: #cf222e;
   --color-danger-subtle: #ffc8c8;
   --color-danger-muted: #ff9b9b;
+
+  --color-attention-fg: #9a6700;
+  --color-attention-emphasis: #9a6700;
+  --color-attention-muted: #d4a72c66;
+  --color-attention-subtle: #fff8c5;
+
+  --color-success-fg: #1a7f37;
+  --color-success-emphasis: #1f883d;
+  --color-success-muted: #4ac26b66;
+  --color-success-subtle: #dafbe1;
 
   --color-neutral-strong-emphasis: var(--color-scale-gray-350);
   --color-neutral-emphasis: var(--color-scale-gray-300);
@@ -140,7 +156,7 @@ $font-size-xl: $font-size-base * 1.75 !default;
   --color-suggestion-bg: var(--color-canvas-default);
   --color-suggestion-fg: var(--color-fg-default);
   --color-suggestion-hover-bg: var(--color-scale-gray-300);
-  --color-suggestion-focus-bg: var(--color-accent-muted);
+  --color-suggestion-focus-bg: var(--color-scale-gray-300);
   --color-suggestion-focus-fg: var(--color-fg-default);
 
   // Modal
