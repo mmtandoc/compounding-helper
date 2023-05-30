@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next"
 import * as z from "zod"
 
@@ -66,6 +67,18 @@ export default async function handler(
         await deleteChemicalById(id)
       } catch (error) {
         console.error(error)
+        // Unable to delete due to existing reference
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2003"
+        ) {
+          return sendJsonError(
+            res,
+            409,
+            "Unable to delete due to chemical being referenced by other records (products).",
+          )
+        }
+
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
