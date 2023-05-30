@@ -296,11 +296,7 @@ const MfrEntry = (props: MfrEntryProps) => {
           </FormGroup>
           <FormGroup>
             <label htmlFor={`${id}-storage`}>Storage:</label>
-            <RhfSelect
-              id={`${id}-storage`}
-              {...register("storage")}
-              initialOption
-            >
+            <RhfSelect id={`${id}-storage`} name="storage" initialOption>
               <option value="room">Room</option>
               <option value="fridge">Fridge</option>
               <option value="freezer">Freezer</option>
