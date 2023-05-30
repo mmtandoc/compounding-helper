@@ -1,5 +1,6 @@
 import { RiskAssessment } from "@prisma/client"
-import { Control } from "react-hook-form"
+import { useEffect } from "react"
+import { Control, useFormContext, useWatch } from "react-hook-form"
 import useSWR from "swr"
 
 import { Spinner } from "components/ui"
@@ -30,6 +31,17 @@ const RiskAssessmentSelect = (props: Props) => {
   if (error) {
     console.error(error)
   }
+
+  const riskAssessmentId = useWatch({ name: "riskAssessmentId", control })
+
+  const { register, reset, setValue } = useFormContext()
+
+  useEffect(() => {
+    if (!isLoading && !riskAssessmentId && riskAssessments?.[0]?.id) {
+      register("riskAssessmentId")
+      setValue("riskAssessmentId", riskAssessments?.[0]?.id)
+    }
+  }, [isLoading, register, riskAssessmentId, riskAssessments, setValue])
 
   if (isLoading) {
     return <Spinner />
