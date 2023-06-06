@@ -22,6 +22,7 @@ const ViewRoutine: NextPageWithLayout<ViewRoutineProps> = (
       apiEndpointPath={`/api/routines/${data.id}`}
       urlPath={`/routines/${data.id}`}
       detailsComponent={RoutineDetails}
+      actions={{ print: true }}
     />
   )
 }
