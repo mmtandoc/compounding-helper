@@ -1,9 +1,11 @@
 import axios from "axios"
-import { MaterialDesignContent, SnackbarProvider } from "notistack"
+import { SnackbarProvider, closeSnackbar } from "notistack"
 import { IconContext } from "react-icons"
+import { MdClose } from "react-icons/md"
 import { SWRConfig } from "swr"
 
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
+import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
 import { AppPropsWithLayout } from "types/common"
 
@@ -97,7 +99,14 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               default: Alert,
               warning: Alert,
             }}
-            autoHideDuration={7000}
+            autoHideDuration={5000}
+            action={(snackbarId) => (
+              <IconButton
+                onClick={() => closeSnackbar(snackbarId)}
+                icon={MdClose}
+                variant="text"
+              />
+            )}
           >
             {layout}
           </SnackbarProvider>
