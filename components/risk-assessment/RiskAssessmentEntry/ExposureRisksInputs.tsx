@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Control,
   Path,
@@ -16,6 +16,7 @@ import {
   RhfBooleanRadioGroup,
 } from "components/ui/forms"
 import { NullableRiskAssessmentFields } from "lib/fields"
+import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { SdsWithRelations } from "types/models"
 
 type ExposureRisksInputsProps = {
@@ -35,10 +36,13 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
     register,
     control = formMethods.control,
   } = props
+
   const isOtherRisk = useWatch({
     name: `${name}.other` as Path<NullableRiskAssessmentFields>,
     control: control,
   })
+
+  const { setValue, clearErrors } = formMethods
 
   const {
     data: sdses,
@@ -51,6 +55,23 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
   if (sdsError) {
     console.error(sdsError)
   }
+
+  useUpdateFieldConditionally({
+    updateCondition: isOtherRisk === false,
+    fields: [
+      [`${name}.otherDescription` as Path<NullableRiskAssessmentFields>, null],
+    ],
+    register,
+    setValue,
+  })
+
+  useEffect(() => {
+    if (isOtherRisk === false) {
+      clearErrors(
+        `${name}.otherDescription` as Path<NullableRiskAssessmentFields>,
+      )
+    }
+  }, [isOtherRisk, clearErrors, name])
 
   /* const getHazardCategoriesByClasses = (...classNames: string[]) => {
     if (sdses === undefined) {
@@ -155,7 +176,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
           <RhfBooleanRadioGroup
             name={`${name}.other` as Path<NullableRiskAssessmentFields>}
             control={control}
-            rules={{ deps: `${name}.otherDescription` }}
+            /* rules={{ deps: `${name}.otherDescription` }} */
           />
         </FormGroup>
         <div className="form-group" style={{ flexGrow: 1 }}>
