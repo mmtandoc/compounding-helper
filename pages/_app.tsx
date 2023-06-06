@@ -1,8 +1,12 @@
 import axios from "axios"
+import { SnackbarProvider, closeSnackbar } from "notistack"
 import { IconContext } from "react-icons"
+import { MdClose } from "react-icons/md"
 import { SWRConfig } from "swr"
 
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
+import { IconButton } from "components/ui"
+import { Alert } from "components/ui/Alert"
 import { AppPropsWithLayout } from "types/common"
 
 import "styles/main.scss"
@@ -82,11 +86,33 @@ const multiFetcher = (urls: Record<string, string> | string[] | string) => {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
+
   return (
     <>
       <IconContext.Provider value={{ style: { verticalAlign: "middle" } }}>
-        <SWRConfig value={{ fetcher: multiFetcher }}>{layout}</SWRConfig>
+        <SWRConfig value={{ fetcher: multiFetcher }}>
+          <SnackbarProvider
+            Components={{
+              success: Alert,
+              info: Alert,
+              error: Alert,
+              default: Alert,
+              warning: Alert,
+            }}
+            autoHideDuration={5000}
+            action={(snackbarId) => (
+              <IconButton
+                onClick={() => closeSnackbar(snackbarId)}
+                icon={MdClose}
+                variant="text"
+              />
+            )}
+          >
+            {layout}
+          </SnackbarProvider>
+        </SWRConfig>
       </IconContext.Provider>
+
       <style jsx global>{`
         #__next {
           display: flex;

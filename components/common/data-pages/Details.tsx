@@ -1,12 +1,15 @@
-import axios from "axios"
+import axios, { AxiosError, isAxiosError } from "axios"
 import { useRouter } from "next/dist/client/router"
 import Link from "next/link"
+import { enqueueSnackbar } from "notistack"
 import { useContext, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 
 import { Button, Modal } from "components/ui"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 import { useDocument } from "lib/hooks/useDocument"
+import { capitalize } from "lib/utils"
+import { JsonError } from "types/common"
 
 type DetailsComponentProps<TModel> = {
   data: TModel
@@ -51,10 +54,24 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
 
   const handleDelete = () => {
     axios.delete(apiEndpointPath).then(
-      () => router.push(urlPath),
-      (reason) => {
-        //TODO: Handle errors
-        console.log({ error: reason })
+      () => {
+        enqueueSnackbar(`The ${dataLabel} has been deleted.`, {
+          variant: "success",
+        })
+        router.push(urlPath)
+      },
+      (error: Error | AxiosError<JsonError>) => {
+        if (isAxiosError<JsonError>(error)) {
+          if (error.code === "409") {
+          }
+          enqueueSnackbar(error.response?.data.message ?? error.message, {
+            variant: "error",
+            persist: true,
+          })
+        } else {
+          enqueueSnackbar(error.message, { variant: "error" })
+        }
+        console.error({ error })
       },
     )
   }

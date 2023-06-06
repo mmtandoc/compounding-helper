@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import axios from "axios"
+import axios, { AxiosError, isAxiosError } from "axios"
 import Link from "next/link"
+import { enqueueSnackbar } from "notistack"
 import { useEffect, useState } from "react"
 import {
   DeepPartial,
@@ -13,7 +14,7 @@ import {
 import { Button } from "components/ui"
 import { Form } from "components/ui/forms"
 import { formErrorMap } from "lib/formErrorMap"
-import { DataEntryComponent } from "types/common"
+import { DataEntryComponent, JsonError } from "types/common"
 
 type CreateFormProps<
   TSchema extends Zod.ZodTypeAny,
@@ -88,9 +89,17 @@ const CreateForm = <
         setSavedPayload(data)
         setResourceUrl(res.headers["location"])
       })
-      .catch((reason) => {
-        //TODO: Handle error
-        console.log(JSON.stringify(reason))
+      .catch((error: Error | AxiosError<JsonError>) => {
+        if (isAxiosError<JsonError>(error)) {
+          if (error.code === "409") {
+          }
+          enqueueSnackbar(error.response?.data.message ?? error.message, {
+            variant: "error",
+          })
+        } else {
+          enqueueSnackbar(error.message, { variant: "error" })
+        }
+        console.error({ error })
         setSaveSuccessful(false)
       })
   }

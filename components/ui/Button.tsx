@@ -9,13 +9,15 @@ export interface ButtonProps extends HtmlButtonAttributes {
   endIcon?: IconType
   endIconProps?: IconBaseProps
   size?: "extra-small" | "small" | "medium" | "large"
-  theme?: "primary" | "secondary" | "tertiary" | "neutral"
+  theme?: "primary" | "neutral"
+  variant?: "text" | "contained" // | "outline"
 }
 
 const Button = (props: ButtonProps) => {
   const {
-    size,
-    theme,
+    size = "medium",
+    theme = "neutral",
+    variant = "contained",
     children,
     className,
     startIcon: StartIcon,
@@ -28,7 +30,9 @@ const Button = (props: ButtonProps) => {
     <button
       {...buttonProps}
       type={buttonProps.type ?? "button"}
-      className={`button ${className ?? ""} ${size ?? ""} ${theme ?? ""}`}
+      className={`button ${className ?? ""} ${size ?? ""} ${theme ?? ""} ${
+        variant ?? ""
+      }`}
     >
       {StartIcon && (
         <span className="start-icon">
@@ -42,19 +46,26 @@ const Button = (props: ButtonProps) => {
         </span>
       )}
       <style jsx>{`
-        %button-extra-small {
-          font-size: var(--button-font-size-small);
-          padding: 0.1rem 0.1rem;
-        }
+        @mixin button-variant-text($fgColor, $disabledFgColor) {
+          border: none;
+          background-color: transparent;
+          color: $fgColor;
 
-        %button-small {
-          font-size: var(--button-font-size-small);
-          padding: 0.15rem 0.8rem;
-        }
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+            border-color: transparent;
+          }
 
-        %button-medium {
-          font-size: var(--button-font-size);
-          padding: 0.3rem 1.2rem;
+          &:active {
+            background-color: transparent;
+            border-color: transparent;
+          }
+
+          &:disabled {
+            background-color: transparent;
+            color: $disabledFgColor;
+            border-color: transparent;
+          }
         }
 
         .start-icon {
@@ -65,14 +76,7 @@ const Button = (props: ButtonProps) => {
           margin-left: 0.3rem;
         }
 
-        %button-large {
-          font-size: var(--button-font-size-large);
-          padding: 0.45rem 1.3rem;
-        }
-
         .button {
-          @extend %button-medium;
-
           position: relative;
           display: inline-block;
           border-radius: 0.5rem;
@@ -83,43 +87,62 @@ const Button = (props: ButtonProps) => {
           vertical-align: middle;
           cursor: pointer;
           user-select: none;
-          border: 1px solid var(--color-button-border);
-          background-color: var(--color-button-bg);
-          color: var(--color-button-fg);
           text-decoration: none;
           appearance: none;
 
+          &:disabled {
+            cursor: default;
+          }
+
+          // === Sizes ===
           &.large {
-            @extend %button-large;
+            font-size: var(--button-font-size-large);
+            padding: 0.45rem 1.3rem;
           }
 
           &.small {
-            @extend %button-small;
+            font-size: var(--button-font-size-small);
+            padding: 0.15rem 0.8rem;
           }
 
           &.medium {
-            @extend %button-medium;
+            font-size: var(--button-font-size);
+            padding: 0.3rem 1.2rem;
           }
 
           &.extra-small {
-            @extend %button-extra-small;
+            font-size: var(--button-font-size-small);
+            padding: 0.1rem 0.1rem;
           }
+          // Themes
 
-          &:hover {
-            background-color: var(--color-button-hover-bg);
-            border-color: var(--color-button-hover-border);
-          }
+          &.neutral {
+            border: 1px solid var(--color-button-border);
+            background-color: var(--color-button-bg);
+            color: var(--color-button-fg);
 
-          &:active {
-            background-color: var(--color-button-active-bg);
-            border-color: var(--color-button-active-border);
-          }
+            &:hover {
+              background-color: var(--color-button-hover-bg);
+              border-color: var(--color-button-hover-border);
+            }
 
-          &:disabled {
-            background-color: var(--color-button-disabled-bg);
-            color: var(--color-button-disabled-fg);
-            border-color: var(--color-button-disabled-border);
-            cursor: default;
+            &:active {
+              background-color: var(--color-button-active-bg);
+              border-color: var(--color-button-active-border);
+            }
+
+            &:disabled {
+              background-color: var(--color-button-disabled-bg);
+              color: var(--color-button-disabled-fg);
+              border-color: var(--color-button-disabled-border);
+            }
+
+            &.text {
+              @include button-variant-text(
+                var(--color-button-fg),
+                var(--color-button-disabled-fg)
+              );
+            }
           }
 
           &.primary {
@@ -142,6 +165,13 @@ const Button = (props: ButtonProps) => {
               background-color: var(--color-button-primary-disabled-bg);
               color: var(--color-button-primary-disabled-fg);
               border-color: var(--color-button-primary-disabled-border);
+            }
+
+            &.text {
+              @include button-variant-text(
+                var(--color-button-primary-fg),
+                var(--color-button-primary-disabled-fg)
+              );
             }
           }
         }
