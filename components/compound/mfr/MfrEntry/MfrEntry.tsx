@@ -28,7 +28,7 @@ interface MfrEntryProps {
 
 const MfrEntry = (props: MfrEntryProps) => {
   const { formMethods } = props
-  const { register, watch, control } = formMethods
+  const { register, watch, control, setValue } = formMethods
   const id = useId()
 
   const [compoundId, riskAssessmentId, quantities] = watch([
@@ -92,6 +92,22 @@ const MfrEntry = (props: MfrEntryProps) => {
     () => (riskAssessment ? getRequiredPpeList(riskAssessment) : []),
     [riskAssessment],
   )
+
+  const pharmaceuticalForm = watch("pharmaceuticalForm")
+
+  useEffect(() => {
+    switch (pharmaceuticalForm) {
+      case null:
+        return
+      case "Cream":
+      case "Ointment":
+      case "Lotion":
+        setValue("expectedYield.unit", "g")
+        break
+      case "Liquid":
+        setValue("expectedYield.unit", "ml")
+    }
+  }, [pharmaceuticalForm, setValue])
 
   register("riskAssessmentId")
   return (

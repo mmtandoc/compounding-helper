@@ -1,4 +1,11 @@
-import { UseFieldArrayReturn, UseFormReturn } from "react-hook-form"
+import { useEffect } from "react"
+import {
+  FieldArrayWithId,
+  UseFieldArrayReturn,
+  UseFormRegister,
+  UseFormReturn,
+  UseFormSetValue,
+} from "react-hook-form"
 
 import { Spinner, Table } from "components/ui"
 import { FormGroup, Input, RhfSelect } from "components/ui/forms"
@@ -17,7 +24,7 @@ export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
     isLoading = false,
     compound,
     fields,
-    formMethods: { register },
+    formMethods: { register, setValue },
   } = props
 
   if (isLoading) {
@@ -65,37 +72,60 @@ export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
             renderCell: (_, data) => {
               const index = data.order - 1
               const field = fields[index]
+
               return (
-                <>
-                  {field && (
-                    <FormGroup
-                      row
-                      key={field.id}
-                      style={{
-                        width: "minContent",
-                      }}
-                    >
-                      <Input
-                        {...register(`quantities.${index}.amount`, {
-                          valueAsNumber: true,
-                        })}
-                        size={5}
-                      />
-                      <RhfSelect
-                        name={`quantities.${index}.unit`}
-                        initialOption
-                      >
-                        <option value="g">g</option>
-                        <option value="ml">ml</option>
-                      </RhfSelect>
-                    </FormGroup>
-                  )}
-                </>
+                field && (
+                  <QuantityInput
+                    key={field.id}
+                    field={field}
+                    ingredient={data}
+                    register={register}
+                    setValue={setValue}
+                    index={index}
+                  />
+                )
               )
             },
           },
         ] as TableColumn<IngredientAll, any>[]
       }
     />
+  )
+}
+
+const QuantityInput = (props: {
+  field: FieldArrayWithId<NullableMfrFields, "quantities">
+  register: UseFormRegister<NullableMfrFields>
+  setValue: UseFormSetValue<NullableMfrFields>
+  ingredient: IngredientAll
+  index: number
+}) => {
+  const { field, ingredient, setValue, register, index } = props
+
+  useEffect(() => {
+    setValue(
+      `quantities.${index}.unit`,
+      ingredient.physicalForm === "liquid" ? "ml" : "g",
+    )
+  }, [field, index, ingredient.physicalForm, setValue])
+
+  return (
+    <FormGroup
+      row
+      style={{
+        width: "minContent",
+      }}
+    >
+      <Input
+        {...register(`quantities.${index}.amount`, {
+          valueAsNumber: true,
+        })}
+        size={5}
+      />
+      <RhfSelect name={`quantities.${index}.unit`} initialOption>
+        <option value="g">g</option>
+        <option value="ml">ml</option>
+      </RhfSelect>
+    </FormGroup>
   )
 }
