@@ -96,17 +96,14 @@ const MfrEntry = (props: MfrEntryProps) => {
   const pharmaceuticalForm = watch("pharmaceuticalForm")
 
   useEffect(() => {
-    switch (pharmaceuticalForm) {
-      case null:
-        return
-      case "Cream":
-      case "Ointment":
-      case "Lotion":
-        setValue("expectedYield.unit", "g")
-        break
-      case "Liquid":
-        setValue("expectedYield.unit", "ml")
+    if (!pharmaceuticalForm) {
+      return
     }
+
+    setValue(
+      "expectedYield.unit",
+      ["Liquid", "Lotion"].includes(pharmaceuticalForm) ? "ml" : "g",
+    )
   }, [pharmaceuticalForm, setValue])
 
   register("riskAssessmentId")

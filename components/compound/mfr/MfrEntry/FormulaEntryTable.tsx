@@ -105,7 +105,7 @@ const QuantityInput = (props: {
   useEffect(() => {
     setValue(
       `quantities.${index}.unit`,
-      ingredient.physicalForm === "liquid" ? "ml" : "g",
+      ["liquid", "lotion"].includes(ingredient.physicalForm) ? "ml" : "g",
     )
   }, [field, index, ingredient.physicalForm, setValue])
 
