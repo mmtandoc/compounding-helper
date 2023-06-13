@@ -19,6 +19,7 @@ const Routines: NextPageWithLayout<Props> = (props) => {
     "/api/routines?sort=category:asc,name:asc",
     {
       fallbackData: initialData,
+      revalidateOnMount: true,
     },
   )
 

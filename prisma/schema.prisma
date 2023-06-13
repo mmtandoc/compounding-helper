@@ -316,6 +316,7 @@ model RoutineCompletion {
   routineId Int
   date      DateTime
   name      String
+  comment   String?
 
   @@id([routineId, date])
   @@map("routine_completions")

@@ -75,6 +75,12 @@ export type NullableRecurrenceRuleFields = Merge<
 export const completionSchema = z.object({
   date: isoDateZodString().transform((d) => new Date(d)),
   name: z.string(),
+  comment: z
+    .string()
+    .trim()
+    .transform((arg) => (arg === "" ? null : arg))
+    .nullable()
+    .default(null),
 })
 
 export type CompletionFields = z.output<typeof completionSchema>

@@ -117,12 +117,13 @@ const Table = <TData,>(props: Props<TData>) => {
     }, data)
   }
 
-  const debounceFilterData = useCallback(
-    debounce((filters: ColumnFilter[]) => {
-      setFilteredData(filterData(filters))
-    }, 300),
-    [],
-  )
+  const debounceFilterDataCallback = debounce((filters: ColumnFilter[]) => {
+    setFilteredData(filterData(filters))
+  }, 300)
+
+  const debounceFilterData = useCallback(debounceFilterDataCallback, [
+    debounceFilterDataCallback,
+  ])
 
   useEffect(() => {
     if (columnFilters.length === 0) {

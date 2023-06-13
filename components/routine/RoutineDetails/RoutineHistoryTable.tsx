@@ -24,6 +24,11 @@ const RoutineHistoryTable = (props: Props) => {
           accessorPath: "name",
           label: "Completed by",
         },
+        {
+          accessorPath: "comment",
+          label: "Comment",
+          cellStyle: { whiteSpace: "pre-wrap" },
+        },
       ]}
     />
   )

@@ -1,29 +1,59 @@
 import { RoutineCompletion } from "@prisma/client"
-import axios from "axios"
+import axios, { AxiosError, isAxiosError } from "axios"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
-import { useRouter } from "next/router"
+import { enqueueSnackbar } from "notistack"
 import { useEffect, useMemo, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
+import { MdComment } from "react-icons/md"
 import { RRule } from "rrule"
 import { mutate } from "swr"
 
-import { Button, Modal, Table } from "components/ui"
-import {
-  BooleanRadioGroup,
-  Form,
-  FormGroup,
-  Input,
-  Select,
-} from "components/ui/forms"
+import { Button, Modal, Table, Tooltip } from "components/ui"
+import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
 import { RoutineEntity } from "lib/entities"
 import { CompletionFields, NullableCompletionFields } from "lib/fields"
 import filterFns from "lib/table/filterFns"
 import { toIsoDateString } from "lib/utils"
+import { JsonError } from "types/common"
 import { RoutineWithHistory } from "types/models"
 
 type Props = {
   data: RoutineWithHistory[]
+}
+
+const CommentView = (props: { comment: string }) => {
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false)
+
+  return (
+    <span
+      className="comment-view"
+      onMouseEnter={() => setIsTooltipVisible(true)}
+      onMouseLeave={() => setIsTooltipVisible(false)}
+    >
+      <MdComment style={{ transform: "scaleX(-1)", marginLeft: "0.5rem" }} />
+      <Tooltip visible={isTooltipVisible}>{props.comment}</Tooltip>
+      <style jsx global>{`
+        .comment-view {
+          position: relative;
+
+          &:hover {
+            > svg {
+              color: var(--color-fg-muted);
+            }
+          }
+
+          .tooltip {
+            left: -1.5rem;
+            white-space: pre-wrap;
+            background-color: var(--color-canvas-subtle);
+            max-width: 40rem;
+            width: max-content;
+          }
+        }
+      `}</style>
+    </span>
+  )
 }
 
 //TODO: Implement searching
@@ -90,10 +120,16 @@ const RoutineTable = (props: Props) => {
               (a?.date.toISOString() ?? "").localeCompare(
                 b?.date.toISOString() ?? "",
               ),
-            renderCell: (completion: RoutineCompletion | null) =>
-              completion?.date
-                ? `${toIsoDateString(completion.date)} by ${completion.name}`
-                : null,
+            renderCell: (completion: RoutineCompletion | null) => {
+              return completion?.date ? (
+                <span style={{ whiteSpace: "nowrap" }}>
+                  {toIsoDateString(completion.date)} by {completion.name}
+                  {completion.comment && (
+                    <CommentView comment={completion.comment} />
+                  )}
+                </span>
+              ) : null
+            },
           },
           {
             id: "dueDate",
@@ -215,11 +251,27 @@ const MarkCompleteModal = (props: {
 
   const onSubmit = (values: unknown) => {
     const data = values as CompletionFields
-    //TODO: Finish implementation
-    console.log(data)
     axios
       .put(`/api/routines/${routine.id}/history`, data)
-      .then(() => mutate("/api/routines"))
+      .then(() =>
+        mutate(
+          (key) =>
+            typeof key === "string" &&
+            (key.startsWith("/api/routines?") ||
+              key === "/api/routines" ||
+              key.startsWith(`/api/routines/${routine.id}`)),
+        ),
+      )
+      .catch((error: Error | AxiosError<JsonError>) => {
+        if (isAxiosError<JsonError>(error)) {
+          enqueueSnackbar(error.response?.data.message ?? error.message, {
+            variant: "error",
+          })
+        } else {
+          enqueueSnackbar(error.message, { variant: "error" })
+        }
+        console.error({ error })
+      })
     onClose()
   }
 
@@ -257,8 +309,25 @@ const MarkCompleteModal = (props: {
                 />
               </FormGroup>
             </FormGroup>
+            <FormGroup>
+              <label className="optional" htmlFor="comment">
+                Comment:
+              </label>
+              <TextArea
+                id="comment"
+                {...register("comment")}
+                autoResize
+                rows={3}
+              />
+            </FormGroup>
           </Form>
         </FormProvider>
+        <style jsx>{`
+          label.optional::after {
+            content: " (Optional)";
+            font-weight: lighter;
+          }
+        `}</style>
       </Modal.Body>
       <Modal.Footer>
         <Button type="submit" form="mark-complete-form">
