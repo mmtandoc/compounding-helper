@@ -10,7 +10,7 @@ import { ApiBody } from "types/common"
 import { MfrAll, mfrAll } from "types/models"
 
 const querySchema = z.object({
-  compoundId: z.string().pipe(z.coerce.number()),
+  id: z.string().pipe(z.coerce.number()),
   version: z.string().pipe(z.coerce.number()),
 })
 
@@ -26,7 +26,7 @@ export default async function handler(
     return sendZodError(res, results.error)
   }
 
-  const { compoundId, version } = results.data
+  const { id: compoundId, version } = results.data
 
   switch (method) {
     case "GET": {
