@@ -138,13 +138,13 @@ const MfrDetails = (props: MfrEntryProps) => {
           }
           columns={[
             {
-              label: "Quality controls",
-              accessorPath: "name",
-              cellStyle: { width: "min-content" },
+              header: "Quality controls",
+              accessorKey: "name",
+              meta: { cellStyle: { width: "min-content" } },
             },
             {
-              label: "Expected specifications",
-              accessorPath: "expectedSpecification",
+              header: "Expected specifications",
+              accessorKey: "expectedSpecification",
             },
           ]}
         />

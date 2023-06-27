@@ -1,93 +1,58 @@
 import { Chemical } from "@prisma/client"
-import Link from "next/link"
+import { createColumnHelper } from "@tanstack/react-table"
 
-import { Button, Table } from "components/ui"
-import filterFns from "lib/table/filterFns"
+import { Table } from "components/ui"
+import DataRowActions from "components/ui/Table/DataRowActions"
 import { toIsoDateString } from "lib/utils"
 
 type Props = {
   data: Chemical[]
 }
 
-//TODO: Implement searching
+const columnHelper = createColumnHelper<Chemical>()
+
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    filterFn: "equalsString",
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    filterFn: "includesString",
+  }),
+  columnHelper.accessor("casNumber", {
+    header: "CAS #",
+  }),
+  columnHelper.accessor("nioshTable", {
+    header: "NIOSH Table",
+    cell: (info) =>
+      info.getValue() === -1 ? "N/A" : `Table ${info.getValue()}`,
+    enableColumnFilter: false,
+  }),
+  columnHelper.accessor("nioshRevisionDate", {
+    header: "NIOSH Revision Date",
+    cell: (info) => {
+      const value = info.getValue()
+      return value ? toIsoDateString(value) : ""
+    },
+    enableColumnFilter: false,
+  }),
+  columnHelper.display({
+    id: "actions",
+    cell: (info) => (
+      <DataRowActions
+        row={info.row}
+        getEditUrl={(data) => `/chemicals/${data.id}/edit`}
+        getViewUrl={(data) => `/chemicals/${data.id}`}
+      />
+    ),
+  }),
+]
+
 const ChemicalTable = (props: Props) => {
   const { data } = props
 
-  return (
-    <>
-      <Table
-        className="chemical-table"
-        data={data}
-        columns={[
-          {
-            accessorPath: "id",
-            label: "ID",
-            sortable: true,
-            compare: (a: number, b: number) => a - b,
-          },
-          {
-            accessorPath: "name",
-            label: "Name",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "casNumber",
-            label: "CAS Number",
-            sortable: true,
-            compare: (a: string | null, b: string | null) =>
-              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
-            renderCell: (value: string | null) => value ?? "N/A",
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "nioshTable",
-            label: "NIOSH Table",
-            sortable: true,
-            compare: (a: number, b: number) => a - b,
-            renderCell: (value: number) =>
-              value === -1 ? "N/A" : `Table ${value}`,
-          },
-          {
-            accessorPath: "nioshRevisionDate",
-            label: "NIOSH Revision Date",
-            sortable: true,
-            compare: (a: Date | null, b: Date | null) =>
-              (a?.toISOString() ?? "").localeCompare(b?.toISOString() ?? ""),
-            renderCell: (date: Date | null) =>
-              date ? toIsoDateString(date) : "",
-          },
-          {
-            id: "actions",
-            renderCell: (_, data) => (
-              <div>
-                <Link href={`/chemicals/${data.id}`}>
-                  <Button size="small" theme="primary">
-                    View
-                  </Button>
-                </Link>
-                <Link href={`/chemicals/${data.id}/edit`}>
-                  <Button size="small">Edit</Button>
-                </Link>
-                <style jsx>{`
-                  div {
-                    display: flex;
-                    column-gap: 0.3rem;
-                    flex-wrap: nowrap;
-                    margin: 0.2rem 0;
-                  }
-                `}</style>
-              </div>
-            ),
-          },
-        ]}
-      />
-    </>
-  )
+  return <Table className="chemical-table" data={data} columns={columns} />
 }
 
 export default ChemicalTable

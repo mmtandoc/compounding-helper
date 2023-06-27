@@ -1,9 +1,8 @@
 import { Chemical } from "@prisma/client"
-import Link from "next/link"
-import React from "react"
+import { createColumnHelper } from "@tanstack/react-table"
 
-import { Button, Table } from "components/ui"
-import filterFns from "lib/table/filterFns"
+import { Table } from "components/ui"
+import DataRowActions from "components/ui/Table/DataRowActions"
 import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
@@ -11,88 +10,55 @@ type Props = {
   data: SdsWithRelations[]
 }
 
-//TODO: Allow searching & sorting, add option to hide old revisions
+const columnHelper = createColumnHelper<SdsWithRelations>()
+
+const columns = [
+  columnHelper.accessor("id", { header: "ID", enableColumnFilter: false }),
+  columnHelper.accessor("product.chemical", {
+    header: "Chemical",
+    filterFn: (row, columnId, filterValue: string) => {
+      const chemical = row.getValue<Chemical>(columnId)
+      return [chemical.name, ...chemical.synonyms].some((str) =>
+        str.toUpperCase().includes(filterValue.toUpperCase()),
+      )
+    },
+    sortingFn: (rowA, rowB, columnId) =>
+      rowA
+        .getValue<Chemical>(columnId)
+        .name.localeCompare(rowB.getValue<Chemical>(columnId).name, undefined, {
+          numeric: true,
+        }),
+    cell: (info) => info.getValue().name,
+  }),
+  columnHelper.accessor("product.name", {
+    header: "Product",
+    filterFn: "includesString",
+  }),
+  columnHelper.accessor("product.vendor.name", {
+    header: "Vendor",
+    filterFn: "includesString",
+  }),
+  columnHelper.accessor("revisionDate", {
+    header: "Revision Date",
+    cell: (info) => toIsoDateString(info.getValue()),
+  }),
+  columnHelper.display({
+    id: "actions",
+    cell: (info) => (
+      <DataRowActions
+        row={info.row}
+        getViewUrl={(data) => `/sds/${data.id}`}
+        getEditUrl={(data) => `/sds/${data.id}/edit`}
+      />
+    ),
+  }),
+]
+
+//TODO: add option to hide old revisions
 const SdsTable = (props: Props) => {
   const { data } = props
 
-  return (
-    <>
-      <Table
-        className="sds-table"
-        data={data}
-        columns={[
-          {
-            accessorPath: "id",
-            label: "ID",
-            sortable: true,
-            compare: (a: number, b: number) => a - b,
-          },
-          {
-            accessorPath: "product.chemical",
-            label: "Chemical",
-            sortable: true,
-            compare: (a: Chemical, b: Chemical) =>
-              a.name.localeCompare(b.name, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: (chemical: Chemical, _, query) =>
-              [chemical.name, ...chemical.synonyms].some((str) =>
-                filterFns.string(str, _, query),
-              ),
-            renderCell: (chemical: Chemical) => chemical.name,
-          },
-          {
-            accessorPath: "product.name",
-            label: "Product",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "product.vendor.name",
-            label: "Vendor",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "revisionDate",
-            label: "Revision Date",
-            sortable: true,
-            compare: (a: Date, b: Date) =>
-              a.toISOString().localeCompare(b.toISOString()),
-            renderCell: (date: Date) => toIsoDateString(date),
-          },
-          {
-            id: "actions",
-            renderCell: (_, data) => (
-              <div>
-                <Link href={`/sds/${data.id}`}>
-                  <Button size="small" theme="primary">
-                    View
-                  </Button>
-                </Link>
-                <Link href={`/sds/${data.id}/edit`}>
-                  <Button size="small">Edit</Button>
-                </Link>
-                <style jsx>{`
-                  div {
-                    display: flex;
-                    column-gap: 0.3rem;
-                    flex-wrap: nowrap;
-                    margin: 0.2rem 0;
-                  }
-                `}</style>
-              </div>
-            ),
-          },
-        ]}
-      />
-    </>
-  )
+  return <Table className="sds-table" data={data} columns={columns} />
 }
 
 export default SdsTable

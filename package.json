@@ -23,6 +23,7 @@
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^3.1.0",
     "@prisma/client": "^4.14.0",
+    "@tanstack/react-table": "^8.9.2",
     "axios": "^1.4.0",
     "babel-plugin-superjson-next": "^0.4.5",
     "date-fns": "^2.30.0",

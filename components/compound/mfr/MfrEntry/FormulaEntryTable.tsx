@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { createColumnHelper } from "@tanstack/react-table"
+import { useEffect, useMemo } from "react"
 import {
   FieldArrayWithId,
   UseFieldArrayReturn,
@@ -9,7 +10,6 @@ import {
 
 import { Spinner, Table } from "components/ui"
 import { FormGroup, Input, RhfSelect } from "components/ui/forms"
-import { TableColumn } from "components/ui/Table"
 import { NullableMfrFields } from "lib/fields"
 import { CompoundWithIngredients, IngredientAll } from "types/models"
 
@@ -19,6 +19,9 @@ type FormulaEntryTableProps = {
   compound?: CompoundWithIngredients
   fields: UseFieldArrayReturn<NullableMfrFields, "quantities">["fields"]
 }
+
+const columnHelper = createColumnHelper<IngredientAll>()
+
 export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
   const {
     isLoading = false,
@@ -27,12 +30,70 @@ export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
     formMethods: { register, setValue },
   } = props
 
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor(
+        (row) =>
+          row.commercialProductName
+            ? row.commercialProductName
+            : `${row?.safetyDataSheet?.product.name} (${row?.safetyDataSheet?.product.vendor.name})`,
+        { header: "Name" },
+      ),
+      columnHelper.accessor("safetyDataSheet.product.chemical.name", {
+        header: "Chemical",
+      }),
+      columnHelper.accessor(
+        (row) =>
+          row.commercialProductDin
+            ? `DIN: ${row.commercialProductDin}`
+            : `CAS #: ${
+                row?.safetyDataSheet?.product.chemical.casNumber ?? "N/A"
+              }`,
+        { header: "Unique ID" },
+      ),
+      columnHelper.accessor("physicalForm", { header: "Form" }),
+      columnHelper.display({
+        header: "Quantity",
+        id: "quantity",
+        meta: {
+          headerStyle: { width: 0 },
+        },
+        cell: (info) => {
+          const data = info.row.original
+          const index = data.order - 1
+          const field = fields[index]
+
+          return (
+            field && (
+              <QuantityInput
+                key={field.id}
+                field={field}
+                ingredient={data}
+                register={register}
+                setValue={setValue}
+                index={index}
+              />
+            )
+          )
+        },
+      }),
+    ],
+    [fields, register, setValue],
+  )
+
   if (isLoading) {
     return <Spinner size="4rem" />
   }
 
   return (
-    <Table
+    <>
+      <Table
+        className="ingredients-table"
+        data={compound?.ingredients ?? []}
+        columns={columns}
+        options={{ enableFilters: false, enableSorting: false }}
+      />
+      {/* <Table
       className="ingredients-table"
       data={compound?.ingredients ?? []}
       columns={
@@ -89,7 +150,8 @@ export const FormulaEntryTable = (props: FormulaEntryTableProps) => {
           },
         ] as TableColumn<IngredientAll, any>[]
       }
-    />
+    /> */}
+    </>
   )
 }
 
