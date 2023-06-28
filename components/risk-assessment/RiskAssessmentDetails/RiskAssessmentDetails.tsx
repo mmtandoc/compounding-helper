@@ -189,7 +189,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               <label>Required?</label>
               <BooleanRadioGroup
                 readOnly={true}
-                name="ppe.gloves.required"
                 selectedValue={data.ppeGlovesRequired}
               />
             </FormGroup>
@@ -205,7 +204,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               <span className="label">Required?</span>
               <BooleanRadioGroup
                 readOnly={true}
-                name="ppe.coat.required"
                 selectedValue={data.ppeCoatRequired}
               />
             </FormGroup>
@@ -221,7 +219,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               <span className="label">Required?</span>
               <BooleanRadioGroup
                 readOnly={true}
-                name="ppe.mask.required"
                 selectedValue={data.ppeMaskRequired}
               />
             </FormGroup>
@@ -237,7 +234,6 @@ const RiskAssessmentDetails = ({ data }: Props) => {
               <label>Required?</label>
               <BooleanRadioGroup
                 readOnly={true}
-                name="ppe.eyeProtection.required"
                 selectedValue={data.ppeEyeProtectionRequired}
               />
             </FormGroup>
@@ -250,14 +246,12 @@ const RiskAssessmentDetails = ({ data }: Props) => {
       <Fieldset legend="Is an eye wash station required?">
         <BooleanRadioGroup
           readOnly={true}
-          name="requireEyeWashStation"
           selectedValue={data.requireEyeWashStation}
         />
       </Fieldset>
       <Fieldset legend="Is a safety shower required?">
         <BooleanRadioGroup
           readOnly={true}
-          name="requireSafetyShower"
           selectedValue={data.requireSafetyShower}
         />
       </Fieldset>
