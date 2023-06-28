@@ -130,6 +130,7 @@ const MfrDetails = (props: MfrEntryProps) => {
       <FormGroup>
         <label>Quality controls:</label>
         <Table
+          className="qc-table"
           data={
             data.qualityControls as {
               name: string
@@ -147,6 +148,7 @@ const MfrDetails = (props: MfrEntryProps) => {
               accessorKey: "expectedSpecification",
             },
           ]}
+          options={{ enableFilters: false, enableSorting: false }}
         />
       </FormGroup>
       <FormGroup>
@@ -242,6 +244,10 @@ const MfrDetails = (props: MfrEntryProps) => {
         .ingredients-table {
           width: 100%;
           margin-bottom: 1rem;
+        }
+
+        .qc-table {
+          width: 100%;
         }
 
         .plain-text {
