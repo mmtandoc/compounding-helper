@@ -1,9 +1,15 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
+import React, { useCallback, useState } from "react"
 
+import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { toIsoDateString } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
+
+import BatchDataTableActions from "../common/BatchDataTableActions"
+import RiskAssessmentDetails from "./RiskAssessmentDetails"
 
 type Props = {
   data: RiskAssessmentAll[]
@@ -89,9 +95,45 @@ const columns = [
   }),
 ]
 
-const RiskAssessmentsTable = ({ data }: Props) => {
+const RiskAssessmentsTable = (props: Props) => {
+  const { data } = props
+
+  const [selectedRows, setSelectedRows] = useState<RiskAssessmentAll[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: RiskAssessmentAll[]) => setSelectedRows(rows),
+    [],
+  )
+
+  const renderDocument = (data: RiskAssessmentAll) => (
+    <div className="details">
+      <h1>
+        Risk Assessment: {data.compound.name} (
+        {toIsoDateString(data.dateAssessed)})
+      </h1>
+      <RiskAssessmentDetails data={data} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+
   return (
-    <Table className="risk-assessment-table" data={data} columns={columns} />
+    <>
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+      <Table
+        className="risk-assessment-table"
+        data={data}
+        columns={columns}
+        options={{ enableRowSelection: true }}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+    </>
   )
 }
 

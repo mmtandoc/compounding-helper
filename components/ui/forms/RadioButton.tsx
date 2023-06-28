@@ -29,7 +29,7 @@ const RadioButton = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           }
 
           &:checked {
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23000' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='5'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23000' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3C/svg%3E");
             background-position: 50%;
             background-repeat: no-repeat;
             background-size: 100% 100%;

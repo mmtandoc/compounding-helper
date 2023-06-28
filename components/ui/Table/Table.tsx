@@ -2,6 +2,7 @@ import {
   Column,
   ColumnDef,
   RowData,
+  RowSelectionState,
   TableOptions,
   Table as TanstackTable,
   flexRender,
@@ -25,6 +26,7 @@ import {
   TiArrowUnsorted,
 } from "react-icons/ti"
 
+import { IndeterminateCheckbox } from "../forms"
 import { Filter } from "./Filter"
 
 declare module "@tanstack/table-core" {
@@ -42,6 +44,7 @@ type TableProps<TData> = {
   columns: ColumnDef<TData, any>[]
   data: TData[]
   options?: Partial<TableOptions<TData>> & { enableFooter?: boolean }
+  onSelectedRowsChange?: (rows: TData[]) => void
   className?: string
 }
 
@@ -50,12 +53,50 @@ const Table = <TData,>(props: TableProps<TData>) => {
     columns,
     data,
     options: { enableFooter = false, ...tableOptions } = {},
+    onSelectedRowsChange,
     className,
   } = props
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  // If enableRowSelection is row, automatically add select column
+  const columnsMemo = useMemo(
+    () =>
+      tableOptions?.enableRowSelection
+        ? [
+            {
+              id: "select",
+              header: ({ table }) => (
+                <IndeterminateCheckbox
+                  checked={table.getIsAllRowsSelected()}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  onChange={table.getToggleAllRowsSelectedHandler()}
+                />
+              ),
+              cell: ({ row }) => (
+                <IndeterminateCheckbox
+                  checked={row.getIsSelected()}
+                  disabled={!row.getCanSelect()}
+                  indeterminate={row.getIsSomeSelected()}
+                  onChange={row.getToggleSelectedHandler()}
+                />
+              ),
+              footer: ({ table }) => (
+                <IndeterminateCheckbox
+                  checked={table.getIsAllRowsSelected()}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  onChange={table.getToggleAllRowsSelectedHandler()}
+                />
+              ),
+            },
+            ...columns,
+          ]
+        : columns,
+    [columns, tableOptions?.enableRowSelection],
+  )
 
   const table = useReactTable({
     data,
-    columns,
+    columns: columnsMemo,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -64,7 +105,17 @@ const Table = <TData,>(props: TableProps<TData>) => {
     enableColumnResizing: false,
     columnResizeMode: "onChange",
     ...tableOptions,
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange: setRowSelection,
   })
+
+  useEffect(() => {
+    onSelectedRowsChange?.(
+      table.getSelectedRowModel().flatRows.map((row) => row.original),
+    )
+  }, [rowSelection, table, onSelectedRowsChange])
 
   const colWidthsRef = useRef<Map<string, number | undefined>>(
     new Map<string, number | undefined>(),

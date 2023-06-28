@@ -3,11 +3,13 @@ import { createColumnHelper } from "@tanstack/react-table"
 import axios, { AxiosError, isAxiosError } from "axios"
 import { formatDistanceToNow } from "date-fns"
 import { enqueueSnackbar } from "notistack"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { MdComment } from "react-icons/md"
 import { mutate } from "swr"
 
+import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { printDetails } from "components/common/styles"
 import { Button, Modal, Table, Tooltip } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
 import DataRowActions from "components/ui/Table/DataRowActions"
@@ -16,6 +18,8 @@ import { CompletionFields, NullableCompletionFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { JsonError } from "types/common"
 import { RoutineWithHistory } from "types/models"
+
+import RoutineDetails from "./RoutineDetails/RoutineDetails"
 
 type Props = {
   data: RoutineWithHistory[]
@@ -204,9 +208,38 @@ const RoutineTable = (props: Props) => {
     [],
   )
 
+  const [selectedRows, setSelectedRows] = useState<RoutineEntity[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: RoutineEntity[]) => setSelectedRows(rows),
+    [],
+  )
+
+  const renderDocument = (data: RoutineEntity) => (
+    <div className="details">
+      <h1>Routine: {data.name}</h1>
+      <RoutineDetails data={data} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+
   return (
     <>
-      <Table className="routine-table" data={routines} columns={columns} />
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+      <Table
+        className="routine-table"
+        data={routines}
+        columns={columns}
+        options={{ enableRowSelection: true }}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
       {currentRoutine && (
         <MarkCompleteModal
           routine={currentRoutine}

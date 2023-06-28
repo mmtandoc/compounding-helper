@@ -1,13 +1,17 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import { useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
+import useSWR from "swr"
 
+import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { printDetails } from "components/common/styles"
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
-import { CompoundWithMfrCount, IngredientAll } from "types/models"
+import { CompoundWithMfrCount, IngredientAll, MfrAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
+import MfrDetails from "./mfr/MfrDetails"
 
 type Props = {
   data: CompoundWithMfrCount[]
@@ -184,8 +188,69 @@ const CompoundsTable = (props: Props) => {
     [showShortcuts],
   )
 
+  const [selectedRows, setSelectedRows] = useState<CompoundWithMfrCount[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: CompoundWithMfrCount[]) => setSelectedRows(rows),
+    [],
+  )
+
+  const PrintDoc = ({ data }: { data: CompoundWithMfrCount }) => {
+    const {
+      data: mfrsData,
+      error,
+      isLoading,
+    } = useSWR<MfrAll[]>(`/api/compounds/${data.id}/mfrs`)
+
+    if (error) {
+      console.error(error)
+    }
+
+    const mfrData = useMemo(
+      () =>
+        mfrsData?.reduce((prev, curr) =>
+          prev.version > curr.version ? prev : curr,
+        ),
+      [mfrsData],
+    )
+
+    if (isLoading || mfrsData === undefined || mfrData === undefined) {
+      return <p>Loading...</p>
+    }
+
+    return (
+      <div className="details">
+        <h1>
+          MFR: {mfrData.compound.name} - v.{mfrData.version}
+        </h1>
+        <MfrDetails data={mfrData} />
+        <style jsx>{printDetails}</style>
+      </div>
+    )
+  }
+
+  const renderDocument = (data: CompoundWithMfrCount) => {
+    return <PrintDoc data={data} />
+  }
+
   return (
-    <Table className="compound-table" data={data} columns={visibleColumns} />
+    <>
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+      <Table
+        className="compound-table"
+        data={data}
+        columns={visibleColumns}
+        options={{ enableRowSelection: (row) => row.original._count.mfrs > 0 }}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+    </>
   )
 }
 

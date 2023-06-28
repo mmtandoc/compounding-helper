@@ -1,9 +1,14 @@
 import { createColumnHelper } from "@tanstack/react-table"
+import { useCallback, useState } from "react"
 
+import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import { toIsoDateString } from "lib/utils"
 import { MfrAll } from "types/models"
+
+import MfrDetails from "./MfrDetails/MfrDetails"
 
 type Props = {
   data: MfrAll[]
@@ -46,10 +51,43 @@ const columns = [
   }),
 ]
 
-const MfrTable = (props: Props) => {
-  const { data } = props
+const MfrTable = ({ data }: Props) => {
+  const [selectedRows, setSelectedRows] = useState<MfrAll[]>([])
 
-  return <Table className="mfr-table" data={data} columns={columns} />
+  const handleSelectedRowsChange = useCallback(
+    (rows: MfrAll[]) => setSelectedRows(rows),
+    [],
+  )
+
+  const renderDocument = (data: MfrAll) => (
+    <div className="details">
+      <h1>
+        MFR: {data.compound.name} - v.{data.version}
+      </h1>
+      <MfrDetails data={data} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+
+  return (
+    <>
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+      <Table
+        className="mfr-table"
+        data={data}
+        columns={columns}
+        options={{ enableRowSelection: true }}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
+      <BatchDataTableActions
+        selectedRows={selectedRows}
+        renderDocument={renderDocument}
+      />
+    </>
+  )
 }
 
 export default MfrTable
