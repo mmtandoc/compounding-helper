@@ -20,11 +20,11 @@ const RadioButton = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           margin-inline: 5px 3px;
           background-color: var(--color-radio-bg);
 
-          &:hover {
+          &:hover:not([readOnly]) {
             border-color: var(--color-radio-hover-border);
           }
 
-          &:active {
+          &:active:not([readOnly]) {
             border-color: var(--color-radio-active-border);
           }
 
