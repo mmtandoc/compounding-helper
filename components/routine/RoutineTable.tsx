@@ -158,7 +158,7 @@ const RoutineTable = (props: Props) => {
         filterFn: (row, columnId, filterValue: string) => {
           const value = row.getValue<boolean>(columnId)
 
-          if (filterValue === undefined || filterValue.length === 0) {
+          if (filterValue === undefined || filterValue === "") {
             return true
           }
           return (value ? "yes" : "no") === filterValue
@@ -233,7 +233,10 @@ const RoutineTable = (props: Props) => {
         className="routine-table"
         data={routines}
         columns={columns}
-        options={{ enableRowSelection: true }}
+        options={{
+          enableRowSelection: true,
+          initialState: { columnFilters: [{ id: "isActive", value: "yes" }] },
+        }}
         onSelectedRowsChange={handleSelectedRowsChange}
       />
       <BatchDataTableActions
