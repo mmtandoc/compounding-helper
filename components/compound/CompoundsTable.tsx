@@ -238,6 +238,7 @@ const CompoundsTable = (props: Props) => {
       <BatchDataTableActions
         selectedRows={selectedRows}
         renderDocument={renderDocument}
+        printButtonText="Print selected MFRs"
       />
       <Table
         className="compound-table"
@@ -249,6 +250,7 @@ const CompoundsTable = (props: Props) => {
       <BatchDataTableActions
         selectedRows={selectedRows}
         renderDocument={renderDocument}
+        printButtonText="Print selected MFRs"
       />
     </>
   )

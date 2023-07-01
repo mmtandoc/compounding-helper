@@ -20,7 +20,7 @@ const BatchDataTableActions = <TData,>({
           documentTitle={documentTitle}
           documents={selectedRows.map(renderDocument)}
         >
-          {printButtonText ?? "Print All"}
+          {printButtonText ?? "Print selected rows"}
         </BatchPrintButton>
         <style jsx>{`
           .batch-table-actions {
