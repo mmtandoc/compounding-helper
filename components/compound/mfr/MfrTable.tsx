@@ -1,7 +1,8 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import { useCallback, useState } from "react"
 
-import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
 import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
@@ -71,10 +72,11 @@ const MfrTable = ({ data }: Props) => {
 
   return (
     <>
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
       <Table
         className="mfr-table"
         data={data}
@@ -82,10 +84,11 @@ const MfrTable = ({ data }: Props) => {
         options={{ enableRowSelection: true }}
         onSelectedRowsChange={handleSelectedRowsChange}
       />
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
     </>
   )
 }

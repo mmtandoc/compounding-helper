@@ -1,14 +1,15 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import React, { useCallback, useState } from "react"
+import { useCallback, useState } from "react"
 
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
 import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import { toIsoDateString } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
-import BatchDataTableActions from "../common/BatchDataTableActions"
 import RiskAssessmentDetails from "./RiskAssessmentDetails"
 
 type Props = {
@@ -118,10 +119,11 @@ const RiskAssessmentsTable = (props: Props) => {
 
   return (
     <>
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
       <Table
         className="risk-assessment-table"
         data={data}
@@ -129,10 +131,11 @@ const RiskAssessmentsTable = (props: Props) => {
         options={{ enableRowSelection: true }}
         onSelectedRowsChange={handleSelectedRowsChange}
       />
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
     </>
   )
 }

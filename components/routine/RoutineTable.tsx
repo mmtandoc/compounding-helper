@@ -8,7 +8,8 @@ import { FormProvider, useForm } from "react-hook-form"
 import { MdComment } from "react-icons/md"
 import { mutate } from "swr"
 
-import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
 import { printDetails } from "components/common/styles"
 import { Button, Modal, Table, Tooltip } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
@@ -225,10 +226,11 @@ const RoutineTable = (props: Props) => {
 
   return (
     <>
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
       <Table
         className="routine-table"
         data={routines}
@@ -239,10 +241,11 @@ const RoutineTable = (props: Props) => {
         }}
         onSelectedRowsChange={handleSelectedRowsChange}
       />
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
       {currentRoutine && (
         <MarkCompleteModal
           routine={currentRoutine}

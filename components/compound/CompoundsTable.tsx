@@ -3,7 +3,8 @@ import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import useSWR from "swr"
 
-import BatchDataTableActions from "components/common/BatchDataTableActions"
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
 import { printDetails } from "components/common/styles"
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
@@ -235,11 +236,11 @@ const CompoundsTable = (props: Props) => {
 
   return (
     <>
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-        printButtonText="Print selected MFRs"
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
       <Table
         className="compound-table"
         data={data}
@@ -247,11 +248,11 @@ const CompoundsTable = (props: Props) => {
         options={{ enableRowSelection: (row) => row.original._count.mfrs > 0 }}
         onSelectedRowsChange={handleSelectedRowsChange}
       />
-      <BatchDataTableActions
-        selectedRows={selectedRows}
-        renderDocument={renderDocument}
-        printButtonText="Print selected MFRs"
-      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
     </>
   )
 }
