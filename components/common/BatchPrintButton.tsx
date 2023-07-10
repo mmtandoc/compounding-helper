@@ -88,6 +88,10 @@ export const BatchPrintButton = (
             padding: 0;
           }
 
+          .print-hide {
+            display: none !important;
+          }
+
           .page-break {
             margin-top: 1rem;
             display: block;

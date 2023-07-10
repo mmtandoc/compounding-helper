@@ -50,6 +50,10 @@ export const printDetails = css.global`
         text-decoration-line: none;
         outline: none !important;
       }
+
+      .print-hide {
+        display: none !important;
+      }
     }
   }
 
