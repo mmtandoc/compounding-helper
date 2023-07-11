@@ -187,17 +187,29 @@ const RiskAssessmentDetails = ({ data }: Props) => {
           <PpeFieldset
             legend="Gloves:"
             required={data.ppeGlovesRequired}
-            type={`${capitalize(data.ppeGlovesType as string)} gloves`}
+            type={
+              data.ppeGlovesRequired
+                ? `${capitalize(data.ppeGlovesType as string)} gloves`
+                : undefined
+            }
           />
           <PpeFieldset
             legend="Coat:"
             required={data.ppeCoatRequired}
-            type={`${capitalize(data.ppeCoatType as string)} coat`}
+            type={
+              data.ppeCoatRequired
+                ? `${capitalize(data.ppeCoatType as string)} coat`
+                : undefined
+            }
           />
           <PpeFieldset
             legend="Mask:"
             required={data.ppeMaskRequired}
-            type={`${capitalize(data.ppeMaskType as string)}`}
+            type={
+              data.ppeMaskRequired
+                ? `${capitalize(data.ppeMaskType as string)}`
+                : undefined
+            }
           />
           <PpeFieldset
             legend="Eye Protection:"
