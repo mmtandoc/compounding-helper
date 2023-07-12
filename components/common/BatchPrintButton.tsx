@@ -1,40 +1,68 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react"
+import { SnackbarKey, closeSnackbar, enqueueSnackbar } from "notistack"
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { useReactToPrint } from "react-to-print"
 
-import { printDetails } from "components/common/styles"
 import { Button } from "components/ui"
 import { ButtonProps } from "components/ui/Button"
 
-export const BatchPrintButton = (
-  props: {
-    documentTitle?: string
-    documents: ReactNode[]
-    children: ReactNode
-  } & ButtonProps,
-) => {
+type Props = {
+  documentTitle?: string
+  children: ReactNode
+  documents: (ReactNode | ((props: { onLoaded: () => void }) => JSX.Element))[]
+} & ButtonProps
+
+export const BatchPrintButton = (props: Props) => {
   const { documents, documentTitle, children, ...buttonProps } = props
 
   const componentRef = useRef(null)
 
   const [isPrinting, setIsPrinting] = useState(false)
 
+  const [docsLoadedCount, setDocsLoadedCount] = useState(
+    documents.filter((doc) => typeof doc !== "function").length,
+  )
+
+  useEffect(() => {
+    setDocsLoadedCount(
+      documents.filter((doc) => typeof doc !== "function").length,
+    )
+  }, [documents])
+
   // We store the resolve Promise being used in `onBeforeGetContent` here
-  const promiseResolveRef = React.useRef<((_?: any) => void) | null>(null)
+  const promiseResolveRef = React.useRef<((_?: unknown) => void) | null>(null)
+
+  const isLoaded = useMemo(
+    () => docsLoadedCount === documents.length,
+    [docsLoadedCount, documents.length],
+  )
 
   // We watch for the state to change here, and for the Promise resolve to be available
   useEffect(() => {
-    if (isPrinting && promiseResolveRef.current) {
+    if (isPrinting && promiseResolveRef.current && isLoaded) {
       // Resolves the Promise, letting `react-to-print` know that the DOM updates are completed
       promiseResolveRef.current()
     }
-  }, [isPrinting])
+  }, [isLoaded, isPrinting])
+
+  const printPrepAlertKeyRef = React.useRef<SnackbarKey | null>(null)
 
   const handlePrintAll = useReactToPrint({
     content: () => componentRef.current,
     documentTitle,
     bodyClass: "print-body",
     onBeforeGetContent: () => {
-      return new Promise<undefined>((resolve) => {
+      return new Promise((resolve) => {
+        const key = enqueueSnackbar("Preparing to print...", {
+          autoHideDuration: 5000,
+        })
+        printPrepAlertKeyRef.current = key
         promiseResolveRef.current = resolve
         setIsPrinting(true)
       })
@@ -43,18 +71,35 @@ export const BatchPrintButton = (
       // Reset the Promise resolve so we can print again
       promiseResolveRef.current = null
       setIsPrinting(false)
+      setDocsLoadedCount(
+        documents.filter((doc) => typeof doc !== "function").length,
+      )
+
+      const key = printPrepAlertKeyRef.current
+      if (key === null) return
+
+      closeSnackbar(key)
+      printPrepAlertKeyRef.current = null
     },
   })
+
+  const handleLoaded = useCallback(() => {
+    setDocsLoadedCount((prevCount) => prevCount + 1)
+  }, [])
 
   return (
     <div className="batch-print-button">
       <div style={{ display: "none" }}>
         <div className="print-body" ref={componentRef}>
           {isPrinting &&
-            documents.map((doc, i) => (
+            documents.map((Doc, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <div className="page-break" />}
-                {doc}
+                {typeof Doc === "function" ? (
+                  <Doc onLoaded={handleLoaded} />
+                ) : (
+                  Doc
+                )}
               </React.Fragment>
             ))}
         </div>
@@ -62,7 +107,7 @@ export const BatchPrintButton = (
       <Button
         {...buttonProps}
         onClick={(e) => {
-          //buttonProps?.onClick?.(e)
+          buttonProps?.onClick?.(e)
           handlePrintAll()
         }}
       >

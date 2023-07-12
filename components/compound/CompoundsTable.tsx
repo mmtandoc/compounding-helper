@@ -1,6 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import useSWR from "swr"
 
 import { BatchPrintButton } from "components/common/BatchPrintButton"
@@ -196,48 +196,10 @@ const CompoundsTable = (props: Props) => {
     [],
   )
 
-  const PrintDoc = ({ data }: { data: CompoundWithMfrCount }) => {
-    const {
-      data: mfrsData,
-      error,
-      isLoading,
-    } = useSWR<MfrAll[]>(`/api/compounds/${data.id}/mfrs`)
-
-    if (error) {
-      console.error(error)
-    }
-
-    const mfrData = useMemo(
-      () =>
-        mfrsData?.reduce((prev, curr) =>
-          prev.version > curr.version ? prev : curr,
-        ),
-      [mfrsData],
-    )
-
-    if (isLoading || mfrsData === undefined || mfrData === undefined) {
-      return <p>Loading...</p>
-    }
-
-    return (
-      <div className="details">
-        <h1>
-          MFR: {mfrData.compound.name} - v.{mfrData.version}
-        </h1>
-        <MfrDetails data={mfrData} />
-        <style jsx>{printDetails}</style>
-      </div>
-    )
-  }
-
-  const renderDocument = (data: CompoundWithMfrCount) => {
-    return <PrintDoc data={data} />
-  }
-
   return (
     <>
       <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
           Print selected MFRs
         </BatchPrintButton>
       </BatchTableActions>
@@ -249,7 +211,7 @@ const CompoundsTable = (props: Props) => {
         onSelectedRowsChange={handleSelectedRowsChange}
       />
       <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
           Print selected MFRs
         </BatchPrintButton>
       </BatchTableActions>
@@ -257,4 +219,60 @@ const CompoundsTable = (props: Props) => {
   )
 }
 
+const MfrPrintDoc = ({
+  data,
+  onLoaded,
+}: {
+  data: CompoundWithMfrCount
+  onLoaded: () => void
+}) => {
+  const {
+    data: mfrsData,
+    error,
+    isLoading,
+  } = useSWR<MfrAll[]>(`/api/compounds/${data.id}/mfrs`)
+
+  if (error) {
+    console.error(error)
+  }
+
+  const mfrData = useMemo(
+    () =>
+      mfrsData?.reduce((prev, curr) =>
+        prev.version > curr.version ? prev : curr,
+      ),
+    [mfrsData],
+  )
+
+  const onLoadedCalledRef = useRef(false)
+
+  useEffect(() => {
+    // check if data exists and the effect haven't been called
+    if (!isLoading && mfrsData && mfrData && !onLoadedCalledRef.current) {
+      onLoadedCalledRef.current = true
+      onLoaded()
+    }
+  }, [isLoading, mfrData, mfrsData, onLoaded])
+
+  if (isLoading || mfrsData === undefined || mfrData === undefined) {
+    return null
+  }
+
+  return (
+    <div className="details">
+      <h1>
+        MFR: {mfrData.compound.name} - v.{mfrData.version}
+      </h1>
+      <MfrDetails data={mfrData} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+}
+
+const createRenderMfrDocument = (data: CompoundWithMfrCount) => {
+  const Doc = ({ onLoaded }: { onLoaded: () => void }) => (
+    <MfrPrintDoc data={data} onLoaded={onLoaded} />
+  )
+  return Doc
+}
 export default CompoundsTable
