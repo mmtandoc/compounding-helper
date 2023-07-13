@@ -1,22 +1,26 @@
 import { RoutineCompletion } from "@prisma/client"
+import { createColumnHelper } from "@tanstack/react-table"
 import axios, { AxiosError, isAxiosError } from "axios"
 import { formatDistanceToNow } from "date-fns"
-import Link from "next/link"
 import { enqueueSnackbar } from "notistack"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { MdComment } from "react-icons/md"
-import { RRule } from "rrule"
 import { mutate } from "swr"
 
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
+import { printDetails } from "components/common/styles"
 import { Button, Modal, Table, Tooltip } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
+import DataRowActions from "components/ui/Table/DataRowActions"
 import { RoutineEntity } from "lib/entities"
 import { CompletionFields, NullableCompletionFields } from "lib/fields"
-import filterFns from "lib/table/filterFns"
 import { toIsoDateString } from "lib/utils"
 import { JsonError } from "types/common"
 import { RoutineWithHistory } from "types/models"
+
+import RoutineDetails from "./RoutineDetails/RoutineDetails"
 
 type Props = {
   data: RoutineWithHistory[]
@@ -56,6 +60,8 @@ const CommentView = (props: { comment: string }) => {
   )
 }
 
+const columnHelper = createColumnHelper<RoutineEntity>()
+
 //TODO: Implement searching
 const RoutineTable = (props: Props) => {
   const { data } = props
@@ -76,149 +82,170 @@ const RoutineTable = (props: Props) => {
     return () => clearInterval(interval)
   }, [])
 
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("category", {
+        header: "Category",
+      }),
+      columnHelper.accessor("name", {
+        header: "Name",
+        filterFn: "includesString",
+        cell: (info) => (
+          <span>
+            {info.getValue()}
+            <style jsx>{`
+              span {
+                font-weight: 550;
+              }
+            `}</style>
+          </span>
+        ),
+      }),
+      columnHelper.accessor((row) => row.getRRule(), {
+        id: "rrule",
+        header: "Occurs",
+        cell: (info) => info.getValue().toText(),
+        enableSorting: false,
+        enableColumnFilter: false,
+      }),
+      columnHelper.accessor((row) => row.getLastCompleted(), {
+        id: "lastCompleted",
+        header: "Last Completed",
+        cell: (info) => {
+          const lastCompleted = info.getValue()
+          return lastCompleted?.date ? (
+            <span style={{ whiteSpace: "nowrap" }}>
+              {toIsoDateString(lastCompleted.date)} by {lastCompleted.name}
+              {lastCompleted.comment && (
+                <CommentView comment={lastCompleted.comment} />
+              )}
+            </span>
+          ) : null
+        },
+        sortingFn: (rowA, rowB, columnId) =>
+          (
+            rowA
+              .getValue<RoutineCompletion | null>(columnId)
+              ?.date.toISOString() ?? ""
+          ).localeCompare(
+            rowB
+              .getValue<RoutineCompletion | null>(columnId)
+              ?.date.toISOString() ?? "",
+          ),
+        enableColumnFilter: false,
+      }),
+      columnHelper.accessor((row) => row.getDueDate(), {
+        id: "dueDate",
+        header: "Due Date",
+        cell: (info) => {
+          const dueDate = info.getValue()
+          return dueDate ? (
+            <span
+              style={{
+                color: info.row.original.isOverdue() ? "#cc0000" : "initial",
+              }}
+            >
+              {`${toIsoDateString(dueDate)} (${formatDistanceToNow(dueDate, {
+                addSuffix: true,
+              })})`}
+            </span>
+          ) : null
+        },
+        enableColumnFilter: false,
+      }),
+      columnHelper.accessor("isActive", {
+        header: "Is Active",
+        cell: (info) => (info.getValue() ? "Yes" : "No"),
+        filterFn: (row, columnId, filterValue: string) => {
+          const value = row.getValue<boolean>(columnId)
+
+          if (filterValue === undefined || filterValue === "") {
+            return true
+          }
+          return (value ? "yes" : "no") === filterValue
+        },
+        meta: {
+          filterComponent: ({ column }) => (
+            <Select
+              value={(column.getFilterValue() as string) ?? ""}
+              onChange={(e) => column.setFilterValue(e.target.value)}
+            >
+              <option value=""></option>
+              <option value="yes">Active</option>
+              <option value="no">Inactive</option>
+            </Select>
+          ),
+        },
+      }),
+      columnHelper.display({
+        id: "markComplete",
+        cell: (info) => (
+          <>
+            <Button
+              size="small"
+              onClick={() => {
+                setIsModalOpen(true)
+                setCurrentRoutine(info.row.original)
+              }}
+            >
+              Mark complete
+            </Button>
+          </>
+        ),
+        enableSorting: false,
+        enableColumnFilter: false,
+      }),
+      columnHelper.display({
+        id: "actions",
+        cell: (info) => (
+          <DataRowActions
+            row={info.row}
+            getViewUrl={(data) => `/routines/${data.id}`}
+            getEditUrl={(data) => `/routines/${data.id}/edit`}
+          />
+        ),
+      }),
+    ],
+    [],
+  )
+
+  const [selectedRows, setSelectedRows] = useState<RoutineEntity[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: RoutineEntity[]) => setSelectedRows(rows),
+    [],
+  )
+
+  const renderDocument = (data: RoutineEntity) => (
+    <div className="details">
+      <h1>Routine: {data.name}</h1>
+      <RoutineDetails data={data} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+
   return (
     <>
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
       <Table
         className="routine-table"
         data={routines}
-        columns={[
-          {
-            accessorPath: "category",
-            label: "Category",
-            sortable: true,
-            compare: (a: string | null, b: string | null) =>
-              (a ?? "").localeCompare(b ?? "", "en-CA", { numeric: true }),
-          },
-          {
-            accessorPath: "name",
-            label: "Name",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-            cellStyle: { fontWeight: 550 },
-          },
-          {
-            id: "rrule",
-            accessorFn: (routine) => routine.getRRule(),
-            label: "Occurs",
-            sortable: true,
-            compare: (a: RRule, b: RRule) =>
-              a.toText().localeCompare(b.toText(), "en-CA", { numeric: true }),
-            renderCell: (rule: RRule) => rule.toText(),
-          },
-          {
-            id: "lastCompleted",
-            accessorFn: (item) => item.getLastCompleted(),
-            label: "Last Completed",
-            sortable: true,
-            compare: (
-              a: RoutineCompletion | null,
-              b: RoutineCompletion | null,
-            ) =>
-              (a?.date.toISOString() ?? "").localeCompare(
-                b?.date.toISOString() ?? "",
-              ),
-            renderCell: (completion: RoutineCompletion | null) => {
-              return completion?.date ? (
-                <span style={{ whiteSpace: "nowrap" }}>
-                  {toIsoDateString(completion.date)} by {completion.name}
-                  {completion.comment && (
-                    <CommentView comment={completion.comment} />
-                  )}
-                </span>
-              ) : null
-            },
-          },
-          {
-            id: "dueDate",
-            accessorFn: (item) => item.getDueDate(),
-            label: "Due Date",
-            sortable: true,
-            compare: (a: Date | null, b: Date | null) =>
-              (a?.toISOString() ?? "").localeCompare(b?.toISOString() ?? ""),
-            renderCell: (dueDate: Date | null, item) =>
-              dueDate ? (
-                <span
-                  style={{
-                    color: item.isOverdue() ? "#cc0000" : "initial",
-                  }}
-                >
-                  {`${toIsoDateString(dueDate)} (${formatDistanceToNow(
-                    dueDate,
-                    {
-                      addSuffix: true,
-                    },
-                  )})`}
-                </span>
-              ) : null,
-          },
-          {
-            accessorPath: "isActive",
-            label: "Active",
-            sortable: true,
-            enableColumnFilter: true,
-            //TODO: Support filtering on values other than string?
-            /* filterFn: (cellValue: boolean, item, query: boolean | null) =>
-              query === null ? true : cellValue === query, */
-            filterFn: (cellValue: boolean, item, query) =>
-              query === "" ? true : (query === "yes") === cellValue,
-            renderFilterInput: ({ filter, setFilterValue }) => (
-              <Select
-                value={filter?.value ?? ""}
-                onChange={(e) => setFilterValue(e.target.value)}
-              >
-                <option value=""></option>
-                <option value="yes">Active</option>
-                <option value="no">Inactive</option>
-              </Select>
-            ),
-            defaultFilterValue: "yes",
-            compare: (a: boolean, b: boolean) => Number(a) - Number(b),
-            renderCell: (isActive: boolean) => (isActive ? "Yes" : "No"),
-          },
-          {
-            id: "mark-complete",
-            renderCell: (_, data) => (
-              <>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setIsModalOpen(true)
-                    setCurrentRoutine(data)
-                  }}
-                >
-                  Mark complete
-                </Button>
-              </>
-            ),
-          },
-          {
-            id: "actions",
-            renderCell: (_, data) => (
-              <div>
-                <Link href={`/routines/${data.id}`}>
-                  <Button size="small" theme="primary">
-                    View
-                  </Button>
-                </Link>
-                <Link href={`/routines/${data.id}/edit`}>
-                  <Button size="small">Edit</Button>
-                </Link>
-                <style jsx>{`
-                  div {
-                    display: flex;
-                    column-gap: 0.3rem;
-                    flex-wrap: nowrap;
-                    margin: 0.2rem 0;
-                  }
-                `}</style>
-              </div>
-            ),
-          },
-        ]}
+        columns={columns}
+        options={{
+          enableRowSelection: true,
+          initialState: { columnFilters: [{ id: "isActive", value: "yes" }] },
+        }}
+        onSelectedRowsChange={handleSelectedRowsChange}
       />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected rows
+        </BatchPrintButton>
+      </BatchTableActions>
       {currentRoutine && (
         <MarkCompleteModal
           routine={currentRoutine}

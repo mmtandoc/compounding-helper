@@ -27,26 +27,30 @@ const MfrDetails = (props: MfrEntryProps) => {
 
   return (
     <div className="mfr-details">
-      <Fieldset className="info">
-        <FormGroup row className="ref-number">
-          <label>Ref #:</label>
-          <span>{`MFR-${String(data.compoundId).padStart(3, "0")}-${String(
-            data.version,
-          ).padStart(2, "0")}`}</span>
-        </FormGroup>
-      </Fieldset>
-      <FormGroup row>
-        <label>Compound:</label>
-        <span>{data.compound.name}</span>
-      </FormGroup>
-      <FormGroup row>
-        <label>Pharmaceutical form:</label>
-        <span>{data.pharmaceuticalForm}</span>
-      </FormGroup>
-      <FormGroup row>
-        <label>Route of administration:</label>
-        <span>{data.routeOfAdministration}</span>
-      </FormGroup>
+      <div className="row">
+        <div>
+          <FormGroup row>
+            <label>Compound:</label>
+            <span>{data.compound.name}</span>
+          </FormGroup>
+          <FormGroup row>
+            <label>Pharmaceutical form:</label>
+            <span>{data.pharmaceuticalForm}</span>
+          </FormGroup>
+          <FormGroup row>
+            <label>Route of administration:</label>
+            <span>{data.routeOfAdministration}</span>
+          </FormGroup>
+        </div>
+        <Fieldset className="info">
+          <FormGroup row className="ref-number">
+            <label>Ref #:</label>
+            <span>{`MFR-${String(data.compoundId).padStart(3, "0")}-${String(
+              data.version,
+            ).padStart(2, "0")}`}</span>
+          </FormGroup>
+        </Fieldset>
+      </div>
       <FormGroup row style={{ justifyContent: "space-between" }}></FormGroup>
       <FormGroup row></FormGroup>
       <Fieldset legend="Formula:">
@@ -69,7 +73,7 @@ const MfrDetails = (props: MfrEntryProps) => {
             {toIsoDateString(data.riskAssessment.dateAssessed)}
           </span>
           <Link
-            className="risk-assessment-link"
+            className="risk-assessment-link print-hide"
             href={`/risk-assessments/${data.riskAssessment.id}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -130,6 +134,7 @@ const MfrDetails = (props: MfrEntryProps) => {
       <FormGroup>
         <label>Quality controls:</label>
         <Table
+          className="qc-table"
           data={
             data.qualityControls as {
               name: string
@@ -138,15 +143,21 @@ const MfrDetails = (props: MfrEntryProps) => {
           }
           columns={[
             {
-              label: "Quality controls",
-              accessorPath: "name",
-              cellStyle: { width: "min-content" },
+              header: "Quality controls",
+              accessorKey: "name",
+              meta: {
+                cellStyle: {
+                  width: "min-content",
+                  textAlign: "center",
+                },
+              },
             },
             {
-              label: "Expected specifications",
-              accessorPath: "expectedSpecification",
+              header: "Expected specifications",
+              accessorKey: "expectedSpecification",
             },
           ]}
+          options={{ enableFilters: false, enableSorting: false }}
         />
       </FormGroup>
       <FormGroup>
@@ -202,15 +213,12 @@ const MfrDetails = (props: MfrEntryProps) => {
           value={convertToPlainText(data)}
         />
       </Fieldset>
-      <style jsx>{`
+      <style jsx global>{`
         ul {
           margin-block: 0;
         }
-      `}</style>
-      <style jsx global>{`
-        .mfr-details {
-          position: relative;
 
+        .mfr-details {
           > .form-group {
             padding-inline: 0.75em;
           }
@@ -221,13 +229,20 @@ const MfrDetails = (props: MfrEntryProps) => {
         }
 
         .info {
-          position: absolute;
-          right: 0;
-          top: 0;
+          white-space: nowrap;
+          margin-left: auto;
+          height: min-content;
+          width: min-content;
         }
 
         .ref-number {
-          font-size: var(--font-size-xl);
+          font-size: var(--font-size-lg);
+        }
+
+        @media (min-width: 850px) {
+          .ref-number {
+            font-size: var(--font-size-xl);
+          }
         }
 
         .risk-assessment-link {
@@ -242,6 +257,10 @@ const MfrDetails = (props: MfrEntryProps) => {
         .ingredients-table {
           width: 100%;
           margin-bottom: 1rem;
+        }
+
+        .qc-table {
+          width: 100%;
         }
 
         .plain-text {

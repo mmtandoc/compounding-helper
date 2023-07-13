@@ -8,8 +8,9 @@ import { useReactToPrint } from "react-to-print"
 import { Button, Modal } from "components/ui"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 import { useDocument } from "lib/hooks/useDocument"
-import { capitalize } from "lib/utils"
 import { JsonError } from "types/common"
+
+import { printDetails } from "../styles"
 
 type DetailsComponentProps<TModel> = {
   data: TModel
@@ -79,7 +80,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
   return (
     <div className="details">
       <DetailsComponent data={data} />
-      <div className="action-row">
+      <div className="action-row print-hide">
         {actions.print && <Button onClick={handlePrint}>Print</Button>}
         {actions.edit && (
           <Link href={`${urlPath}/edit`}>
@@ -118,68 +119,9 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
           margin-top: 1.5rem;
         }
       `}</style>
-      <style jsx global>{`
-        @media print {
-          html {
-            font-size: 52%;
-          }
-
-          h1 {
-            margin: 0 0 2rem;
-          }
-
-          .page {
-            border: none !important;
-            max-width: none !important;
-          }
-
-          textarea {
-            border: 1px solid black;
-          }
-
-          input[type="radio"] {
-            height: 1rem !important;
-            width: 1rem !important;
-          }
-
-          textarea,
-          select,
-          input {
-            //font-size: 3rem;
-          }
-
-          body {
-            background-color: white !important;
-          }
-
-          .print-hide,
-          .action-row,
-          button {
-            display: none !important;
-          }
-        }
-
-        @page {
-          margin: 1.5cm 0.5cm;
-          font-size: 12px;
-          print-color-adjust: exact;
-        }
-
-        .print-body {
-          .details fieldset,
-          .details .form-group {
-            page-break-inside: avoid;
-            display: block;
-          }
-
-          .details a {
-            color: currentColor !important;
-            text-decoration: none !important;
-            text-decoration-line: none;
-            outline: none !important;
-          }
-        }
-      `}</style>
+      <style jsx global>
+        {printDetails}
+      </style>
     </div>
   )
 }

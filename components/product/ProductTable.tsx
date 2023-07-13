@@ -1,88 +1,66 @@
 import { Chemical } from "@prisma/client"
-import Link from "next/link"
+import { createColumnHelper } from "@tanstack/react-table"
 
-import { Button, Table } from "components/ui"
-import filterFns from "lib/table/filterFns"
+import { Table } from "components/ui"
+import DataRowActions from "components/ui/Table/DataRowActions"
 import { ProductAll } from "types/models"
 
 type Props = {
   data: ProductAll[]
 }
 
+const columnHelper = createColumnHelper<ProductAll>()
+
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    enableSorting: true,
+    enableColumnFilter: false,
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    enableSorting: true,
+    filterFn: "includesString",
+  }),
+  columnHelper.accessor("vendor.name", {
+    header: "Vendor",
+    enableSorting: true,
+    filterFn: "includesString",
+  }),
+  columnHelper.accessor("chemical", {
+    header: "Chemical",
+    cell: (info) => info.getValue().name,
+    sortingFn: (rowA, rowB, columnId) =>
+      rowA
+        .getValue<Chemical>(columnId)
+        .name.localeCompare(rowB.getValue<Chemical>(columnId).name, "en-CA", {
+          numeric: true,
+        }),
+    filterFn: (row, columnId, filterValue: string) => {
+      const chemical = row.getValue<Chemical>(columnId)
+
+      return [chemical.name, ...chemical.synonyms].some(
+        (str) => str.toUpperCase() === filterValue.toUpperCase(),
+      )
+    },
+  }),
+  columnHelper.display({
+    id: "actions",
+    cell: (info) => (
+      <DataRowActions
+        row={info.row}
+        getEditUrl={(data) => `/products/${data.id}/edit`}
+        getViewUrl={(data) => `/products/${data.id}`}
+      />
+    ),
+  }),
+]
+
 //TODO: Implement searching
 const ProductTable = (props: Props) => {
   const { data } = props
 
-  return (
-    <>
-      <Table
-        className="product-table"
-        data={data}
-        columns={[
-          {
-            accessorPath: "id",
-            label: "ID",
-            sortable: true,
-            compare: (a: number, b: number) => a - b,
-          },
-          {
-            accessorPath: "name",
-            label: "Name",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "vendor.name",
-            label: "Vendor",
-            sortable: true,
-            compare: (a: string, b: string) =>
-              a.localeCompare(b, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: filterFns.string,
-          },
-          {
-            accessorPath: "chemical",
-            label: "Chemical",
-            sortable: true,
-            compare: (a: Chemical, b: Chemical) =>
-              a.name.localeCompare(b.name, "en-CA", { numeric: true }),
-            enableColumnFilter: true,
-            filterFn: (chemical: Chemical, _, query) =>
-              [chemical.name, ...chemical.synonyms].some((str) =>
-                filterFns.string(str, _, query),
-              ),
-            renderCell: (chemical: Chemical) => chemical.name,
-          },
-          {
-            id: "actions",
-            renderCell: (_, data) => (
-              <div>
-                <Link href={`/products/${data.id}`}>
-                  <Button size="small" theme="primary">
-                    View
-                  </Button>
-                </Link>
-                <Link href={`/products/${data.id}/edit`}>
-                  <Button size="small">Edit</Button>
-                </Link>
-                <style jsx>{`
-                  div {
-                    display: flex;
-                    column-gap: 0.3rem;
-                    flex-wrap: nowrap;
-                    margin: 0.2rem 0;
-                  }
-                `}</style>
-              </div>
-            ),
-          },
-        ]}
-      />
-    </>
-  )
+  return <Table className="product-table" data={data} columns={columns} />
 }
 
 export default ProductTable

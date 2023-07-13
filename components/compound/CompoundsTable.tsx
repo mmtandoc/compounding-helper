@@ -1,175 +1,182 @@
+import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import { useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import useSWR from "swr"
 
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
+import { printDetails } from "components/common/styles"
 import { Button, Table } from "components/ui"
-import { TableColumn } from "components/ui/Table"
-import filterFns from "lib/table/filterFns"
-import { CompoundWithMfrCount, IngredientAll } from "types/models"
+import DataRowActions from "components/ui/Table/DataRowActions"
+import RowActions from "components/ui/Table/RowActions"
+import { CompoundWithMfrCount, IngredientAll, MfrAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
+import MfrDetails from "./mfr/MfrDetails"
 
 type Props = {
   data: CompoundWithMfrCount[]
   options?: { showShortcuts?: boolean }
 }
 
-const columns: TableColumn<CompoundWithMfrCount, any>[] = [
-  {
-    label: "ID",
-    sortable: true,
-    compare: (a: number, b: number) => a - b,
-    accessorPath: "id",
-    cellStyle: { width: "3em" },
-  },
-  {
-    id: "shortcut",
-    label: "HWNG Shortcut",
-    renderCell: (_, data) => {
-      const variations = data.shortcutVariations as {
+const columnHelper = createColumnHelper<CompoundWithMfrCount>()
+
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    enableColumnFilter: false,
+  }),
+  columnHelper.accessor(
+    (row) => {
+      const variations = row.shortcutVariations as {
         code: string
         name: string
       }[]
-      if (!data.hasShortcut) return ""
 
-      if (variations.length > 0) {
-        return (
-          <>
-            <div>
-              {getHwngShortcutString(
-                data.id,
-                [{ code: "__", name: "placeholder" }],
-                data.shortcutSuffix,
-              )}
-            </div>
-            <div>{variations.map((v) => v.code).join("/")}</div>
-          </>
-        )
-      } else {
-        return getHwngShortcutString(data.id, variations, data.shortcutSuffix)
-      }
+      return row.hasShortcut
+        ? getHwngShortcutString(
+            row.id,
+            variations.length > 0
+              ? [{ code: "__", name: "placeholder" }]
+              : null,
+            row.shortcutSuffix,
+          )
+        : null
     },
-    cellStyle: { whiteSpace: "nowrap" },
-  },
-  {
-    label: "Name",
-    sortable: true,
-    compare: (a: string, b: string) => a.localeCompare(b),
-    accessorPath: "name",
-    enableColumnFilter: true,
-    filterFn: filterFns.string,
-    cellStyle: { width: "30%" },
-  },
-  {
-    label: "Ingredients",
-    accessorPath: "ingredients",
-    cellStyle: { padding: 0, width: "30%" },
-    renderCell: (ingredients: IngredientAll[]) => (
-      <div>
-        {ingredients.map((ingredient, i) => {
-          const chemical = ingredient?.safetyDataSheet?.product.chemical
-          if (!chemical) {
-            return <span key={i}>{ingredient.commercialProductName}</span>
-          }
-          const chemicalLink = (
-            <Link href={`/chemicals/${chemical.id}`}>{chemical.name}</Link>
-          )
-          return (
-            <span key={i}>
-              {ingredient.commercialProductName ? (
-                <>
-                  {ingredient.commercialProductName} ({chemicalLink})
-                </>
-              ) : (
-                chemicalLink
-              )}
-            </span>
-          )
-        })}
-        <style jsx>{`
-          div {
-            display: flex;
-            flex-direction: column;
-          }
-          div > span {
-            padding: 0 1rem;
-          }
+    {
+      id: "shortcut",
+      header: "HWNG Shortcut",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (info) => {
+        const shortcutString = info.getValue()
+        if (!shortcutString) {
+          return null
+        }
 
-          div > span:not(:last-child) {
-            border-bottom: 1px solid lightgray;
-          }
-        `}</style>
-      </div>
-    ),
-    enableColumnFilter: true,
-    filterFn: filterFns.ingredients,
-  },
-  {
+        const data = info.row.original
+        const variations = data.shortcutVariations as {
+          code: string
+          name: string
+        }[]
+
+        if (variations.length > 0) {
+          return (
+            <>
+              <div>{shortcutString}</div>
+              <div>{variations.map((v) => v.code).join("/")}</div>
+            </>
+          )
+        }
+
+        return shortcutString
+      },
+      meta: { cellStyle: { whiteSpace: "nowrap" } },
+    },
+  ),
+  columnHelper.accessor("name", {
+    header: "Name",
+  }),
+  columnHelper.accessor("ingredients", {
+    header: "Ingredients",
+    enableSorting: false,
+    cell: (info) => {
+      const ingredients = info.getValue()
+      return (
+        <div>
+          {ingredients.map((ingredient, i) => {
+            const chemical = ingredient?.safetyDataSheet?.product.chemical
+            if (!chemical) {
+              return <span key={i}>{ingredient.commercialProductName}</span>
+            }
+            const chemicalLink = (
+              <Link href={`/chemicals/${chemical.id}`}>{chemical.name}</Link>
+            )
+            return (
+              <span key={i}>
+                {ingredient.commercialProductName ? (
+                  <>
+                    {ingredient.commercialProductName} ({chemicalLink})
+                  </>
+                ) : (
+                  chemicalLink
+                )}
+              </span>
+            )
+          })}
+          <style jsx>{`
+            div {
+              display: flex;
+              flex-direction: column;
+              > span {
+                padding: 0 1rem;
+                &:not(:last-child) {
+                  border-bottom: 1px solid lightgray;
+                }
+              }
+            }
+          `}</style>
+        </div>
+      )
+    },
+    meta: { cellStyle: { padding: 0 } },
+    filterFn: (row, columnId, filterValue: string) => {
+      return row
+        .getValue<IngredientAll[]>(columnId)
+        .some((ing) =>
+          [
+            ing.commercialProductName,
+            ing.safetyDataSheet?.product.name,
+            ing.safetyDataSheet?.product.chemical.name,
+            ...(ing.safetyDataSheet?.product.chemical.synonyms ?? []),
+          ].some((val) =>
+            val?.toUpperCase().includes(filterValue.toUpperCase()),
+          ),
+        )
+    },
+  }),
+  columnHelper.display({
     id: "actions",
-    renderCell: (_, data) => (
-      <div>
-        <Link href={`/compounds/${data.id}`}>
-          <Button size="small" theme="primary">
-            View
-          </Button>
-        </Link>
-        <Link href={`/compounds/${data.id}/edit`}>
-          <Button size="small">Edit</Button>
-        </Link>
-        <style jsx>{`
-          div {
-            display: flex;
-            column-gap: 0.3rem;
-            flex-wrap: nowrap;
-            margin: 0.2rem 0;
-          }
-        `}</style>
-      </div>
+    cell: (info) => (
+      <DataRowActions
+        row={info.row}
+        getViewUrl={(data) => `/compounds/${data.id}`}
+        getEditUrl={(data) => `/compounds/${data.id}/edit`}
+      />
     ),
-  },
-  {
+    size: 1,
+  }),
+  columnHelper.display({
     id: "ra-actions",
-    renderCell: (_, data) => (
-      <div>
-        <Link href={`/risk-assessments/${data.id}`}>
+    cell: (info) => (
+      <RowActions>
+        <Link href={`/risk-assessments/${info.row.original.id}`}>
           <Button size="small">View Risk Assessment</Button>
         </Link>
-        <style jsx>{`
-          div {
-            display: flex;
-            column-gap: 0.3rem;
-            flex-wrap: nowrap;
-            margin: 0.2rem 0;
-          }
-        `}</style>
-      </div>
+      </RowActions>
     ),
-  },
-  {
+  }),
+  columnHelper.display({
     id: "mfr-actions",
-    renderCell: (_, data) => (
-      <div>
-        {data._count.mfrs > 0 ? (
-          <Link href={`/compounds/${data.id}/mfrs/latest`}>
-            <Button size="small" theme="primary">
-              View MFR
-            </Button>
-          </Link>
-        ) : (
-          <Link href={`/compounds/${data.id}/mfrs/new`}>
-            <Button size="small">Create MFR</Button>
-          </Link>
-        )}
-        <style jsx>{`
-          div {
-            display: flex;
-            column-gap: 0.3rem;
-            flex-wrap: nowrap;
-            margin: 0.2rem 0;
-          }
-        `}</style>
-      </div>
-    ),
-  },
+    cell: (info) => {
+      const data = info.row.original
+      return (
+        <RowActions>
+          {data._count.mfrs > 0 ? (
+            <Link href={`/compounds/${data.id}/mfrs/latest`}>
+              <Button size="small" theme="primary">
+                View MFR
+              </Button>
+            </Link>
+          ) : (
+            <Link href={`/compounds/${data.id}/mfrs/new`}>
+              <Button size="small">Create MFR</Button>
+            </Link>
+          )}
+        </RowActions>
+      )
+    },
+  }),
 ]
 
 const CompoundsTable = (props: Props) => {
@@ -182,9 +189,90 @@ const CompoundsTable = (props: Props) => {
     [showShortcuts],
   )
 
+  const [selectedRows, setSelectedRows] = useState<CompoundWithMfrCount[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: CompoundWithMfrCount[]) => setSelectedRows(rows),
+    [],
+  )
+
   return (
-    <Table className="compound-table" data={data} columns={visibleColumns} />
+    <>
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
+      <Table
+        className="compound-table"
+        data={data}
+        columns={visibleColumns}
+        options={{ enableRowSelection: (row) => row.original._count.mfrs > 0 }}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
+      <BatchTableActions selectedRows={selectedRows}>
+        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
+    </>
   )
 }
 
+const MfrPrintDoc = ({
+  data,
+  onLoaded,
+}: {
+  data: CompoundWithMfrCount
+  onLoaded: () => void
+}) => {
+  const {
+    data: mfrsData,
+    error,
+    isLoading,
+  } = useSWR<MfrAll[]>(`/api/compounds/${data.id}/mfrs`)
+
+  if (error) {
+    console.error(error)
+  }
+
+  const mfrData = useMemo(
+    () =>
+      mfrsData?.reduce((prev, curr) =>
+        prev.version > curr.version ? prev : curr,
+      ),
+    [mfrsData],
+  )
+
+  const onLoadedCalledRef = useRef(false)
+
+  useEffect(() => {
+    // check if data exists and the effect haven't been called
+    if (!isLoading && mfrsData && mfrData && !onLoadedCalledRef.current) {
+      onLoadedCalledRef.current = true
+      onLoaded()
+    }
+  }, [isLoading, mfrData, mfrsData, onLoaded])
+
+  if (isLoading || mfrsData === undefined || mfrData === undefined) {
+    return null
+  }
+
+  return (
+    <div className="details">
+      <h1>
+        MFR: {mfrData.compound.name} - v.{mfrData.version}
+      </h1>
+      <MfrDetails data={mfrData} />
+      <style jsx>{printDetails}</style>
+    </div>
+  )
+}
+
+const createRenderMfrDocument = (data: CompoundWithMfrCount) => {
+  const Doc = ({ onLoaded }: { onLoaded: () => void }) => (
+    <MfrPrintDoc data={data} onLoaded={onLoaded} />
+  )
+  return Doc
+}
 export default CompoundsTable

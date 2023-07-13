@@ -155,7 +155,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         />
       </Fieldset>
       <Fieldset legend="Exposure risk to compounding personnel (as per section 2 of the SDS or product monograph)">
-        <div className="row grow">
+        <div className="row grow wrap">
           <ExposureRisksDisplay
             category="From SDS"
             values={{
@@ -184,60 +184,37 @@ const RiskAssessmentDetails = ({ data }: Props) => {
       </Fieldset>
       <Fieldset legend="PPE deemed necessary (as per SDS, product monograph) and assessment of risk:">
         <div className="row grow wrap">
-          <Fieldset legend="Gloves:">
-            <FormGroup>
-              <label>Required?</label>
-              <BooleanRadioGroup
-                readOnly={true}
-                selectedValue={data.ppeGlovesRequired}
-              />
-            </FormGroup>
-            {data.ppeGlovesRequired && (
-              <div className="form-group row wrap">
-                <span className="label">Type:</span>
-                <span>{capitalize(data.ppeGlovesType as string)} gloves</span>
-              </div>
-            )}
-          </Fieldset>
-          <Fieldset legend="Coat:">
-            <FormGroup>
-              <span className="label">Required?</span>
-              <BooleanRadioGroup
-                readOnly={true}
-                selectedValue={data.ppeCoatRequired}
-              />
-            </FormGroup>
-            {data.ppeCoatRequired && (
-              <div className="form-group row wrap">
-                <span className="label">Type:</span>
-                <span>{capitalize(data.ppeCoatType as string)} coat</span>
-              </div>
-            )}
-          </Fieldset>
-          <Fieldset legend="Mask:">
-            <FormGroup>
-              <span className="label">Required?</span>
-              <BooleanRadioGroup
-                readOnly={true}
-                selectedValue={data.ppeMaskRequired}
-              />
-            </FormGroup>
-            {data.ppeMaskRequired && (
-              <div className="form-group row wrap">
-                <span className="label">Type:</span>
-                <span>{capitalize(data.ppeMaskType as string)}</span>
-              </div>
-            )}
-          </Fieldset>
-          <Fieldset className="row" legend="Eye Protection:">
-            <FormGroup>
-              <label>Required?</label>
-              <BooleanRadioGroup
-                readOnly={true}
-                selectedValue={data.ppeEyeProtectionRequired}
-              />
-            </FormGroup>
-          </Fieldset>
+          <PpeFieldset
+            legend="Gloves:"
+            required={data.ppeGlovesRequired}
+            type={
+              data.ppeGlovesRequired
+                ? `${capitalize(data.ppeGlovesType as string)} gloves`
+                : undefined
+            }
+          />
+          <PpeFieldset
+            legend="Coat:"
+            required={data.ppeCoatRequired}
+            type={
+              data.ppeCoatRequired
+                ? `${capitalize(data.ppeCoatType as string)} coat`
+                : undefined
+            }
+          />
+          <PpeFieldset
+            legend="Mask:"
+            required={data.ppeMaskRequired}
+            type={
+              data.ppeMaskRequired
+                ? `${capitalize(data.ppeMaskType as string)}`
+                : undefined
+            }
+          />
+          <PpeFieldset
+            legend="Eye Protection:"
+            required={data.ppeEyeProtectionRequired}
+          />
           <Fieldset legend="Other:">
             <span>{data.ppeOther ? data.ppeOther : "N/A"}</span>
           </Fieldset>
@@ -382,6 +359,28 @@ const ExposureRisksDisplay = ({
           border-right: 1px solid black;
         }
       `}</style>
+    </Fieldset>
+  )
+}
+
+const PpeFieldset = (props: {
+  legend: string
+  required: boolean
+  type?: string
+}) => {
+  const { legend, required, type } = props
+  return (
+    <Fieldset legend={legend}>
+      <FormGroup>
+        <label>Required?</label>
+        <BooleanRadioGroup readOnly={true} selectedValue={required} />
+      </FormGroup>
+      {type && required && (
+        <div className="form-group row wrap">
+          <span className="label">Type:</span>
+          <span style={{ whiteSpace: "nowrap" }}>{type}</span>
+        </div>
+      )}
     </Fieldset>
   )
 }
