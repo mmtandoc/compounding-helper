@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode, useMemo } from "react"
 
 type TooltipProps = {
   children: ReactNode
@@ -10,6 +10,15 @@ type TooltipProps = {
 const Tooltip = (props: TooltipProps) => {
   const { children, visible, className, style } = props
 
+  // To fix issue #76, "TypeError: Cannot read properties of undefined (reading 'backgroundColor')"
+  const arrowColor = useMemo(
+    () =>
+      `transparent transparent ${
+        style?.backgroundColor ?? "#dedede"
+      } transparent`,
+    [style?.backgroundColor],
+  )
+
   return (
     <>
       {visible && (
@@ -18,7 +27,7 @@ const Tooltip = (props: TooltipProps) => {
           style={style}
         >
           {children}{" "}
-          <style jsx global>{`
+          <style jsx>{`
             .tooltip {
               padding: 0.8rem 2rem;
               margin-top: 1.2rem;
@@ -45,10 +54,9 @@ const Tooltip = (props: TooltipProps) => {
               z-index: 10;
             }
           `}</style>
-          <style jsx global>{`
+          <style jsx>{`
             .tooltip:after {
-              border-color: transparent transparent
-                ${style?.backgroundColor ?? "#dedede"} transparent;
+              border-color: ${arrowColor};
             }
           `}</style>
         </div>
