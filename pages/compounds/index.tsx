@@ -1,6 +1,8 @@
+import Link from "next/link"
 import { useState } from "react"
 
 import CompoundsTable from "components/compound/CompoundsTable"
+import { Button } from "components/ui"
 import { prisma } from "lib/prisma"
 import { NextPageWithLayout } from "types/common"
 import { CompoundWithMfrCount, compoundWithMfrCount } from "types/models"
@@ -16,9 +18,9 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
 
   const actionBar = (
     <div className="action-bar">
-      {/* <Link href="/compounds/new">
+      <Link href="/risk-assessments/new">
         <Button>New Compound</Button>
-      </Link> */}
+      </Link>
       <label>
         <input
           type="checkbox"
