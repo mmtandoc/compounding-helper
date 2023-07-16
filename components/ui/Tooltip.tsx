@@ -3,12 +3,21 @@ import React, { ReactNode, useMemo } from "react"
 type TooltipProps = {
   children: ReactNode
   visible: boolean
+  arrowPosition?: "top-start" | "top-end"
   className?: string
   style?: React.CSSProperties
 }
 
+//TODO: Support arrow changing arrow position
+//TODO: Implement using Floating UI
 const Tooltip = (props: TooltipProps) => {
-  const { children, visible, className, style } = props
+  const {
+    children,
+    visible,
+    arrowPosition = "top-start",
+    className,
+    style,
+  } = props
 
   // To fix issue #76, "TypeError: Cannot read properties of undefined (reading 'backgroundColor')"
   const arrowColor = useMemo(
@@ -23,10 +32,11 @@ const Tooltip = (props: TooltipProps) => {
     <>
       {visible && (
         <div
-          className={`tooltip ${!!className ? className : ""}`}
+          role="tooltip"
+          className={`tooltip ${!!className ? className : ""} ${arrowPosition}`}
           style={style}
         >
-          {children}{" "}
+          {children}
           <style jsx>{`
             .tooltip {
               padding: 0.8rem 2rem;
@@ -37,12 +47,17 @@ const Tooltip = (props: TooltipProps) => {
               box-shadow: 1px 2px 1px 1px rgba(0, 0, 0, 0.316);
             }
 
+            .tooltip.top-start:after {
+              left: 2rem;
+            }
+
+            .tooltip.top-end:after {
+              right: 2rem;
+            }
+
             .tooltip:after {
               content: "";
               position: absolute;
-
-              /* position tooltip correctly */
-              left: 2rem;
 
               /* vertically center */
               bottom: 100%;
