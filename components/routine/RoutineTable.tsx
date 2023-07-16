@@ -10,6 +10,7 @@ import { mutate } from "swr"
 
 import { BatchPrintButton } from "components/common/BatchPrintButton"
 import BatchTableActions from "components/common/BatchTableActions"
+import { HoverTooltip } from "components/common/HoverTooltip"
 import { printDetails } from "components/common/styles"
 import { Button, Modal, Table, Tooltip } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
@@ -24,40 +25,6 @@ import RoutineDetails from "./RoutineDetails/RoutineDetails"
 
 type Props = {
   data: RoutineWithHistory[]
-}
-
-const CommentView = (props: { comment: string }) => {
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false)
-
-  return (
-    <span
-      className="comment-view"
-      onMouseEnter={() => setIsTooltipVisible(true)}
-      onMouseLeave={() => setIsTooltipVisible(false)}
-    >
-      <MdComment style={{ transform: "scaleX(-1)", marginLeft: "0.5rem" }} />
-      <Tooltip visible={isTooltipVisible}>{props.comment}</Tooltip>
-      <style jsx global>{`
-        .comment-view {
-          position: relative;
-
-          &:hover {
-            > svg {
-              color: var(--color-fg-muted);
-            }
-          }
-
-          .tooltip {
-            left: -1.5rem;
-            white-space: pre-wrap;
-            background-color: var(--color-canvas-subtle);
-            max-width: 40rem;
-            width: max-content;
-          }
-        }
-      `}</style>
-    </span>
-  )
 }
 
 const columnHelper = createColumnHelper<RoutineEntity>()
@@ -117,7 +84,13 @@ const RoutineTable = (props: Props) => {
             <span style={{ whiteSpace: "nowrap" }}>
               {toIsoDateString(lastCompleted.date)} by {lastCompleted.name}
               {lastCompleted.comment && (
-                <CommentView comment={lastCompleted.comment} />
+                <HoverTooltip
+                  tooltipContent={lastCompleted.comment}
+                  style={{ marginLeft: "0.5rem" }}
+                  offset={"3rem"}
+                >
+                  <MdComment style={{ transform: "scaleX(-1)" }} />
+                </HoverTooltip>
               )}
             </span>
           ) : null
