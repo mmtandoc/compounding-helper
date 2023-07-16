@@ -134,6 +134,10 @@ const RiskAssessmentEntry = (props: Props) => {
   register("id")
   return (
     <>
+      <div className="info">
+        Note: Creating a risk assessment will also create the associated
+        compound.
+      </div>
       <FormGroup>
         <label htmlFor="compound-name">Compound name:</label>
         <Input
@@ -471,6 +475,15 @@ const RiskAssessmentEntry = (props: Props) => {
       <style jsx>{`
         #risk-level-select {
           width: min-content;
+        }
+
+        .info {
+          border: var(--border-default);
+          border-radius: 0.4rem;
+          background-color: var(--color-scale-blue-300);
+          padding: 0.5rem 1rem;
+          width: fit-content;
+          font-size: var(--font-size-sm);
         }
       `}</style>
     </>
