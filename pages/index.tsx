@@ -6,7 +6,7 @@ import { NextPageWithLayout } from "types/common"
 
 type HomeGridItem = {
   id: string
-  header: string
+  header?: string
   links: { label: string; url: string }[]
 }
 
@@ -56,18 +56,21 @@ const dataGridItems: HomeGridItem[] = [
   },
 ]
 
-/* {
-  header: "Misc.",
-  links: [
-    { label: "Health hazards table", url: "/hazards" },
-    { label: "Link directory", url: "/links" },
-    { label: "Settings", url: "/settings" },
-  ],
-}, */
+const miscGridItems: HomeGridItem[] = [
+  {
+    id: "misc",
+    links: [
+      { label: "Health hazards table", url: "/hazards" },
+      { label: "Link directory", url: "/links" },
+      { label: "Routines", url: "/routines" },
+      { label: "Settings", url: "/settings" },
+    ],
+  },
+]
 
 const HomeCell = ({ item }: { item: HomeGridItem }) => (
   <div className={`home-cell ${item.id}`}>
-    <div className="header">{item.header}</div>
+    {item.header && <div className="header">{item.header}</div>}
     <div className="links">
       {item.links.map((link, i) => (
         <Link href={link.url} key={i}>
@@ -165,10 +168,17 @@ const HomeSection = (props: { className?: string; items: HomeGridItem[] }) => (
 const Home: NextPageWithLayout = () => {
   return (
     <div className="home-page">
-      <HomeSection className="main-section" items={mainGridItems} />
+      <details className="data-collapsible" open>
+        <summary>Compounds</summary>
+        <HomeSection className="main-section" items={mainGridItems} />
+      </details>
       <details className="data-collapsible">
         <summary>Data Management</summary>
         <HomeSection className="data-section" items={dataGridItems} />
+      </details>
+      <details className="data-collapsible" open>
+        <summary>Misc.</summary>
+        <HomeSection className="misc-section" items={miscGridItems} />
       </details>
 
       <style jsx global>{`
