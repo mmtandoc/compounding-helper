@@ -41,12 +41,14 @@ const columns = [
     cell: (info) => (
       <DataRowActions
         row={info.row}
-        getViewUrl={(data) =>
-          `/compounds/${data.compoundId}/mfrs/${data.version}`
-        }
-        getEditUrl={(data) =>
-          `/compounds/${data.compoundId}/mfrs/${data.version}/edit`
-        }
+        viewButton={{
+          getUrl: (data) =>
+            `/compounds/${data.compoundId}/mfrs/${data.version}`,
+        }}
+        editButton={{
+          getUrl: (data) =>
+            `/compounds/${data.compoundId}/mfrs/${data.version}/edit`,
+        }}
       />
     ),
   }),

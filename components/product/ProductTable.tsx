@@ -49,8 +49,8 @@ const columns = [
     cell: (info) => (
       <DataRowActions
         row={info.row}
-        getEditUrl={(data) => `/products/${data.id}/edit`}
-        getViewUrl={(data) => `/products/${data.id}`}
+        viewButton={{ getUrl: (data) => `/products/${data.id}` }}
+        editButton={{ getUrl: (data) => `/products/${data.id}/edit` }}
       />
     ),
   }),

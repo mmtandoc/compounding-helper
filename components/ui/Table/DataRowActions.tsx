@@ -1,25 +1,29 @@
 import { Row, RowData } from "@tanstack/react-table"
 import Link from "next/link"
+import { ReactNode } from "react"
 
 import Button from "../Button"
 import RowActions from "./RowActions"
 
 const DataRowActions = <TData extends RowData>(props: {
   row: Row<TData>
-  getViewUrl: (data: TData) => string
-  getEditUrl: (data: TData) => string
+  viewButton: { getUrl: (data: TData) => string; value?: ReactNode }
+  editButton?: { getUrl: (data: TData) => string; value?: ReactNode }
 }) => {
   const data = props.row.original
+  const { viewButton, editButton } = props
   return (
     <RowActions>
-      <Link href={props.getViewUrl(data)}>
+      <Link href={viewButton.getUrl(data)}>
         <Button size="small" theme="primary">
-          View
+          {viewButton?.value ?? "View"}
         </Button>
       </Link>
-      <Link href={props.getEditUrl(data)}>
-        <Button size="small">Edit</Button>
-      </Link>
+      {editButton && (
+        <Link href={editButton.getUrl(data)}>
+          <Button size="small">{editButton?.value ?? "Edit"}</Button>
+        </Link>
+      )}
     </RowActions>
   )
 }

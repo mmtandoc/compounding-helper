@@ -173,8 +173,8 @@ const RoutineTable = (props: Props) => {
         cell: (info) => (
           <DataRowActions
             row={info.row}
-            getViewUrl={(data) => `/routines/${data.id}`}
-            getEditUrl={(data) => `/routines/${data.id}/edit`}
+            viewButton={{ getUrl: (data) => `/routines/${data.id}` }}
+            editButton={{ getUrl: (data) => `/routines/${data.id}/edit` }}
           />
         ),
       }),

@@ -140,8 +140,11 @@ const columns = [
     cell: (info) => (
       <DataRowActions
         row={info.row}
-        getViewUrl={(data) => `/compounds/${data.id}`}
-        getEditUrl={(data) => `/compounds/${data.id}/edit`}
+        viewButton={{
+          getUrl: (data) => `/compounds/${data.id}`,
+          value: "View compound",
+        }}
+        editButton={{ getUrl: (data) => `/compounds/${data.id}/edit` }}
       />
     ),
     size: 1,
