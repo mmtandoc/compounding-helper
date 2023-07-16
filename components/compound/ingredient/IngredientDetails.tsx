@@ -9,6 +9,8 @@ import {
 import { capitalize, toIsoDateString } from "lib/utils"
 import { IngredientAll } from "types/models"
 
+import { HealthHazardItem } from "./HealthHazardItem"
+
 interface IngredientDetailsProps {
   ingredient: IngredientAll
 }
@@ -141,14 +143,7 @@ export const IngredientDetails = (props: IngredientDetailsProps) => {
               <ul className="health-hazard-list">
                 {sds.healthHazards.length > 0 ? (
                   sds.healthHazards.map((h, i) => (
-                    <li key={i}>
-                      {h.hazardCategory.hazardClass.name} - Category{" "}
-                      {h.hazardCategory.level}
-                      {h.hazardCategory.shortDescription
-                        ? ` - ${h.hazardCategory.shortDescription}`
-                        : ""}
-                      {!h.additionalInfo ? "" : ` (${h.additionalInfo})`}
-                    </li>
+                    <HealthHazardItem key={i} hazard={h} />
                   ))
                 ) : (
                   <li>No health hazards</li>

@@ -194,3 +194,18 @@ export const routineWithHistory = Prisma.validator<Prisma.RoutineArgs>()({
 export type RoutineWithHistory = Prisma.RoutineGetPayload<
   typeof routineWithHistory
 >
+
+export const sdsHealthHazard =
+  Prisma.validator<Prisma.HazardCategoryToSDSArgs>()({
+    include: {
+      hazardCategory: {
+        include: {
+          hazardClass: true,
+        },
+      },
+    },
+  })
+
+export type SdsHealthHazard = Prisma.HazardCategoryToSDSGetPayload<
+  typeof sdsHealthHazard
+>

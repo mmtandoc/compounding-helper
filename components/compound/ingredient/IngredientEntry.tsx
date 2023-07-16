@@ -25,6 +25,7 @@ import { NestedForm } from "lib/rhf/nestedForm"
 import { JsonError } from "types/common"
 import { ChemicalAll, SdsWithRelations } from "types/models"
 
+import { HealthHazardItem } from "./HealthHazardItem"
 import SdsSelect from "./SdsSelect"
 
 interface IngredientEntryProps<
@@ -361,14 +362,11 @@ const IngredientEntry = <
                 <span className="label">SDS health hazards:</span>
                 <ul className="health-hazard-list">
                   {selectedSds.healthHazards.map((h, i) => (
-                    <li key={i}>
-                      {h.hazardCategory.hazardClass.name} - Category{" "}
-                      {h.hazardCategory.level}
-                      {h.hazardCategory.shortDescription
-                        ? ` - ${h.hazardCategory.shortDescription}`
-                        : ""}
-                      {!h.additionalInfo ? "" : ` (${h.additionalInfo})`}
-                    </li>
+                    <HealthHazardItem
+                      key={i}
+                      hazard={h}
+                      arrowPosition="top-end"
+                    />
                   ))}
                 </ul>
               </div>
