@@ -61,7 +61,17 @@ const Header = () => {
       <NavMenu
         items={[
           { label: "Home", url: "/" },
-          { label: "Compounds", url: "/compounds" },
+          {
+            label: "Compounds",
+            url: "/compounds",
+            children: [
+              { label: "View compounds", url: "/compounds" },
+              {
+                label: "Create new compound",
+                url: "/risk-assessments/new",
+              },
+            ],
+          },
           {
             label: "Risk assessments",
             url: "/risk-assessments",
