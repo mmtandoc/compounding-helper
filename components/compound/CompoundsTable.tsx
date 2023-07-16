@@ -144,7 +144,7 @@ const columns = [
           getUrl: (data) => `/compounds/${data.id}`,
           value: "View compound",
         }}
-        editButton={{ getUrl: (data) => `/compounds/${data.id}/edit` }}
+        /* editButton={{ getUrl: (data) => `/compounds/${data.id}/edit` }} */
       />
     ),
     size: 1,
