@@ -35,28 +35,28 @@ export const HoverTooltip = (props: {
       <style jsx global>{`
         .hover-tooltip {
           position: relative;
-        }
 
-        .content {
-          cursor: pointer;
-        }
+          .content {
+            cursor: pointer;
+          }
 
-        .tooltip {
-          top: ${offset};
+          .tooltip {
+            top: ${offset};
 
-          white-space: pre-wrap;
-          background-color: var(--color-canvas-subtle);
-          max-width: 40rem;
-          width: max-content;
-        }
+            white-space: pre-wrap;
+            background-color: var(--color-canvas-subtle);
+            max-width: 40rem;
+            width: max-content;
+          }
 
-        .tooltip.top-end {
-          left: auto;
-          right: -2.35rem;
-        }
+          .tooltip.top-end {
+            left: auto;
+            right: -2.35rem;
+          }
 
-        .tooltip.top-start {
-          left: -2.35rem;
+          .tooltip.top-start {
+            left: -2.35rem;
+          }
         }
       `}</style>
     </span>

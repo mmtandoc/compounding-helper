@@ -115,6 +115,8 @@ const ErrorContainer = <
       <style jsx>{`
         .input-container {
           display: block;
+          position: relative;
+
           &.full-width {
             width: 100%;
           }
@@ -126,7 +128,7 @@ const ErrorContainer = <
           width: max-content;
         }
 
-        .tooltip {
+        .input-container .tooltip {
           font-size: 1.2rem;
           max-width: max-content;
         }
