@@ -18,6 +18,7 @@ export const HealthHazardItem = (props: {
       <span className="hazard-class">
         {category.hazardClass.name}
         <HoverTooltip
+          className="print-hide"
           tooltipContent={
             <>
               <p className="label">Hazard Class: {category.hazardClass.name}</p>
@@ -34,6 +35,7 @@ export const HealthHazardItem = (props: {
         Category {category.level}
         {category.shortDescription ? ` - ${category.shortDescription}` : ""}
         <HoverTooltip
+          className="print-hide"
           tooltipContent={
             <>
               <p>
