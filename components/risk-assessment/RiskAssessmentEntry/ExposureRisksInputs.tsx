@@ -139,7 +139,11 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
                 <span className="label">{sds.product.name}</span>
                 {sds.healthHazards.length > 0 ? (
                   sds.healthHazards.map((h, i) => (
-                    <HealthHazardItem hazard={h} key={i} />
+                    <HealthHazardItem
+                      hazard={h}
+                      key={i}
+                      arrowPosition="top-end"
+                    />
                   ))
                 ) : (
                   <li>No health hazards</li>
@@ -166,6 +170,10 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
             .health-hazards > ul > span.label {
               margin-left: -2rem;
               font-weight: 700;
+            }
+
+            :global(.health-hazard-item .tooltip) {
+              font-size: 1.3rem;
             }
           `}</style>
         </div>
