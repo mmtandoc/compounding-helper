@@ -27,7 +27,7 @@ export const HealthHazardItem = (props: {
           }
           arrowPosition={arrowPosition}
         >
-          <BsInfoCircle />
+          <BsInfoCircle style={{ verticalAlign: "initial" }} />
         </HoverTooltip>
       </span>
       {" - "}
@@ -53,7 +53,7 @@ export const HealthHazardItem = (props: {
           }
           arrowPosition={arrowPosition}
         >
-          <BsInfoCircle />
+          <BsInfoCircle style={{ verticalAlign: "initial" }} />
         </HoverTooltip>
       </span>
       <span className="additional-info">
@@ -71,6 +71,7 @@ export const HealthHazardItem = (props: {
 
         .hover-tooltip {
           margin-left: 0.3rem;
+          vertical-align: middle;
 
           &:hover {
             > svg {
