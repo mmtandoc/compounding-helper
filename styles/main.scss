@@ -18,6 +18,10 @@ a:not([class]) {
   }
 }
 
+label.disabled {
+  color: dimgray;
+}
+
 /* ===== MISC ===== */
 
 .row {
