@@ -277,20 +277,46 @@ const MfrDetails = (props: MfrEntryProps) => {
 
 const getRequiredPpeList = (riskAssessment: RiskAssessment) => {
   const requiredPpe = []
+
+  const toPpeString = (type: string, comment?: string | null) =>
+    type + (comment ? ` (${comment})` : "")
+
   if (riskAssessment?.ppeGlovesRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeGlovesType} gloves`))
+    requiredPpe.push(
+      toPpeString(
+        capitalize(`${riskAssessment.ppeGlovesType} gloves`),
+        riskAssessment.ppeGlovesComment,
+      ),
+    )
   }
   if (riskAssessment?.ppeCoatRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeCoatType} coat`))
+    requiredPpe.push(
+      toPpeString(
+        capitalize(`${riskAssessment.ppeCoatType} coat`),
+        riskAssessment.ppeCoatComment,
+      ),
+    )
   }
   if (riskAssessment?.ppeMaskRequired) {
-    requiredPpe.push(capitalize(`${riskAssessment.ppeMaskType} mask`))
+    requiredPpe.push(
+      toPpeString(
+        capitalize(`${riskAssessment.ppeMaskType} mask`),
+        riskAssessment.ppeMaskComment,
+      ),
+    )
   }
   if (riskAssessment?.ppeEyeProtectionRequired) {
-    requiredPpe.push(capitalize(`Eye protection`))
+    requiredPpe.push(
+      toPpeString("Eye protection", riskAssessment.ppeEyeProtectionComment),
+    )
   }
-  if (riskAssessment?.ppeOther) {
-    requiredPpe.push(capitalize(riskAssessment.ppeOther))
+  if (riskAssessment?.ppeOtherRequired && riskAssessment.ppeOther) {
+    requiredPpe.push(
+      toPpeString(
+        `Other PPE: ${riskAssessment.ppeOther}`,
+        riskAssessment.ppeOtherComment,
+      ),
+    )
   }
   return requiredPpe
 }

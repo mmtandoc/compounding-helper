@@ -37,6 +37,7 @@ export type ExposureRisksFields = z.output<typeof exposureRisksSchema>
 export type ExposureRisksFieldsInput = z.input<typeof exposureRisksSchema>
 const refinePPE = (arg: any, ctx: any) =>
   arg.required &&
+  "type" in arg &&
   (arg.type === null || arg.type === undefined) &&
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
@@ -73,24 +74,61 @@ export const riskAssessmentSchema = z.object({
       .object({
         required: z.boolean(),
         type: z.nativeEnum(GlovesType).optional(),
+        comment: z
+          .string()
+          .trim()
+          .transform((arg) => (arg === "" ? null : arg))
+          .nullable()
+          .default(null),
       })
       .superRefine(refinePPE),
     coat: z
       .object({
         required: z.boolean(),
         type: z.nativeEnum(CoatType).optional(),
+        comment: z
+          .string()
+          .trim()
+          .transform((arg) => (arg === "" ? null : arg))
+          .nullable()
+          .default(null),
       })
       .superRefine(refinePPE),
     mask: z
       .object({
         required: z.boolean(),
-        type: z.string().trim().min(1).nullish(),
+        type: z.string().trim().min(1).optional(),
+        comment: z
+          .string()
+          .trim()
+          .transform((arg) => (arg === "" ? null : arg))
+          .nullable()
+          .default(null),
       })
       .superRefine(refinePPE),
-    eyeProtection: z.object({
-      required: z.boolean(),
-    }),
-    other: z.string().trim().nullish(),
+    eyeProtection: z
+      .object({
+        required: z.boolean(),
+        comment: z
+          .string()
+          .trim()
+          .transform((arg) => (arg === "" ? null : arg))
+          .nullable()
+          .default(null),
+      })
+      .superRefine(refinePPE),
+    other: z
+      .object({
+        required: z.boolean(),
+        type: z.string().trim().min(1).optional(),
+        comment: z
+          .string()
+          .trim()
+          .transform((arg) => (arg === "" ? null : arg))
+          .nullable()
+          .default(null),
+      })
+      .superRefine(refinePPE),
   }),
   requireEyeWashStation: z.boolean(),
   requireSafetyShower: z.boolean(),
@@ -108,7 +146,10 @@ export type RiskAssessmentFieldsInput = z.input<typeof riskAssessmentSchema>
 
 export type NullableRiskAssessmentFields = Simplify<
   Merge<
-    NullableDeep<RiskAssessmentFieldsInput, { ignoreKeys: "id" }>,
+    NullableDeep<
+      RiskAssessmentFieldsInput,
+      { ignoreKeys: "id"; makeObjectTypeNullable: false }
+    >,
     { compound: NullableCompoundFields }
   >
 >
