@@ -183,7 +183,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         </div>
       </Fieldset>
       <Fieldset legend="PPE deemed necessary (as per SDS, product monograph) and assessment of risk:">
-        <div className="row grow wrap">
+        <div className="ppe-container row grow wrap">
           <PpeFieldset
             legend="Gloves:"
             required={data.ppeGlovesRequired}
@@ -192,6 +192,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
                 ? `${capitalize(data.ppeGlovesType as string)} gloves`
                 : undefined
             }
+            comment={data.ppeGlovesComment ?? undefined}
           />
           <PpeFieldset
             legend="Coat:"
@@ -201,6 +202,7 @@ const RiskAssessmentDetails = ({ data }: Props) => {
                 ? `${capitalize(data.ppeCoatType as string)} coat`
                 : undefined
             }
+            comment={data.ppeCoatComment ?? undefined}
           />
           <PpeFieldset
             legend="Mask:"
@@ -210,14 +212,19 @@ const RiskAssessmentDetails = ({ data }: Props) => {
                 ? `${capitalize(data.ppeMaskType as string)}`
                 : undefined
             }
+            comment={data.ppeMaskComment ?? undefined}
           />
           <PpeFieldset
             legend="Eye Protection:"
             required={data.ppeEyeProtectionRequired}
+            comment={data.ppeEyeProtectionComment ?? undefined}
           />
-          <Fieldset legend="Other:">
-            <span>{data.ppeOther ? data.ppeOther : "N/A"}</span>
-          </Fieldset>
+          <PpeFieldset
+            legend="Other:"
+            required={data.ppeOtherRequired}
+            type={data.ppeOtherRequired ? (data.ppeOther as string) : undefined}
+            comment={data.ppeOtherComment ?? undefined}
+          />
         </div>
       </Fieldset>
       <Fieldset legend="Is an eye wash station required?">
@@ -279,6 +286,10 @@ const RiskAssessmentDetails = ({ data }: Props) => {
         .radio-group label {
           display: flex;
           align-items: center;
+        }
+
+        .ppe-container > fieldset {
+          min-width: 25rem;
         }
       `}</style>
     </div>
@@ -367,19 +378,26 @@ const PpeFieldset = (props: {
   legend: string
   required: boolean
   type?: string
+  comment?: string
 }) => {
-  const { legend, required, type } = props
+  const { legend, required, type, comment } = props
   return (
-    <Fieldset legend={legend}>
+    <Fieldset className="ppe-fieldset" legend={legend}>
       <FormGroup>
         <label>Required?</label>
         <BooleanRadioGroup readOnly={true} selectedValue={required} />
       </FormGroup>
       {type && required && (
-        <div className="form-group row wrap">
+        <FormGroup row className="wrap">
           <span className="label">Type:</span>
           <span style={{ whiteSpace: "nowrap" }}>{type}</span>
-        </div>
+        </FormGroup>
+      )}
+      {comment && required && (
+        <FormGroup row className="wrap">
+          <span className="label">Comment:</span>
+          <span style={{ whiteSpace: "break-spaces" }}>{comment}</span>
+        </FormGroup>
       )}
     </Fieldset>
   )

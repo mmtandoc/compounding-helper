@@ -109,17 +109,27 @@ const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
       gloves: {
         required: data.ppeGlovesRequired,
         type: data.ppeGlovesType ?? undefined,
+        comment: data.ppeGlovesComment ?? undefined,
       },
       coat: {
         required: data.ppeCoatRequired,
         type: data.ppeCoatType ?? undefined,
+        comment: data.ppeCoatComment ?? undefined,
       },
       mask: {
         required: data.ppeMaskRequired,
         type: data.ppeMaskType ?? undefined,
+        comment: data.ppeMaskComment ?? undefined,
       },
-      eyeProtection: { required: data.ppeEyeProtectionRequired },
-      other: data.ppeOther ?? undefined,
+      eyeProtection: {
+        required: data.ppeEyeProtectionRequired,
+        comment: data.ppeEyeProtectionComment ?? undefined,
+      },
+      other: {
+        required: data.ppeOtherRequired,
+        type: data.ppeOther ?? undefined,
+        comment: data.ppeOtherComment ?? undefined,
+      },
     },
     requireEyeWashStation: data.requireEyeWashStation,
     requireSafetyShower: data.requireSafetyShower,
@@ -176,14 +186,25 @@ const toModel = (
           const ppe = fields[key]
           data = {
             ...data,
-            ppeGlovesRequired: ppe?.gloves?.required,
-            ppeGlovesType: ppe?.gloves?.type ?? null,
-            ppeCoatRequired: ppe?.coat?.required,
-            ppeCoatType: ppe?.coat?.type ?? null,
-            ppeMaskRequired: ppe?.mask?.required,
-            ppeMaskType: ppe?.mask?.type ?? null,
-            ppeEyeProtectionRequired: ppe?.eyeProtection?.required,
-            ppeOther: ppe?.other ?? null,
+            // Gloves
+            ppeGlovesRequired: ppe.gloves.required,
+            ppeGlovesType: ppe.gloves?.type ?? null,
+            ppeGlovesComment: ppe.gloves?.comment ?? null,
+            // Coat
+            ppeCoatRequired: ppe.coat.required,
+            ppeCoatType: ppe.coat?.type ?? null,
+            ppeCoatComment: ppe.coat?.comment ?? null,
+            // Mask
+            ppeMaskRequired: ppe.mask.required,
+            ppeMaskType: ppe.mask?.type ?? null,
+            ppeMaskComment: ppe.mask?.comment ?? null,
+            // Eye protection
+            ppeEyeProtectionRequired: ppe.eyeProtection.required,
+            ppeEyeProtectionComment: ppe.eyeProtection?.comment ?? null,
+            // Other
+            ppeOtherRequired: ppe.other.required,
+            ppeOther: ppe?.other?.type ?? null,
+            ppeOtherComment: ppe?.other?.comment ?? null,
           }
           break
         case "dateAssessed":

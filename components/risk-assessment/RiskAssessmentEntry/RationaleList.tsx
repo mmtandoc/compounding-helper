@@ -16,6 +16,7 @@ import { DotJotList } from "components/ui/forms"
 import { NullableRiskAssessmentFields } from "lib/fields"
 import { JsonError } from "types/common"
 import { SdsWithRelations } from "types/models"
+import { Nullable } from "types/util"
 
 interface RationaleListProps
   extends Omit<UseControllerProps<NullableRiskAssessmentFields>, "name"> {
@@ -215,26 +216,34 @@ const autoRationalesFunctions: ((
   (values) => {
     const requiredPPE: string[] = []
     const ppe = values.ppe
+
+    const toRationaleString = (
+      label: string,
+      ppeObject: Partial<
+        Nullable<{ required: boolean; type?: string; comment?: string }>
+      >,
+    ) => label + (ppeObject.type ? ` (${ppeObject.type})` : "") // + (ppeObject.comment ? `. ${ppeObject.comment}` : "")
+
     if (ppe?.mask?.required) {
-      requiredPPE.push("Mask" + (ppe.mask.type ? ` (${ppe.mask.type})` : ""))
+      requiredPPE.push(toRationaleString("Mask", ppe.mask))
     }
 
     if (ppe?.eyeProtection?.required) {
-      requiredPPE.push("Eye protection")
+      requiredPPE.push(toRationaleString("Eye protection", ppe.eyeProtection))
     }
 
     if (ppe?.coat?.required) {
-      requiredPPE.push("Coat" + (ppe.coat.type ? ` (${ppe.coat.type})` : ""))
+      requiredPPE.push(toRationaleString("Coat", ppe.coat))
     }
 
     if (ppe?.gloves?.required) {
-      requiredPPE.push(
-        "Gloves" + (ppe.gloves.type ? ` (${ppe.gloves.type})` : ""),
-      )
+      requiredPPE.push(toRationaleString("Gloves", ppe.gloves))
     }
 
-    if (ppe?.other) {
-      requiredPPE.push(ppe?.other)
+    if (ppe?.other?.required) {
+      requiredPPE.push(
+        `Other PPE: ${ppe.other.type}`, // + (ppe.other.comment ? ` (${ppe.other.comment})` : ""),
+      )
     }
 
     if (requiredPPE.length === 0) {

@@ -1,0 +1,1 @@
+UPDATE "risk_assessments" SET "ppeOtherRequired" = false WHERE "ppeOther" IS NULL;

@@ -137,12 +137,18 @@ model RiskAssessment {
   //PPE
   ppeGlovesRequired        Boolean
   ppeGlovesType            GlovesType?
+  ppeGlovesComment         String?
   ppeCoatRequired          Boolean
   ppeCoatType              CoatType?
+  ppeCoatComment           String?
   ppeMaskRequired          Boolean
   ppeMaskType              String?
+  ppeMaskComment           String?
   ppeEyeProtectionRequired Boolean
-  ppeOther                 String?
+  ppeEyeProtectionComment  String?
+  ppeOtherRequired         Boolean
+  ppeOther                 String? // TODO: Rename to ppeOtherType
+  ppeOtherComment          String?
 
   requireEyeWashStation Boolean
   requireSafetyShower   Boolean

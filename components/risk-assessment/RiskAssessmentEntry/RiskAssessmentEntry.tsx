@@ -55,13 +55,21 @@ const RiskAssessmentEntry = (props: Props) => {
     clearErrors,
   } = formMethods
 
-  const [isWorkflowUninterrupted, glovesRequired, coatRequired, maskRequired] =
-    watch([
-      "isWorkflowUninterrupted",
-      "ppe.gloves.required",
-      "ppe.coat.required",
-      "ppe.mask.required",
-    ])
+  const [
+    isWorkflowUninterrupted,
+    glovesRequired,
+    coatRequired,
+    maskRequired,
+    eyeProtectionRequired,
+    otherPpeRequired,
+  ] = watch([
+    "isWorkflowUninterrupted",
+    "ppe.gloves.required",
+    "ppe.coat.required",
+    "ppe.mask.required",
+    "ppe.eyeProtection.required",
+    "ppe.other.required",
+  ])
 
   const ingredientsArrayMethods = useFieldArray({
     control: control,
@@ -89,38 +97,81 @@ const RiskAssessmentEntry = (props: Props) => {
   useEffect(() => {
     if (maskRequired === false) {
       clearErrors("ppe.mask.type")
+      clearErrors("ppe.mask.comment")
     }
   }, [maskRequired, clearErrors])
 
   useEffect(() => {
     if (coatRequired === false) {
       clearErrors("ppe.coat.type")
+      clearErrors("ppe.coat.comment")
     }
   }, [coatRequired, clearErrors])
 
   useEffect(() => {
     if (glovesRequired === false) {
       clearErrors("ppe.gloves.type")
+      clearErrors("ppe.gloves.comment")
     }
   }, [glovesRequired, clearErrors])
 
+  useEffect(() => {
+    if (eyeProtectionRequired === false) {
+      clearErrors("ppe.eyeProtection.comment")
+    }
+  }, [eyeProtectionRequired, clearErrors])
+
+  useEffect(() => {
+    if (otherPpeRequired === false) {
+      clearErrors("ppe.other.type")
+      clearErrors("ppe.other.comment")
+    }
+  }, [otherPpeRequired, clearErrors])
+
   useUpdateFieldConditionally({
     updateCondition: coatRequired === false || coatRequired === null,
-    fields: [["ppe.coat.type", null]],
+    fields: [
+      ["ppe.coat.type", null],
+      ["ppe.coat.comment", null],
+    ],
     register,
     setValue,
   })
 
   useUpdateFieldConditionally({
     updateCondition: glovesRequired === false || glovesRequired === null,
-    fields: [["ppe.gloves.type", null]],
+    fields: [
+      ["ppe.gloves.type", null],
+      ["ppe.gloves.comment", null],
+    ],
     register,
     setValue,
   })
 
   useUpdateFieldConditionally({
     updateCondition: maskRequired === false || maskRequired === null,
-    fields: [["ppe.mask.type", null]],
+    fields: [
+      ["ppe.mask.type", null],
+      ["ppe.mask.comment", null],
+    ],
+    register,
+    setValue,
+  })
+
+  useUpdateFieldConditionally({
+    updateCondition:
+      eyeProtectionRequired === false || eyeProtectionRequired === null,
+    fields: [["ppe.eyeProtection.comment", null]],
+    register,
+    setValue,
+  })
+
+  useUpdateFieldConditionally({
+    updateCondition: otherPpeRequired === false || otherPpeRequired === null,
+    fields: [
+      ["ppe.other.type", null],
+      ["ppe.other.comment", null],
+    ],
     register,
     setValue,
   })
@@ -338,91 +389,216 @@ const RiskAssessmentEntry = (props: Props) => {
         )}
       </Fieldset>
       <Fieldset legend="PPE deemed necessary (as per SDS, product monograph) and assessment of risk:">
-        <Fieldset legend="Gloves:" className="row">
-          <FormGroup>
-            <label>Required?</label>
-            <RhfBooleanRadioGroup
-              id="ppe-gloves-required"
-              name="ppe.gloves.required"
-            />
+        <Fieldset legend="Gloves:">
+          <FormGroup row>
+            <FormGroup>
+              <label htmlFor={"ppe-gloves-required"}>Required?</label>
+              <RhfBooleanRadioGroup
+                id={"ppe-gloves-required"}
+                name="ppe.gloves.required"
+              />
+            </FormGroup>
+            <FormGroup>
+              <label
+                htmlFor="ppe-gloves-type"
+                className={!glovesRequired ? "disabled" : ""}
+              >
+                Type:
+              </label>
+              <RhfSelect
+                name={"ppe.gloves.type"}
+                rules={{
+                  disabled: !glovesRequired,
+                }}
+                id="ppe-gloves-type"
+                initialOption
+              >
+                <option value="regular">Regular gloves</option>
+                <option value="chemotherapy">Chemotherapy gloves</option>
+                <option value="double">Double gloves</option>
+              </RhfSelect>
+            </FormGroup>
           </FormGroup>
           <FormGroup>
-            <label className={!glovesRequired ? "disabled" : ""}>Type:</label>
-            <RhfSelect
-              name="ppe.gloves.type"
-              rules={{
-                disabled: !glovesRequired,
-              }}
-              id="ppe-gloves"
-              initialOption
+            <label
+              htmlFor="ppe-gloves-comment"
+              className={`optional ${!glovesRequired ? "disabled" : ""}`}
             >
-              <option value="regular">Regular gloves</option>
-              <option value="chemotherapy">Chemotherapy gloves</option>
-              <option value="double">Double gloves</option>
-            </RhfSelect>
-          </FormGroup>
-        </Fieldset>
-        <Fieldset legend="Coat:" className="row">
-          <FormGroup>
-            <label>Required?</label>
-            <RhfBooleanRadioGroup
-              id="ppe-coat-required"
-              name="ppe.coat.required"
-            />
-          </FormGroup>
-          <FormGroup>
-            <label className={!coatRequired ? "disabled" : ""}>Type:</label>
-            <RhfSelect
-              name="ppe.coat.type"
-              rules={{
-                disabled: !coatRequired,
-              }}
-              id="ppe-coat-type"
-              initialOption
-            >
-              <option value="designated">Designated coat</option>
-              <option value="disposable">Disposable coat</option>
-            </RhfSelect>
-          </FormGroup>
-        </Fieldset>
-        <Fieldset legend="Mask:" className="row">
-          <FormGroup>
-            <label>Required?</label>
-            <RhfBooleanRadioGroup
-              id="ppe-mask-required"
-              name="ppe.mask.required"
-            />
-          </FormGroup>
-          <FormGroup>
-            <label className={!maskRequired ? "disabled" : ""}>Type:</label>
+              Comment:
+            </label>
             <Input
-              {...register("ppe.mask.type", {
+              {...register(`ppe.gloves.comment`, {
+                disabled: !glovesRequired,
+              })}
+              type="text"
+              id="ppe-gloves-comment"
+              size={100}
+              disabled={!glovesRequired}
+            />
+          </FormGroup>
+        </Fieldset>
+        <Fieldset legend="Coat:">
+          <FormGroup row>
+            <FormGroup>
+              <label htmlFor="ppe-coat-required">Required?</label>
+              <RhfBooleanRadioGroup
+                id="ppe-coat-required"
+                name="ppe.coat.required"
+              />
+            </FormGroup>
+            <FormGroup>
+              <label
+                htmlFor="ppe-coat-type"
+                className={!coatRequired ? "disabled" : ""}
+              >
+                Type:
+              </label>
+              <RhfSelect
+                name="ppe.coat.type"
+                rules={{
+                  disabled: !coatRequired,
+                }}
+                id="ppe-coat-type"
+                initialOption
+              >
+                <option value="designated">Designated coat</option>
+                <option value="disposable">Disposable coat</option>
+              </RhfSelect>
+            </FormGroup>
+          </FormGroup>
+          <FormGroup>
+            <label
+              htmlFor="ppe-coat-comment"
+              className={`optional ${!coatRequired ? "disabled" : ""}`}
+            >
+              Comment:
+            </label>
+            <Input
+              {...register("ppe.coat.comment", {
+                disabled: !coatRequired,
+              })}
+              type="text"
+              id="ppe-coat-comment"
+              size={100}
+              disabled={!coatRequired}
+            />
+          </FormGroup>
+        </Fieldset>
+        <Fieldset legend="Mask:">
+          <FormGroup row>
+            <FormGroup>
+              <label htmlFor="ppe-mask-required">Required?</label>
+              <RhfBooleanRadioGroup
+                id="ppe-mask-required"
+                name="ppe.mask.required"
+              />
+            </FormGroup>
+            <FormGroup>
+              <label
+                htmlFor="ppe-mask-type"
+                className={!maskRequired ? "disabled" : ""}
+              >
+                Type:
+              </label>
+              <Input
+                {...register("ppe.mask.type", {
+                  disabled: !maskRequired,
+                })}
+                type="text"
+                id="ppe-mask-type"
+                disabled={!maskRequired}
+              />
+            </FormGroup>
+          </FormGroup>
+          <FormGroup>
+            <label
+              htmlFor="ppe-mask-comment"
+              className={`optional ${!maskRequired ? "disabled" : ""}`}
+            >
+              Comment:
+            </label>
+            <Input
+              {...register("ppe.mask.comment", {
                 disabled: !maskRequired,
               })}
               type="text"
-              id="ppe-mask-type"
+              id="ppe-mask-comment"
+              size={100}
               disabled={!maskRequired}
             />
           </FormGroup>
         </Fieldset>
-        <Fieldset legend="Eye Protection:" className="row">
+        <Fieldset legend="Eye Protection:">
           <FormGroup>
-            <label>Required?</label>
+            <label htmlFor="ppe-eye-protection-required">Required?</label>
             <RhfBooleanRadioGroup
               id="ppe-eye-protection-required"
               name="ppe.eyeProtection.required"
             />
           </FormGroup>
+          <FormGroup>
+            <label
+              htmlFor="ppe-eye-protection-comment"
+              className={`optional ${!eyeProtectionRequired ? "disabled" : ""}`}
+            >
+              Comment:
+            </label>
+            <Input
+              {...register("ppe.eyeProtection.comment", {
+                disabled: !eyeProtectionRequired,
+              })}
+              type="text"
+              id="ppe-eye-protection-comment"
+              size={100}
+              disabled={!eyeProtectionRequired}
+            />
+          </FormGroup>
         </Fieldset>
-        <FormGroup>
-          <label>Other:</label>
-          <Input
-            {...register("ppe.other")}
-            type="text"
-            id="ppe-other"
-            size={100}
-          />
-        </FormGroup>
+        <Fieldset legend="Other:">
+          <FormGroup row>
+            <FormGroup>
+              <label htmlFor="ppe-other-required">Required?</label>
+              <RhfBooleanRadioGroup
+                id="ppe-other-required"
+                name="ppe.other.required"
+              />
+            </FormGroup>
+            <FormGroup>
+              <label
+                htmlFor="ppe-other-type"
+                className={!otherPpeRequired ? "disabled" : ""}
+              >
+                Type:
+              </label>
+              <Input
+                {...register("ppe.other.type", {
+                  disabled: !otherPpeRequired,
+                })}
+                type="text"
+                id="ppe-other-type"
+                size={100}
+                disabled={!otherPpeRequired}
+              />
+            </FormGroup>
+          </FormGroup>
+          <FormGroup>
+            <label
+              htmlFor="ppe-other-comment"
+              className={`optional ${!otherPpeRequired ? "disabled" : ""}`}
+            >
+              Comment:
+            </label>
+            <Input
+              {...register("ppe.other.comment", {
+                disabled: !otherPpeRequired,
+              })}
+              type="text"
+              id="ppe-other-comment"
+              size={100}
+              disabled={!otherPpeRequired}
+            />
+          </FormGroup>
+        </Fieldset>
       </Fieldset>
       <Fieldset legend="Is an eye wash station required?">
         <RhfBooleanRadioGroup
@@ -484,6 +660,11 @@ const RiskAssessmentEntry = (props: Props) => {
           padding: 0.5rem 1rem;
           width: fit-content;
           font-size: var(--font-size-sm);
+        }
+
+        label.optional::after {
+          content: " (Optional)";
+          font-weight: lighter;
         }
       `}</style>
     </>
