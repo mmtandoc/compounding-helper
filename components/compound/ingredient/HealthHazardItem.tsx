@@ -14,7 +14,7 @@ export const HealthHazardItem = (props: {
   } = props
 
   return (
-    <li>
+    <li className="health-hazard-item">
       <span className="hazard-class">
         {category.hazardClass.name}
         <HoverTooltip
@@ -59,7 +59,7 @@ export const HealthHazardItem = (props: {
       <span className="additional-info">
         {!additionalInfo ? "" : ` (${additionalInfo})`}
       </span>
-      <style jsx global>{`
+      <style jsx>{`
         .hazard-class,
         .hazard-category {
           p:not(:last-of-type) {
@@ -69,18 +69,16 @@ export const HealthHazardItem = (props: {
           //text-decoration: underline dashed var(--color-fg-default);
         }
 
-        .hover-tooltip {
+        .health-hazard-item :global(.hover-tooltip) {
           margin-left: 0.3rem;
           vertical-align: middle;
 
-          &:hover {
-            > svg {
-              color: var(--color-fg-muted);
-            }
+          :global(> .content > svg:hover) {
+            color: var(--color-scale-gray-500);
           }
 
-          p {
-            margin: 0 0;
+          :global(p) {
+            margin: 0;
           }
         }
       `}</style>
