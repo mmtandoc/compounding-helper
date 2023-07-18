@@ -8,6 +8,7 @@ import {
 } from "react-hook-form"
 import useSWR from "swr"
 
+import { HealthHazardItem } from "components/compound/ingredient/HealthHazardItem"
 import { Spinner } from "components/ui"
 import {
   Fieldset,
@@ -138,7 +139,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
                 <span className="label">{sds.product.name}</span>
                 {sds.healthHazards.length > 0 ? (
                   sds.healthHazards.map((h, i) => (
-                    <li key={i}>{hazardToString(h)}</li>
+                    <HealthHazardItem hazard={h} key={i} />
                   ))
                 ) : (
                   <li>No health hazards</li>
@@ -146,7 +147,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
               </ul>
             ))
           )}
-          <style jsx global>{`
+          <style jsx>{`
             .health-hazards {
               display: flex;
               flex-direction: column;
@@ -154,8 +155,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
               row-gap: 0.7rem;
             }
 
-            .health-hazards ul > li,
-            .health-hazards span.label {
+            .health-hazards ul {
               font-size: 1rem;
             }
 
@@ -163,7 +163,7 @@ const ExposureRisksInputs = (props: ExposureRisksInputsProps) => {
               margin-block: 0;
             }
 
-            .health-hazards span.label {
+            .health-hazards > ul > span.label {
               margin-left: -2rem;
               font-weight: 700;
             }
@@ -205,15 +205,6 @@ type ExposureRiskRowProps = {
   relatedHazardMap?: Map<string, SdsWithRelations["healthHazards"]>
 }
 
-const hazardToString = (hazard: SdsWithRelations["healthHazards"][number]) => {
-  const category = hazard.hazardCategory
-  const hazardClass = category.hazardClass
-
-  return `${hazardClass.name} - Cat. ${category.level} ${
-    hazard.additionalInfo ? `(${hazard.additionalInfo})` : ""
-  }`
-}
-
 const ExposureRiskRow = ({
   riskName,
   name,
@@ -230,13 +221,10 @@ const ExposureRiskRow = ({
       {relatedHazardMap && (
         <div className="col related-health-hazards">
           <ul>
-            {Array.from(relatedHazardMap.entries()).map(
-              ([chemical, hazards], i) =>
-                hazards.map((h, j) => (
-                  <li key={`${i}-${j}`}>
-                    {hazardToString(h)} ({chemical})
-                  </li>
-                )),
+            {Array.from(relatedHazardMap.entries()).map(([_, hazards], i) =>
+              hazards.map((h, j) => (
+                <HealthHazardItem hazard={h} key={`${i}-${j}`} />
+              )),
             )}
           </ul>
           <style jsx>{`
