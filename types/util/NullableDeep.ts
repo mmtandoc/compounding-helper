@@ -25,12 +25,18 @@ export interface NullableDeepOptions {
 	*/
   readonly makeArrayTypeNullable?: boolean
 
+  /**
+	@default true
+	*/
+  readonly makeObjectTypeNullable?: boolean
+
   readonly ignoreKeys?: unknown
 }
 
 interface DefaultNullableDeepOptions extends NullableDeepOptions {
   recurseIntoArrays: true
   makeArrayTypeNullable: false
+  makeObjectTypeNullable: true
   ignoreKeys: never
 }
 
@@ -163,5 +169,11 @@ type NullableObjectDeep<
 > = Simplify<{
   [KeyType in keyof ObjectType]: KeyType extends Options["ignoreKeys"]
     ? ObjectType[KeyType]
+    : Options["makeObjectTypeNullable"] extends true
+    ? NullableDeep<ObjectType[KeyType], Options> | null
+    : ObjectType[KeyType] extends object
+    ? ObjectType[KeyType] extends ReadonlyArray<infer _>
+      ? NullableDeep<ObjectType[KeyType], Options> | null
+      : NullableDeep<ObjectType[KeyType], Options>
     : NullableDeep<ObjectType[KeyType], Options> | null
 }>
