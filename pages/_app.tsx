@@ -89,7 +89,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <IconContext.Provider value={{ style: { verticalAlign: "middle" } }}>
+      <IconContext.Provider
+        value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
+      >
         <SWRConfig value={{ fetcher: multiFetcher }}>
           <SnackbarProvider
             Components={{
