@@ -57,6 +57,7 @@ const Tooltip = (props: TooltipProps) => {
 
             .tooltip:after {
               content: "";
+              pointer-events: none;
               position: absolute;
 
               /* vertically center */

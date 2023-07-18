@@ -16,7 +16,7 @@ export const HoverTooltip = (props: {
     arrowPosition = "top-start",
     style,
     className,
-    offset = "2.5rem",
+    offset,
   } = props
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
 
@@ -41,7 +41,7 @@ export const HoverTooltip = (props: {
           }
 
           .tooltip {
-            top: ${offset};
+            ${offset ? `top: ${offset};` : ""}
 
             white-space: pre-wrap;
             background-color: var(--color-canvas-subtle);
