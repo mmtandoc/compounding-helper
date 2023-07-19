@@ -67,20 +67,16 @@ const RhfSelect = <
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     let value: any = e.target.value
 
-    switch (value) {
-      case undefined:
-        value = undefined
-        break
-      case initialOption?.value:
-        value = null
-        break
-      default:
-        if (rules?.setValueAs) {
-          value = rules?.setValueAs(value)
-        } else {
-          value = rules?.valueAsNumber ? Number(value) : value
-        }
-        break
+    if (value === undefined) {
+      //value = undefined
+    } else if (initialOption && value === initialOption?.value) {
+      value = null
+    } else {
+      if (rules?.setValueAs) {
+        value = rules?.setValueAs(value)
+      } else {
+        value = rules?.valueAsNumber ? Number(value) : value
+      }
     }
 
     onChange(value)

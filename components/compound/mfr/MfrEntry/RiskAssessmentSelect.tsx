@@ -34,14 +34,14 @@ const RiskAssessmentSelect = (props: Props) => {
 
   const riskAssessmentId = useWatch({ name: "riskAssessmentId", control })
 
-  const { register, reset, setValue } = useFormContext()
+  const { register, resetField } = useFormContext()
 
   useEffect(() => {
-    if (!isLoading && !riskAssessmentId && riskAssessments?.[0]?.id) {
+    if (!isLoading && riskAssessmentId === null && riskAssessments?.[0]?.id) {
       register("riskAssessmentId")
-      setValue("riskAssessmentId", riskAssessments?.[0]?.id)
+      resetField("riskAssessmentId", { defaultValue: riskAssessments[0].id })
     }
-  }, [isLoading, register, riskAssessmentId, riskAssessments, setValue])
+  }, [register, isLoading, resetField, riskAssessmentId, riskAssessments])
 
   if (isLoading) {
     return <Spinner />
