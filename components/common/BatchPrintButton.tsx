@@ -140,7 +140,7 @@ export const BatchPrintButton = (props: Props) => {
           .page-break {
             margin-top: 1rem;
             display: block;
-            break-before: always;
+            break-before: page;
           }
         }
 
