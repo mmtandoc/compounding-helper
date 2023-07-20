@@ -150,9 +150,9 @@ const Table = <TData,>(props: TableProps<TData>) => {
               <th
                 key={header.id}
                 ref={(el) => {
-                  if (el?.clientWidth === undefined) return
+                  if (el?.offsetWidth === undefined) return
 
-                  colWidthsRef.current.set(header.column.id, el?.clientWidth)
+                  colWidthsRef.current.set(header.column.id, el.offsetWidth)
                   if (!colWidths) {
                     setColWidths(colWidthsRef.current)
                   }
