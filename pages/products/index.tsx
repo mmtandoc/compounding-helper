@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 
+import TableActionBar from "components/common/TableActionBar"
 import ProductTable from "components/product/ProductTable"
 import { Button } from "components/ui"
 import { getProducts } from "pages/api/products"
@@ -15,19 +16,11 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
   const { data } = props
 
   const actionBar = (
-    <div className="action-bar">
+    <TableActionBar>
       <Link href="/products/new">
         <Button>New Product</Button>
       </Link>
-      <style jsx>{`
-        .action-bar {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-          display: flex;
-          column-gap: 0.5rem;
-        }
-      `}</style>
-    </div>
+    </TableActionBar>
   )
 
   return (

@@ -1,7 +1,13 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { useCallback, useState } from "react"
 
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
+import { printDetails } from "components/common/styles"
+import TableActionBar from "components/common/TableActionBar"
+import MfrDetails from "components/compound/mfr/MfrDetails"
 import MfrTable from "components/compound/mfr/MfrTable"
 import { Button } from "components/ui"
 import { getCompoundById } from "pages/api/compounds/[id]"
@@ -19,28 +25,33 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
   const router = useRouter()
   const compoundId = parseInt(router.query.id as string)
 
+  const [selectedRows, setSelectedRows] = useState<MfrAll[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: MfrAll[]) => setSelectedRows(rows),
+    [],
+  )
+
   const actionBar = (
-    <div className="action-bar">
+    <TableActionBar>
       <Link href={`/compounds/${compoundId}/mfrs/new`}>
         <Button>New MFR</Button>
       </Link>
       <Link href={`/compounds/${compoundId}`}>
         <Button>Return to compound</Button>
       </Link>
-      <style jsx>{`
-        .action-bar {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-          display: flex;
-          column-gap: 0.5rem;
-        }
-      `}</style>
-    </div>
+      <BatchTableActions visible={selectedRows.length > 0}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected MFRs
+        </BatchPrintButton>
+      </BatchTableActions>
+    </TableActionBar>
   )
+
   return (
     <>
       {actionBar}
-      <MfrTable data={mfrs} />
+      <MfrTable data={mfrs} onSelectedRowsChange={handleSelectedRowsChange} />
       {actionBar}
       <style jsx>{`
         :global(.mfr-table) {
@@ -75,5 +86,15 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     },
   }
 }
+
+const renderDocument = (data: MfrAll) => (
+  <div className="details">
+    <h1>
+      MFR: {data.compound.name} - v.{data.version}
+    </h1>
+    <MfrDetails data={data} />
+    <style jsx>{printDetails}</style>
+  </div>
+)
 
 export default CompoundMfrs

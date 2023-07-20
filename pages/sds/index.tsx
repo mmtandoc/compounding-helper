@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import TableActionBar from "components/common/TableActionBar"
 import SdsTable from "components/sds/SdsTable"
 import { Button } from "components/ui"
 import { getSafetyDataSheets } from "pages/api/sds"
@@ -16,20 +17,13 @@ const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
   const { data } = props
 
   const actionBar = (
-    <div className="action-bar">
+    <TableActionBar>
       <Link href="/sds/new">
         <Button>New SDS summary</Button>
       </Link>
-      <style jsx>{`
-        .action-bar {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-          display: flex;
-          column-gap: 0.5rem;
-        }
-      `}</style>
-    </div>
+    </TableActionBar>
   )
+
   return (
     <div>
       {actionBar}

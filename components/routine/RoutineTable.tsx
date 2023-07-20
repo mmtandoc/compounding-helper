@@ -3,16 +3,13 @@ import { createColumnHelper } from "@tanstack/react-table"
 import axios, { AxiosError, isAxiosError } from "axios"
 import { formatDistanceToNow } from "date-fns"
 import { enqueueSnackbar } from "notistack"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { MdComment } from "react-icons/md"
 import { mutate } from "swr"
 
-import { BatchPrintButton } from "components/common/BatchPrintButton"
-import BatchTableActions from "components/common/BatchTableActions"
 import { HoverTooltip } from "components/common/HoverTooltip"
-import { printDetails } from "components/common/styles"
-import { Button, Modal, Table, Tooltip } from "components/ui"
+import { Button, Modal, Table } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import { RoutineEntity } from "lib/entities"
@@ -21,17 +18,16 @@ import { toIsoDateString } from "lib/utils"
 import { JsonError } from "types/common"
 import { RoutineWithHistory } from "types/models"
 
-import RoutineDetails from "./RoutineDetails/RoutineDetails"
-
 type Props = {
   data: RoutineWithHistory[]
+  onSelectedRowsChange?: (rows: RoutineEntity[]) => void
 }
 
 const columnHelper = createColumnHelper<RoutineEntity>()
 
 //TODO: Implement searching
 const RoutineTable = (props: Props) => {
-  const { data } = props
+  const { data, onSelectedRowsChange } = props
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [currentRoutine, setCurrentRoutine] = useState<RoutineEntity>()
@@ -182,28 +178,8 @@ const RoutineTable = (props: Props) => {
     [],
   )
 
-  const [selectedRows, setSelectedRows] = useState<RoutineEntity[]>([])
-
-  const handleSelectedRowsChange = useCallback(
-    (rows: RoutineEntity[]) => setSelectedRows(rows),
-    [],
-  )
-
-  const renderDocument = (data: RoutineEntity) => (
-    <div className="details">
-      <h1>Routine: {data.name}</h1>
-      <RoutineDetails data={data} />
-      <style jsx>{printDetails}</style>
-    </div>
-  )
-
   return (
     <>
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected rows
-        </BatchPrintButton>
-      </BatchTableActions>
       <Table
         className="routine-table"
         data={routines}
@@ -212,13 +188,8 @@ const RoutineTable = (props: Props) => {
           enableRowSelection: true,
           initialState: { columnFilters: [{ id: "isActive", value: "yes" }] },
         }}
-        onSelectedRowsChange={handleSelectedRowsChange}
+        onSelectedRowsChange={onSelectedRowsChange}
       />
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected rows
-        </BatchPrintButton>
-      </BatchTableActions>
       {currentRoutine && (
         <MarkCompleteModal
           routine={currentRoutine}

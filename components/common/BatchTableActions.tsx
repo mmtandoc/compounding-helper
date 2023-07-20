@@ -2,26 +2,26 @@ import { ReactNode } from "react"
 
 const BatchTableActions = ({
   children,
-  selectedRows,
+  visible = true,
 }: {
   children: ReactNode
-  selectedRows: unknown[]
-}) => (
-  <>
-    {selectedRows.length > 0 && (
-      <div className="batch-table-actions">
-        {children}
-        <style jsx>{`
-          .batch-table-actions {
-            display: flex;
-            width: 100%;
-            justify-content: end;
-            margin: 1rem 0;
-          }
-        `}</style>
-      </div>
-    )}
-  </>
-)
+  visible?: boolean
+}) => {
+  if (!visible) return null
+
+  return (
+    <div className="batch-table-actions">
+      {children}
+      <style jsx>{`
+        .batch-table-actions {
+          display: flex;
+          justify-content: end;
+          margin-left: auto;
+          margin-right: 0;
+        }
+      `}</style>
+    </div>
+  )
+}
 
 export default BatchTableActions

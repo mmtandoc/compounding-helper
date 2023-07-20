@@ -1,9 +1,16 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
+import { useCallback, useState } from "react"
 import useSWR from "swr"
 
+import { BatchPrintButton } from "components/common/BatchPrintButton"
+import BatchTableActions from "components/common/BatchTableActions"
+import { printDetails } from "components/common/styles"
+import TableActionBar from "components/common/TableActionBar"
+import RoutineDetails from "components/routine/RoutineDetails"
 import RoutineTable from "components/routine/RoutineTable"
 import { Button } from "components/ui"
+import { RoutineEntity } from "lib/entities"
 import { getRoutines } from "pages/api/routines"
 import { NextPageWithLayout } from "types/common"
 import { RoutineWithHistory } from "types/models"
@@ -23,6 +30,13 @@ const Routines: NextPageWithLayout<Props> = (props) => {
     },
   )
 
+  const [selectedRows, setSelectedRows] = useState<RoutineEntity[]>([])
+
+  const handleSelectedRowsChange = useCallback(
+    (rows: RoutineEntity[]) => setSelectedRows(rows),
+    [],
+  )
+
   if (error) {
     console.error(error)
   }
@@ -32,24 +46,25 @@ const Routines: NextPageWithLayout<Props> = (props) => {
   }
 
   const actionBar = (
-    <div className="action-bar">
+    <TableActionBar>
       <Link href="/routines/new">
         <Button>New Routine</Button>
       </Link>
-      <style jsx>{`
-        .action-bar {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-          display: flex;
-          column-gap: 0.5rem;
-        }
-      `}</style>
-    </div>
+      <BatchTableActions visible={selectedRows.length > 0}>
+        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
+          Print selected routines
+        </BatchPrintButton>
+      </BatchTableActions>
+    </TableActionBar>
   )
+
   return (
     <div>
       {actionBar}
-      <RoutineTable data={routines} />
+      <RoutineTable
+        data={routines}
+        onSelectedRowsChange={handleSelectedRowsChange}
+      />
       {actionBar}
       <style jsx>{`
         :global(.routine-table) {
@@ -59,6 +74,14 @@ const Routines: NextPageWithLayout<Props> = (props) => {
     </div>
   )
 }
+
+const renderDocument = (data: RoutineEntity) => (
+  <div className="details">
+    <h1>Routine: {data.name}</h1>
+    <RoutineDetails data={data} />
+    <style jsx>{printDetails}</style>
+  </div>
+)
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const data = await getRoutines({

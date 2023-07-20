@@ -1,18 +1,13 @@
 import { createColumnHelper } from "@tanstack/react-table"
-import { useCallback, useState } from "react"
 
-import { BatchPrintButton } from "components/common/BatchPrintButton"
-import BatchTableActions from "components/common/BatchTableActions"
-import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import { toIsoDateString } from "lib/utils"
 import { MfrAll } from "types/models"
 
-import MfrDetails from "./MfrDetails/MfrDetails"
-
 type Props = {
   data: MfrAll[]
+  onSelectedRowsChange?: (rows: MfrAll[]) => void
 }
 
 const columnHelper = createColumnHelper<MfrAll>()
@@ -54,45 +49,14 @@ const columns = [
   }),
 ]
 
-const MfrTable = ({ data }: Props) => {
-  const [selectedRows, setSelectedRows] = useState<MfrAll[]>([])
-
-  const handleSelectedRowsChange = useCallback(
-    (rows: MfrAll[]) => setSelectedRows(rows),
-    [],
-  )
-
-  const renderDocument = (data: MfrAll) => (
-    <div className="details">
-      <h1>
-        MFR: {data.compound.name} - v.{data.version}
-      </h1>
-      <MfrDetails data={data} />
-      <style jsx>{printDetails}</style>
-    </div>
-  )
-
-  return (
-    <>
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected MFRs
-        </BatchPrintButton>
-      </BatchTableActions>
-      <Table
-        className="mfr-table"
-        data={data}
-        columns={columns}
-        options={{ enableRowSelection: true }}
-        onSelectedRowsChange={handleSelectedRowsChange}
-      />
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected MFRs
-        </BatchPrintButton>
-      </BatchTableActions>
-    </>
-  )
-}
+const MfrTable = ({ data, onSelectedRowsChange }: Props) => (
+  <Table
+    className="mfr-table"
+    data={data}
+    columns={columns}
+    options={{ enableRowSelection: true }}
+    onSelectedRowsChange={onSelectedRowsChange}
+  />
+)
 
 export default MfrTable

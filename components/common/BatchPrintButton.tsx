@@ -110,6 +110,7 @@ export const BatchPrintButton = (props: Props) => {
           buttonProps?.onClick?.(e)
           handlePrintAll()
         }}
+        disabled={!documents.length}
       >
         {children}
       </Button>

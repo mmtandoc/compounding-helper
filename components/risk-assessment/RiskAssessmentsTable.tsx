@@ -1,19 +1,13 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import { useCallback, useState } from "react"
 
-import { BatchPrintButton } from "components/common/BatchPrintButton"
-import BatchTableActions from "components/common/BatchTableActions"
-import { printDetails } from "components/common/styles"
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
-import { toIsoDateString } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
-
-import RiskAssessmentDetails from "./RiskAssessmentDetails"
 
 type Props = {
   data: RiskAssessmentAll[]
+  onSelectedRowsChange?: (rows: RiskAssessmentAll[]) => void
 }
 
 const columnHelper = createColumnHelper<RiskAssessmentAll>()
@@ -96,48 +90,14 @@ const columns = [
   }),
 ]
 
-const RiskAssessmentsTable = (props: Props) => {
-  const { data } = props
-
-  const [selectedRows, setSelectedRows] = useState<RiskAssessmentAll[]>([])
-
-  const handleSelectedRowsChange = useCallback(
-    (rows: RiskAssessmentAll[]) => setSelectedRows(rows),
-    [],
-  )
-
-  const renderDocument = (data: RiskAssessmentAll) => (
-    <div className="details">
-      <h1>
-        Risk Assessment: {data.compound.name} (
-        {toIsoDateString(data.dateAssessed)})
-      </h1>
-      <RiskAssessmentDetails data={data} />
-      <style jsx>{printDetails}</style>
-    </div>
-  )
-
-  return (
-    <>
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected rows
-        </BatchPrintButton>
-      </BatchTableActions>
-      <Table
-        className="risk-assessment-table"
-        data={data}
-        columns={columns}
-        options={{ enableRowSelection: true }}
-        onSelectedRowsChange={handleSelectedRowsChange}
-      />
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(renderDocument)}>
-          Print selected rows
-        </BatchPrintButton>
-      </BatchTableActions>
-    </>
-  )
-}
+const RiskAssessmentsTable = ({ data, onSelectedRowsChange }: Props) => (
+  <Table
+    className="risk-assessment-table"
+    data={data}
+    columns={columns}
+    options={{ enableRowSelection: true }}
+    onSelectedRowsChange={onSelectedRowsChange}
+  />
+)
 
 export default RiskAssessmentsTable

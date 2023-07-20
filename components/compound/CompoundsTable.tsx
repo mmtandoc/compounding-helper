@@ -1,21 +1,17 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import useSWR from "swr"
+import { useMemo } from "react"
 
-import { BatchPrintButton } from "components/common/BatchPrintButton"
-import BatchTableActions from "components/common/BatchTableActions"
-import { printDetails } from "components/common/styles"
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
-import { CompoundWithMfrCount, IngredientAll, MfrAll } from "types/models"
+import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
-import MfrDetails from "./mfr/MfrDetails"
 
 type Props = {
   data: CompoundWithMfrCount[]
+  onSelectedRowsChange?: (rows: CompoundWithMfrCount[]) => void
   options?: { showShortcuts?: boolean }
 }
 
@@ -183,8 +179,11 @@ const columns = [
 ]
 
 const CompoundsTable = (props: Props) => {
-  const { data } = props
-  const { showShortcuts = false } = props.options ?? {}
+  const {
+    data,
+    onSelectedRowsChange,
+    options: { showShortcuts = false } = {},
+  } = props
 
   const visibleColumns = useMemo(
     () =>
@@ -192,90 +191,15 @@ const CompoundsTable = (props: Props) => {
     [showShortcuts],
   )
 
-  const [selectedRows, setSelectedRows] = useState<CompoundWithMfrCount[]>([])
-
-  const handleSelectedRowsChange = useCallback(
-    (rows: CompoundWithMfrCount[]) => setSelectedRows(rows),
-    [],
-  )
-
   return (
-    <>
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
-          Print selected MFRs
-        </BatchPrintButton>
-      </BatchTableActions>
-      <Table
-        className="compound-table"
-        data={data}
-        columns={visibleColumns}
-        options={{ enableRowSelection: (row) => row.original._count.mfrs > 0 }}
-        onSelectedRowsChange={handleSelectedRowsChange}
-      />
-      <BatchTableActions selectedRows={selectedRows}>
-        <BatchPrintButton documents={selectedRows.map(createRenderMfrDocument)}>
-          Print selected MFRs
-        </BatchPrintButton>
-      </BatchTableActions>
-    </>
+    <Table
+      className="compound-table"
+      data={data}
+      columns={visibleColumns}
+      options={{ enableRowSelection: (row) => row.original._count.mfrs > 0 }}
+      onSelectedRowsChange={onSelectedRowsChange}
+    />
   )
 }
 
-const MfrPrintDoc = ({
-  data,
-  onLoaded,
-}: {
-  data: CompoundWithMfrCount
-  onLoaded: () => void
-}) => {
-  const {
-    data: mfrsData,
-    error,
-    isLoading,
-  } = useSWR<MfrAll[]>(`/api/compounds/${data.id}/mfrs`)
-
-  if (error) {
-    console.error(error)
-  }
-
-  const mfrData = useMemo(
-    () =>
-      mfrsData?.reduce((prev, curr) =>
-        prev.version > curr.version ? prev : curr,
-      ),
-    [mfrsData],
-  )
-
-  const onLoadedCalledRef = useRef(false)
-
-  useEffect(() => {
-    // check if data exists and the effect haven't been called
-    if (!isLoading && mfrsData && mfrData && !onLoadedCalledRef.current) {
-      onLoadedCalledRef.current = true
-      onLoaded()
-    }
-  }, [isLoading, mfrData, mfrsData, onLoaded])
-
-  if (isLoading || mfrsData === undefined || mfrData === undefined) {
-    return null
-  }
-
-  return (
-    <div className="details">
-      <h1>
-        MFR: {mfrData.compound.name} - v.{mfrData.version}
-      </h1>
-      <MfrDetails data={mfrData} />
-      <style jsx>{printDetails}</style>
-    </div>
-  )
-}
-
-const createRenderMfrDocument = (data: CompoundWithMfrCount) => {
-  const Doc = ({ onLoaded }: { onLoaded: () => void }) => (
-    <MfrPrintDoc data={data} onLoaded={onLoaded} />
-  )
-  return Doc
-}
 export default CompoundsTable
