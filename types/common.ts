@@ -27,6 +27,6 @@ export type NextPageWithLayout<
   getLayout?: (page: ReactElement, pageProps: TLayoutProps) => ReactNode
 }
 
-export type AppPropsWithLayout = AppProps & {
+export type AppPropsWithLayout<P = any> = AppProps<P & { title?: string }> & {
   Component: NextPageWithLayout
 }
