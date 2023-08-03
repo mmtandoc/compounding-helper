@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime"
 import { NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 

@@ -7,6 +7,7 @@ import { FromZodErrorOptions, fromZodError } from "zod-validation-error"
 export type PrismaOrderByWithRelationInput = Record<
   string,
   | Prisma.SortOrder
+  | Prisma.SortOrderInput
   | {
       _count?: Prisma.SortOrder
     }
