@@ -1,13 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next"
 
-import { sendJsonError } from "lib/api/utils"
-import { prisma } from "lib/prisma"
+import {
+  NextApiRequestWithSession,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
+import { forUser, getUserPrismaClient } from "lib/prisma"
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const { method } = req
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const { method, session } = req
 
   //console.log(req)
 
@@ -17,7 +18,7 @@ export default async function handler(
       let vendors
 
       try {
-        vendors = await prisma.vendor.findMany({
+        vendors = await getUserPrismaClient(session.user).vendor.findMany({
           orderBy: { id: "asc" },
           include: {
             products: true,
@@ -38,3 +39,5 @@ export default async function handler(
       )
   }
 }
+
+export default withSession(handler)

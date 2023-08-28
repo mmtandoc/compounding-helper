@@ -1,23 +1,25 @@
 import { Link, Prisma } from "@prisma/client"
+import { User as AuthUser } from "@supabase/supabase-js"
 import { NextApiRequest, NextApiResponse } from "next"
 
-import { sendJsonError } from "lib/api/utils"
+import {
+  NextApiRequestWithSession,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { linkDirectorySchema } from "lib/fields"
-import { prisma } from "lib/prisma"
+import { forUser, forUserTx, getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiBody<Link[]>>,
-) {
-  const { body, method } = req
+const handler = withSession<ApiBody<Link[]>>(async (req, res) => {
+  const { body, method, session } = req
 
   switch (method) {
     case "GET": {
       let links
 
       try {
-        links = await getLinks()
+        links = await getLinks(session.user)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -36,7 +38,7 @@ export default async function handler(
 
       let result
       try {
-        result = await setLinks(data.links)
+        result = await setLinks(session.user, data.links)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -51,16 +53,22 @@ export default async function handler(
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
 
-export const getLinks = async () =>
-  prisma.link.findMany({ orderBy: { order: "asc" } })
+export default handler
 
-export const setLinks = async (data: Prisma.LinkCreateManyArgs["data"]) => {
-  const [, , result] = await prisma.$transaction([
-    prisma.link.deleteMany(),
-    prisma.link.createMany({ data }),
-    prisma.link.findMany({ orderBy: { order: "asc" } }),
+export const getLinks = async (user: AuthUser) =>
+  getUserPrismaClient(user).link.findMany({ orderBy: { order: "asc" } })
+
+export const setLinks = async (
+  user: AuthUser,
+  data: Prisma.LinkCreateManyArgs["data"],
+) => {
+  const client = getUserPrismaClient(user)
+  const [, , result] = await client.$transaction([
+    client.link.deleteMany(),
+    client.link.createMany({ data }),
+    client.link.findMany({ orderBy: { order: "asc" } }),
   ])
   return result
 }

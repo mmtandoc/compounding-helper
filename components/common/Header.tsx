@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 
-import { Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
+import { Button, Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
 import Logo from "public/logo.svg"
 
 type NavItem = { label: string; url?: string; children?: NavItem[] }
@@ -56,68 +57,79 @@ const NavMenu = (props: NavMenuProps) => {
 }
 
 const Header = () => {
+  const user = useUser()
+
   const left = (
     <div className="left">
-      <NavMenu
-        items={[
-          { label: "Home", url: "/" },
-          {
-            label: "Compounds",
-            url: "/compounds",
-            children: [
-              { label: "View compounds", url: "/compounds" },
-              {
-                label: "Create new compound",
-                url: "/risk-assessments/new",
-              },
-            ],
-          },
-          {
-            label: "Risk assessments",
-            url: "/risk-assessments",
-            children: [
-              { label: "View risk assessments", url: "/risk-assessments" },
-              {
-                label: "Create new risk assessment",
-                url: "/risk-assessments/new",
-              },
-            ],
-          },
-          {
-            label: "SDS summaries",
-            url: "/sds",
-            children: [
-              { label: "View SDS summaries", url: "/sds" },
-              { label: "Create new SDS summary", url: "/sds/new" },
-            ],
-          },
-          {
-            label: "Products",
-            url: "/products",
-            children: [
-              { label: "View products", url: "/products" },
-              { label: "Create new product", url: "/products/new" },
-            ],
-          },
-          {
-            label: "Chemicals",
-            url: "/chemicals",
-            children: [
-              { label: "View chemicals", url: "/chemicals" },
-              { label: "Create chemical", url: "/chemicals/new" },
-            ],
-          },
-          {
-            label: "Misc.",
-            children: [
-              { label: "Health hazards table", url: "/hazards" },
-              { label: "Link directory", url: "/links" },
-              { label: "Routines", url: "/routines" },
-              { label: "Settings", url: "/settings" },
-            ],
-          },
-        ]}
-      />
+      {user ? (
+        <NavMenu
+          items={[
+            { label: "Home", url: "/" },
+            {
+              label: "Compounds",
+              url: "/compounds",
+              children: [
+                { label: "View compounds", url: "/compounds" },
+                {
+                  label: "Create new compound",
+                  url: "/risk-assessments/new",
+                },
+              ],
+            },
+            {
+              label: "Risk assessments",
+              url: "/risk-assessments",
+              children: [
+                { label: "View risk assessments", url: "/risk-assessments" },
+                {
+                  label: "Create new risk assessment",
+                  url: "/risk-assessments/new",
+                },
+              ],
+            },
+            {
+              label: "SDS summaries",
+              url: "/sds",
+              children: [
+                { label: "View SDS summaries", url: "/sds" },
+                { label: "Create new SDS summary", url: "/sds/new" },
+              ],
+            },
+            {
+              label: "Products",
+              url: "/products",
+              children: [
+                { label: "View products", url: "/products" },
+                { label: "Create new product", url: "/products/new" },
+              ],
+            },
+            {
+              label: "Chemicals",
+              url: "/chemicals",
+              children: [
+                { label: "View chemicals", url: "/chemicals" },
+                { label: "Create chemical", url: "/chemicals/new" },
+              ],
+            },
+            {
+              label: "Misc.",
+              children: [
+                { label: "Health hazards table", url: "/hazards" },
+                { label: "Link directory", url: "/links" },
+                { label: "Routines", url: "/routines" },
+                { label: "Settings", url: "/settings" },
+              ],
+            },
+          ]}
+        />
+      ) : (
+        <NavMenu
+          items={[
+            { label: "Home", url: "/" },
+            /* { label: "About", url: "/about" }, */
+          ]}
+        />
+      )}
       <style jsx>{`
         .left {
           display: flex;
@@ -145,8 +157,39 @@ const Header = () => {
 
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development"
 
+  const AuthActions = () => {
+    const supabaseClient = useSupabaseClient()
+    const router = useRouter()
+    const user = useUser()
+
+    if (user) {
+      return (
+        <>
+          <Link href="/profile">
+            <Button variant="text">{user.email}</Button>
+          </Link>
+          <Button
+            variant="text"
+            onClick={async () => {
+              await supabaseClient.auth.signOut()
+              router.push("/")
+            }}
+          >
+            Sign out
+          </Button>
+        </>
+      )
+    }
+    return (
+      <>
+        <Link href="/login">Sign in</Link>
+      </>
+    )
+  }
+
   const right = (
     <div className="right">
+      <AuthActions />
       {environment !== "production" && (
         <span className="env">{environment.toUpperCase()}</span>
       )}

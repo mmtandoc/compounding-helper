@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import SdsEntry from "components/sds/SdsEntry"
+import { getSession } from "lib/api/utils"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { toIsoDateString } from "lib/utils"
@@ -35,13 +36,23 @@ const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
 export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const sdsId = parseInt(context.query.id as string)
 
   if (isNaN(sdsId)) {
     return { notFound: true }
   }
 
-  const data = await getSdsById(sdsId)
+  const data = await getSdsById(session.user, sdsId)
 
   if (data === null) {
     return { notFound: true }

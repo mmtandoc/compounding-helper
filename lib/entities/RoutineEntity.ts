@@ -8,6 +8,7 @@ type Completion = Omit<RoutineCompletion, "routineId">
 
 export default class RoutineEntity implements Routine {
   id!: number
+  pharmacyId!: number
   category!: string | null
   name!: string
   description!: string | null

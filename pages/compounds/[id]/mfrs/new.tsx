@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
+import { getSession } from "lib/api/utils"
 import { NullableMfrFields, mfrSchema } from "lib/fields"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -49,8 +50,18 @@ const NewMfr: NextPageWithLayout<NewMfrProps> = (props) => {
 export const getServerSideProps: GetServerSideProps<NewMfrProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const compoundId = parseInt(context.query.id as string)
-  const compound = await getCompoundById(compoundId)
+  const compound = await getCompoundById(session.user, compoundId)
 
   if (compound === null) {
     return { notFound: true }

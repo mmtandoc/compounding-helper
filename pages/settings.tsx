@@ -2,6 +2,7 @@ import type { GetServerSideProps } from "next"
 
 import EditForm from "components/common/data-pages/EditForm"
 import SettingsEntry from "components/settings/SettingsEntry"
+import { getSession } from "lib/api/utils"
 import {
   NullableSettingsFields,
   SettingsFields,
@@ -25,8 +26,20 @@ const Settings: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = (await getSettings()) ?? []
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data = (await getSettings(session.user)) ?? []
 
   const values = settingsSchema.parse(data)
 

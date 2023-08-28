@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
+import { getSession } from "lib/api/utils"
 import {
   ChemicalFields,
   NullableChemicalFields,
@@ -36,13 +37,23 @@ const EditChemical: NextPageWithLayout<EditChemicalProps> = (
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getChemicalById(id)
+  const data = await getChemicalById(session.user, id)
 
   if (data === null) {
     return { notFound: true }

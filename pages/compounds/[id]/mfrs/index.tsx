@@ -10,6 +10,7 @@ import TableActionBar from "components/common/TableActionBar"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import MfrTable from "components/compound/mfr/MfrTable"
 import { Button } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { getMfrsByCompoundId } from "pages/api/compounds/[id]/mfrs"
 import { NextPageWithLayout } from "types/common"
@@ -65,19 +66,29 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const compoundId = parseInt(context.query.id as string)
 
   if (isNaN(compoundId)) {
     return { notFound: true }
   }
 
-  const compound = await getCompoundById(compoundId)
+  const compound = await getCompoundById(session.user, compoundId)
 
   if (compound === null) {
     return { notFound: true }
   }
 
-  const mfrs = (await getMfrsByCompoundId(compoundId)) ?? []
+  const mfrs = (await getMfrsByCompoundId(session.user, compoundId)) ?? []
 
   return {
     props: {

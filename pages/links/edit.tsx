@@ -2,6 +2,7 @@ import type { GetServerSideProps } from "next"
 
 import EditForm from "components/common/data-pages/EditForm"
 import LinkDirectoryEntry from "components/links/LinkDirectoryEntry"
+import { getSession } from "lib/api/utils"
 import {
   LinkDirectoryFields,
   NullableLinkDirectoryFields,
@@ -26,8 +27,20 @@ const EditLinks: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = (await getLinks()) ?? []
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data = (await getLinks(session.user)) ?? []
 
   const values = linkDirectorySchema.parse({ links: data })
 

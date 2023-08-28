@@ -9,6 +9,7 @@ import { isoDateZodString } from "./utils"
 
 export const chemicalSchema = z.object({
   id: z.number().int().optional(),
+  pharmacyId: z.number().int().nullish(),
   name: z.string().trim().min(1),
   casNumber: z
     .string()

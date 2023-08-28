@@ -1,31 +1,33 @@
-import { NextMiddleware, NextRequest, NextResponse } from "next/server"
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export const middleware: NextMiddleware = (req: NextRequest) => {
-  const basicAuthCredentials = process.env.BASIC_AUTH_CREDENTIALS
+export async function middleware(req: NextRequest) {
+  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
+  const res = NextResponse.next()
+  // Create authenticated Supabase Client.
+  const supabase = createMiddlewareClient({ req, res })
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  if (!basicAuthCredentials) {
-    return NextResponse.next()
+  // Check auth condition
+  if (session) {
+    // Authentication successful, forward request to protected route.
+    console.log("AUTH SUCCESSFUL")
+    return res
   }
 
-  const validCredentials = basicAuthCredentials.split(";").map((cred) => {
-    const [username, password] = cred.split(":")
-    return { username, password }
-  })
+  console.log("AUTH FAILED")
 
-  const basicAuth = req.headers.get("authorization")
+  // Auth condition not met, redirect to home page.
+  const redirectUrl = req.nextUrl.clone()
+  redirectUrl.pathname = "/login"
+  redirectUrl.searchParams.set(`redirectedFrom`, req.nextUrl.pathname)
+  return NextResponse.redirect(redirectUrl)
+}
 
-  if (basicAuth) {
-    const credentials = basicAuth.split(" ")[1]
-    const [user, password] = atob(credentials).split(":")
-    if (
-      validCredentials.some(
-        ({ username: validUsername, password: validPassword }) =>
-          user === validUsername && password === validPassword,
-      )
-    ) {
-      return NextResponse.next()
-    }
-  }
-
-  return NextResponse.rewrite(new URL("/api/auth", req.url))
+export const config = {
+  matcher: ["/((?!login|signup|about|_next/static|_next/image|favicon.ico).*)"],
 }

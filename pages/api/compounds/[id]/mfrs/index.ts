@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client"
-import { NextApiRequest, NextApiResponse } from "next"
+import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError } from "lib/api/utils"
+import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
 import { mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { MfrAll, mfrAll as includeAllNested } from "types/models"
 
@@ -13,11 +13,8 @@ const querySchema = z.object({
   id: z.string().pipe(z.coerce.number()),
 })
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiBody<MfrAll[] | MfrAll>>,
-) {
-  const { method } = req
+const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
+  const { method, session } = req
 
   const results = querySchema.safeParse(req.query)
 
@@ -32,7 +29,7 @@ export default async function handler(
       let mfrs: MfrAll[]
 
       try {
-        mfrs = await getMfrsByCompoundId(compoundId)
+        mfrs = await getMfrsByCompoundId(session.user, compoundId)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -49,14 +46,14 @@ export default async function handler(
         return sendJsonError(res, 400, "Body is invalid.")
       }
 
-      const latestVersion = await getLatestMfrVersion(compoundId)
+      const latestVersion = await getLatestMfrVersion(session.user, compoundId)
 
       const nextVersion = latestVersion ? latestVersion + 1 : 0
 
       const mfrData = MfrMapper.toModel({ version: nextVersion, ...fields })
 
       try {
-        const result = await prisma.mfr.create({
+        const result = await getUserPrismaClient(session.user).mfr.create({
           ...includeAllNested,
           data: {
             ...mfrData,
@@ -85,23 +82,29 @@ export default async function handler(
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
+
+export default handler
 
 export const getMfrs = async (
+  currentUser: AuthUser,
   args?: Omit<Prisma.MfrFindManyArgs, "select" | "include">,
 ) => {
   const defaultArgs: Omit<Prisma.MfrFindManyArgs, "select" | "include"> = {
     orderBy: [{ riskAssessment: { compoundId: "asc" } }, { version: "asc" }],
   }
-  return await prisma.mfr.findMany({
+  return await getUserPrismaClient(currentUser).mfr.findMany({
     ...defaultArgs,
     ...args,
     ...includeAllNested,
   })
 }
 
-export const getMfrsByCompoundId = async (compoundId: number) =>
-  getMfrs({
+export const getMfrsByCompoundId = async (
+  currentUser: AuthUser,
+  compoundId: number,
+) =>
+  getMfrs(currentUser, {
     where: {
       riskAssessment: {
         compoundId: {
@@ -111,9 +114,12 @@ export const getMfrsByCompoundId = async (compoundId: number) =>
     },
   })
 
-export const getLatestMfrVersion = async (compoundId: number) =>
+export const getLatestMfrVersion = async (
+  currentUser: AuthUser,
+  compoundId: number,
+) =>
   (
-    await prisma.mfr.aggregate({
+    await getUserPrismaClient(currentUser).mfr.aggregate({
       where: { compoundId },
       _max: {
         version: true,

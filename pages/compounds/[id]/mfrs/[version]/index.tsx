@@ -4,6 +4,7 @@ import { useRouter } from "next/router"
 
 import Details from "components/common/data-pages/Details"
 import MfrDetails from "components/compound/mfr/MfrDetails"
+import { getSession } from "lib/api/utils"
 import { getLatestMfrVersion } from "pages/api/compounds/[id]/mfrs"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
@@ -54,6 +55,16 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const compoundId = parseInt(context.query.id as string)
   const version = parseInt(context.query.version as string)
 
@@ -61,9 +72,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  const data = await getMfr(compoundId, version)
+  const data = await getMfr(session.user, compoundId, version)
 
-  const latestVersion = await getLatestMfrVersion(compoundId)
+  const latestVersion = await getLatestMfrVersion(session.user, compoundId)
 
   if (data === null) {
     return { notFound: true }

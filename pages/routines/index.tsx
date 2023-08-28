@@ -10,6 +10,7 @@ import TableActionBar from "components/common/TableActionBar"
 import RoutineDetails from "components/routine/RoutineDetails"
 import RoutineTable from "components/routine/RoutineTable"
 import { Button } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { RoutineEntity } from "lib/entities"
 import { getRoutines } from "pages/api/routines"
 import { NextPageWithLayout } from "types/common"
@@ -83,8 +84,18 @@ const renderDocument = (data: RoutineEntity) => (
   </div>
 )
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = await getRoutines({
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data = await getRoutines(session.user, {
     orderBy: [{ category: "asc" }, { name: "asc" }],
   })
 

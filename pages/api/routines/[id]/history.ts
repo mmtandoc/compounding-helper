@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client"
-import type { NextApiHandler } from "next"
+import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError } from "lib/api/utils"
+import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
 import { completionSchema } from "lib/fields"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 
 import { getRoutineById } from "."
@@ -13,8 +13,8 @@ const querySchema = z.object({
   id: z.string().pipe(z.coerce.number()),
 })
 
-const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
-  const { method } = req
+const handler = withSession<ApiBody<undefined>>(async (req, res) => {
+  const { method, session } = req
 
   const results = querySchema.safeParse(req.query)
 
@@ -33,7 +33,7 @@ const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
       }
 
       try {
-        const lastCompleted = (await getRoutineById(routineId))
+        const lastCompleted = (await getRoutineById(session.user, routineId))
           ?.completionHistory[0]?.date
 
         if (lastCompleted && lastCompleted > new Date(data.date)) {
@@ -44,7 +44,7 @@ const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
           )
         }
 
-        await createRoutineCompletion({ routineId, ...data })
+        await createRoutineCompletion(session.user, { routineId, ...data })
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -59,10 +59,11 @@ const handler: NextApiHandler<ApiBody<undefined>> = async (req, res) => {
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
 
 export default handler
 
 export const createRoutineCompletion = async (
+  currentUser: AuthUser,
   data: Prisma.RoutineCompletionUncheckedCreateInput,
-) => prisma.routineCompletion.create({ data })
+) => getUserPrismaClient(currentUser).routineCompletion.create({ data })

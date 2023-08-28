@@ -1,25 +1,32 @@
 import { Prisma, Settings } from "@prisma/client"
+import { User as AuthUser } from "@supabase/supabase-js"
 import { NextApiRequest, NextApiResponse } from "next"
+import { SetOptional } from "type-fest"
 
-import { sendJsonError } from "lib/api/utils"
+import { getUserById } from "lib/api/users"
+import {
+  NextApiRequestWithSession,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { settingsSchema } from "lib/fields"
-import { prisma } from "lib/prisma"
+import { forUser, getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 
 const BASE_ID = 0
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: NextApiRequestWithSession,
   res: NextApiResponse<ApiBody<Settings | null>>,
 ) {
-  const { body, method } = req
+  const { body, method, session } = req
 
   switch (method) {
     case "GET": {
       let settings
 
       try {
-        settings = await getSettings()
+        settings = await getSettings(session.user)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -39,9 +46,9 @@ export default async function handler(
       let result
       try {
         result =
-          (await getSettings()) !== null
-            ? await updateSettings(data)
-            : await createSettings(data)
+          (await getSettings(session.user)) !== null
+            ? await updateSettings(session.user, data)
+            : await createSettings(session.user, data)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -58,14 +65,29 @@ export default async function handler(
   }
 }
 
-export const getSettings = async () =>
-  prisma.settings.findUnique({ where: { id: BASE_ID } })
+export default withSession(handler)
 
-export const createSettings = async (data: Prisma.SettingsCreateArgs["data"]) =>
-  prisma.settings.create({ data: settingsSchema.parse(data) })
+export const getSettings = async (user: AuthUser) =>
+  getUserPrismaClient(user).settings.findUnique({
+    where: { pharmacyId: (await getUserById(user, user.id)).pharmacyId },
+  })
 
-export const updateSettings = async (data: Prisma.SettingsUpdateArgs["data"]) =>
-  prisma.settings.update({
-    where: { id: BASE_ID },
+export const createSettings = async (
+  user: AuthUser,
+  data: SetOptional<Prisma.SettingsCreateArgs["data"], "pharmacyId">,
+) =>
+  getUserPrismaClient(user).settings.create({
+    data: {
+      pharmacyId: (await getUserById(user, user.id)).pharmacyId,
+      ...settingsSchema.parse(data),
+    },
+  })
+
+export const updateSettings = async (
+  user: AuthUser,
+  data: Prisma.SettingsUpdateArgs["data"],
+) =>
+  getUserPrismaClient(user).settings.update({
+    where: { pharmacyId: (await getUserById(user, user.id)).pharmacyId },
     data: settingsSchema.parse(data),
   })

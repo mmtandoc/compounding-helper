@@ -1,5 +1,11 @@
+import {
+  Session,
+  createPagesBrowserClient,
+} from "@supabase/auth-helpers-nextjs"
+import { SessionContextProvider } from "@supabase/auth-helpers-react"
 import axios from "axios"
 import { SnackbarProvider, closeSnackbar } from "notistack"
+import { useState } from "react"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
 import { SWRConfig } from "swr"
@@ -83,38 +89,48 @@ const multiFetcher = (urls: Record<string, string> | string[] | string) => {
   })
 }
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function MyApp({
+  Component,
+  pageProps,
+}: AppPropsWithLayout<{
+  initialSession: Session
+}>) {
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
+  const [supabaseClient] = useState(() => createPagesBrowserClient())
 
   return (
     <>
-      <IconContext.Provider
-        value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
+      <SessionContextProvider
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
       >
-        <SWRConfig value={{ fetcher: multiFetcher }}>
-          <SnackbarProvider
-            Components={{
-              success: Alert,
-              info: Alert,
-              error: Alert,
-              default: Alert,
-              warning: Alert,
-            }}
-            autoHideDuration={5000}
-            action={(snackbarId) => (
-              <IconButton
-                onClick={() => closeSnackbar(snackbarId)}
-                icon={MdClose}
-                variant="text"
-              />
-            )}
-          >
-            {layout}
-          </SnackbarProvider>
-        </SWRConfig>
-      </IconContext.Provider>
-
+        <IconContext.Provider
+          value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
+        >
+          <SWRConfig value={{ fetcher: multiFetcher }}>
+            <SnackbarProvider
+              Components={{
+                success: Alert,
+                info: Alert,
+                error: Alert,
+                default: Alert,
+                warning: Alert,
+              }}
+              autoHideDuration={5000}
+              action={(snackbarId) => (
+                <IconButton
+                  onClick={() => closeSnackbar(snackbarId)}
+                  icon={MdClose}
+                  variant="text"
+                />
+              )}
+            >
+              {layout}
+            </SnackbarProvider>
+          </SWRConfig>
+        </IconContext.Provider>
+      </SessionContextProvider>
       <style jsx global>{`
         #__next {
           display: flex;

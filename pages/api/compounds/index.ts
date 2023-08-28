@@ -1,23 +1,20 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { User as AuthUser } from "@supabase/supabase-js"
 
-import { sendJsonError } from "lib/api/utils"
+import { sendJsonError, withSession } from "lib/api/utils"
 import { CompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 import {
   CompoundWithIngredients,
   compoundWithIngredients as includeAllNested,
 } from "types/models"
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<
-    ApiBody<CompoundWithIngredients[] | CompoundWithIngredients>
-  >,
-) {
-  const { method } = req
+const handler = withSession<
+  ApiBody<CompoundWithIngredients[] | CompoundWithIngredients>
+>(async (req, res) => {
+  const { method, session } = req
 
   //TODO: Implement filtering
   switch (method) {
@@ -25,7 +22,7 @@ export default async function handler(
       let compounds
 
       try {
-        compounds = await getCompounds()
+        compounds = await getCompounds(session.user)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -42,7 +39,7 @@ export default async function handler(
         return sendJsonError(res, 400, "Body is invalid.")
       }
 
-      const result = await createCompound(fields)
+      const result = await createCompound(session.user, fields)
       res
         .setHeader("Location", `/compounds/${result.id}`)
         .status(201)
@@ -56,16 +53,21 @@ export default async function handler(
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
 
-export const getCompounds = async () =>
-  prisma.compound.findMany({
+export default handler
+
+export const getCompounds = async (currentUser: AuthUser) =>
+  getUserPrismaClient(currentUser).compound.findMany({
     orderBy: { id: "asc" },
     ...includeAllNested,
   })
 
-export const createCompound = async (fields: CompoundFields) =>
-  prisma.compound.create({
+export const createCompound = async (
+  currentUser: AuthUser,
+  fields: CompoundFields,
+) =>
+  getUserPrismaClient(currentUser).compound.create({
     ...includeAllNested,
     data: {
       ingredients: {

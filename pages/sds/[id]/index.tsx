@@ -6,6 +6,7 @@ import { useState } from "react"
 
 import SdsDetails from "components/sds/SdsDetails"
 import { Button, Modal } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -76,13 +77,23 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
 export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getSdsById(id)
+  const data = await getSdsById(session.user, id)
 
   if (data === null) {
     return { notFound: true }

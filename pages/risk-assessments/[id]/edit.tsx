@@ -4,6 +4,7 @@ import React from "react"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
+import { getSession } from "lib/api/utils"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
@@ -34,13 +35,23 @@ const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const riskAssessmentId = parseInt(context.query.id as string)
 
   if (isNaN(riskAssessmentId)) {
     return { notFound: true }
   }
 
-  const data = await getRiskAssessmentById(riskAssessmentId)
+  const data = await getRiskAssessmentById(session.user, riskAssessmentId)
 
   if (data === null) {
     return { notFound: true }

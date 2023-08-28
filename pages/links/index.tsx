@@ -5,6 +5,7 @@ import { BiEdit } from "react-icons/bi"
 import useSWR from "swr"
 
 import { IconButton } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { getLinks } from "pages/api/links"
 import { NextPageWithLayout } from "types/common"
 
@@ -75,8 +76,20 @@ const Links: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = (await getLinks()) ?? []
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data = (await getLinks(session.user)) ?? []
 
   return { props: { title: "Links", data } }
 }

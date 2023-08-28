@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RoutineEntry from "components/routine/RoutineEntry"
+import { getSession } from "lib/api/utils"
 import { NullableRoutineFields, RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { getRoutineById } from "pages/api/routines/[id]"
@@ -33,13 +34,23 @@ const EditRoutine: NextPageWithLayout<EditRoutineProps> = (
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getRoutineById(id)
+  const data = await getRoutineById(session.user, id)
 
   if (data === null) {
     return { notFound: true }

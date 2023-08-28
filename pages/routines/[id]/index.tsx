@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 
 import Details from "components/common/data-pages/Details"
 import RoutineDetails from "components/routine/RoutineDetails"
+import { getSession } from "lib/api/utils"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RoutineWithHistory } from "types/models"
@@ -30,13 +31,23 @@ const ViewRoutine: NextPageWithLayout<ViewRoutineProps> = (
 export const getServerSideProps: GetServerSideProps<ViewRoutineProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getRoutineById(id)
+  const data = await getRoutineById(session.user, id)
 
   if (data === null) {
     return { notFound: true }

@@ -7,6 +7,7 @@ import { ChemicalAll } from "types/models"
 const toFieldValues = (data: ChemicalAll): ChemicalFields => {
   return chemicalSchema.parse({
     id: data.id,
+    pharmacyId: data.pharmacyId,
     name: data.name,
     casNumber: data.casNumber,
     hasNoCasNumber: data.casNumber === null,
@@ -24,6 +25,7 @@ const toModel = (
 ): Prisma.ChemicalUncheckedCreateInput => {
   return {
     id: values.id ?? undefined,
+    pharmacyId: values.pharmacyId,
     name: values.name,
     casNumber: values.casNumber,
     nioshTable: values.nioshTable,

@@ -1,3 +1,4 @@
+import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import useSWR from "swr"
@@ -9,7 +10,8 @@ import TableActionBar from "components/common/TableActionBar"
 import CompoundsTable from "components/compound/CompoundsTable"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import { Button } from "components/ui"
-import { prisma } from "lib/prisma"
+import { getSession } from "lib/api/utils"
+import { getUserPrismaClient } from "lib/prisma"
 import { NextPageWithLayout } from "types/common"
 import {
   CompoundWithMfrCount,
@@ -72,9 +74,21 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const data: CompoundWithMfrCount[] =
-    (await prisma.compound.findMany(compoundWithMfrCount)) ?? []
+    (await getUserPrismaClient(session.user).compound.findMany(
+      compoundWithMfrCount,
+    )) ?? []
 
   return { props: { title: "Compounds", data } }
 }

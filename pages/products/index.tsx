@@ -4,6 +4,7 @@ import Link from "next/link"
 import TableActionBar from "components/common/TableActionBar"
 import ProductTable from "components/product/ProductTable"
 import { Button } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { getProducts } from "pages/api/products"
 import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"
@@ -37,8 +38,20 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data: ProductAll[] = (await getProducts()) ?? []
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data: ProductAll[] = (await getProducts(session.user)) ?? []
 
   return { props: { title: "Products", data } }
 }

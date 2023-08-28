@@ -1,18 +1,26 @@
 import { Prisma } from "@prisma/client"
-import { NextApiResponse } from "next"
-import { ConditionalExcept, ConditionalKeys } from "type-fest"
+import { Session, createPagesServerClient } from "@supabase/auth-helpers-nextjs"
+import {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+} from "next"
+import { ConditionalKeys } from "type-fest"
 import { z } from "zod"
 import { FromZodErrorOptions, fromZodError } from "zod-validation-error"
 
-export type PrismaOrderByWithRelationInput = Record<
-  string,
-  | Prisma.SortOrder
-  | Prisma.SortOrderInput
-  | {
-      _count?: Prisma.SortOrder
-    }
-  | undefined
->
+export type PrismaOrderByWithRelationInput = {
+  [k: string]:
+    | number
+    | Prisma.SortOrder
+    | Prisma.SortOrderInput
+    | PrismaOrderByWithRelationInput
+    | {
+        _count?: Prisma.SortOrder
+      }
+    | PrismaOrderByWithRelationInput
+  //| undefined
+}
 
 export const parseSortQuery = <TOrderBy extends PrismaOrderByWithRelationInput>(
   query: Partial<Record<string, string | string[]>>,
@@ -81,3 +89,49 @@ export const sendZodError = (
     validationError.details,
   )
 }
+
+export type NextApiHandlerWithSession<Data = any> = (
+  req: NextApiRequestWithSession,
+  res: NextApiResponse<Data>,
+) => unknown | Promise<unknown>
+
+export type NextApiRequestWithSession = NextApiRequest & { session: Session }
+
+export const withSession =
+  <ResponseData = any>(handler: NextApiHandlerWithSession<ResponseData>) =>
+  async (
+    req: NextApiRequestWithSession,
+    res: NextApiResponse<ResponseData>,
+  ) => {
+    try {
+      const supabase = createPagesServerClient({ req, res })
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw error
+      }
+      req.session = session
+      return handler(req, res)
+    } catch (error) {
+      return sendJsonError(res, 401, "Authentication required")
+    }
+  }
+
+export const getSession = async (
+  context:
+    | GetServerSidePropsContext
+    | {
+        req: NextApiRequest
+        res: NextApiResponse
+      },
+) => {
+  const supabase = createPagesServerClient(context)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  return session
+}
+
+//export const getCurrentUser = async ()

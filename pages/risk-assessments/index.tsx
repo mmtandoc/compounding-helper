@@ -1,4 +1,5 @@
 import { RiskAssessment } from "@prisma/client"
+import { GetServerSideProps } from "next"
 import Link from "next/link"
 import React, { useCallback, useState } from "react"
 
@@ -9,6 +10,7 @@ import TableActionBar from "components/common/TableActionBar"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
 import { Button } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { toIsoDateString } from "lib/utils"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import { NextPageWithLayout } from "types/common"
@@ -58,8 +60,18 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export async function getServerSideProps() {
-  const data: RiskAssessment[] = (await getRiskAssessments()) ?? []
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data: RiskAssessment[] = (await getRiskAssessments(session.user)) ?? []
 
   return { props: { title: "Risk Assessments", data } }
 }

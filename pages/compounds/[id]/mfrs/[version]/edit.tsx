@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 
 import EditForm from "components/common/data-pages/EditForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
+import { getSession } from "lib/api/utils"
 import { MfrFieldsWithVersion, NullableMfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
@@ -31,6 +32,16 @@ const EditMfr: NextPageWithLayout<EditMfrProps> = (props: EditMfrProps) => {
 export const getServerSideProps: GetServerSideProps<EditMfrProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const compoundId = parseInt(context.query.id as string)
   const version = parseInt(context.query.version as string)
 
@@ -38,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<EditMfrProps> = async (
     return { notFound: true }
   }
 
-  const data = await getMfr(compoundId, version)
+  const data = await getMfr(session.user, compoundId, version)
 
   if (data === null) {
     return { notFound: true }

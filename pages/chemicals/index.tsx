@@ -5,6 +5,7 @@ import Link from "next/link"
 import ChemicalTable from "components/chemical/ChemicalTable"
 import TableActionBar from "components/common/TableActionBar"
 import { Button } from "components/ui"
+import { getSession } from "lib/api/utils"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 
@@ -39,10 +40,20 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<
-  ChemicalsProps
-> = async () => {
-  const data: Chemical[] = (await getChemicals()) ?? []
+export const getServerSideProps: GetServerSideProps<ChemicalsProps> = async (
+  ctx,
+) => {
+  const session = await getSession(ctx)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  const data: Chemical[] = (await getChemicals(session.user)) ?? []
 
   return { props: { title: "Chemicals", data } }
 }

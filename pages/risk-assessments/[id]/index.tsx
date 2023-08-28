@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 
 import Details from "components/common/data-pages/Details"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
+import { getSession } from "lib/api/utils"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RiskAssessmentAll } from "types/models"
@@ -30,13 +31,23 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
 export const getServerSideProps: GetServerSideProps<
   RiskAssessmentProps
 > = async (context) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const riskAssessmentId = parseInt(context.query.id as string)
 
   if (isNaN(riskAssessmentId)) {
     return { notFound: true }
   }
 
-  const data = await getRiskAssessmentById(riskAssessmentId)
+  const data = await getRiskAssessmentById(session.user, riskAssessmentId)
 
   if (data === null) {
     return { notFound: true }

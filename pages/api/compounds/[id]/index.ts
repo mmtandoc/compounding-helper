@@ -1,12 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { NextApiRequest, NextApiResponse } from "next"
+import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError } from "lib/api/utils"
+import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
 import { compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { CompoundWithIngredients } from "types/models"
 
@@ -14,105 +14,107 @@ const querySchema = z.object({
   id: z.string().pipe(z.coerce.number()),
 })
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiBody<CompoundWithIngredients> | string>,
-) {
-  const { body, method } = req
+const handler = withSession<ApiBody<CompoundWithIngredients> | string>(
+  async (req, res) => {
+    const { body, method, session } = req
 
-  const results = querySchema.safeParse(req.query)
+    const results = querySchema.safeParse(req.query)
 
-  if (!results.success) {
-    return sendZodError(res, results.error)
-  }
-
-  const id = results.data.id
-
-  switch (method) {
-    case "GET": {
-      let compound
-      try {
-        compound = await getCompoundById(id)
-      } catch (error) {
-        console.error(error)
-        return sendJsonError(res, 500, "Encountered error with database.")
-      }
-
-      if (compound === null) {
-        return sendJsonError(res, 404, `Compound ${id} not found.`)
-      }
-
-      return res.status(200).json(compound)
+    if (!results.success) {
+      return sendZodError(res, results.error)
     }
-    case "PUT": {
-      let fields
-      try {
-        fields = compoundSchema.parse(body)
-      } catch (error) {
-        console.error(error)
-        return sendJsonError(res, 400, "Body is invalid.")
-      }
 
-      const ingredients = fields.ingredients.map(IngredientMapper.toModel)
+    const id = results.data.id
 
-      let compound
-      try {
-        compound = await updateCompoundById(id, {
-          ingredients: {
-            deleteMany: {},
-            createMany: {
-              data: ingredients,
-            },
-          },
-          ...CompoundMapper.toModel(fields),
-        })
-      } catch (error) {
-        console.error(error)
-        return sendJsonError(res, 500, "Encountered error with database.")
-      }
-
-      if (compound === null) {
-        return sendJsonError(res, 404, `Compound ${id} not found.`)
-      }
-
-      return res.status(200).json(compound)
-    }
-    case "DELETE": {
-      try {
-        await deleteCompoundById(id)
-      } catch (error) {
-        console.error(error)
-        // Unable to delete due to existing reference
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === "P2003"
-        ) {
-          return sendJsonError(
-            res,
-            409,
-            "Unable to delete due to compound being referenced by other records (i.e. MFR/Risk assessment).",
-          )
+    switch (method) {
+      case "GET": {
+        let compound
+        try {
+          compound = await getCompoundById(session.user, id)
+        } catch (error) {
+          console.error(error)
+          return sendJsonError(res, 500, "Encountered error with database.")
         }
 
-        return sendJsonError(res, 500, "Encountered error with database.")
-      }
+        if (compound === null) {
+          return sendJsonError(res, 404, `Compound ${id} not found.`)
+        }
 
-      return res.status(200).send(`Compound ${id} deleted.`)
+        return res.status(200).json(compound)
+      }
+      case "PUT": {
+        let fields
+        try {
+          fields = compoundSchema.parse(body)
+        } catch (error) {
+          console.error(error)
+          return sendJsonError(res, 400, "Body is invalid.")
+        }
+
+        const ingredients = fields.ingredients.map(IngredientMapper.toModel)
+
+        let compound
+        try {
+          compound = await updateCompoundById(session.user, id, {
+            ingredients: {
+              deleteMany: {},
+              createMany: {
+                data: ingredients,
+              },
+            },
+            ...CompoundMapper.toModel(fields),
+          })
+        } catch (error) {
+          console.error(error)
+          return sendJsonError(res, 500, "Encountered error with database.")
+        }
+
+        if (compound === null) {
+          return sendJsonError(res, 404, `Compound ${id} not found.`)
+        }
+
+        return res.status(200).json(compound)
+      }
+      case "DELETE": {
+        try {
+          await deleteCompoundById(session.user, id)
+        } catch (error) {
+          console.error(error)
+          // Unable to delete due to existing reference
+          if (
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            error.code === "P2003"
+          ) {
+            return sendJsonError(
+              res,
+              409,
+              "Unable to delete due to compound being referenced by other records (i.e. MFR/Risk assessment).",
+            )
+          }
+
+          return sendJsonError(res, 500, "Encountered error with database.")
+        }
+
+        return res.status(200).send(`Compound ${id} deleted.`)
+      }
+      default:
+        return sendJsonError(
+          res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
+          405,
+          `Method ${method} Not Allowed`,
+        )
     }
-    default:
-      return sendJsonError(
-        res.setHeader("Allow", ["GET", "PUT", "DELETE"]),
-        405,
-        `Method ${method} Not Allowed`,
-      )
-  }
-}
+  },
+)
+
+export default handler
 
 export const updateCompoundById = async (
+  currentUser: AuthUser,
   id: number,
   data: Prisma.CompoundUpdateArgs["data"],
 ) => {
-  return await prisma.compound.update({
+  return await getUserPrismaClient(currentUser).compound.update({
     where: {
       id,
     },
@@ -147,8 +149,8 @@ export const updateCompoundById = async (
   })
 }
 
-export const getCompoundById = async (id: number) => {
-  return await prisma.compound.findUnique({
+export const getCompoundById = async (currentUser: AuthUser, id: number) => {
+  return await getUserPrismaClient(currentUser).compound.findUnique({
     where: {
       id,
     },
@@ -182,9 +184,11 @@ export const getCompoundById = async (id: number) => {
   })
 }
 
-export const deleteCompoundById = async (id: number) => {
-  return await prisma.$transaction([
-    prisma.ingredient.deleteMany({ where: { compoundId: id } }),
-    prisma.compound.delete({ where: { id } }),
+export const deleteCompoundById = async (currentUser: AuthUser, id: number) => {
+  const client = getUserPrismaClient(currentUser)
+
+  return await client.$transaction([
+    client.ingredient.deleteMany({ where: { compoundId: id } }),
+    client.compound.delete({ where: { id } }),
   ])
 }

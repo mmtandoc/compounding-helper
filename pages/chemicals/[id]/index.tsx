@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next"
 
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
+import { getSession } from "lib/api/utils"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
 import { ChemicalAll } from "types/models"
@@ -29,13 +30,23 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
 export const getServerSideProps: GetServerSideProps<ChemicalPageProps> = async (
   context,
 ) => {
+  const session = await getSession(context)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
   const id = parseInt(context.query.id as string)
 
   if (isNaN(id)) {
     return { notFound: true }
   }
 
-  const data = await getChemicalById(id)
+  const data = await getChemicalById(session.user, id)
 
   if (data === null) {
     return { notFound: true }
