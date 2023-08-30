@@ -16,6 +16,8 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
 ) => {
   const { data } = props
 
+  const ownedByCentral = data.pharmacyId === null
+
   return (
     <Details
       data={data}
@@ -23,6 +25,8 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
       apiEndpointPath={`/api/chemicals/${data.id}`}
       urlPath={`/chemicals/${data.id}`}
       detailsComponent={ChemicalDetails}
+      // Users are allowed to edit even if owned by central, but can only modify their own local additional info
+      actions={{ edit: true, delete: !ownedByCentral }}
     />
   )
 }

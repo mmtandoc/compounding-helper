@@ -4,6 +4,8 @@ import { ChemicalFields, chemicalSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
+import AdditionalChemicalInfoMapper from "./AdditionalChemicalInfoMapper"
+
 const toFieldValues = (data: ChemicalAll): ChemicalFields => {
   return chemicalSchema.parse({
     id: data.id,
@@ -16,7 +18,9 @@ const toFieldValues = (data: ChemicalAll): ChemicalFields => {
     nioshRevisionDate: data.nioshRevisionDate
       ? toIsoDateString(data.nioshRevisionDate)
       : null,
-    additionalInfo: data.additionalInfo,
+    additionalInfo: data.additionalInfo.map(
+      AdditionalChemicalInfoMapper.toFieldValues,
+    ),
   })
 }
 
@@ -33,7 +37,6 @@ const toModel = (
     nioshRevisionDate: values.nioshRevisionDate
       ? new Date(values.nioshRevisionDate)
       : null,
-    additionalInfo: values.additionalInfo,
   }
 }
 

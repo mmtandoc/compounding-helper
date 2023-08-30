@@ -15,16 +15,31 @@ model Chemical {
   pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   name              String
-  casNumber         String?   @unique
+  casNumber         String?                  @unique
   synonyms          String[]
   products          Product[]
-  nioshTable        Int       @default(-1)
-  nioshRevisionDate DateTime? @db.Date
-  additionalInfo    String?
-  updatedAt         DateTime  @default(now()) @updatedAt
+  nioshTable        Int                      @default(-1)
+  nioshRevisionDate DateTime?                @db.Date
+  updatedAt         DateTime                 @default(now()) @updatedAt
+  additionalInfo    AdditionalChemicalInfo[]
 
   //@@index([synonyms(ops: ArrayOps)], type: Gin)
   @@map("chemicals")
+}
+
+model AdditionalChemicalInfo {
+  id Int @id @default(autoincrement())
+
+  chemical   Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  chemicalId Int
+
+  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
+
+  value String
+
+  @@unique([chemicalId, pharmacyId])
+  @@map("additional_chemical_info")
 }
 
 model Product {
@@ -367,16 +382,17 @@ model Pharmacy {
   id   Int    @id @default(autoincrement())
   name String
 
-  users           User[]
-  chemicals       Chemical[]
-  products        Product[]
-  vendors         Vendor[]
-  sdsSummaries    SDS[]
-  riskAssessments RiskAssessment[]
-  compounds       Compound[]
-  links           Link[]
-  routines        Routine[]
-  settings        Settings?
+  users                  User[]
+  chemicals              Chemical[]
+  additionalChemicalInfo AdditionalChemicalInfo[]
+  products               Product[]
+  vendors                Vendor[]
+  sdsSummaries           SDS[]
+  riskAssessments        RiskAssessment[]
+  compounds              Compound[]
+  links                  Link[]
+  routines               Routine[]
+  settings               Settings?
 
   @@map("pharmacies")
 }

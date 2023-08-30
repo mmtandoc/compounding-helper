@@ -4,9 +4,11 @@ import * as z from "zod"
 
 import { sendJsonError, withSession } from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
+import AdditionalChemicalInfoMapper from "lib/mappers/AdditionalChemicalInfoMapper"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
+import { chemicalAll } from "types/models"
 
 const querySchema = z.object({
   query: z.string().optional(),
@@ -78,6 +80,7 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
 
 export default handler
 
+//TODO: Refactor
 export async function getChemicals(user: AuthUser, nameQuery?: string) {
   const where =
     nameQuery !== undefined
@@ -90,12 +93,27 @@ export async function getChemicals(user: AuthUser, nameQuery?: string) {
           )`
       : Prisma.empty
 
-  return await getUserPrismaClient(user).$queryRaw<Chemical[]>(
-    Prisma.sql`SELECT * FROM public.chemicals ${where} ORDER BY id ASC;`,
-  )
+  const matchingIds = where
+    ? await getUserPrismaClient(user).$queryRaw<Pick<Chemical, "id">[]>(
+        Prisma.sql`SELECT id FROM public.chemicals ${where} ORDER BY id ASC;`,
+      )
+    : undefined
+
+  return await getUserPrismaClient(user).chemical.findMany({
+    ...chemicalAll,
+    where: where ? { id: { in: matchingIds?.map((v) => v.id) } } : undefined,
+    orderBy: { id: "asc" },
+  })
 }
 
 export const createChemical = async (user: AuthUser, values: ChemicalFields) =>
   await getUserPrismaClient(user).chemical.create({
-    data: ChemicalMapper.toModel(values),
+    data: {
+      ...ChemicalMapper.toModel(values),
+      additionalInfo: {
+        createMany: {
+          data: values.additionalInfo.map(AdditionalChemicalInfoMapper.toModel),
+        },
+      },
+    },
   })

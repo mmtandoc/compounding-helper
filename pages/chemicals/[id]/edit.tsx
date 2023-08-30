@@ -36,7 +36,9 @@ const EditChemical: NextPageWithLayout<EditChemicalProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<EditChemicalProps> = async (
+  context,
+) => {
   const session = await getSession(context)
 
   if (!session)

@@ -12,6 +12,7 @@ const defaultValues: NullableChemicalFields = {
   synonyms: null,
   nioshTable: null,
   nioshRevisionDate: null,
+  additionalInfo: [],
 }
 
 const NewChemical: NextPageWithLayout = () => {

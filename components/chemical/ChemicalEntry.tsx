@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { Controller, UseFormReturn } from "react-hook-form"
+import { useEffect, useMemo } from "react"
+import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
 
+import { Button } from "components/ui"
 import {
   DotJotList,
-  FormGroup,
+  Fieldset,
   Input,
   LabelFormGroup,
   RhfRadioGroup,
@@ -25,7 +26,15 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   const { register, control, watch, setValue, getFieldState, trigger } =
     formMethods
 
+  const additionalInfoArrayMethods = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormContext)
+    name: "additionalInfo", // unique name for your Field Array
+  })
+
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
+
+  //TODO: Support central admins editing central chemical data
+  const ownedByCentral = useMemo(() => watch("pharmacyId") === null, [watch])
 
   useUpdateFieldConditionally({
     updateCondition: hasNoCasNumber === true,
@@ -41,68 +50,121 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
     }
   }, [getFieldState, hasNoCasNumber, trigger])
 
+  const additionalInfo = watch("additionalInfo")
+
+  const hasLocalAdditionalInfo = useMemo(
+    () => additionalInfo?.some((val) => val.pharmacyId !== null),
+    [additionalInfo],
+  )
+
   register("id")
   return (
-    <>
-      <LabelFormGroup>
-        <span>Chemical name:</span>
-        <Input type="text" {...register("name")} />
-      </LabelFormGroup>
-      <LabelFormGroup>
-        <span>CAS number:</span>
-        <div className="row">
-          <Input
-            type="text"
-            {...register("casNumber", { disabled: hasNoCasNumber })}
-            placeholder="XXXXXXX-YY-Z"
-          />
-          <label>
-            <input
-              type="checkbox"
-              {...register(`hasNoCasNumber`, { deps: "casNumber" })}
-            />
-            <span>No CAS number</span>
-          </label>
+    <div className="chemical-entry">
+      {ownedByCentral && (
+        <div className="info">
+          The chemical is owned by the central database. Current user can only
+          modify their pharmacy&apos;s additional info.
         </div>
-      </LabelFormGroup>
-      <LabelFormGroup>
-        <span>Synonyms:</span>
-        <Controller
-          control={control}
-          name="synonyms"
-          render={({ field: { onChange, onBlur, value, ref } }) => (
-            <DotJotList
-              items={value?.map((v) => ({ text: v })) ?? []}
-              onChange={(items) => onChange(items.map((item) => item.text))}
-              ref={ref}
-              onBlur={onBlur}
-              size={30}
+      )}
+      <Fieldset
+        disabled={ownedByCentral}
+        style={{ border: "none", padding: "initial" }}
+      >
+        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+          <span>Chemical name:</span>
+          <Input type="text" {...register("name")} />
+        </LabelFormGroup>
+        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+          <span>CAS number:</span>
+          <div className="row">
+            <Input
+              type="text"
+              {...register("casNumber", {
+                disabled: hasNoCasNumber,
+              })}
+              placeholder="XXXXXXX-YY-Z"
             />
-          )}
-        ></Controller>
-      </LabelFormGroup>
-      <LabelFormGroup>
-        <span>NIOSH Tables:</span>
-        <RhfRadioGroup
-          name={"nioshTable"}
-          valueAsNumber={true}
-          radioOptions={[
-            [-1, "None"],
-            [1, "Table 1"],
-            [2, "Table 2"],
-            [3, "Table 3"],
-          ]}
-        />
-      </LabelFormGroup>
-      <FormGroup>
-        <label htmlFor="additionalInfo">Additional Info:</label>
-        <TextArea
-          id="additionalInfo"
-          {...register("additionalInfo")}
-          autoResize
-        />
-      </FormGroup>
-    </>
+            <label>
+              <input
+                type="checkbox"
+                {...register(`hasNoCasNumber`, {
+                  deps: "casNumber",
+                })}
+              />
+              <span>No CAS number</span>
+            </label>
+          </div>
+        </LabelFormGroup>
+        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+          <span>Synonyms:</span>
+          <Controller
+            control={control}
+            name="synonyms"
+            render={({ field: { onChange, onBlur, value, ref } }) => (
+              <DotJotList
+                items={value?.map((v) => ({ text: v })) ?? []}
+                onChange={(items) => onChange(items.map((item) => item.text))}
+                ref={ref}
+                onBlur={onBlur}
+                size={30}
+                readOnly={ownedByCentral}
+              />
+            )}
+          ></Controller>
+        </LabelFormGroup>
+        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+          <span>NIOSH Tables:</span>
+          <RhfRadioGroup
+            name={"nioshTable"}
+            valueAsNumber={true}
+            radioOptions={[
+              [-1, "None"],
+              [1, "Table 1"],
+              [2, "Table 2"],
+              [3, "Table 3"],
+            ]}
+          />
+        </LabelFormGroup>
+      </Fieldset>
+      <Fieldset legend="Additional Info">
+        {additionalInfoArrayMethods.fields.map((item, index) => (
+          <Fieldset
+            key={item.id}
+            legend={item.pharmacyId === null ? "Central" : "Local"}
+            disabled={item.pharmacyId === null && ownedByCentral}
+          >
+            <TextArea
+              {...register(`additionalInfo.${index}.value`)}
+              autoResize
+              fullWidth
+            />
+          </Fieldset>
+        ))}
+        {!hasLocalAdditionalInfo && (
+          <Button
+            onClick={() =>
+              additionalInfoArrayMethods.append({
+                value: "",
+                pharmacyId: undefined,
+              })
+            }
+            size="small"
+          >
+            Add local additional info
+          </Button>
+        )}
+      </Fieldset>
+      <style jsx>{`
+        .chemical-entry .info {
+          border: var(--border-default);
+          border-radius: 0.4rem;
+          background-color: var(--color-scale-blue-300);
+          padding: 0.5rem 1rem;
+          width: fit-content;
+          font-size: var(--font-size-sm);
+        }
+      `}</style>
+    </div>
   )
 }
 

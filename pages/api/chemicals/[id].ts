@@ -102,14 +102,84 @@ export const getChemicalById = async (user: AuthUser, id: number) =>
 
 export const updateChemicalById = async (
   user: AuthUser,
-  id: number,
+  chemicalId: number,
   values: ChemicalFields,
-) =>
-  await getUserPrismaClient(user).chemical.update({
-    where: { id },
-    data: ChemicalMapper.toModel(values),
-    ...chemicalAll,
+) => {
+  const localAdditionalInfo = values.additionalInfo.filter(
+    (v): v is { value: string; pharmacyId?: number } => v.pharmacyId !== null,
+  )
+
+  return await getUserPrismaClient(user).$transaction(async (tx) => {
+    const currentPharmacyId = (
+      await tx.$queryRaw<
+        {
+          currentPharmacyId: number
+        }[]
+      >`SELECT get_current_pharmacy_id "currentPharmacyId" FROM get_current_pharmacy_id();`
+    )[0].currentPharmacyId
+
+    /*
+    If the updated chemical data has no additional info owned by current user's pharmacy,
+    then we should delete their current additional info if it exists
+    */
+    if (!localAdditionalInfo.length) {
+      console.log({ localAdditionalInfo })
+      try {
+        await tx.additionalChemicalInfo.delete({
+          where: {
+            chemicalId_pharmacyId: {
+              chemicalId,
+              pharmacyId: currentPharmacyId,
+            },
+          },
+        })
+      } catch (error) {
+        // Catch error thrown if records doesn't exist (https://github.com/prisma/prisma/issues/4072)
+      }
+    }
+
+    // If owned by central, only update additionalChemicalInfo
+    if (values.pharmacyId === null) {
+      for (const val of localAdditionalInfo) {
+        await tx.additionalChemicalInfo.upsert({
+          where: {
+            chemicalId_pharmacyId: {
+              chemicalId,
+              pharmacyId: val.pharmacyId ?? currentPharmacyId,
+            },
+          },
+          create: { value: val.value, chemicalId },
+          update: { value: val.value },
+        })
+      }
+
+      return await tx.chemical.findUniqueOrThrow({
+        where: { id: chemicalId },
+        ...chemicalAll,
+      })
+    }
+
+    return await tx.chemical.update({
+      where: { id: chemicalId },
+      data: {
+        ...ChemicalMapper.toModel(values),
+        additionalInfo: {
+          upsert: localAdditionalInfo.map((val) => ({
+            where: {
+              chemicalId_pharmacyId: {
+                chemicalId,
+                pharmacyId: val.pharmacyId ?? currentPharmacyId,
+              },
+            },
+            create: { value: val.value },
+            update: { value: val.value },
+          })),
+        },
+      },
+      ...chemicalAll,
+    })
   })
+}
 
 export const deleteChemicalById = async (user: AuthUser, id: number) =>
   await getUserPrismaClient(user).chemical.delete({ where: { id } })
