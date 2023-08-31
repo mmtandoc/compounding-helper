@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import * as z from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -29,7 +33,7 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
       case "GET": {
         let chemical
         try {
-          chemical = await getChemicalById(session.user, id)
+          chemical = await getChemicalById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -52,7 +56,7 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
 
         let updatedChemical
         try {
-          updatedChemical = await updateChemicalById(session.user, id, data)
+          updatedChemical = await updateChemicalById(session, id, data)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -62,7 +66,7 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
       }
       case "DELETE": {
         try {
-          await deleteChemicalById(session.user, id)
+          await deleteChemicalById(session, id)
         } catch (error) {
           console.error(error)
           // Unable to delete due to existing reference
@@ -94,14 +98,14 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
 
 export default handler
 
-export const getChemicalById = async (user: AuthUser, id: number) =>
-  await getUserPrismaClient(user).chemical.findUnique({
+export const getChemicalById = async (session: AppSession, id: number) =>
+  await getUserPrismaClient(session.authSession.user).chemical.findUnique({
     where: { id },
     ...chemicalAll,
   })
 
 export const updateChemicalById = async (
-  user: AuthUser,
+  session: AppSession,
   chemicalId: number,
   values: ChemicalFields,
 ) => {
@@ -109,77 +113,81 @@ export const updateChemicalById = async (
     (v): v is { value: string; pharmacyId?: number } => v.pharmacyId !== null,
   )
 
-  return await getUserPrismaClient(user).$transaction(async (tx) => {
-    const currentPharmacyId = (
-      await tx.$queryRaw<
-        {
-          currentPharmacyId: number
-        }[]
-      >`SELECT get_current_pharmacy_id "currentPharmacyId" FROM get_current_pharmacy_id();`
-    )[0].currentPharmacyId
+  return await getUserPrismaClient(session.authSession.user).$transaction(
+    async (tx) => {
+      const currentPharmacyId = (
+        await tx.$queryRaw<
+          {
+            currentPharmacyId: number
+          }[]
+        >`SELECT get_current_pharmacy_id "currentPharmacyId" FROM get_current_pharmacy_id();`
+      )[0].currentPharmacyId
 
-    /*
+      /*
     If the updated chemical data has no additional info owned by current user's pharmacy,
     then we should delete their current additional info if it exists
     */
-    if (!localAdditionalInfo.length) {
-      console.log({ localAdditionalInfo })
-      try {
-        await tx.additionalChemicalInfo.delete({
-          where: {
-            chemicalId_pharmacyId: {
-              chemicalId,
-              pharmacyId: currentPharmacyId,
+      if (!localAdditionalInfo.length) {
+        console.log({ localAdditionalInfo })
+        try {
+          await tx.additionalChemicalInfo.delete({
+            where: {
+              chemicalId_pharmacyId: {
+                chemicalId,
+                pharmacyId: currentPharmacyId,
+              },
             },
-          },
-        })
-      } catch (error) {
-        // Catch error thrown if records doesn't exist (https://github.com/prisma/prisma/issues/4072)
-      }
-    }
-
-    // If owned by central, only update additionalChemicalInfo
-    if (values.pharmacyId === null) {
-      for (const val of localAdditionalInfo) {
-        await tx.additionalChemicalInfo.upsert({
-          where: {
-            chemicalId_pharmacyId: {
-              chemicalId,
-              pharmacyId: val.pharmacyId ?? currentPharmacyId,
-            },
-          },
-          create: { value: val.value, chemicalId },
-          update: { value: val.value },
-        })
+          })
+        } catch (error) {
+          // Catch error thrown if records doesn't exist (https://github.com/prisma/prisma/issues/4072)
+        }
       }
 
-      return await tx.chemical.findUniqueOrThrow({
-        where: { id: chemicalId },
-        ...chemicalAll,
-      })
-    }
-
-    return await tx.chemical.update({
-      where: { id: chemicalId },
-      data: {
-        ...ChemicalMapper.toModel(values),
-        additionalInfo: {
-          upsert: localAdditionalInfo.map((val) => ({
+      // If owned by central, only update additionalChemicalInfo
+      if (values.pharmacyId === null) {
+        for (const val of localAdditionalInfo) {
+          await tx.additionalChemicalInfo.upsert({
             where: {
               chemicalId_pharmacyId: {
                 chemicalId,
                 pharmacyId: val.pharmacyId ?? currentPharmacyId,
               },
             },
-            create: { value: val.value },
+            create: { value: val.value, chemicalId },
             update: { value: val.value },
-          })),
+          })
+        }
+
+        return await tx.chemical.findUniqueOrThrow({
+          where: { id: chemicalId },
+          ...chemicalAll,
+        })
+      }
+
+      return await tx.chemical.update({
+        where: { id: chemicalId },
+        data: {
+          ...ChemicalMapper.toModel(values),
+          additionalInfo: {
+            upsert: localAdditionalInfo.map((val) => ({
+              where: {
+                chemicalId_pharmacyId: {
+                  chemicalId,
+                  pharmacyId: val.pharmacyId ?? currentPharmacyId,
+                },
+              },
+              create: { value: val.value },
+              update: { value: val.value },
+            })),
+          },
         },
-      },
-      ...chemicalAll,
-    })
-  })
+        ...chemicalAll,
+      })
+    },
+  )
 }
 
-export const deleteChemicalById = async (user: AuthUser, id: number) =>
-  await getUserPrismaClient(user).chemical.delete({ where: { id } })
+export const deleteChemicalById = async (session: AppSession, id: number) =>
+  await getUserPrismaClient(session.authSession.user).chemical.delete({
+    where: { id },
+  })

@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client"
-import { Session, createPagesServerClient } from "@supabase/auth-helpers-nextjs"
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"
+import { AuthSession } from "@supabase/supabase-js"
 import {
   GetServerSidePropsContext,
   NextApiRequest,
@@ -8,6 +9,9 @@ import {
 import { ConditionalKeys } from "type-fest"
 import { z } from "zod"
 import { FromZodErrorOptions, fromZodError } from "zod-validation-error"
+
+import { getBypassPrismaClient } from "lib/prisma"
+import { UserWithPharmacy, userWithPharmacy } from "types/models"
 
 export type PrismaOrderByWithRelationInput = {
   [k: string]:
@@ -90,12 +94,17 @@ export const sendZodError = (
   )
 }
 
+export type AppSession = {
+  authSession: AuthSession
+  appUser: UserWithPharmacy
+}
+
 export type NextApiHandlerWithSession<Data = any> = (
   req: NextApiRequestWithSession,
   res: NextApiResponse<Data>,
 ) => unknown | Promise<unknown>
 
-export type NextApiRequestWithSession = NextApiRequest & { session: Session }
+export type NextApiRequestWithSession = NextApiRequest & { session: AppSession }
 
 export const withSession =
   <ResponseData = any>(handler: NextApiHandlerWithSession<ResponseData>) =>
@@ -106,13 +115,20 @@ export const withSession =
     try {
       const supabase = createPagesServerClient({ req, res })
       const {
-        data: { session },
+        data: { session: authSession },
         error,
       } = await supabase.auth.getSession()
-      if (!session) {
+      if (!authSession) {
         throw error
       }
-      req.session = session
+
+      const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
+        where: { id: authSession.user.id },
+        ...userWithPharmacy,
+      })
+
+      req.session = { authSession, appUser }
+
       return handler(req, res)
     } catch (error) {
       return sendJsonError(res, 401, "Authentication required")
@@ -129,9 +145,18 @@ export const getSession = async (
 ) => {
   const supabase = createPagesServerClient(context)
   const {
-    data: { session },
+    data: { session: authSession },
+    error,
   } = await supabase.auth.getSession()
-  return session
-}
 
-//export const getCurrentUser = async ()
+  if (!authSession) {
+    return null
+  }
+
+  const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
+    where: { id: authSession.user.id },
+    ...userWithPharmacy,
+  })
+
+  return { authSession, appUser }
+}

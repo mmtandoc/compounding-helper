@@ -71,7 +71,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     }
 
-  const data: RiskAssessment[] = (await getRiskAssessments(session.user)) ?? []
+  const data: RiskAssessment[] = (await getRiskAssessments(session)) ?? []
 
   return { props: { title: "Risk Assessments", data } }
 }

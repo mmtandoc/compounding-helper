@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import * as z from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -34,7 +38,7 @@ const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
       let products
 
       try {
-        products = await getProducts(session.user, filters)
+        products = await getProducts(session, filters)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -53,7 +57,7 @@ const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
 
       let result
       try {
-        result = await createProduct(session.user, fields)
+        result = await createProduct(session, fields)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -77,17 +81,20 @@ const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
 export default handler
 
 export const getProducts = async (
-  user: AuthUser,
+  session: AppSession,
   where?: Prisma.ProductWhereInput,
 ) =>
-  await getUserPrismaClient(user).product.findMany({
+  await getUserPrismaClient(session.authSession.user).product.findMany({
     where,
     orderBy: { id: "asc" },
     ...productAll,
   })
 
-export const createProduct = async (user: AuthUser, values: ProductFields) =>
-  await getUserPrismaClient(user).product.create({
+export const createProduct = async (
+  session: AppSession,
+  values: ProductFields,
+) =>
+  await getUserPrismaClient(session.authSession.user).product.create({
     data: ProductMapper.toModel(values),
     ...productAll,
   })

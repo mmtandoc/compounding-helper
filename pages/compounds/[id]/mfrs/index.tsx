@@ -82,13 +82,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  const compound = await getCompoundById(session.user, compoundId)
+  const compound = await getCompoundById(session, compoundId)
 
   if (compound === null) {
     return { notFound: true }
   }
 
-  const mfrs = (await getMfrsByCompoundId(session.user, compoundId)) ?? []
+  const mfrs = (await getMfrsByCompoundId(session, compoundId)) ?? []
 
   return {
     props: {

@@ -1,7 +1,11 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 
-import { parseSortQuery, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  parseSortQuery,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -30,7 +34,7 @@ const handler = withSession<ApiBody<RoutineWithHistory[] | RoutineWithHistory>>(
         let routines: RoutineWithHistory[]
 
         try {
-          routines = await getRoutines(session.user, { orderBy })
+          routines = await getRoutines(session, { orderBy })
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -49,7 +53,7 @@ const handler = withSession<ApiBody<RoutineWithHistory[] | RoutineWithHistory>>(
 
         let result: RoutineWithHistory
         try {
-          result = await createRoutine(session.user, fields)
+          result = await createRoutine(session, fields)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -74,14 +78,14 @@ const handler = withSession<ApiBody<RoutineWithHistory[] | RoutineWithHistory>>(
 export default handler
 
 export const getRoutines = async (
-  currentUser: AuthUser,
+  session: AppSession,
   args?: Omit<Prisma.RoutineFindManyArgs, "select" | "include">,
 ) => {
   const defaultArgs: Omit<Prisma.RoutineFindManyArgs, "select" | "include"> = {
     orderBy: { id: "asc" },
   }
 
-  return await getUserPrismaClient(currentUser).routine.findMany({
+  return await getUserPrismaClient(session.authSession.user).routine.findMany({
     ...defaultArgs,
     ...args,
     ...routineWithHistory,
@@ -89,10 +93,10 @@ export const getRoutines = async (
 }
 
 export const createRoutine = async (
-  currentUser: AuthUser,
+  session: AppSession,
   values: RoutineFields,
 ) =>
-  await getUserPrismaClient(currentUser).routine.create({
+  await getUserPrismaClient(session.authSession.user).routine.create({
     data: RoutineMapper.toModel(values),
     ...routineWithHistory,
   })

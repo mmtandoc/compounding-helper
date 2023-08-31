@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<ChemicalPageProps> = async (
     return { notFound: true }
   }
 
-  const data = await getChemicalById(session.user, id)
+  const data = await getChemicalById(session, id)
 
   if (data === null) {
     return { notFound: true }

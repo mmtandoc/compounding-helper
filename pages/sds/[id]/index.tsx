@@ -93,7 +93,7 @@ export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
     return { notFound: true }
   }
 
-  const data = await getSdsById(session.user, id)
+  const data = await getSdsById(session, id)
 
   if (data === null) {
     return { notFound: true }

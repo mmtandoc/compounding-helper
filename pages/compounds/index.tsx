@@ -86,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
 
   const data: CompoundWithMfrCount[] =
-    (await getUserPrismaClient(session.user).compound.findMany(
+    (await getUserPrismaClient(session.authSession.user).compound.findMany(
       compoundWithMfrCount,
     )) ?? []
 

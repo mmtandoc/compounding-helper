@@ -1,8 +1,6 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
-import { NextApiRequest, NextApiResponse } from "next"
 
-import { sendJsonError, withSession } from "lib/api/utils"
+import { AppSession, sendJsonError, withSession } from "lib/api/utils"
 import { SdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -62,10 +60,7 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
         let safetyDatasheets
 
         try {
-          safetyDatasheets = await getSafetyDataSheets(
-            session.user,
-            findManyArgs,
-          )
+          safetyDatasheets = await getSafetyDataSheets(session, findManyArgs)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -85,7 +80,7 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
 
         let result
         try {
-          result = await createSds(session.user, fields)
+          result = await createSds(session, fields)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -106,8 +101,8 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
 
 export default handler
 
-export const createSds = async (currentUser: AuthUser, fields: SdsFields) => {
-  return await getUserPrismaClient(currentUser).sDS.create({
+export const createSds = async (session: AppSession, fields: SdsFields) => {
+  return await getUserPrismaClient(session.authSession.user).sDS.create({
     data: {
       healthHazards: {
         createMany: {
@@ -127,10 +122,10 @@ export const createSds = async (currentUser: AuthUser, fields: SdsFields) => {
 }
 
 export const getSafetyDataSheets = async (
-  currentUser: AuthUser,
+  session: AppSession,
   args?: Omit<Prisma.SDSFindManyArgs, "select" | "include">,
 ) =>
-  getUserPrismaClient(currentUser).sDS.findMany({
+  getUserPrismaClient(session.authSession.user).sDS.findMany({
     ...args,
     ...sdsWithRelations,
   })

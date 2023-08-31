@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  const data = await getProductById(session.user, id)
+  const data = await getProductById(session, id)
 
   if (data === null) {
     return { notFound: true }

@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  const data = await getCompoundById(session.user, id)
+  const data = await getCompoundById(session, id)
 
   if (data === null) {
     return { notFound: true }

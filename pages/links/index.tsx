@@ -89,7 +89,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       },
     }
 
-  const data = (await getLinks(session.user)) ?? []
+  const data = (await getLinks(session)) ?? []
 
   return { props: { title: "Links", data } }
 }

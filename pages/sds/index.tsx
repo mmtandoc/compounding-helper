@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
 
   const data: SdsWithRelations[] =
-    (await getSafetyDataSheets(session.user, { orderBy: { id: "asc" } })) ?? []
+    (await getSafetyDataSheets(session, { orderBy: { id: "asc" } })) ?? []
 
   return { props: { title: "SDS Summaries", data } }
 }

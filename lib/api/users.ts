@@ -1,14 +1,16 @@
-import { User as AuthUser } from "@supabase/supabase-js"
-
 import { getUserPrismaClient } from "lib/prisma"
+import { userWithPharmacy } from "types/models"
+
+import { AppSession } from "./utils"
 
 /**
  *
- * @param currentUser The current Supabase Auth user
+ * @param session The current app session
  * @param userId The ID of the user to get
  * @returns The User with the specified ID
  */
-export const getUserById = async (currentUser: AuthUser, userId: string) =>
-  await getUserPrismaClient(currentUser).user.findUniqueOrThrow({
+export const getUserById = async (session: AppSession, userId: string) =>
+  await getUserPrismaClient(session.authSession.user).user.findUniqueOrThrow({
     where: { id: userId },
+    ...userWithPharmacy,
   })

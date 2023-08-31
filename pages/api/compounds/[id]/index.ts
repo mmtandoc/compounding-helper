@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -30,7 +34,7 @@ const handler = withSession<ApiBody<CompoundWithIngredients> | string>(
       case "GET": {
         let compound
         try {
-          compound = await getCompoundById(session.user, id)
+          compound = await getCompoundById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -55,7 +59,7 @@ const handler = withSession<ApiBody<CompoundWithIngredients> | string>(
 
         let compound
         try {
-          compound = await updateCompoundById(session.user, id, {
+          compound = await updateCompoundById(session, id, {
             ingredients: {
               deleteMany: {},
               createMany: {
@@ -77,7 +81,7 @@ const handler = withSession<ApiBody<CompoundWithIngredients> | string>(
       }
       case "DELETE": {
         try {
-          await deleteCompoundById(session.user, id)
+          await deleteCompoundById(session, id)
         } catch (error) {
           console.error(error)
           // Unable to delete due to existing reference
@@ -110,11 +114,11 @@ const handler = withSession<ApiBody<CompoundWithIngredients> | string>(
 export default handler
 
 export const updateCompoundById = async (
-  currentUser: AuthUser,
+  session: AppSession,
   id: number,
   data: Prisma.CompoundUpdateArgs["data"],
 ) => {
-  return await getUserPrismaClient(currentUser).compound.update({
+  return await getUserPrismaClient(session.authSession.user).compound.update({
     where: {
       id,
     },
@@ -149,8 +153,10 @@ export const updateCompoundById = async (
   })
 }
 
-export const getCompoundById = async (currentUser: AuthUser, id: number) => {
-  return await getUserPrismaClient(currentUser).compound.findUnique({
+export const getCompoundById = async (session: AppSession, id: number) => {
+  return await getUserPrismaClient(
+    session.authSession.user,
+  ).compound.findUnique({
     where: {
       id,
     },
@@ -184,8 +190,8 @@ export const getCompoundById = async (currentUser: AuthUser, id: number) => {
   })
 }
 
-export const deleteCompoundById = async (currentUser: AuthUser, id: number) => {
-  const client = getUserPrismaClient(currentUser)
+export const deleteCompoundById = async (session: AppSession, id: number) => {
+  const client = getUserPrismaClient(session.authSession.user)
 
   return await client.$transaction([
     client.ingredient.deleteMany({ where: { compoundId: id } }),

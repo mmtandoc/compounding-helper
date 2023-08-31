@@ -1,10 +1,14 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { SdsFields, sdsSchema } from "lib/fields"
 import SdsHazardMapper from "lib/mappers/SdsHazardMapper"
 import SdsMapper from "lib/mappers/SdsMapper"
@@ -32,7 +36,7 @@ const handler = withSession<ApiBody<SdsWithRelations | undefined>>(
         let sds
 
         try {
-          sds = await getSdsById(session.user, id)
+          sds = await getSdsById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -55,7 +59,7 @@ const handler = withSession<ApiBody<SdsWithRelations | undefined>>(
 
         let result
         try {
-          result = await updateSdsById(session.user, id, fields)
+          result = await updateSdsById(session, id, fields)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -65,7 +69,7 @@ const handler = withSession<ApiBody<SdsWithRelations | undefined>>(
       }
       case "DELETE": {
         try {
-          await deleteSdsById(session.user, id)
+          await deleteSdsById(session, id)
         } catch (error) {
           console.error(error)
           // Unable to delete due to existing reference
@@ -97,15 +101,15 @@ const handler = withSession<ApiBody<SdsWithRelations | undefined>>(
 
 export default handler
 
-export const getSdsById = async (currentUser: AuthUser, id: number) => {
-  return await getUserPrismaClient(currentUser).sDS.findUnique({
+export const getSdsById = async (session: AppSession, id: number) => {
+  return await getUserPrismaClient(session.authSession.user).sDS.findUnique({
     where: { id },
     ...sdsWithRelations,
   })
 }
 
-export const deleteSdsById = async (currentUser: AuthUser, id: number) => {
-  const prismaClient = getUserPrismaClient(currentUser)
+export const deleteSdsById = async (session: AppSession, id: number) => {
+  const prismaClient = getUserPrismaClient(session.authSession.user)
 
   await prismaClient.$transaction([
     prismaClient.hazardCategoryToSDS.deleteMany({ where: { sdsId: id } }),
@@ -116,7 +120,7 @@ export const deleteSdsById = async (currentUser: AuthUser, id: number) => {
 }
 
 export const updateSdsById = async (
-  currentUser: AuthUser,
+  session: AppSession,
   id: number,
   fields: SdsFields,
 ) => {
@@ -152,5 +156,7 @@ export const updateSdsById = async (
 
   console.dir(updateArgs, { depth: null })
 
-  return await getUserPrismaClient(currentUser).sDS.update(updateArgs)
+  return await getUserPrismaClient(session.authSession.user).sDS.update(
+    updateArgs,
+  )
 }

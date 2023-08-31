@@ -72,9 +72,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  const data = await getMfr(session.user, compoundId, version)
+  const data = await getMfr(session, compoundId, version)
 
-  const latestVersion = await getLatestMfrVersion(session.user, compoundId)
+  const latestVersion = await getLatestMfrVersion(session, compoundId)
 
   if (data === null) {
     return { notFound: true }

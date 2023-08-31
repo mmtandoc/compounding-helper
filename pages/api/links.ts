@@ -1,8 +1,8 @@
 import { Link, Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import { NextApiRequest, NextApiResponse } from "next"
 
 import {
+  AppSession,
   NextApiRequestWithSession,
   sendJsonError,
   withSession,
@@ -19,7 +19,7 @@ const handler = withSession<ApiBody<Link[]>>(async (req, res) => {
       let links
 
       try {
-        links = await getLinks(session.user)
+        links = await getLinks(session)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -38,7 +38,7 @@ const handler = withSession<ApiBody<Link[]>>(async (req, res) => {
 
       let result
       try {
-        result = await setLinks(session.user, data.links)
+        result = await setLinks(session, data.links)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -57,14 +57,16 @@ const handler = withSession<ApiBody<Link[]>>(async (req, res) => {
 
 export default handler
 
-export const getLinks = async (user: AuthUser) =>
-  getUserPrismaClient(user).link.findMany({ orderBy: { order: "asc" } })
+export const getLinks = async (session: AppSession) =>
+  getUserPrismaClient(session.authSession.user).link.findMany({
+    orderBy: { order: "asc" },
+  })
 
 export const setLinks = async (
-  user: AuthUser,
+  session: AppSession,
   data: Prisma.LinkCreateManyArgs["data"],
 ) => {
-  const client = getUserPrismaClient(user)
+  const client = getUserPrismaClient(session.authSession.user)
   const [, , result] = await client.$transaction([
     client.link.deleteMany(),
     client.link.createMany({ data }),

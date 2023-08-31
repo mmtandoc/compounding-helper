@@ -53,7 +53,7 @@ export const getServerSideProps: GetServerSideProps<ChemicalsProps> = async (
       },
     }
 
-  const data: Chemical[] = (await getChemicals(session.user)) ?? []
+  const data: Chemical[] = (await getChemicals(session)) ?? []
 
   return { props: { title: "Chemicals", data } }
 }

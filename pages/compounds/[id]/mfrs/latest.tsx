@@ -26,13 +26,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true }
   }
 
-  const compound = await getCompoundById(session.user, compoundId)
+  const compound = await getCompoundById(session, compoundId)
 
   if (compound === null) {
     return { notFound: true }
   }
 
-  const latestVersion = await getLatestMfrVersion(session.user, compoundId)
+  const latestVersion = await getLatestMfrVersion(session, compoundId)
 
   if (latestVersion === null) {
     return { notFound: true }

@@ -40,7 +40,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       },
     }
 
-  const data = (await getLinks(session.user)) ?? []
+  const data = (await getLinks(session)) ?? []
 
   const values = linkDirectorySchema.parse({ links: data })
 

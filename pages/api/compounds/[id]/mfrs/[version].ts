@@ -1,7 +1,11 @@
-import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { MfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -28,7 +32,7 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
     case "GET": {
       let mfr
       try {
-        mfr = await getMfr(session.user, compoundId, version)
+        mfr = await getMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -61,7 +65,7 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
 
       let updatedMfr
       try {
-        updatedMfr = await updateMfr(session.user, compoundId, version, data)
+        updatedMfr = await updateMfr(session, compoundId, version, data)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -71,7 +75,7 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
     }
     case "DELETE": {
       try {
-        await deleteMfr(session.user, compoundId, version)
+        await deleteMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -91,32 +95,32 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
 export default handler
 
 export const getMfr = async (
-  currentUser: AuthUser,
+  session: AppSession,
   compoundId: number,
   version: number,
 ) =>
-  await getUserPrismaClient(currentUser).mfr.findUnique({
+  await getUserPrismaClient(session.authSession.user).mfr.findUnique({
     where: { compoundId_version: { compoundId, version } },
     ...mfrAll,
   })
 
 export const updateMfr = async (
-  currentUser: AuthUser,
+  session: AppSession,
   compoundId: number,
   version: number,
   values: MfrFields,
 ) =>
-  await getUserPrismaClient(currentUser).mfr.update({
+  await getUserPrismaClient(session.authSession.user).mfr.update({
     where: { compoundId_version: { compoundId, version } },
     data: MfrMapper.toModel({ version, ...values }),
     ...mfrAll,
   })
 
 export const deleteMfr = async (
-  currentUser: AuthUser,
+  session: AppSession,
   compoundId: number,
   version: number,
 ) =>
-  await getUserPrismaClient(currentUser).mfr.delete({
+  await getUserPrismaClient(session.authSession.user).mfr.delete({
     where: { compoundId_version: { compoundId, version } },
   })

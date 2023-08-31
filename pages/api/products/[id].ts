@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import * as z from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -29,7 +33,7 @@ const handler = withSession<ApiBody<ProductAll | undefined>>(
       case "GET": {
         let product
         try {
-          product = await getProductById(session.user, id)
+          product = await getProductById(session, id)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -53,7 +57,7 @@ const handler = withSession<ApiBody<ProductAll | undefined>>(
 
         let updatedProduct
         try {
-          updatedProduct = await updateProductById(session.user, id, fields)
+          updatedProduct = await updateProductById(session, id, fields)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -63,7 +67,7 @@ const handler = withSession<ApiBody<ProductAll | undefined>>(
       }
       case "DELETE": {
         try {
-          await deleteProductById(session.user, id)
+          await deleteProductById(session, id)
         } catch (error) {
           console.error(error)
           // Unable to delete due to existing reference
@@ -96,22 +100,24 @@ const handler = withSession<ApiBody<ProductAll | undefined>>(
 
 export default handler
 
-export const getProductById = async (user: AuthUser, id: number) =>
-  getUserPrismaClient(user).product.findUnique({
+export const getProductById = async (session: AppSession, id: number) =>
+  getUserPrismaClient(session.authSession.user).product.findUnique({
     where: { id },
     ...productAll,
   })
 
 export const updateProductById = async (
-  user: AuthUser,
+  session: AppSession,
   id: number,
   values: ProductFields,
 ) =>
-  getUserPrismaClient(user).product.update({
+  getUserPrismaClient(session.authSession.user).product.update({
     where: { id },
     data: ProductMapper.toModel(values),
     ...productAll,
   })
 
-export const deleteProductById = async (user: AuthUser, id: number) =>
-  getUserPrismaClient(user).product.delete({ where: { id } })
+export const deleteProductById = async (session: AppSession, id: number) =>
+  getUserPrismaClient(session.authSession.user).product.delete({
+    where: { id },
+  })

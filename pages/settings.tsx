@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       },
     }
 
-  const data = (await getSettings(session.user)) ?? []
+  const data = (await getSettings(session)) ?? []
 
   const values = settingsSchema.parse(data)
 

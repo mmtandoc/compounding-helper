@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true }
   }
 
-  const data = await getRoutineById(session.user, id)
+  const data = await getRoutineById(session, id)
 
   if (data === null) {
     return { notFound: true }

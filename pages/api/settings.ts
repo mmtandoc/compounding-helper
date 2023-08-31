@@ -1,16 +1,15 @@
 import { Prisma, Settings } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiResponse } from "next"
 import { SetOptional } from "type-fest"
 
-import { getUserById } from "lib/api/users"
 import {
+  AppSession,
   NextApiRequestWithSession,
   sendJsonError,
   withSession,
 } from "lib/api/utils"
 import { settingsSchema } from "lib/fields"
-import { forUser, getUserPrismaClient } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 
 const BASE_ID = 0
@@ -26,7 +25,7 @@ async function handler(
       let settings
 
       try {
-        settings = await getSettings(session.user)
+        settings = await getSettings(session)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -46,9 +45,9 @@ async function handler(
       let result
       try {
         result =
-          (await getSettings(session.user)) !== null
-            ? await updateSettings(session.user, data)
-            : await createSettings(session.user, data)
+          (await getSettings(session)) !== null
+            ? await updateSettings(session, data)
+            : await createSettings(session, data)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -67,27 +66,29 @@ async function handler(
 
 export default withSession(handler)
 
-export const getSettings = async (user: AuthUser) =>
-  getUserPrismaClient(user).settings.findUnique({
-    where: { pharmacyId: (await getUserById(user, user.id)).pharmacyId },
+export const getSettings = async (session: AppSession) =>
+  getUserPrismaClient(session.authSession.user).settings.findUnique({
+    where: { pharmacyId: session.appUser.pharmacyId },
   })
 
 export const createSettings = async (
-  user: AuthUser,
+  session: AppSession,
   data: SetOptional<Prisma.SettingsCreateArgs["data"], "pharmacyId">,
 ) =>
-  getUserPrismaClient(user).settings.create({
+  getUserPrismaClient(session.authSession.user).settings.create({
     data: {
-      pharmacyId: (await getUserById(user, user.id)).pharmacyId,
+      pharmacyId: session.appUser.pharmacyId,
       ...settingsSchema.parse(data),
     },
   })
 
 export const updateSettings = async (
-  user: AuthUser,
+  session: AppSession,
   data: Prisma.SettingsUpdateArgs["data"],
 ) =>
-  getUserPrismaClient(user).settings.update({
-    where: { pharmacyId: (await getUserById(user, user.id)).pharmacyId },
+  getUserPrismaClient(session.authSession.user).settings.update({
+    where: {
+      pharmacyId: session.appUser.pharmacyId,
+    },
     data: settingsSchema.parse(data),
   })

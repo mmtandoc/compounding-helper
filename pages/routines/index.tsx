@@ -95,7 +95,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       },
     }
 
-  const data = await getRoutines(session.user, {
+  const data = await getRoutines(session, {
     orderBy: [{ category: "asc" }, { name: "asc" }],
   })
 

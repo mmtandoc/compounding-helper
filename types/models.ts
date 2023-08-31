@@ -210,3 +210,11 @@ export const sdsHealthHazard =
 export type SdsHealthHazard = Prisma.HazardCategoryToSDSGetPayload<
   typeof sdsHealthHazard
 >
+
+export const userWithPharmacy = Prisma.validator<Prisma.UserDefaultArgs>()({
+  include: {
+    pharmacy: true,
+  },
+})
+
+export type UserWithPharmacy = Prisma.UserGetPayload<typeof userWithPharmacy>

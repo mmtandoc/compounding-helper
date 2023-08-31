@@ -1,8 +1,7 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import _ from "lodash"
 
-import { sendJsonError, withSession } from "lib/api/utils"
+import { AppSession, sendJsonError, withSession } from "lib/api/utils"
 import { riskAssessmentSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -52,7 +51,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
         let riskAssessments
 
         try {
-          riskAssessments = await getRiskAssessments(session.user, findManyArgs)
+          riskAssessments = await getRiskAssessments(session, findManyArgs)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -79,7 +78,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
         try {
           //TODO: Make transaction
           if (compound.id !== undefined) {
-            updateCompoundById(session.user, compound.id, {
+            updateCompoundById(session, compound.id, {
               ...compound,
               ingredients: {
                 deleteMany: {},
@@ -88,11 +87,11 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
             })
           } else {
             riskAssessmentData.compoundId = (
-              await createCompound(session.user, fields.compound)
+              await createCompound(session, fields.compound)
             ).id
           }
           const result = await getUserPrismaClient(
-            session.user,
+            session.authSession.user,
           ).riskAssessment.create({
             ...includeAllNested,
             data: {
@@ -124,7 +123,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
 export default handler
 
 export const getRiskAssessments = async (
-  user: AuthUser,
+  session: AppSession,
   args?: Omit<Prisma.RiskAssessmentFindManyArgs, "select" | "include">,
 ) => {
   const defaultArgs: Omit<
@@ -133,7 +132,9 @@ export const getRiskAssessments = async (
   > = {
     orderBy: { id: "asc" },
   }
-  return await getUserPrismaClient(user).riskAssessment.findMany({
+  return await getUserPrismaClient(
+    session.authSession.user,
+  ).riskAssessment.findMany({
     ...defaultArgs,
     ...args,
     ...includeAllNested,

@@ -1,6 +1,4 @@
-import { User as AuthUser } from "@supabase/supabase-js"
-
-import { sendJsonError, withSession } from "lib/api/utils"
+import { AppSession, sendJsonError, withSession } from "lib/api/utils"
 import { CompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -22,7 +20,7 @@ const handler = withSession<
       let compounds
 
       try {
-        compounds = await getCompounds(session.user)
+        compounds = await getCompounds(session)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -39,7 +37,7 @@ const handler = withSession<
         return sendJsonError(res, 400, "Body is invalid.")
       }
 
-      const result = await createCompound(session.user, fields)
+      const result = await createCompound(session, fields)
       res
         .setHeader("Location", `/compounds/${result.id}`)
         .status(201)
@@ -57,17 +55,17 @@ const handler = withSession<
 
 export default handler
 
-export const getCompounds = async (currentUser: AuthUser) =>
-  getUserPrismaClient(currentUser).compound.findMany({
+export const getCompounds = async (session: AppSession) =>
+  getUserPrismaClient(session.authSession.user).compound.findMany({
     orderBy: { id: "asc" },
     ...includeAllNested,
   })
 
 export const createCompound = async (
-  currentUser: AuthUser,
+  session: AppSession,
   fields: CompoundFields,
 ) =>
-  getUserPrismaClient(currentUser).compound.create({
+  getUserPrismaClient(session.authSession.user).compound.create({
     ...includeAllNested,
     data: {
       ingredients: {

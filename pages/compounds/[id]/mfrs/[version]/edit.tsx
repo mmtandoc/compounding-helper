@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<EditMfrProps> = async (
     return { notFound: true }
   }
 
-  const data = await getMfr(session.user, compoundId, version)
+  const data = await getMfr(session, compoundId, version)
 
   if (data === null) {
     return { notFound: true }

@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps<
     return { notFound: true }
   }
 
-  const data = await getRiskAssessmentById(session.user, riskAssessmentId)
+  const data = await getRiskAssessmentById(session, riskAssessmentId)
 
   if (data === null) {
     return { notFound: true }

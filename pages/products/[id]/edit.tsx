@@ -7,7 +7,7 @@ import { getSession } from "lib/api/utils"
 import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { getProductById } from "pages/api/products/[id]"
-import { NextPageWithLayout } from "types/common"
+import { ErrorProps, NextPageWithLayout } from "types/common"
 
 type EditProductProps = {
   values: ProductFields
@@ -51,10 +51,17 @@ export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
     return { notFound: true }
   }
 
-  const data = await getProductById(session.user, id)
+  const data = await getProductById(session, id)
 
   if (data === null) {
     return { notFound: true }
+  }
+
+  //Check if record is owned by central
+  if (data.pharmacyId === null) {
+    /* return {
+      props: { error: { statusCode: 403, message: "Forbidden" } },
+    } */
   }
 
   const values = ProductMapper.toFieldValues(data)

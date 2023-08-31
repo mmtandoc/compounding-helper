@@ -1,9 +1,13 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import _ from "lodash"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { riskAssessmentSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -31,7 +35,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
       case "GET": {
         let riskAssessment
         try {
-          riskAssessment = await getRiskAssessmentById(session.user, id)
+          riskAssessment = await getRiskAssessmentById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -59,7 +63,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
 
         let riskAssessment
         try {
-          riskAssessment = await updateRiskAssessmentById(session.user, id, {
+          riskAssessment = await updateRiskAssessmentById(session, id, {
             ..._.omit(
               RiskAssessmentMapper.toModel(fields),
               "id",
@@ -101,12 +105,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
       }
       case "DELETE": {
         try {
-          const { compoundId } = await deleteRiskAssessmentById(
-            session.user,
-            id,
-          )
+          const { compoundId } = await deleteRiskAssessmentById(session, id)
           //Delete associated compound, as currently a one-to-one relationship
-          await deleteCompoundById(session.user, compoundId)
+          await deleteCompoundById(session, compoundId)
         } catch (error) {
           console.error(error)
           // Unable to delete due to existing reference
@@ -139,11 +140,13 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
 export default handler
 
 export const updateRiskAssessmentById = async (
-  user: AuthUser,
+  session: AppSession,
   id: number,
   data: Prisma.RiskAssessmentUpdateArgs["data"],
 ) => {
-  return await getUserPrismaClient(user).riskAssessment.update({
+  return await getUserPrismaClient(
+    session.authSession.user,
+  ).riskAssessment.update({
     where: {
       id,
     },
@@ -154,8 +157,13 @@ export const updateRiskAssessmentById = async (
   })
 }
 
-export const getRiskAssessmentById = async (user: AuthUser, id: number) => {
-  return await getUserPrismaClient(user).riskAssessment.findUnique({
+export const getRiskAssessmentById = async (
+  session: AppSession,
+  id: number,
+) => {
+  return await getUserPrismaClient(
+    session.authSession.user,
+  ).riskAssessment.findUnique({
     where: {
       id,
     },
@@ -165,5 +173,10 @@ export const getRiskAssessmentById = async (user: AuthUser, id: number) => {
   })
 }
 
-export const deleteRiskAssessmentById = async (user: AuthUser, id: number) =>
-  getUserPrismaClient(user).riskAssessment.delete({ where: { id } })
+export const deleteRiskAssessmentById = async (
+  session: AppSession,
+  id: number,
+) =>
+  getUserPrismaClient(session.authSession.user).riskAssessment.delete({
+    where: { id },
+  })

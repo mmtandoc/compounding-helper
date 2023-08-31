@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -29,7 +33,7 @@ const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
       let mfrs: MfrAll[]
 
       try {
-        mfrs = await getMfrsByCompoundId(session.user, compoundId)
+        mfrs = await getMfrsByCompoundId(session, compoundId)
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -46,14 +50,16 @@ const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
         return sendJsonError(res, 400, "Body is invalid.")
       }
 
-      const latestVersion = await getLatestMfrVersion(session.user, compoundId)
+      const latestVersion = await getLatestMfrVersion(session, compoundId)
 
       const nextVersion = latestVersion ? latestVersion + 1 : 0
 
       const mfrData = MfrMapper.toModel({ version: nextVersion, ...fields })
 
       try {
-        const result = await getUserPrismaClient(session.user).mfr.create({
+        const result = await getUserPrismaClient(
+          session.authSession.user,
+        ).mfr.create({
           ...includeAllNested,
           data: {
             ...mfrData,
@@ -87,13 +93,13 @@ const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
 export default handler
 
 export const getMfrs = async (
-  currentUser: AuthUser,
+  session: AppSession,
   args?: Omit<Prisma.MfrFindManyArgs, "select" | "include">,
 ) => {
   const defaultArgs: Omit<Prisma.MfrFindManyArgs, "select" | "include"> = {
     orderBy: [{ riskAssessment: { compoundId: "asc" } }, { version: "asc" }],
   }
-  return await getUserPrismaClient(currentUser).mfr.findMany({
+  return await getUserPrismaClient(session.authSession.user).mfr.findMany({
     ...defaultArgs,
     ...args,
     ...includeAllNested,
@@ -101,10 +107,10 @@ export const getMfrs = async (
 }
 
 export const getMfrsByCompoundId = async (
-  currentUser: AuthUser,
+  session: AppSession,
   compoundId: number,
 ) =>
-  getMfrs(currentUser, {
+  getMfrs(session, {
     where: {
       riskAssessment: {
         compoundId: {
@@ -115,11 +121,11 @@ export const getMfrsByCompoundId = async (
   })
 
 export const getLatestMfrVersion = async (
-  currentUser: AuthUser,
+  session: AppSession,
   compoundId: number,
 ) =>
   (
-    await getUserPrismaClient(currentUser).mfr.aggregate({
+    await getUserPrismaClient(session.authSession.user).mfr.aggregate({
       where: { compoundId },
       _max: {
         version: true,

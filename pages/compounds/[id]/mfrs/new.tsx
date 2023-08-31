@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps<NewMfrProps> = async (
     }
 
   const compoundId = parseInt(context.query.id as string)
-  const compound = await getCompoundById(session.user, compoundId)
+  const compound = await getCompoundById(session, compoundId)
 
   if (compound === null) {
     return { notFound: true }

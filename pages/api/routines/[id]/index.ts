@@ -1,7 +1,11 @@
-import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -28,7 +32,7 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
       case "GET": {
         let routine
         try {
-          routine = await getRoutineById(session.user, id)
+          routine = await getRoutineById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -51,7 +55,7 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
 
         let updatedRoutine
         try {
-          updatedRoutine = await updateRoutineById(session.user, id, data)
+          updatedRoutine = await updateRoutineById(session, id, data)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -61,7 +65,7 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
       }
       case "DELETE": {
         try {
-          await deleteRoutineById(session.user, id)
+          await deleteRoutineById(session, id)
         } catch (error) {
           console.error(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -81,22 +85,24 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
 
 export default handler
 
-export const getRoutineById = async (currentUser: AuthUser, id: number) =>
-  await getUserPrismaClient(currentUser).routine.findUnique({
+export const getRoutineById = async (session: AppSession, id: number) =>
+  await getUserPrismaClient(session.authSession.user).routine.findUnique({
     where: { id },
     ...routineWithHistory,
   })
 
 export const updateRoutineById = async (
-  currentUser: AuthUser,
+  session: AppSession,
   id: number,
   values: RoutineFields,
 ) =>
-  await getUserPrismaClient(currentUser).routine.update({
+  await getUserPrismaClient(session.authSession.user).routine.update({
     where: { id },
     data: RoutineMapper.toModel(values),
     ...routineWithHistory,
   })
 
-export const deleteRoutineById = async (currentUser: AuthUser, id: number) =>
-  await getUserPrismaClient(currentUser).routine.delete({ where: { id } })
+export const deleteRoutineById = async (session: AppSession, id: number) =>
+  await getUserPrismaClient(session.authSession.user).routine.delete({
+    where: { id },
+  })

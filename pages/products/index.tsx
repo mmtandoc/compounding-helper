@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       },
     }
 
-  const data: ProductAll[] = (await getProducts(session.user)) ?? []
+  const data: ProductAll[] = (await getProducts(session)) ?? []
 
   return { props: { title: "Products", data } }
 }

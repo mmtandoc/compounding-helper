@@ -1,8 +1,12 @@
 import { Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import { z } from "zod"
 
-import { sendJsonError, sendZodError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { completionSchema } from "lib/fields"
 import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
@@ -33,7 +37,7 @@ const handler = withSession<ApiBody<undefined>>(async (req, res) => {
       }
 
       try {
-        const lastCompleted = (await getRoutineById(session.user, routineId))
+        const lastCompleted = (await getRoutineById(session, routineId))
           ?.completionHistory[0]?.date
 
         if (lastCompleted && lastCompleted > new Date(data.date)) {
@@ -44,7 +48,7 @@ const handler = withSession<ApiBody<undefined>>(async (req, res) => {
           )
         }
 
-        await createRoutineCompletion(session.user, { routineId, ...data })
+        await createRoutineCompletion(session, { routineId, ...data })
       } catch (error) {
         console.error(error)
         return sendJsonError(res, 500, "Encountered error with database.")
@@ -64,6 +68,9 @@ const handler = withSession<ApiBody<undefined>>(async (req, res) => {
 export default handler
 
 export const createRoutineCompletion = async (
-  currentUser: AuthUser,
+  session: AppSession,
   data: Prisma.RoutineCompletionUncheckedCreateInput,
-) => getUserPrismaClient(currentUser).routineCompletion.create({ data })
+) =>
+  getUserPrismaClient(session.authSession.user).routineCompletion.create({
+    data,
+  })

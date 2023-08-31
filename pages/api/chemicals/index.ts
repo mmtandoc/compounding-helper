@@ -1,8 +1,7 @@
 import { Chemical, Prisma } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
 import * as z from "zod"
 
-import { sendJsonError, withSession } from "lib/api/utils"
+import { AppSession, sendJsonError, withSession } from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import AdditionalChemicalInfoMapper from "lib/mappers/AdditionalChemicalInfoMapper"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
@@ -37,7 +36,7 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
         let chemicals
 
         try {
-          chemicals = await getChemicals(session.user, query)
+          chemicals = await getChemicals(session, query)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -56,7 +55,7 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
 
         let chemical
         try {
-          chemical = await createChemical(session.user, data)
+          chemical = await createChemical(session, data)
         } catch (error) {
           console.log(error)
           return sendJsonError(res, 500, "Encountered error with database.")
@@ -81,7 +80,7 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
 export default handler
 
 //TODO: Refactor
-export async function getChemicals(user: AuthUser, nameQuery?: string) {
+export async function getChemicals(session: AppSession, nameQuery?: string) {
   const where =
     nameQuery !== undefined
       ? Prisma.sql`WHERE (
@@ -94,20 +93,23 @@ export async function getChemicals(user: AuthUser, nameQuery?: string) {
       : Prisma.empty
 
   const matchingIds = where
-    ? await getUserPrismaClient(user).$queryRaw<Pick<Chemical, "id">[]>(
-        Prisma.sql`SELECT id FROM public.chemicals ${where} ORDER BY id ASC;`,
-      )
+    ? await getUserPrismaClient(session.authSession.user).$queryRaw<
+        Pick<Chemical, "id">[]
+      >(Prisma.sql`SELECT id FROM public.chemicals ${where} ORDER BY id ASC;`)
     : undefined
 
-  return await getUserPrismaClient(user).chemical.findMany({
+  return await getUserPrismaClient(session.authSession.user).chemical.findMany({
     ...chemicalAll,
     where: where ? { id: { in: matchingIds?.map((v) => v.id) } } : undefined,
     orderBy: { id: "asc" },
   })
 }
 
-export const createChemical = async (user: AuthUser, values: ChemicalFields) =>
-  await getUserPrismaClient(user).chemical.create({
+export const createChemical = async (
+  session: AppSession,
+  values: ChemicalFields,
+) =>
+  await getUserPrismaClient(session.authSession.user).chemical.create({
     data: {
       ...ChemicalMapper.toModel(values),
       additionalInfo: {
