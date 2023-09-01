@@ -12,6 +12,7 @@ import {
 } from "components/ui/forms"
 import { NullableChemicalFields } from "lib/fields"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
+import { isCentralPharmacy } from "lib/utils"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
@@ -34,7 +35,11 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
 
   //TODO: Support central admins editing central chemical data
-  const ownedByCentral = useMemo(() => watch("pharmacyId") === null, [watch])
+  const pharmacyId = watch("pharmacyId")
+  const ownedByCentral = useMemo(
+    () => isCentralPharmacy(pharmacyId ?? NaN),
+    [pharmacyId],
+  )
 
   useUpdateFieldConditionally({
     updateCondition: hasNoCasNumber === true,
@@ -53,7 +58,8 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   const additionalInfo = watch("additionalInfo")
 
   const hasLocalAdditionalInfo = useMemo(
-    () => additionalInfo?.some((val) => val.pharmacyId !== null),
+    () =>
+      additionalInfo?.some((val) => isCentralPharmacy(val.pharmacyId ?? NaN)),
     [additionalInfo],
   )
 
@@ -130,8 +136,12 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
         {additionalInfoArrayMethods.fields.map((item, index) => (
           <Fieldset
             key={item.id}
-            legend={item.pharmacyId === null ? "Central" : "Local"}
-            disabled={item.pharmacyId === null && ownedByCentral}
+            legend={
+              isCentralPharmacy(item.pharmacyId ?? NaN) ? "Central" : "Local"
+            }
+            disabled={
+              isCentralPharmacy(item.pharmacyId ?? NaN) && ownedByCentral
+            }
           >
             <TextArea
               {...register(`additionalInfo.${index}.value`)}

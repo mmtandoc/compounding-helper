@@ -11,8 +11,8 @@ generator client {
 model Chemical {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   name              String
   casNumber         String?                  @unique
@@ -33,8 +33,8 @@ model AdditionalChemicalInfo {
   chemical   Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
   chemicalId Int
 
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
 
   value String
 
@@ -45,8 +45,8 @@ model AdditionalChemicalInfo {
 model Product {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   name       String
   chemical   Chemical @relation(fields: [chemicalId], references: [id])
@@ -63,8 +63,8 @@ model Product {
 model Vendor {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   name     String
   products Product[]
@@ -75,8 +75,8 @@ model Vendor {
 model SDS {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   product            Product               @relation(fields: [productId], references: [id])
   productId          Int
@@ -131,8 +131,8 @@ model HazardCategoryToSDS {
 model RiskAssessment {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   compound   Compound @relation(fields: [compoundId], references: [id])
   compoundId Int
@@ -238,8 +238,8 @@ enum PreparationFrequency {
 model Compound {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   name               String
   ingredients        Ingredient[]
@@ -328,9 +328,9 @@ enum Storage {
 }
 
 model Link {
-  id         Int       @id @default(autoincrement())
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   url         String
   name        String
@@ -353,8 +353,8 @@ model Settings {
 model Routine {
   id Int @id @default(autoincrement())
 
-  pharmacyId Int?      @default(dbgenerated("get_current_pharmacy_id()"))
-  pharmacy   Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
   category          String?
   name              String

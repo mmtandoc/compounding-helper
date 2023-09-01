@@ -22,7 +22,7 @@ export type NullableHazardFields = Simplify<NullableDeep<HazardFieldsInput>>
 
 export const sdsSchema = z.object({
   id: z.number().int().optional(),
-  pharmacyId: z.number().int().nullish(),
+  pharmacyId: z.number().int().optional(),
   chemicalId: z.number().int(),
   productId: z.number().int(),
   hmisHazardLevel: transformStringToNumber(

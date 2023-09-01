@@ -10,6 +10,7 @@ import {
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { getUserPrismaClient } from "lib/prisma"
+import { isCentralPharmacy } from "lib/utils"
 import { ApiBody } from "types/common"
 import { ChemicalAll, chemicalAll } from "types/models"
 
@@ -109,26 +110,20 @@ export const updateChemicalById = async (
   chemicalId: number,
   values: ChemicalFields,
 ) => {
+  const currentPharmacyId = session.appUser.pharmacyId
+
   const localAdditionalInfo = values.additionalInfo.filter(
-    (v): v is { value: string; pharmacyId?: number } => v.pharmacyId !== null,
+    (v): v is { value: string; pharmacyId?: number } =>
+      v.pharmacyId === currentPharmacyId,
   )
 
   return await getUserPrismaClient(session.authSession.user).$transaction(
     async (tx) => {
-      const currentPharmacyId = (
-        await tx.$queryRaw<
-          {
-            currentPharmacyId: number
-          }[]
-        >`SELECT get_current_pharmacy_id "currentPharmacyId" FROM get_current_pharmacy_id();`
-      )[0].currentPharmacyId
-
       /*
-    If the updated chemical data has no additional info owned by current user's pharmacy,
-    then we should delete their current additional info if it exists
-    */
+      If the updated chemical data has no additional info owned by current user's pharmacy,
+      then we should delete their current additional info if it exists
+      */
       if (!localAdditionalInfo.length) {
-        console.log({ localAdditionalInfo })
         try {
           await tx.additionalChemicalInfo.delete({
             where: {
@@ -143,8 +138,11 @@ export const updateChemicalById = async (
         }
       }
 
-      // If owned by central, only update additionalChemicalInfo
-      if (values.pharmacyId === null) {
+      // If owned by central, and current user doesn't belong to central pharmacy, only update additionalChemicalInfo
+      if (
+        !isCentralPharmacy(currentPharmacyId) &&
+        isCentralPharmacy(values.pharmacyId ?? currentPharmacyId)
+      ) {
         for (const val of localAdditionalInfo) {
           await tx.additionalChemicalInfo.upsert({
             where: {

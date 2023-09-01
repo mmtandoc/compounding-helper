@@ -3,6 +3,7 @@ import { GetServerSideProps } from "next"
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
 import { getSession } from "lib/api/utils"
+import { isCentralPharmacy } from "lib/utils"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
 import { ChemicalAll } from "types/models"
@@ -16,7 +17,7 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
 ) => {
   const { data } = props
 
-  const ownedByCentral = data.pharmacyId === null
+  const ownedByCentral = isCentralPharmacy(data.pharmacyId)
 
   return (
     <Details

@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
-import { toIsoDateString } from "lib/utils"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
 type Props = {
@@ -41,7 +41,7 @@ const ChemicalDetails = (props: Props) => {
           data.additionalInfo.map((v, i) => (
             <FormGroup key={i}>
               <span className="label">
-                {v.pharmacyId ? "Local" : "Central"}
+                {isCentralPharmacy(v.pharmacyId) ? "Central" : "Local"}
               </span>
               <TextArea value={v.value} cols={20} readOnly autoResize />
             </FormGroup>

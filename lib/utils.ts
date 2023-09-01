@@ -5,3 +5,6 @@ export const capitalize = (str: string, allWords = false): string => {
 }
 
 export const toIsoDateString = (date: Date) => date.toISOString().split("T")[0]
+
+// To support potential modification in future
+export const isCentralPharmacy = (pharmacyId: number) => pharmacyId === -1

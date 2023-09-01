@@ -6,7 +6,7 @@ import { NullableDeep } from "types/util"
 
 export const linkSchema = z.object({
   id: z.number().int().optional(),
-  pharmacyId: z.number().int().nullish(),
+  pharmacyId: z.number().int().optional(),
   url: z.string().trim().min(1).url(),
   name: z.string().trim().min(1),
   description: z

@@ -7,7 +7,7 @@ import { Merge, NullableDeep } from "types/util"
 
 export const productSchema = z.object({
   id: z.number().int().optional(),
-  pharmacyId: z.number().int().nullish(),
+  pharmacyId: z.number().int().optional(),
   name: z.string().trim().min(1),
   chemicalId: z.number().int(),
   vendorId: z.number().int(),

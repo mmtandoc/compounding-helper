@@ -90,7 +90,7 @@ export type NullableCompletionFields = NullableDeep<CompletionFieldsInput>
 
 export const routineSchema = z.object({
   id: z.number().int().optional(),
-  pharmacyId: z.number().int().nullish(),
+  pharmacyId: z.number().int().optional(),
   name: z.string().trim().min(1),
   category: z
     .string()

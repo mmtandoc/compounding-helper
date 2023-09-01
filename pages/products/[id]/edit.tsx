@@ -6,6 +6,7 @@ import ProductEntry from "components/product/ProductEntry"
 import { getSession } from "lib/api/utils"
 import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
+import { isCentralPharmacy } from "lib/utils"
 import { getProductById } from "pages/api/products/[id]"
 import { ErrorProps, NextPageWithLayout } from "types/common"
 
@@ -58,7 +59,7 @@ export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
   }
 
   //Check if record is owned by central
-  if (data.pharmacyId === null) {
+  if (isCentralPharmacy(data.pharmacyId)) {
     /* return {
       props: { error: { statusCode: 403, message: "Forbidden" } },
     } */
