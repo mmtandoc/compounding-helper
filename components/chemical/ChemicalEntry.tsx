@@ -1,5 +1,7 @@
+import { useUser } from "@supabase/auth-helpers-react"
 import { useEffect, useMemo } from "react"
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
+import { preload } from "swr"
 
 import { Button } from "components/ui"
 import {
@@ -11,18 +13,29 @@ import {
   TextArea,
 } from "components/ui/forms"
 import { NullableChemicalFields } from "lib/fields"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
 import { isCentralPharmacy } from "lib/utils"
+import { multiFetcher } from "pages/_app"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
   formMethods: UseFormReturn<NullableChemicalFields>
 }
 
+//preload("/api/users/current", multiFetcher)
+
 const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   props: Props,
 ) => {
   const { formMethods } = props
+
+  const { user, error: userError } = useCurrentUser()
+
+  //TODO: Handle error
+  if (userError) {
+    console.error(userError)
+  }
 
   const { register, control, watch, setValue, getFieldState, trigger } =
     formMethods
@@ -34,11 +47,11 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
 
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
 
-  //TODO: Support central admins editing central chemical data
   const pharmacyId = watch("pharmacyId")
-  const ownedByCentral = useMemo(
-    () => isCentralPharmacy(pharmacyId ?? NaN),
-    [pharmacyId],
+
+  const canFullEdit = useMemo(
+    () => (user ? pharmacyId === user.pharmacyId : false),
+    [user, pharmacyId],
   )
 
   useUpdateFieldConditionally({
@@ -58,29 +71,29 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   const additionalInfo = watch("additionalInfo")
 
   const hasLocalAdditionalInfo = useMemo(
-    () =>
-      additionalInfo?.some((val) => isCentralPharmacy(val.pharmacyId ?? NaN)),
-    [additionalInfo],
+    () => additionalInfo?.some((val) => val.pharmacyId === user?.pharmacyId),
+    [additionalInfo, user?.pharmacyId],
   )
 
   register("id")
   return (
     <div className="chemical-entry">
-      {ownedByCentral && (
+      {isCentralPharmacy(pharmacyId ?? NaN) && (
         <div className="info">
-          The chemical is owned by the central database. Current user can only
-          modify their pharmacy&apos;s additional info.
+          The chemical is owned by the central database.
+          {!canFullEdit &&
+            " Current user can only modify their pharmacy's additional info."}
         </div>
       )}
       <Fieldset
-        disabled={ownedByCentral}
+        disabled={!canFullEdit}
         style={{ border: "none", padding: "initial" }}
       >
-        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+        <LabelFormGroup className={!canFullEdit ? "disabled" : undefined}>
           <span>Chemical name:</span>
           <Input type="text" {...register("name")} />
         </LabelFormGroup>
-        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+        <LabelFormGroup className={!canFullEdit ? "disabled" : undefined}>
           <span>CAS number:</span>
           <div className="row">
             <Input
@@ -101,7 +114,7 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
             </label>
           </div>
         </LabelFormGroup>
-        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+        <LabelFormGroup className={!canFullEdit ? "disabled" : undefined}>
           <span>Synonyms:</span>
           <Controller
             control={control}
@@ -113,12 +126,12 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
                 ref={ref}
                 onBlur={onBlur}
                 size={30}
-                readOnly={ownedByCentral}
+                readOnly={!canFullEdit}
               />
             )}
           ></Controller>
         </LabelFormGroup>
-        <LabelFormGroup className={ownedByCentral ? "disabled" : undefined}>
+        <LabelFormGroup className={!canFullEdit ? "disabled" : undefined}>
           <span>NIOSH Tables:</span>
           <RhfRadioGroup
             name={"nioshTable"}
@@ -139,9 +152,7 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
             legend={
               isCentralPharmacy(item.pharmacyId ?? NaN) ? "Central" : "Local"
             }
-            disabled={
-              isCentralPharmacy(item.pharmacyId ?? NaN) && ownedByCentral
-            }
+            disabled={isCentralPharmacy(item.pharmacyId ?? NaN) && !canFullEdit}
           >
             <TextArea
               {...register(`additionalInfo.${index}.value`)}
