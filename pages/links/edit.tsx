@@ -47,6 +47,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   return {
     props: {
       title: "Edit Link Directory",
+      initialAppSession: session,
       values,
     },
   }

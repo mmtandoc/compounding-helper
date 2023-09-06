@@ -53,7 +53,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 
   const data: ProductAll[] = (await getProducts(session)) ?? []
 
-  return { props: { title: "Products", data } }
+  return { props: { title: "Products", initialAppSession: session, data } }
 }
 
 export default Products

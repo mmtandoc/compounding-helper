@@ -53,7 +53,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return { notFound: true }
   }
 
-  return { props: { title: `Compound: ${data.name}`, data } }
+  return {
+    props: {
+      title: `Compound: ${data.name}`,
+      initialAppSession: session,
+      data,
+    },
+  }
 }
 
 export default CompoundPage

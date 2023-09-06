@@ -7,6 +7,7 @@ import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import { getSession } from "lib/api/utils"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
+import { isCentralPharmacy } from "lib/utils"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -54,6 +55,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const data = await getRiskAssessmentById(session, riskAssessmentId)
 
   if (data === null) {
+    return { notFound: true }
+  }
+
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(data.pharmacyId) &&
+    session.appUser.pharmacyId !== data.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
     return { notFound: true }
   }
 

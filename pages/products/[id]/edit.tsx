@@ -8,7 +8,7 @@ import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { isCentralPharmacy } from "lib/utils"
 import { getProductById } from "pages/api/products/[id]"
-import { ErrorProps, NextPageWithLayout } from "types/common"
+import { NextPageWithLayout } from "types/common"
 
 type EditProductProps = {
   values: ProductFields
@@ -58,11 +58,13 @@ export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
     return { notFound: true }
   }
 
-  //Check if record is owned by central
-  if (isCentralPharmacy(data.pharmacyId)) {
-    /* return {
-      props: { error: { statusCode: 403, message: "Forbidden" } },
-    } */
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(data.pharmacyId) &&
+    session.appUser.pharmacyId !== data.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
+    return { notFound: true }
   }
 
   const values = ProductMapper.toFieldValues(data)

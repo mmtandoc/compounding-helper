@@ -1,9 +1,10 @@
 import { GetServerSideProps } from "next"
+import { useMemo } from "react"
 
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
 import { getSession } from "lib/api/utils"
-import { isCentralPharmacy } from "lib/utils"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
 import { ChemicalAll } from "types/models"
@@ -17,7 +18,12 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
 ) => {
   const { data } = props
 
-  const ownedByCentral = isCentralPharmacy(data.pharmacyId)
+  const { user } = useCurrentUser()
+
+  const ownedByCurrentPharmacy = useMemo(
+    () => user?.pharmacyId === data.pharmacyId,
+    [data.pharmacyId, user?.pharmacyId],
+  )
 
   return (
     <Details
@@ -27,7 +33,7 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
       urlPath={`/chemicals/${data.id}`}
       detailsComponent={ChemicalDetails}
       // Users are allowed to edit even if owned by central, but can only modify their own local additional info
-      actions={{ edit: true, delete: !ownedByCentral }}
+      actions={{ edit: true, delete: ownedByCurrentPharmacy }}
     />
   )
 }
@@ -57,7 +63,13 @@ export const getServerSideProps: GetServerSideProps<ChemicalPageProps> = async (
     return { notFound: true }
   }
 
-  return { props: { title: `Chemical: ${data.name}`, data } }
+  return {
+    props: {
+      title: `Chemical: ${data.name}`,
+      initialAppSession: session,
+      data,
+    },
+  }
 }
 
 export default ChemicalPage

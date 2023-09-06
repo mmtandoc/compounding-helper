@@ -1,18 +1,16 @@
-import {
-  Session,
-  createPagesBrowserClient,
-} from "@supabase/auth-helpers-nextjs"
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 import { SessionContextProvider } from "@supabase/auth-helpers-react"
 import axios from "axios"
 import { SnackbarProvider, closeSnackbar } from "notistack"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
-import { SWRConfig } from "swr"
+import { SWRConfig, mutate } from "swr"
 
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
+import { AppSession } from "lib/api/utils"
 import { AppPropsWithLayout } from "types/common"
 
 import "styles/main.scss"
@@ -51,7 +49,9 @@ axios.interceptors.response.use((originalResponse) => {
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data)
 
-const multiFetcher = (urls: Record<string, string> | string[] | string) => {
+export const multiFetcher = (
+  urls: Record<string, string> | string[] | string,
+) => {
   if (typeof urls === "string") {
     return fetcher(urls)
   }
@@ -93,22 +93,54 @@ function MyApp({
   Component,
   pageProps,
 }: AppPropsWithLayout<{
-  initialSession: Session
+  initialAppSession?: AppSession
 }>) {
+  const [supabaseClient] = useState(() => createPagesBrowserClient())
+
+  // Track whether user is signed in to override initialSession to be null
+  // Otherwise, signing out while on a page that gives an "initialSession" page prop causes header to not update
+  const [isSignedIn, setIsSignedIn] = useState(false)
+
+  //TODO: Improve current user profile handling
+  useEffect(() => {
+    supabaseClient.auth.onAuthStateChange((e) => {
+      switch (e) {
+        case "SIGNED_IN":
+        case "TOKEN_REFRESHED":
+        case "USER_UPDATED":
+          mutate("/api/users/current")
+          setIsSignedIn(true)
+          break
+        case "SIGNED_OUT":
+          mutate("/api/users/current", null)
+          setIsSignedIn(false)
+          break
+      }
+    })
+  }, [supabaseClient.auth])
+
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
 
   return (
     <>
       <SessionContextProvider
         supabaseClient={supabaseClient}
-        initialSession={pageProps.initialSession}
+        initialSession={
+          isSignedIn ? pageProps.initialAppSession?.authSession : null
+        }
       >
         <IconContext.Provider
           value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
         >
-          <SWRConfig value={{ fetcher: multiFetcher }}>
+          <SWRConfig
+            value={{
+              fetcher: multiFetcher,
+              fallback: {
+                "/api/users/current": pageProps.initialAppSession?.appUser,
+              },
+            }}
+          >
             <SnackbarProvider
               Components={{
                 success: Alert,

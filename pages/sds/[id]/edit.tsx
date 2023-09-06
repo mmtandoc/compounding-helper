@@ -6,7 +6,7 @@ import SdsEntry from "components/sds/SdsEntry"
 import { getSession } from "lib/api/utils"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
-import { toIsoDateString } from "lib/utils"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -58,11 +58,21 @@ export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
     return { notFound: true }
   }
 
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(data.pharmacyId) &&
+    session.appUser.pharmacyId !== data.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
+    return { notFound: true }
+  }
+
   return {
     props: {
       title: `Edit SDS Summary: ${data.product.name} - ${
         data.product.vendor.name
       } (${toIsoDateString(data.revisionDate)})`,
+      initialAppSession: session,
       values: SdsMapper.toFieldValues(data),
     },
   }

@@ -54,7 +54,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const data: SdsWithRelations[] =
     (await getSafetyDataSheets(session, { orderBy: { id: "asc" } })) ?? []
 
-  return { props: { title: "SDS Summaries", data } }
+  return { props: { title: "SDS Summaries", initialAppSession: session, data } }
 }
 
 export default SafetyDataSheets

@@ -4,6 +4,7 @@ import CreateForm from "components/common/data-pages/CreateForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
 import { getSession } from "lib/api/utils"
 import { NullableMfrFields, mfrSchema } from "lib/fields"
+import { isCentralPharmacy } from "lib/utils"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -64,6 +65,15 @@ export const getServerSideProps: GetServerSideProps<NewMfrProps> = async (
   const compound = await getCompoundById(session, compoundId)
 
   if (compound === null) {
+    return { notFound: true }
+  }
+
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(compound.pharmacyId) &&
+    session.appUser.pharmacyId !== compound.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
     return { notFound: true }
   }
 

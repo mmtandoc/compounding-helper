@@ -3,6 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { ProductAll } from "types/models"
 
 type Props = {
@@ -46,13 +47,24 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/products/${data.id}` }}
-        editButton={{ getUrl: (data) => `/products/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const { user, error: userError } = useCurrentUser()
+      if (userError) {
+        console.error(userError)
+      }
+      const canEdit = info.row.original.pharmacyId === user?.pharmacyId
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/products/${data.id}` }}
+          editButton={
+            canEdit
+              ? { getUrl: (data) => `/products/${data.id}/edit` }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

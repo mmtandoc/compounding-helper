@@ -83,6 +83,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   return {
     props: {
       title: `MFR: ${data.compound.name} - v.${data.version}`,
+      initialAppSession: session,
       data,
       isLatest: data.version === latestVersion,
     },

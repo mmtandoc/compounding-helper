@@ -1,7 +1,8 @@
-import { GetStaticProps } from "next"
+import { GetServerSideProps } from "next"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import ProductEntry from "components/product/ProductEntry"
+import { getSession } from "lib/api/utils"
 import { NullableProductFields, productSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -23,8 +24,23 @@ const NewProduct: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "New Product" },
-})
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+
+  return {
+    props: {
+      title: "New Product",
+      initialAppSession: session,
+    },
+  }
+}
 
 export default NewProduct

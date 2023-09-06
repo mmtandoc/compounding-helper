@@ -5,6 +5,7 @@ import MfrEntry from "components/compound/mfr/MfrEntry"
 import { getSession } from "lib/api/utils"
 import { MfrFieldsWithVersion, NullableMfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
+import { isCentralPharmacy } from "lib/utils"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
 
@@ -52,6 +53,15 @@ export const getServerSideProps: GetServerSideProps<EditMfrProps> = async (
   const data = await getMfr(session, compoundId, version)
 
   if (data === null) {
+    return { notFound: true }
+  }
+
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(data.compound.pharmacyId) &&
+    session.appUser.pharmacyId !== data.compound.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
     return { notFound: true }
   }
 

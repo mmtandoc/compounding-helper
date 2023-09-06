@@ -5,6 +5,7 @@ import { useMemo } from "react"
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
@@ -157,8 +158,15 @@ const columns = [
   }),
   columnHelper.display({
     id: "mfr-actions",
-    cell: (info) => {
+    cell: function MfrActionsCell(info) {
+      const { user, error: userError } = useCurrentUser()
+      if (userError) {
+        console.error(userError)
+      }
+
       const data = info.row.original
+      const canEdit = user?.pharmacyId === data.pharmacyId
+
       return (
         <RowActions>
           {data._count.mfrs > 0 ? (
@@ -167,11 +175,11 @@ const columns = [
                 View MFR
               </Button>
             </Link>
-          ) : (
+          ) : canEdit ? (
             <Link href={`/compounds/${data.id}/mfrs/new`}>
               <Button size="small">Create MFR</Button>
             </Link>
-          )}
+          ) : null}
         </RowActions>
       )
     },

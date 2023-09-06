@@ -91,7 +91,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 
   const data = (await getLinks(session)) ?? []
 
-  return { props: { title: "Links", data } }
+  return { props: { title: "Links", initialAppSession: session, data } }
 }
 
 export default Links

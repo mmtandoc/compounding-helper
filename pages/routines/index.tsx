@@ -102,6 +102,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   return {
     props: {
       title: "Routines",
+      initialAppSession: session,
       initialData: data,
     },
   }
