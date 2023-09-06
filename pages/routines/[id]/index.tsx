@@ -53,7 +53,9 @@ export const getServerSideProps: GetServerSideProps<ViewRoutineProps> = async (
     return { notFound: true }
   }
 
-  return { props: { title: `Routine: ${data.name}`, data } }
+  return {
+    props: { title: `Routine: ${data.name}`, initialAppSession: session, data },
+  }
 }
 
 export default ViewRoutine

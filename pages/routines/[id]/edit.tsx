@@ -6,6 +6,7 @@ import RoutineEntry from "components/routine/RoutineEntry"
 import { getSession } from "lib/api/utils"
 import { NullableRoutineFields, RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
+import { isCentralPharmacy } from "lib/utils"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -56,11 +57,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true }
   }
 
+  //Check if record is owned by central & current user is not a central user
+  if (
+    isCentralPharmacy(data.pharmacyId) &&
+    session.appUser.pharmacyId !== data.pharmacyId
+  ) {
+    //TODO: Return 403 status code instead?
+    return { notFound: true }
+  }
+
   const values = RoutineMapper.toFieldValues(data)
 
   return {
     props: {
       title: `Edit Routine - ${values?.name}`,
+      initialAppSession: session,
       values,
     },
   }

@@ -90,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       compoundWithMfrCount,
     )) ?? []
 
-  return { props: { title: "Compounds", data } }
+  return { props: { title: "Compounds", initialAppSession: session, data } }
 }
 
 const MfrPrintDoc = ({

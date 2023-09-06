@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
     data.product.vendor.name
   } (${toIsoDateString(data.revisionDate)})`
 
-  return { props: { title, data } }
+  return { props: { title, initialAppSession: session, data } }
 }
 
 export default SdsPage

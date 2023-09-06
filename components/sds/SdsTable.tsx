@@ -3,6 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
@@ -44,13 +45,22 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/sds/${data.id}` }}
-        editButton={{ getUrl: (data) => `/sds/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const { user, error: userError } = useCurrentUser()
+      if (userError) {
+        console.error(userError)
+      }
+      const canEdit = info.row.original.pharmacyId === user?.pharmacyId
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/sds/${data.id}` }}
+          editButton={
+            canEdit ? { getUrl: (data) => `/sds/${data.id}/edit` } : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

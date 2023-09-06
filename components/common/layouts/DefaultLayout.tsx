@@ -4,13 +4,13 @@ import React, { ReactNode, useRef } from "react"
 import Header from "components/common/Header"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 
-type Props = {
+export type DefaultLayoutProps = {
   title?: string
   pageRef?: React.Ref<HTMLDivElement>
   children: ReactNode
 }
 
-const DefaultLayout = ({ title, children }: Props) => {
+const DefaultLayout = ({ title, children }: DefaultLayoutProps) => {
   const pageRef = useRef<HTMLDivElement>(null)
 
   return (
@@ -62,5 +62,5 @@ const DefaultLayout = ({ title, children }: Props) => {
 export default DefaultLayout
 export const getDefaultLayout = (
   page: React.ReactElement,
-  { title = undefined }: { title?: string },
-) => <DefaultLayout title={title}>{page}</DefaultLayout>
+  layoutProps: Omit<DefaultLayoutProps, "children">,
+) => <DefaultLayout {...layoutProps}>{page}</DefaultLayout>

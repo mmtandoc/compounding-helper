@@ -56,6 +56,7 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       title: `Risk Assessment: ${data.compound.name}`,
+      initialAppSession: session,
       data,
     },
   }

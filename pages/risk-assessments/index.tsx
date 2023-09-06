@@ -1,7 +1,6 @@
-import { RiskAssessment } from "@prisma/client"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
-import React, { useCallback, useState } from "react"
+import { useCallback, useState } from "react"
 
 import { BatchPrintButton } from "components/common/BatchPrintButton"
 import BatchTableActions from "components/common/BatchTableActions"
@@ -60,7 +59,7 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const session = await getSession(ctx)
 
   if (!session)
@@ -71,9 +70,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     }
 
-  const data: RiskAssessment[] = (await getRiskAssessments(session)) ?? []
+  const data: RiskAssessmentAll[] = (await getRiskAssessments(session)) ?? []
 
-  return { props: { title: "Risk Assessments", data } }
+  return {
+    props: { title: "Risk Assessments", initialAppSession: session, data },
+  }
 }
 
 const renderDocument = (data: RiskAssessmentAll) => (

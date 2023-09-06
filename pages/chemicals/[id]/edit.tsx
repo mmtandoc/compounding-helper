@@ -66,6 +66,7 @@ export const getServerSideProps: GetServerSideProps<EditChemicalProps> = async (
   return {
     props: {
       title: `Edit Chemical - ${values?.name}`,
+      initialAppSession: session,
       values,
     },
   }

@@ -93,6 +93,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   return {
     props: {
       title: `MFRs for ${compound.name}`,
+      initialAppSession: session,
       mfrs,
     },
   }

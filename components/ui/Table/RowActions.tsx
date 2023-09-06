@@ -11,7 +11,7 @@ const RowActions = (props: { children: ReactNode }) => {
           flex-wrap: nowrap;
           margin: 0.2rem 0;
 
-          justify-content: center;
+          justify-content: left;
         }
       `}</style>
     </div>

@@ -3,6 +3,7 @@ import Link from "next/link"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -80,13 +81,24 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/risk-assessments/${data.id}` }}
-        editButton={{ getUrl: (data) => `/risk-assessments/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const { user, error: userError } = useCurrentUser()
+      if (userError) {
+        console.error(userError)
+      }
+      const canEdit = info.row.original.pharmacyId === user?.pharmacyId
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/risk-assessments/${data.id}` }}
+          editButton={
+            canEdit
+              ? { getUrl: (data) => `/risk-assessments/${data.id}/edit` }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

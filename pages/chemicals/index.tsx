@@ -55,7 +55,13 @@ export const getServerSideProps: GetServerSideProps<ChemicalsProps> = async (
 
   const data: Chemical[] = (await getChemicals(session)) ?? []
 
-  return { props: { title: "Chemicals", data } }
+  return {
+    props: {
+      title: "Chemicals",
+      initialAppSession: session,
+      data,
+    },
+  }
 }
 
 export default Chemicals

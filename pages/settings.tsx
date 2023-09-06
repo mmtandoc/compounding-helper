@@ -46,6 +46,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   return {
     props: {
       title: "Settings",
+      initialAppSession: session,
       values,
     },
   }
