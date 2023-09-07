@@ -49,6 +49,11 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
 
   const pharmacyId = watch("pharmacyId")
 
+  const isCentralUser = useMemo(
+    () => isCentralPharmacy(user?.pharmacyId ?? NaN),
+    [user?.pharmacyId],
+  )
+
   const canFullEdit = useMemo(
     () => (user ? pharmacyId === user.pharmacyId : false),
     [user, pharmacyId],
@@ -71,7 +76,10 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
   const additionalInfo = watch("additionalInfo")
 
   const hasLocalAdditionalInfo = useMemo(
-    () => additionalInfo?.some((val) => val.pharmacyId === user?.pharmacyId),
+    () =>
+      additionalInfo?.some(
+        (val) => (val.pharmacyId ?? user?.pharmacyId) === user?.pharmacyId,
+      ),
     [additionalInfo, user?.pharmacyId],
   )
 
@@ -150,7 +158,10 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
           <Fieldset
             key={item.id}
             legend={
-              isCentralPharmacy(item.pharmacyId ?? NaN) ? "Central" : "Local"
+              // If add. info's pharmacyId is undefined, use user's pharmacyId
+              isCentralPharmacy(item.pharmacyId ?? user?.pharmacyId ?? NaN)
+                ? "Central"
+                : "Local"
             }
             disabled={isCentralPharmacy(item.pharmacyId ?? NaN) && !canFullEdit}
           >
@@ -171,7 +182,7 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
             }
             size="small"
           >
-            Add local additional info
+            Add {isCentralUser ? "central" : "local"} additional info
           </Button>
         )}
       </Fieldset>
