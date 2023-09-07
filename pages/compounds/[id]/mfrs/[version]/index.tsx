@@ -1,10 +1,12 @@
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import { getSession } from "lib/api/utils"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getLatestMfrVersion } from "pages/api/compounds/[id]/mfrs"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
@@ -22,6 +24,13 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
   const compoundId = parseInt(router.query.id as string)
   const version = parseInt(router.query.version as string)
 
+  const { user } = useCurrentUser()
+
+  const permissions = useMemo(() => {
+    const canEditDelete = user?.pharmacyId === data.compound.pharmacyId
+    return { edit: canEditDelete, delete: canEditDelete }
+  }, [user?.pharmacyId, data.compound.pharmacyId])
+
   return (
     <>
       {!isLatest && (
@@ -36,7 +45,7 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
         apiEndpointPath={`/api/compounds/${compoundId}/mfrs/${version}`}
         urlPath={`/compounds/${compoundId}/mfrs/${version}`}
         detailsComponent={MfrDetails}
-        actions={{ print: true }}
+        actions={{ ...permissions, print: true }}
       />
       <style jsx>{`
         .not-latest-mfr {

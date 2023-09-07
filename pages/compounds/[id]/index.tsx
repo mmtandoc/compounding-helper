@@ -1,8 +1,10 @@
 import { GetServerSideProps } from "next"
+import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import CompoundDetails from "components/compound/CompoundDetails"
 import { getSession } from "lib/api/utils"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { CompoundWithIngredients } from "types/models"
@@ -14,6 +16,13 @@ type Props = {
 const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
   const { data } = props
 
+  const { user } = useCurrentUser()
+
+  const canEdit = useMemo(
+    () => user?.pharmacyId === data.pharmacyId,
+    [user?.pharmacyId, data.pharmacyId],
+  )
+
   return (
     <Details
       data={data}
@@ -23,7 +32,7 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
       detailsComponent={({ data }) => (
         <CompoundDetails data={data} display="all" />
       )}
-      actions={{ delete: false, edit: true }}
+      actions={{ delete: false, edit: canEdit }}
     />
   )
 }
