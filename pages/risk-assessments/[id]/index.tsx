@@ -1,8 +1,10 @@
 import { GetServerSideProps } from "next"
+import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { getSession } from "lib/api/utils"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RiskAssessmentAll } from "types/models"
@@ -16,6 +18,13 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
 ) => {
   const { data } = props
 
+  const { user } = useCurrentUser()
+
+  const permissions = useMemo(() => {
+    const canEditDelete = user?.pharmacyId === data.pharmacyId
+    return { edit: canEditDelete, delete: canEditDelete }
+  }, [user?.pharmacyId, data.pharmacyId])
+
   return (
     <Details
       data={data}
@@ -23,7 +32,7 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
       apiEndpointPath={`/api/risk-assessments/${data.id}`}
       urlPath={`/risk-assessments/${data.id}`}
       detailsComponent={RiskAssessmentDetails}
-      actions={{ delete: true, edit: true, print: true }}
+      actions={{ ...permissions, print: true }}
     />
   )
 }
