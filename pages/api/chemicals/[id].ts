@@ -114,7 +114,7 @@ export const updateChemicalById = async (
 
   const localAdditionalInfo = values.additionalInfo.filter(
     (v): v is { value: string; pharmacyId?: number } =>
-      v.pharmacyId === currentPharmacyId,
+      v.pharmacyId === undefined || v.pharmacyId === currentPharmacyId,
   )
 
   return await getUserPrismaClient(session.authSession.user).$transaction(
