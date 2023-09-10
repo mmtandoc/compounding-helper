@@ -18,8 +18,8 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
 
   const { user } = useCurrentUser()
 
-  const canEdit = useMemo(
-    () => user?.pharmacyId === data.pharmacyId,
+  const disableEdit = useMemo(
+    () => user?.pharmacyId !== data.pharmacyId,
     [user?.pharmacyId, data.pharmacyId],
   )
 
@@ -32,7 +32,13 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
       detailsComponent={({ data }) => (
         <CompoundDetails data={data} display="all" />
       )}
-      actions={{ delete: false, edit: canEdit }}
+      notice={
+        disableEdit && "Current record is owned by central. Unable to edit."
+      }
+      actions={{
+        delete: false,
+        edit: { visible: true, disabled: disableEdit },
+      }}
     />
   )
 }

@@ -18,10 +18,10 @@ const ProductPage: NextPageWithLayout<Props> = (props: Props) => {
 
   const { user } = useCurrentUser()
 
-  const permissions = useMemo(() => {
-    const canEditDelete = user?.pharmacyId === data.pharmacyId
-    return { edit: canEditDelete, delete: canEditDelete }
-  }, [user?.pharmacyId, data.pharmacyId])
+  const disableEditDelete = useMemo(
+    () => user?.pharmacyId !== data.pharmacyId,
+    [user?.pharmacyId, data.pharmacyId],
+  )
 
   return (
     <Details
@@ -30,7 +30,14 @@ const ProductPage: NextPageWithLayout<Props> = (props: Props) => {
       apiEndpointPath={`/api/products/${data.id}`}
       urlPath={`/products/${data.id}`}
       detailsComponent={ProductDetails}
-      actions={permissions}
+      notice={
+        disableEditDelete &&
+        "Current record is owned by central. Unable to edit or delete."
+      }
+      actions={{
+        edit: { visible: true, disabled: disableEditDelete },
+        delete: { visible: true, disabled: disableEditDelete },
+      }}
     />
   )
 }
