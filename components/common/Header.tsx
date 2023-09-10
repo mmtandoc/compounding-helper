@@ -4,7 +4,15 @@ import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 
-import { Button, Dropdown, DropdownMenu, DropdownToggle } from "components/ui"
+import {
+  Banner,
+  Button,
+  Dropdown,
+  DropdownMenu,
+  DropdownToggle,
+} from "components/ui"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { isCentralPharmacy } from "lib/utils"
 import Logo from "public/logo.svg"
 
 type NavItem = { label: string; url?: string; children?: NavItem[] }
@@ -57,7 +65,7 @@ const NavMenu = (props: NavMenuProps) => {
 }
 
 const Header = () => {
-  const user = useUser()
+  const { user } = useCurrentUser()
 
   const left = (
     <div className="left">
@@ -212,13 +220,23 @@ const Header = () => {
   )
 
   return (
-    <nav>
-      <Link className="logo-link" href="/">
-        <Logo />
-      </Link>
-      {left}
-      {right}
+    <div className="header">
+      <nav>
+        <Link className="logo-link" href="/">
+          <Logo />
+        </Link>
+        {left}
+        {right}
+      </nav>
+      {user && isCentralPharmacy(user.pharmacyId) && (
+        <Banner theme="attention">Currently managing central database.</Banner>
+      )}
       <style jsx>{`
+        .header {
+          display: flex;
+          align-items: stretch;
+          flex-direction: column;
+        }
         nav {
           display: flex;
           align-items: center;
@@ -239,7 +257,7 @@ const Header = () => {
           }
         }
       `}</style>
-    </nav>
+    </div>
   )
 }
 
