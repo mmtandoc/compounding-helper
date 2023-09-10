@@ -1,11 +1,10 @@
 import axios, { AxiosError, isAxiosError } from "axios"
 import { useRouter } from "next/dist/client/router"
-import Link from "next/link"
 import { enqueueSnackbar } from "notistack"
-import { useContext, useState } from "react"
+import { ReactNode, useContext, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 
-import { Button, Modal } from "components/ui"
+import { Button, DisableableLink, Modal } from "components/ui"
 import { PageRefContext } from "lib/contexts/PageRefContext"
 import { useDocument } from "lib/hooks/useDocument"
 import { JsonError } from "types/common"
@@ -16,6 +15,8 @@ type DetailsComponentProps<TModel> = {
   data: TModel
 }
 
+type DetailAction = boolean | { visible: boolean; disabled?: boolean }
+
 //TODO: Allow passing additional props to DetailsComponent
 type DetailsProps<TModel> = {
   data: TModel
@@ -25,7 +26,8 @@ type DetailsProps<TModel> = {
     props: Record<string, unknown> & DetailsComponentProps<TModel>,
   ) => JSX.Element
   dataLabel: string
-  actions?: { delete?: boolean; edit?: boolean; print?: boolean }
+  actions?: { delete?: DetailAction; edit?: DetailAction; print?: DetailAction }
+  notice?: ReactNode
 }
 
 const Details = <TModel,>(props: DetailsProps<TModel>) => {
@@ -34,6 +36,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     apiEndpointPath,
     urlPath,
     detailsComponent: DetailsComponent,
+    notice,
     dataLabel,
   } = props
 
@@ -77,18 +80,46 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     )
   }
 
+  console.log({ actions })
+
   return (
     <div className="details">
+      {notice && <div className="notice">{notice}</div>}
       <DetailsComponent data={data} />
       <div className="action-row print-hide">
-        {actions.print && <Button onClick={handlePrint}>Print</Button>}
-        {actions.edit && (
-          <Link href={`${urlPath}/edit`}>
-            <Button>Edit</Button>
-          </Link>
+        {shouldShowAction(actions.print) && (
+          <Button
+            onClick={handlePrint}
+            disabled={
+              typeof actions.print === "object" && actions.print.disabled
+            }
+          >
+            Print
+          </Button>
         )}
-        {actions.delete && (
-          <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
+        {shouldShowAction(actions.edit) && (
+          <DisableableLink
+            href={`${urlPath}/edit`}
+            disabled={typeof actions.edit === "object" && actions.edit.disabled}
+          >
+            <Button
+              disabled={
+                typeof actions.edit === "object" && actions.edit.disabled
+              }
+            >
+              Edit
+            </Button>
+          </DisableableLink>
+        )}
+        {shouldShowAction(actions.delete) && (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            disabled={
+              typeof actions.delete === "object" && actions.delete.disabled
+            }
+          >
+            Delete
+          </Button>
         )}
       </div>
       <Modal isOpen={isModalOpen}>
@@ -112,6 +143,15 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
         </Modal.Footer>
       </Modal>
       <style jsx>{`
+        .notice {
+          border: var(--border-default);
+          border-radius: 0.4rem;
+          background-color: var(--color-scale-blue-300);
+          padding: 0.5rem 1rem;
+          width: fit-content;
+          font-size: var(--font-size-sm);
+          margin-bottom: 1.5rem;
+        }
         .action-row {
           display: flex;
           column-gap: 1rem;
@@ -124,6 +164,13 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
       </style>
     </div>
   )
+}
+
+const shouldShowAction = (action: DetailAction) => {
+  if (typeof action === "boolean") {
+    return action
+  }
+  return action.visible
 }
 
 export default Details

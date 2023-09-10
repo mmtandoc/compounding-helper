@@ -1,11 +1,10 @@
 import axios from "axios"
 import { GetServerSideProps } from "next"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 
 import SdsDetails from "components/sds/SdsDetails"
-import { Button, Modal } from "components/ui"
+import { Button, DisableableLink, Modal } from "components/ui"
 import { getSession } from "lib/api/utils"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { toIsoDateString } from "lib/utils"
@@ -43,46 +42,62 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
   }
 
   return (
-    <>
-      <SdsDetails data={data} />
-      {canEditDelete && (
-        <>
-          <div className="action-row">
-            <Link href={`/sds/${data.id}/edit`}>
-              <Button>Edit</Button>
-            </Link>
-            <Button onClick={() => setIsModalOpen(true)}>Delete</Button>
-          </div>
-          <Modal isOpen={isModalOpen}>
-            <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
-              Delete SDS?
-            </Modal.Header>
-            <Modal.Body>
-              <p>Are you sure you want to delete this SDS?</p>
-              <p>This is permanent and cannot be undone.</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button
-                onClick={() => {
-                  handleDelete()
-                  setIsModalOpen(false)
-                }}
-              >
-                Confirm
-              </Button>
-              <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+    <div className="sds-details">
+      {!canEditDelete && (
+        <div className="notice">
+          Current record is owned by central. Unable to edit or delete.
+        </div>
       )}
+      <SdsDetails data={data} />
+      <div className="action-row">
+        <DisableableLink
+          disabled={!canEditDelete}
+          href={`/sds/${data.id}/edit`}
+        >
+          <Button disabled={!canEditDelete}>Edit</Button>
+        </DisableableLink>
+        <Button disabled={!canEditDelete} onClick={() => setIsModalOpen(true)}>
+          Delete
+        </Button>
+      </div>
+      <Modal isOpen={isModalOpen}>
+        <Modal.Header closeButton onClose={() => setIsModalOpen(false)}>
+          Delete SDS?
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete this SDS?</p>
+          <p>This is permanent and cannot be undone.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={() => {
+              handleDelete()
+              setIsModalOpen(false)
+            }}
+          >
+            Confirm
+          </Button>
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+        </Modal.Footer>
+      </Modal>
+
       <style jsx>{`
+        .sds-details .notice {
+          border: var(--border-default);
+          border-radius: 0.4rem;
+          background-color: var(--color-scale-blue-300);
+          padding: 0.5rem 1rem;
+          width: fit-content;
+          font-size: var(--font-size-sm);
+          margin-bottom: 1.5rem;
+        }
         .action-row {
           display: flex;
           column-gap: 1rem;
           margin-left: 0.5rem;
         }
       `}</style>
-    </>
+    </div>
   )
 }
 

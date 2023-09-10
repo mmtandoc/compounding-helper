@@ -26,10 +26,10 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
 
   const { user } = useCurrentUser()
 
-  const permissions = useMemo(() => {
-    const canEditDelete = user?.pharmacyId === data.compound.pharmacyId
-    return { edit: canEditDelete, delete: canEditDelete }
-  }, [user?.pharmacyId, data.compound.pharmacyId])
+  const disableEditDelete = useMemo(
+    () => user?.pharmacyId !== data.compound.pharmacyId,
+    [user?.pharmacyId, data.compound.pharmacyId],
+  )
 
   return (
     <>
@@ -45,7 +45,15 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
         apiEndpointPath={`/api/compounds/${compoundId}/mfrs/${version}`}
         urlPath={`/compounds/${compoundId}/mfrs/${version}`}
         detailsComponent={MfrDetails}
-        actions={{ ...permissions, print: true }}
+        notice={
+          disableEditDelete &&
+          "Current record is owned by central. Unable to edit or delete."
+        }
+        actions={{
+          edit: { visible: true, disabled: disableEditDelete },
+          delete: { visible: true, disabled: disableEditDelete },
+          print: true,
+        }}
       />
       <style jsx>{`
         .not-latest-mfr {

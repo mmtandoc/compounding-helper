@@ -32,8 +32,15 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
       apiEndpointPath={`/api/chemicals/${data.id}`}
       urlPath={`/chemicals/${data.id}`}
       detailsComponent={ChemicalDetails}
+      notice={
+        !ownedByCurrentPharmacy &&
+        "Current record is owned by central. Unable to delete."
+      }
       // Users are allowed to edit even if owned by central, but can only modify their own local additional info
-      actions={{ edit: true, delete: ownedByCurrentPharmacy }}
+      actions={{
+        edit: true,
+        delete: { visible: true, disabled: !ownedByCurrentPharmacy },
+      }}
     />
   )
 }

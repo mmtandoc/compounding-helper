@@ -20,10 +20,10 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
 
   const { user } = useCurrentUser()
 
-  const permissions = useMemo(() => {
-    const canEditDelete = user?.pharmacyId === data.pharmacyId
-    return { edit: canEditDelete, delete: canEditDelete }
-  }, [user?.pharmacyId, data.pharmacyId])
+  const disableEditDelete = useMemo(
+    () => user?.pharmacyId !== data.pharmacyId,
+    [user?.pharmacyId, data.pharmacyId],
+  )
 
   return (
     <Details
@@ -32,7 +32,15 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
       apiEndpointPath={`/api/risk-assessments/${data.id}`}
       urlPath={`/risk-assessments/${data.id}`}
       detailsComponent={RiskAssessmentDetails}
-      actions={{ ...permissions, print: true }}
+      notice={
+        disableEditDelete &&
+        "Current record is owned by central. Unable to edit or delete."
+      }
+      actions={{
+        edit: { visible: true, disabled: disableEditDelete },
+        delete: { visible: true, disabled: disableEditDelete },
+        print: true,
+      }}
     />
   )
 }
