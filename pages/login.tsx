@@ -8,7 +8,7 @@ import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "components/ui"
@@ -27,7 +27,7 @@ const LoginPage = () => {
 
   type LoginFields = z.input<typeof loginSchema>
 
-  const { handleSubmit, register } = useForm<LoginFields>({
+  const formMethods = useForm<LoginFields>({
     criteriaMode: "all",
     mode: "onTouched",
     reValidateMode: "onChange",
@@ -40,6 +40,8 @@ const LoginPage = () => {
       return result
     },
   })
+
+  const { handleSubmit, register } = formMethods
 
   const supabaseClient = createPagesBrowserClient()
 
@@ -58,8 +60,6 @@ const LoginPage = () => {
       setError(response.error)
       return
     }
-
-    router.push("/")
   }
 
   return (
@@ -70,29 +70,31 @@ const LoginPage = () => {
         })}
         noValidate
       >
-        <FormGroup>
-          <label htmlFor="email">Email:</label>
-          <Input id="email" type="email" {...register("email")} size={40} />
-        </FormGroup>
-        <FormGroup>
-          <label htmlFor="password">Password:</label>
-          <Input
-            id="password"
-            type="password"
-            {...register("password")}
-            size={40}
-          />
-        </FormGroup>
-        {error && <div className="error-field">Error: {error.message}</div>}
-        <Button type="submit">Sign in</Button>
-        <div className="links">
-          {/* 
+        <FormProvider {...formMethods}>
+          <FormGroup>
+            <label htmlFor="email">Email:</label>
+            <Input id="email" type="email" {...register("email")} size={40} />
+          </FormGroup>
+          <FormGroup>
+            <label htmlFor="password">Password:</label>
+            <Input
+              id="password"
+              type="password"
+              {...register("password")}
+              size={40}
+            />
+          </FormGroup>
+          {error && <div className="error-field">Error: {error.message}</div>}
+          <Button type="submit">Sign in</Button>
+          <div className="links">
+            {/* 
             <Link href="" className="disabled">
               Forgot your password? (NOT IMPLEMENTED)
             </Link>
             <Link href="/signup">Don&apos;t have an account? Sign up</Link> 
           */}
-        </div>
+          </div>
+        </FormProvider>
       </Form>
       <style jsx>{`
         .login-page :global(button[type="submit"]) {
