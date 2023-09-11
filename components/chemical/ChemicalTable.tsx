@@ -1,9 +1,10 @@
 import { Chemical } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
+import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
-import { toIsoDateString } from "lib/utils"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 
 type Props = {
   data: Chemical[]
@@ -12,6 +13,12 @@ type Props = {
 const columnHelper = createColumnHelper<Chemical>()
 
 const columns = [
+  columnHelper.accessor((c) => isCentralPharmacy(c.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     filterFn: "equalsString",
