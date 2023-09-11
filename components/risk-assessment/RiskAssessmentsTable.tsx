@@ -1,9 +1,11 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
+import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { isCentralPharmacy } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -14,6 +16,12 @@ type Props = {
 const columnHelper = createColumnHelper<RiskAssessmentAll>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     enableColumnFilter: false,

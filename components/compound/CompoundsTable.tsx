@@ -1,11 +1,13 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { useMemo } from "react"
+import { BsGlobe } from "react-icons/bs"
 
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { isCentralPharmacy } from "lib/utils"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
@@ -19,6 +21,12 @@ type Props = {
 const columnHelper = createColumnHelper<CompoundWithMfrCount>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     enableColumnFilter: false,
