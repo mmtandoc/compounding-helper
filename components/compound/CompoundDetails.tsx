@@ -6,6 +6,7 @@ import { IngredientDetails } from "components/compound/ingredient/IngredientDeta
 import { Button, Spinner } from "components/ui"
 import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
 import { SettingsFields } from "lib/fields"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
@@ -149,28 +150,39 @@ const MfrsActions = (props: { data: CompoundWithIngredients }) => {
     console.error(mfrsError)
   }
 
-  const isLoading = !mfrs && !mfrsError
+  const { user, error: userError, isLoading: isUserLoading } = useCurrentUser()
+
+  if (userError) {
+    console.error(userError)
+  }
+
+  const canCreateNewMfr = useMemo(
+    () => user?.pharmacyId === data.pharmacyId,
+    [data.pharmacyId, user?.pharmacyId],
+  )
+
+  const isLoading = (!mfrs && !mfrsError) || isUserLoading
   return (
     <FormGroup row>
       {!isLoading ? (
-        <>
-          {mfrs && mfrs.length > 0 ? (
-            <>
-              <Link href={`/compounds/${data.id}/mfrs/latest`}>
-                <Button size="small" theme="primary">
-                  View latest MFR
-                </Button>
-              </Link>
-              <Link href={`/compounds/${data.id}/mfrs`}>
-                <Button size="small">View all MFRs</Button>
-              </Link>
-            </>
-          ) : (
+        mfrs && mfrs.length > 0 ? (
+          <>
+            <Link href={`/compounds/${data.id}/mfrs/latest`}>
+              <Button size="small" theme="primary">
+                View latest MFR
+              </Button>
+            </Link>
+            <Link href={`/compounds/${data.id}/mfrs`}>
+              <Button size="small">View all MFRs</Button>
+            </Link>
+          </>
+        ) : (
+          canCreateNewMfr && (
             <Link href={`/compounds/${data.id}/mfrs/new`}>
               <Button size="small">Create MFR</Button>
             </Link>
-          )}
-        </>
+          )
+        )
       ) : (
         <Spinner />
       )}
