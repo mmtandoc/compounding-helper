@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableChemicalFields, chemicalSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -28,23 +26,15 @@ const NewChemical: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "New Chemical",
       },
     }
-
-  return {
-    props: {
-      title: "New Chemical",
-      initialAppSession: session,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default NewChemical

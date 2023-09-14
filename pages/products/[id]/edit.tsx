@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import ProductEntry from "components/product/ProductEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { isCentralPharmacy } from "lib/utils"
@@ -33,48 +32,39 @@ const EditProduct: NextPageWithLayout<EditProductProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<EditProductProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getProductById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getProductById(session, id)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.pharmacyId) &&
+      session.appUser.pharmacyId !== data.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    const values = ProductMapper.toFieldValues(data)
 
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.pharmacyId) &&
-    session.appUser.pharmacyId !== data.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  const values = ProductMapper.toFieldValues(data)
-
-  return {
-    props: {
-      title: `Edit Product - ${values?.name}`,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit Product - ${values?.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditProduct

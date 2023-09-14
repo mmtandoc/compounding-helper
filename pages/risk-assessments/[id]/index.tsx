@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -45,38 +44,28 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<
-  RiskAssessmentProps
-> = async (context) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<RiskAssessmentProps>({
+  getServerSideProps: async (context, session) => {
+    const riskAssessmentId = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(riskAssessmentId)) {
+      return { notFound: true }
     }
 
-  const riskAssessmentId = parseInt(context.query.id as string)
+    const data = await getRiskAssessmentById(session, riskAssessmentId)
 
-  if (isNaN(riskAssessmentId)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getRiskAssessmentById(session, riskAssessmentId)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `Risk Assessment: ${data.compound.name}`,
-      initialAppSession: session,
-      data,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Risk Assessment: ${data.compound.name}`,
+        data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default RiskAssessment

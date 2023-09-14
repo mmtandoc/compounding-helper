@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useCallback, useState } from "react"
 
@@ -9,7 +8,7 @@ import TableActionBar from "components/common/TableActionBar"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
 import { Button } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { toIsoDateString } from "lib/utils"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import { NextPageWithLayout } from "types/common"
@@ -59,23 +58,16 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-  const session = await getSession(ctx)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data: RiskAssessmentAll[] = (await getRiskAssessments(session)) ?? []
 
-  if (!session)
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+      props: { title: "Risk Assessments", data },
     }
-
-  const data: RiskAssessmentAll[] = (await getRiskAssessments(session)) ?? []
-
-  return {
-    props: { title: "Risk Assessments", initialAppSession: session, data },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 const renderDocument = (data: RiskAssessmentAll) => (
   <div className="details">

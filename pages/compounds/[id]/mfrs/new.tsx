@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableMfrFields, mfrSchema } from "lib/fields"
 import { isCentralPharmacy } from "lib/utils"
 import { getCompoundById } from "pages/api/compounds/[id]"
@@ -48,38 +46,29 @@ const NewMfr: NextPageWithLayout<NewMfrProps> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<NewMfrProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<NewMfrProps>({
+  getServerSideProps: async (context, session) => {
+    const compoundId = parseInt(context.query.id as string)
+    const compound = await getCompoundById(session, compoundId)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (compound === null) {
+      return { notFound: true }
     }
 
-  const compoundId = parseInt(context.query.id as string)
-  const compound = await getCompoundById(session, compoundId)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(compound.pharmacyId) &&
+      session.appUser.pharmacyId !== compound.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (compound === null) {
-    return { notFound: true }
-  }
-
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(compound.pharmacyId) &&
-    session.appUser.pharmacyId !== compound.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  return {
-    props: { title: `New MFR - ${compound.name}`, compoundId },
-  }
-}
+    return {
+      props: { title: `New MFR - ${compound.name}`, compoundId },
+    }
+  },
+  requireAuth: true,
+})
 
 export default NewMfr

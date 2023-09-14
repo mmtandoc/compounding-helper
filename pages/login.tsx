@@ -1,11 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  createPagesBrowserClient,
-  createPagesServerClient,
-} from "@supabase/auth-helpers-nextjs"
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 import { useUser } from "@supabase/auth-helpers-react"
-import { GetServerSideProps } from "next"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
@@ -13,7 +8,7 @@ import { z } from "zod"
 
 import { Button } from "components/ui"
 import { Form, FormGroup, Input } from "components/ui/forms"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { formErrorMap } from "lib/formErrorMap"
 
 const loginSchema = z.object({
@@ -116,22 +111,19 @@ const LoginPage = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // Check if we have a session
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async (_, session) => {
+    if (session) {
+      return { redirect: { destination: "/", permanent: false } }
+    }
 
-  if (session) {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "Login",
       },
     }
-  }
-
-  return {
-    props: { title: "Login" },
-  }
-}
+  },
+  requireAuth: false,
+})
 
 export default LoginPage

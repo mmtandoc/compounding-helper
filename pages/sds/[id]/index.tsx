@@ -1,11 +1,10 @@
 import axios from "axios"
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 
 import SdsDetails from "components/sds/SdsDetails"
 import { Button, DisableableLink, Modal } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
@@ -101,36 +100,27 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<SdsPageProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<SdsPageProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getSdsById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getSdsById(session, id)
+    const title = `SDS Summary: ${data.product.name} - ${
+      data.product.vendor.name
+    } (${toIsoDateString(data.revisionDate)})`
 
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  const title = `SDS Summary: ${data.product.name} - ${
-    data.product.vendor.name
-  } (${toIsoDateString(data.revisionDate)})`
-
-  return { props: { title, initialAppSession: session, data } }
-}
+    return { props: { title, data } }
+  },
+  requireAuth: true,
+})
 
 export default SdsPage

@@ -1,10 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
-import React from "react"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { isCentralPharmacy } from "lib/utils"
@@ -35,48 +33,41 @@ const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<EditRiskAssessmentProps>({
+  getServerSideProps: async (context, session) => {
+    const riskAssessmentId = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(riskAssessmentId)) {
+      return { notFound: true }
     }
 
-  const riskAssessmentId = parseInt(context.query.id as string)
+    const data = await getRiskAssessmentById(session, riskAssessmentId)
 
-  if (isNaN(riskAssessmentId)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getRiskAssessmentById(session, riskAssessmentId)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.pharmacyId) &&
+      session.appUser.pharmacyId !== data.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    console.dir(data, { depth: 3 })
 
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.pharmacyId) &&
-    session.appUser.pharmacyId !== data.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
+    const values = RiskAssessmentMapper.toFieldValues(data)
 
-  console.dir(data, { depth: 3 })
-
-  const values = RiskAssessmentMapper.toFieldValues(data)
-
-  return {
-    props: {
-      title: `Edit Risk Assessment - ${values?.compound?.name}`,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit Risk Assessment - ${values?.compound?.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditRiskAssessment

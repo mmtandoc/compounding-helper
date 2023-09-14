@@ -1,11 +1,10 @@
 import { Chemical } from "@prisma/client"
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import ChemicalTable from "components/chemical/ChemicalTable"
 import TableActionBar from "components/common/TableActionBar"
 import { Button } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 
@@ -40,28 +39,17 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<ChemicalsProps> = async (
-  ctx,
-) => {
-  const session = await getSession(ctx)
+export const getServerSideProps = withPageAuth<ChemicalsProps>({
+  getServerSideProps: async (_, session) => {
+    const data: Chemical[] = (await getChemicals(session)) ?? []
 
-  if (!session)
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "Chemicals",
+        data,
       },
     }
-
-  const data: Chemical[] = (await getChemicals(session)) ?? []
-
-  return {
-    props: {
-      title: "Chemicals",
-      initialAppSession: session,
-      data,
-    },
-  }
-}
+  },
+})
 
 export default Chemicals

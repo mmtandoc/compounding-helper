@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import Details from "components/common/data-pages/Details"
 import RoutineDetails from "components/routine/RoutineDetails"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RoutineWithHistory } from "types/models"
@@ -28,34 +26,28 @@ const ViewRoutine: NextPageWithLayout<ViewRoutineProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<ViewRoutineProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<ViewRoutineProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getRoutineById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getRoutineById(session, id)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: { title: `Routine: ${data.name}`, initialAppSession: session, data },
-  }
-}
+    return {
+      props: {
+        title: `Routine: ${data.name}`,
+        data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default ViewRoutine

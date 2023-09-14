@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useMemo } from "react"
 
 import ChemicalDetails from "components/chemical/ChemicalDetails"
 import Details from "components/common/data-pages/Details"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getChemicalById } from "pages/api/chemicals/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -45,38 +44,28 @@ const ChemicalPage: NextPageWithLayout<ChemicalPageProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<ChemicalPageProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<ChemicalPageProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getChemicalById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getChemicalById(session, id)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `Chemical: ${data.name}`,
-      initialAppSession: session,
-      data,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Chemical: ${data.name}`,
+        data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default ChemicalPage

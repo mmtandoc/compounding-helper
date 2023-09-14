@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import ProductDetails from "components/product/ProductDetails"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getProductById } from "pages/api/products/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -42,38 +41,28 @@ const ProductPage: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getProductById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getProductById(session, id)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `Product: ${data.name} (${data.vendor.name})`,
-      initialAppSession: session,
-      data,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Product: ${data.name} (${data.vendor.name})`,
+        data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default ProductPage

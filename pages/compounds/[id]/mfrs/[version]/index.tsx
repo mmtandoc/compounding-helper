@@ -1,11 +1,10 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import MfrDetails from "components/compound/mfr/MfrDetails"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getLatestMfrVersion } from "pages/api/compounds/[id]/mfrs"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
@@ -69,42 +68,32 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const compoundId = parseInt(context.query.id as string)
+    const version = parseInt(context.query.version as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(compoundId) || isNaN(version)) {
+      return { notFound: true }
     }
 
-  const compoundId = parseInt(context.query.id as string)
-  const version = parseInt(context.query.version as string)
+    const data = await getMfr(session, compoundId, version)
 
-  if (isNaN(compoundId) || isNaN(version)) {
-    return { notFound: true }
-  }
+    const latestVersion = await getLatestMfrVersion(session, compoundId)
 
-  const data = await getMfr(session, compoundId, version)
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const latestVersion = await getLatestMfrVersion(session, compoundId)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `MFR: ${data.compound.name} - v.${data.version}`,
-      initialAppSession: session,
-      data,
-      isLatest: data.version === latestVersion,
-    },
-  }
-}
+    return {
+      props: {
+        title: `MFR: ${data.compound.name} - v.${data.version}`,
+        data,
+        isLatest: data.version === latestVersion,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default MfrPage

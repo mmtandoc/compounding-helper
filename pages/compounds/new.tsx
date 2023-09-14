@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import CompoundEntry from "components/compound/CompoundEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableCompoundFields, riskAssessmentSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -38,23 +36,15 @@ const NewCompound: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "New Compound",
       },
     }
-
-  return {
-    props: {
-      title: "New Compound",
-      initialAppSession: session,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default NewCompound

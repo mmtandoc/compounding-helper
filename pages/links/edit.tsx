@@ -1,8 +1,6 @@
-import type { GetServerSideProps } from "next"
-
 import EditForm from "components/common/data-pages/EditForm"
 import LinkDirectoryEntry from "components/links/LinkDirectoryEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import {
   LinkDirectoryFields,
   NullableLinkDirectoryFields,
@@ -27,30 +25,20 @@ const EditLinks: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = (await getLinks(session)) ?? []
 
-  if (!session)
+    const values = linkDirectorySchema.parse({ links: data })
+
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "Edit Link Directory",
+        values,
       },
     }
-
-  const data = (await getLinks(session)) ?? []
-
-  const values = linkDirectorySchema.parse({ links: data })
-
-  return {
-    props: {
-      title: "Edit Link Directory",
-      initialAppSession: session,
-      values,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default EditLinks
