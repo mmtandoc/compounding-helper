@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import CompoundDetails from "components/compound/CompoundDetails"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
@@ -43,38 +42,28 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getCompoundById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getCompoundById(session, id)
-
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `Compound: ${data.name}`,
-      initialAppSession: session,
-      data,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Compound: ${data.name}`,
+        data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default CompoundPage

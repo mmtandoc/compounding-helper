@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import CompoundEntry from "components/compound/CompoundEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableCompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import { isCentralPharmacy } from "lib/utils"
@@ -32,47 +31,39 @@ const EditCompound: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getCompoundById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getCompoundById(session, id)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.pharmacyId) &&
+      session.appUser.pharmacyId !== data.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    const values = CompoundMapper.toFieldValues(data)
 
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.pharmacyId) &&
-    session.appUser.pharmacyId !== data.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  const values = CompoundMapper.toFieldValues(data)
-
-  return {
-    props: {
-      title: `Edit Compound - ${values.name}`,
-      initialAppSession: session,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit Compound - ${values.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditCompound

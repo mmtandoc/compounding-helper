@@ -1,8 +1,6 @@
-import type { GetServerSideProps } from "next"
-
 import EditForm from "components/common/data-pages/EditForm"
 import SettingsEntry from "components/settings/SettingsEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import {
   NullableSettingsFields,
   SettingsFields,
@@ -26,30 +24,20 @@ const Settings: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = (await getSettings(session)) ?? []
 
-  if (!session)
+    const values = settingsSchema.parse(data)
+
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "Settings",
+        values,
       },
     }
-
-  const data = (await getSettings(session)) ?? []
-
-  const values = settingsSchema.parse(data)
-
-  return {
-    props: {
-      title: "Settings",
-      initialAppSession: session,
-      values,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default Settings

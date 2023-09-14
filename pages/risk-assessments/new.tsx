@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { NextPageWithLayout } from "types/common"
@@ -92,23 +91,15 @@ const NewRiskAssessment: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "New Risk Assessment",
       },
     }
-
-  return {
-    props: {
-      title: "New Risk Assessment",
-      initialAppSession: session,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default NewRiskAssessment

@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import SdsEntry from "components/sds/SdsEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -27,23 +25,15 @@ const NewSafetyDataSheet: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "New SDS summary",
       },
     }
-
-  return {
-    props: {
-      title: "New SDS summary",
-      initialAppSession: session,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default NewSafetyDataSheet

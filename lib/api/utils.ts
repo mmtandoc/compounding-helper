@@ -1,11 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"
 import { AuthSession } from "@supabase/supabase-js"
-import {
-  GetServerSidePropsContext,
-  NextApiRequest,
-  NextApiResponse,
-} from "next"
+import { NextApiRequest, NextApiResponse } from "next"
 import { ConditionalKeys } from "type-fest"
 import { z } from "zod"
 import { FromZodErrorOptions, fromZodError } from "zod-validation-error"
@@ -135,18 +131,12 @@ export const withSession =
     }
   }
 
-export const getSession = async (
-  context:
-    | GetServerSidePropsContext
-    | {
-        req: NextApiRequest
-        res: NextApiResponse
-      },
-) => {
-  const supabase = createPagesServerClient(context)
+export const getSession: (
+  ...args: Parameters<typeof createPagesServerClient>
+) => Promise<AppSession | null> = async (context, options) => {
+  const supabase = createPagesServerClient(context, options)
   const {
     data: { session: authSession },
-    error,
   } = await supabase.auth.getSession()
 
   if (!authSession) {

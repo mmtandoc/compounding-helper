@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import {
   ChemicalFields,
   NullableChemicalFields,
@@ -36,40 +35,29 @@ const EditChemical: NextPageWithLayout<EditChemicalProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<EditChemicalProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<EditChemicalProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data = await getChemicalById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getChemicalById(session, id)
+    const values = ChemicalMapper.toFieldValues(data)
 
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  const values = ChemicalMapper.toFieldValues(data)
-
-  return {
-    props: {
-      title: `Edit Chemical - ${values?.name}`,
-      initialAppSession: session,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit Chemical - ${values?.name}`,
+        values,
+      },
+    }
+  },
+})
 
 export default EditChemical

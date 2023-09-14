@@ -1,14 +1,14 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RoutineEntry from "components/routine/RoutineEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableRoutineFields, RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
 import { isCentralPharmacy } from "lib/utils"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
+import { RoutineWithHistory } from "types/models"
 
 type EditRoutineProps = {
   values: RoutineFields
@@ -34,47 +34,40 @@ const EditRoutine: NextPageWithLayout<EditRoutineProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+//TODO: Should be 'withPageAuth<EditRoutineProps>', but typing is incorrect (RoutineFields vs RoutineFieldsInput)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(id)) {
+      return { notFound: true }
     }
 
-  const id = parseInt(context.query.id as string)
+    const data: RoutineWithHistory | null = await getRoutineById(session, id)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getRoutineById(session, id)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.pharmacyId) &&
+      session.appUser.pharmacyId !== data.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    const values = RoutineMapper.toFieldValues(data)
 
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.pharmacyId) &&
-    session.appUser.pharmacyId !== data.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  const values = RoutineMapper.toFieldValues(data)
-
-  return {
-    props: {
-      title: `Edit Routine - ${values?.name}`,
-      initialAppSession: session,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit Routine - ${values?.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditRoutine

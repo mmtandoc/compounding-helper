@@ -1,9 +1,8 @@
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import SdsEntry from "components/sds/SdsEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { isCentralPharmacy, toIsoDateString } from "lib/utils"
@@ -33,49 +32,39 @@ const EditSdsPage: NextPageWithLayout<EditSdsPageProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<EditSdsPageProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<EditSdsPageProps>({
+  getServerSideProps: async (context, session) => {
+    const sdsId = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(sdsId)) {
+      return { notFound: true }
     }
 
-  const sdsId = parseInt(context.query.id as string)
+    const data = await getSdsById(session, sdsId)
 
-  if (isNaN(sdsId)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getSdsById(session, sdsId)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.pharmacyId) &&
+      session.appUser.pharmacyId !== data.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
-
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.pharmacyId) &&
-    session.appUser.pharmacyId !== data.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  return {
-    props: {
-      title: `Edit SDS Summary: ${data.product.name} - ${
-        data.product.vendor.name
-      } (${toIsoDateString(data.revisionDate)})`,
-      initialAppSession: session,
-      values: SdsMapper.toFieldValues(data),
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit SDS Summary: ${data.product.name} - ${
+          data.product.vendor.name
+        } (${toIsoDateString(data.revisionDate)})`,
+        values: SdsMapper.toFieldValues(data),
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditSdsPage

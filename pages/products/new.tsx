@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import ProductEntry from "components/product/ProductEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { NullableProductFields, productSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -24,23 +22,15 @@ const NewProduct: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session)
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "New Product",
       },
     }
-
-  return {
-    props: {
-      title: "New Product",
-      initialAppSession: session,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default NewProduct

@@ -1,11 +1,10 @@
 import { Link as LinkModel } from "@prisma/client"
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { BiEdit } from "react-icons/bi"
 import useSWR from "swr"
 
 import { IconButton } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { getLinks } from "pages/api/links"
 import { NextPageWithLayout } from "types/common"
 
@@ -76,22 +75,13 @@ const Links: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = (await getLinks(session)) ?? []
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    }
-
-  const data = (await getLinks(session)) ?? []
-
-  return { props: { title: "Links", initialAppSession: session, data } }
-}
+    return { props: { title: "Links", data } }
+  },
+  requireAuth: true,
+})
 
 export default Links

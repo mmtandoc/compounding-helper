@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback, useState } from "react"
@@ -10,7 +9,7 @@ import TableActionBar from "components/common/TableActionBar"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import MfrTable from "components/compound/mfr/MfrTable"
 import { Button } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { getMfrsByCompoundId } from "pages/api/compounds/[id]/mfrs"
 import { NextPageWithLayout } from "types/common"
@@ -63,41 +62,31 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const compoundId = parseInt(context.query.id as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(compoundId)) {
+      return { notFound: true }
     }
 
-  const compoundId = parseInt(context.query.id as string)
+    const compound = await getCompoundById(session, compoundId)
 
-  if (isNaN(compoundId)) {
-    return { notFound: true }
-  }
+    if (compound === null) {
+      return { notFound: true }
+    }
 
-  const compound = await getCompoundById(session, compoundId)
+    const mfrs = (await getMfrsByCompoundId(session, compoundId)) ?? []
 
-  if (compound === null) {
-    return { notFound: true }
-  }
-
-  const mfrs = (await getMfrsByCompoundId(session, compoundId)) ?? []
-
-  return {
-    props: {
-      title: `MFRs for ${compound.name}`,
-      initialAppSession: session,
-      mfrs,
-    },
-  }
-}
+    return {
+      props: {
+        title: `MFRs for ${compound.name}`,
+        mfrs,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 const renderDocument = (data: MfrAll) => (
   <div className="details">

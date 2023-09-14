@@ -1,8 +1,6 @@
-import { GetServerSideProps } from "next"
-
 import EditForm from "components/common/data-pages/EditForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { MfrFieldsWithVersion, NullableMfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
 import { isCentralPharmacy } from "lib/utils"
@@ -30,49 +28,40 @@ const EditMfr: NextPageWithLayout<EditMfrProps> = (props: EditMfrProps) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<EditMfrProps> = async (
-  context,
-) => {
-  const session = await getSession(context)
+export const getServerSideProps = withPageAuth<EditMfrProps>({
+  getServerSideProps: async (context, session) => {
+    const compoundId = parseInt(context.query.id as string)
+    const version = parseInt(context.query.version as string)
 
-  if (!session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (isNaN(compoundId) || isNaN(version)) {
+      return { notFound: true }
     }
 
-  const compoundId = parseInt(context.query.id as string)
-  const version = parseInt(context.query.version as string)
+    const data = await getMfr(session, compoundId, version)
 
-  if (isNaN(compoundId) || isNaN(version)) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const data = await getMfr(session, compoundId, version)
+    //Check if record is owned by central & current user is not a central user
+    if (
+      isCentralPharmacy(data.compound.pharmacyId) &&
+      session.appUser.pharmacyId !== data.compound.pharmacyId
+    ) {
+      //TODO: Return 403 status code instead?
+      return { notFound: true }
+    }
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    const values = MfrMapper.toFieldValues(data) as MfrFieldsWithVersion
 
-  //Check if record is owned by central & current user is not a central user
-  if (
-    isCentralPharmacy(data.compound.pharmacyId) &&
-    session.appUser.pharmacyId !== data.compound.pharmacyId
-  ) {
-    //TODO: Return 403 status code instead?
-    return { notFound: true }
-  }
-
-  const values = MfrMapper.toFieldValues(data) as MfrFieldsWithVersion
-
-  return {
-    props: {
-      title: `Edit MFR - ${data.compound.name} - v${data.version}`,
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: `Edit MFR - ${data.compound.name} - v${data.version}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditMfr

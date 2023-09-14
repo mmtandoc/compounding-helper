@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useCallback, useState } from "react"
 import useSWR from "swr"
@@ -10,7 +9,7 @@ import TableActionBar from "components/common/TableActionBar"
 import RoutineDetails from "components/routine/RoutineDetails"
 import RoutineTable from "components/routine/RoutineTable"
 import { Button } from "components/ui"
-import { getSession } from "lib/api/utils"
+import { withPageAuth } from "lib/auth"
 import { RoutineEntity } from "lib/entities"
 import { getRoutines } from "pages/api/routines"
 import { NextPageWithLayout } from "types/common"
@@ -84,28 +83,20 @@ const renderDocument = (data: RoutineEntity) => (
   </div>
 )
 
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-  const session = await getSession(ctx)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = await getRoutines(session, {
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+    })
 
-  if (!session)
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        title: "Routines",
+        initialData: data,
       },
     }
-
-  const data = await getRoutines(session, {
-    orderBy: [{ category: "asc" }, { name: "asc" }],
-  })
-
-  return {
-    props: {
-      title: "Routines",
-      initialAppSession: session,
-      initialData: data,
-    },
-  }
-}
+  },
+  requireAuth: true,
+})
 
 export default Routines
