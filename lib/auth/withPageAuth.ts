@@ -19,7 +19,7 @@ type WithPageAuthProps<
 > = (
   | {
       requireAuth?: true
-      getServerSideProps: AddParameters<
+      getServerSideProps?: AddParameters<
         GetServerSideProps<Props, Params, Preview>,
         [AppSession]
       >
@@ -28,7 +28,7 @@ type WithPageAuthProps<
     }
   | {
       requireAuth: false
-      getServerSideProps: AddParameters<
+      getServerSideProps?: AddParameters<
         GetServerSideProps<Props, Params, Preview>,
         [AppSession | null]
       >
@@ -58,13 +58,15 @@ export default function withPageAuth<
 
       let gsspRes: any = { props: {} }
 
-      if (requireAuth === false) {
-        gsspRes = await getServerSideProps(context, session)
-      } else {
-        if (session === null) {
-          throw new Error("Unauthenticated")
+      if (getServerSideProps) {
+        if (requireAuth === false) {
+          gsspRes = await getServerSideProps(context, session)
+        } else {
+          if (session === null) {
+            throw new Error("Unauthenticated")
+          }
+          gsspRes = await getServerSideProps(context, session)
         }
-        gsspRes = await getServerSideProps(context, session)
       }
 
       return {
