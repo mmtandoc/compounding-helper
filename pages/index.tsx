@@ -1,7 +1,6 @@
-import { GetStaticProps } from "next"
 import Link from "next/link"
-import React from "react"
 
+import { withPageAuth } from "lib/auth"
 import { NextPageWithLayout } from "types/common"
 
 type HomeGridItem = {
@@ -211,8 +210,11 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "Compounding Helper - Home" },
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => ({
+    props: { title: "Compounding Helper - Home" },
+  }),
+  requireAuth: false,
 })
 
 export default Home
