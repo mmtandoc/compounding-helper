@@ -95,17 +95,45 @@ export type AppSession = {
   appUser: UserWithPharmacy
 }
 
-export type NextApiHandlerWithSession<Data = any> = (
-  req: NextApiRequestWithSession,
+export type NextApiHandlerWithSession<
+  Data = any,
+  RequireAuth extends boolean = true,
+> = (
+  req: NextApiRequestWithSession<RequireAuth>,
   res: NextApiResponse<Data>,
 ) => unknown | Promise<unknown>
 
-export type NextApiRequestWithSession = NextApiRequest & { session: AppSession }
+export type NextApiRequestWithSession<RequireAuth extends boolean = true> =
+  NextApiRequest &
+    (RequireAuth extends true
+      ? { session: AppSession }
+      : { session?: AppSession })
 
-export const withSession =
-  <ResponseData = any>(handler: NextApiHandlerWithSession<ResponseData>) =>
-  async (
-    req: NextApiRequestWithSession,
+export function withSession<
+  ResponseData = any,
+  RequireAuth extends boolean = false,
+>(
+  handler: NextApiHandlerWithSession<ResponseData, RequireAuth>,
+  options: { requireAuth: false },
+): NextApiHandlerWithSession<ResponseData, RequireAuth>
+export function withSession<
+  ResponseData = any,
+  RequireAuth extends boolean = true,
+>(
+  handler: NextApiHandlerWithSession<ResponseData, RequireAuth>,
+  options?: { requireAuth?: true },
+): NextApiHandlerWithSession<ResponseData, RequireAuth>
+export function withSession<
+  ResponseData = any,
+  RequireAuth extends boolean = boolean,
+>(
+  handler: NextApiHandlerWithSession<ResponseData, RequireAuth>,
+  options: { requireAuth?: RequireAuth } = { requireAuth: true as RequireAuth },
+): NextApiHandlerWithSession<ResponseData, RequireAuth> {
+  const { requireAuth = true } = options ?? { requireAuth: true }
+
+  return async (
+    req: NextApiRequestWithSession<RequireAuth>,
     res: NextApiResponse<ResponseData>,
   ) => {
     try {
@@ -114,22 +142,25 @@ export const withSession =
         data: { session: authSession },
         error,
       } = await supabase.auth.getSession()
-      if (!authSession) {
+      if (!authSession && requireAuth) {
         throw error
       }
 
-      const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
-        where: { id: authSession.user.id },
-        ...userWithPharmacy,
-      })
+      if (authSession) {
+        const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
+          where: { id: authSession.user.id },
+          ...userWithPharmacy,
+        })
 
-      req.session = { authSession, appUser }
+        req.session = { authSession, appUser }
+      }
 
       return handler(req, res)
     } catch (error) {
       return sendJsonError(res, 401, "Authentication required")
     }
   }
+}
 
 export const getSession: (
   ...args: Parameters<typeof createPagesServerClient>
