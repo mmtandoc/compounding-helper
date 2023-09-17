@@ -14,7 +14,8 @@ export const linkSchema = z.object({
     .trim()
     .transform((arg) => (arg === "" ? null : arg))
     .nullable(),
-  order: z.number().int().positive().optional(),
+  order: z.number().int().positive(),
+  updatedAt: z.coerce.date().optional(),
 })
 
 export type LinkFields = z.output<typeof linkSchema>
@@ -25,8 +26,14 @@ export type NullableLinkFields = NullableDeep<
   { ignoreKeys: "id" }
 >
 
-export const linkDirectorySchema = z.object({ links: linkSchema.array() })
+export const linkDirectorySchema = z.object({
+  centralLinks: linkSchema.array(),
+  localLinks: linkSchema.array(),
+})
 export type LinkDirectoryFields = z.output<typeof linkDirectorySchema>
 export type LinkDirectoryFieldsInput = z.input<typeof linkDirectorySchema>
 
-export type NullableLinkDirectoryFields = { links: NullableLinkFields[] }
+export type NullableLinkDirectoryFields = {
+  centralLinks: NullableLinkFields[]
+  localLinks: NullableLinkFields[]
+}
