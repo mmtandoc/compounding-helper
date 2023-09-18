@@ -193,9 +193,7 @@ const Header = () => {
     }
     return (
       <>
-        <Link href="/login" prefetch={false}>
-          Sign in
-        </Link>
+        <Link href="/login">Sign in</Link>
       </>
     )
   }
