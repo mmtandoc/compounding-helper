@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 import { useUser } from "@supabase/auth-helpers-react"
-import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
@@ -9,7 +8,6 @@ import { z } from "zod"
 
 import { Button } from "components/ui"
 import { Form, FormGroup, Input } from "components/ui/forms"
-import { getSession } from "lib/api/utils"
 import { withPageAuth } from "lib/auth"
 import { formErrorMap } from "lib/formErrorMap"
 
@@ -44,22 +42,19 @@ const LoginPage = () => {
 
   const [error, setError] = useState<Error | undefined>()
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (user) {
       router.push("/")
     }
-  }, [user, router]) */
+  }, [user, router])
 
   const handleSignIn: SubmitHandler<LoginFields> = async (data) => {
     setError(undefined)
     const response = await supabaseClient.auth.signInWithPassword(data)
-
     if (response.error) {
       setError(response.error)
       return
     }
-
-    router.push("/")
   }
 
   return (
@@ -116,26 +111,11 @@ const LoginPage = () => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // code
-  const session = await getSession(context)
-
-  if (session) {
-    console.log("Already logged in. Redirecting to home page.")
-    console.log({ session })
-    return { redirect: { destination: "/", permanent: false } }
-  }
-
-  return {
-    props: { title: "Login" },
-  }
-}
-
-/* export const getServerSideProps = withPageAuth({
+export const getServerSideProps = withPageAuth({
   getServerSideProps: async (_, session) => {
     if (session) {
       console.log("Already logged in. Redirecting to home page.")
-      console.log({session})
+      console.log({ session })
       return { redirect: { destination: "/", permanent: false } }
     }
 
@@ -146,6 +126,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   },
   requireAuth: false,
-}) */
+})
 
 export default LoginPage
