@@ -10,6 +10,7 @@ import { Button } from "components/ui"
 import { Form, FormGroup, Input } from "components/ui/forms"
 import { withPageAuth } from "lib/auth"
 import { formErrorMap } from "lib/formErrorMap"
+import { invalidateNextRouterCache } from "lib/invalidateNextRouterCache"
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -55,6 +56,7 @@ const LoginPage = () => {
       setError(response.error)
       return
     }
+    invalidateNextRouterCache()
   }
 
   return (
