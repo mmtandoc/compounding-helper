@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
+  console.log("MIDDLEWARE: ", req.nextUrl.toString())
   // We need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
   // Create authenticated Supabase Client.
@@ -10,6 +11,7 @@ export async function middleware(req: NextRequest) {
   // Check if we have a session
   const {
     data: { session },
+    error,
   } = await supabase.auth.getSession()
 
   // Check auth condition
@@ -19,7 +21,12 @@ export async function middleware(req: NextRequest) {
     return res
   }
 
-  console.log("AUTH FAILED")
+  //!: REMOVE AFTER FIXING REDIRECTING ISSUE
+  console.log("MIDDLEWARE: ", "AUTH FAILED", req.nextUrl.toString())
+  console.log(req.nextUrl)
+  if (error) {
+    console.log(error)
+  }
 
   // Auth condition not met, redirect to home page.
   const redirectUrl = req.nextUrl.clone()
