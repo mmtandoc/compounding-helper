@@ -72,7 +72,7 @@ const Header = () => {
       {user ? (
         <NavMenu
           items={[
-            /* { label: "Home", url: "/" }, */
+            { label: "Home", url: "/" },
             {
               label: "Compounds",
               url: "/compounds",
@@ -132,12 +132,10 @@ const Header = () => {
         />
       ) : (
         <NavMenu
-          items={
-            [
-              /* { label: "Home", url: "/" }, */
-              /* { label: "About", url: "/about" }, */
-            ]
-          }
+          items={[
+            { label: "Home", url: "/" },
+            /* { label: "About", url: "/about" }, */
+          ]}
         />
       )}
       <style jsx>{`
@@ -170,7 +168,7 @@ const Header = () => {
   const AuthActions = () => {
     const supabaseClient = useSupabaseClient()
     const router = useRouter()
-    //const user = useUser()
+    const user = useUser()
 
     if (user) {
       return (
@@ -182,8 +180,7 @@ const Header = () => {
             variant="text"
             onClick={async () => {
               await supabaseClient.auth.signOut()
-              //.then(() => router.push("/login"))
-              router.push("/login")
+              router.push("/")
             }}
           >
             Sign out
