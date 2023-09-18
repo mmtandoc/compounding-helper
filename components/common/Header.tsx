@@ -225,7 +225,7 @@ const Header = () => {
   return (
     <div className="header">
       <nav>
-        <Link className="logo-link" href="/" prefetch={false}>
+        <Link className="logo-link" href="/">
           <Logo />
         </Link>
         {left}
