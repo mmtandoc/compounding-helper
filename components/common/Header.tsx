@@ -72,7 +72,7 @@ const Header = () => {
       {user ? (
         <NavMenu
           items={[
-            { label: "Home", url: "/" },
+            /* { label: "Home", url: "/" }, */
             {
               label: "Compounds",
               url: "/compounds",
@@ -132,10 +132,12 @@ const Header = () => {
         />
       ) : (
         <NavMenu
-          items={[
-            { label: "Home", url: "/" },
-            /* { label: "About", url: "/about" }, */
-          ]}
+          items={
+            [
+              /* { label: "Home", url: "/" }, */
+              /* { label: "About", url: "/about" }, */
+            ]
+          }
         />
       )}
       <style jsx>{`
@@ -168,7 +170,7 @@ const Header = () => {
   const AuthActions = () => {
     const supabaseClient = useSupabaseClient()
     const router = useRouter()
-    const user = useUser()
+    //const user = useUser()
 
     if (user) {
       return (
@@ -180,7 +182,8 @@ const Header = () => {
             variant="text"
             onClick={async () => {
               await supabaseClient.auth.signOut()
-              router.push("/")
+              //.then(() => router.push("/login"))
+              router.push("/login")
             }}
           >
             Sign out
@@ -190,7 +193,9 @@ const Header = () => {
     }
     return (
       <>
-        <Link href="/login">Sign in</Link>
+        <Link href="/login" prefetch={false}>
+          Sign in
+        </Link>
       </>
     )
   }
@@ -222,7 +227,7 @@ const Header = () => {
   return (
     <div className="header">
       <nav>
-        <Link className="logo-link" href="/">
+        <Link className="logo-link" href="/" prefetch={false}>
           <Logo />
         </Link>
         {left}
