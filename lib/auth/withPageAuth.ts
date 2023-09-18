@@ -1,6 +1,7 @@
 import { ParsedUrlQuery } from "querystring"
 
 import { CookieOptions } from "@supabase/auth-helpers-shared"
+import { isError } from "lodash"
 import { GetServerSideProps, PreviewData } from "next"
 
 import { AppSession, getSession } from "lib/api/utils"
@@ -76,7 +77,12 @@ export default function withPageAuth<
           ...gsspRes.props,
         },
       }
-    } catch (e) {
+    } catch (error) {
+      // Don't catch other errors thrown by getServerSideProps
+      if (isError(error) && error.message !== "Unauthenticated") {
+        throw error
+      }
+
       if (requireAuth) {
         return {
           redirect: {
