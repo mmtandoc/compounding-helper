@@ -10,6 +10,7 @@ import { Button } from "components/ui"
 import { Form, FormGroup, Input } from "components/ui/forms"
 import { withPageAuth } from "lib/auth"
 import { formErrorMap } from "lib/formErrorMap"
+import { invalidateNextRouterCache } from "lib/invalidateNextRouterCache"
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -55,6 +56,7 @@ const LoginPage = () => {
       setError(response.error)
       return
     }
+    invalidateNextRouterCache()
   }
 
   return (
@@ -114,6 +116,8 @@ const LoginPage = () => {
 export const getServerSideProps = withPageAuth({
   getServerSideProps: async (_, session) => {
     if (session) {
+      console.log("Already logged in. Redirecting to home page.")
+      console.log({ session })
       return { redirect: { destination: "/", permanent: false } }
     }
 
