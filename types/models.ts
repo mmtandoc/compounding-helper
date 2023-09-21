@@ -218,3 +218,15 @@ export const userWithPharmacy = Prisma.validator<Prisma.UserDefaultArgs>()({
 })
 
 export type UserWithPharmacy = Prisma.UserGetPayload<typeof userWithPharmacy>
+
+export const pharmacyWithUsers = Prisma.validator<Prisma.PharmacyDefaultArgs>()(
+  {
+    include: {
+      users: true,
+    },
+  },
+)
+
+export type PharmacyWithUsers = Prisma.PharmacyGetPayload<
+  typeof pharmacyWithUsers
+>

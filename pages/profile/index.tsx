@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client"
 import type { NextPage } from "next"
+import Link from "next/link"
 
 import { FormGroup } from "components/ui/forms"
 import { withPageAuth } from "lib/auth"
@@ -22,7 +23,7 @@ const Profile: NextPage<Props> = ({ user }) => {
       </FormGroup>
       <FormGroup row>
         <span className="label">Pharmacy:</span>
-        {user.pharmacy.name}
+        <Link href="/pharmacy">{user.pharmacy.name}</Link>
       </FormGroup>
       <FormGroup row>
         <span className="label">Role:</span>
