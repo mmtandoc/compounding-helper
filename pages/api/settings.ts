@@ -67,7 +67,7 @@ async function handler(
 export default withSession(handler)
 
 export const getSettings = async (session: AppSession) =>
-  getUserPrismaClient(session.authSession.user).settings.findUnique({
+  getUserPrismaClient(session.appUser).settings.findUnique({
     where: { pharmacyId: session.appUser.pharmacyId },
   })
 
@@ -75,7 +75,7 @@ export const createSettings = async (
   session: AppSession,
   data: SetOptional<Prisma.SettingsCreateArgs["data"], "pharmacyId">,
 ) =>
-  getUserPrismaClient(session.authSession.user).settings.create({
+  getUserPrismaClient(session.appUser).settings.create({
     data: {
       pharmacyId: session.appUser.pharmacyId,
       ...settingsSchema.parse(data),
@@ -86,7 +86,7 @@ export const updateSettings = async (
   session: AppSession,
   data: Prisma.SettingsUpdateArgs["data"],
 ) =>
-  getUserPrismaClient(session.authSession.user).settings.update({
+  getUserPrismaClient(session.appUser).settings.update({
     where: {
       pharmacyId: session.appUser.pharmacyId,
     },

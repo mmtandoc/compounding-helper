@@ -35,7 +35,7 @@ export const getPharmacies = async (
   session: AppSession,
   where?: Prisma.PharmacyWhereInput,
 ) =>
-  await getUserPrismaClient(session.authSession.user).pharmacy.findMany({
+  await getUserPrismaClient(session.appUser).pharmacy.findMany({
     where,
     orderBy: { id: "asc" },
   })

@@ -93,12 +93,12 @@ export async function getChemicals(session: AppSession, nameQuery?: string) {
       : Prisma.empty
 
   const matchingIds = where
-    ? await getUserPrismaClient(session.authSession.user).$queryRaw<
+    ? await getUserPrismaClient(session.appUser).$queryRaw<
         Pick<Chemical, "id">[]
       >(Prisma.sql`SELECT id FROM public.chemicals ${where} ORDER BY id ASC;`)
     : undefined
 
-  return await getUserPrismaClient(session.authSession.user).chemical.findMany({
+  return await getUserPrismaClient(session.appUser).chemical.findMany({
     ...chemicalAll,
     where: where ? { id: { in: matchingIds?.map((v) => v.id) } } : undefined,
     orderBy: { id: "asc" },
@@ -109,7 +109,7 @@ export const createChemical = async (
   session: AppSession,
   values: ChemicalFields,
 ) =>
-  await getUserPrismaClient(session.authSession.user).chemical.create({
+  await getUserPrismaClient(session.appUser).chemical.create({
     data: {
       ...ChemicalMapper.toModel(values),
       additionalInfo: {

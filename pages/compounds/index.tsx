@@ -76,7 +76,7 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
 export const getServerSideProps = withPageAuth<Props>({
   getServerSideProps: async (_, session) => {
     const data: CompoundWithMfrCount[] =
-      (await getUserPrismaClient(session.authSession.user).compound.findMany(
+      (await getUserPrismaClient(session.appUser).compound.findMany(
         compoundWithMfrCount,
       )) ?? []
 

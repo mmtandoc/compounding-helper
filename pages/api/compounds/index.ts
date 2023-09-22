@@ -56,7 +56,7 @@ const handler = withSession<
 export default handler
 
 export const getCompounds = async (session: AppSession) =>
-  getUserPrismaClient(session.authSession.user).compound.findMany({
+  getUserPrismaClient(session.appUser).compound.findMany({
     orderBy: { id: "asc" },
     ...includeAllNested,
   })
@@ -65,7 +65,7 @@ export const createCompound = async (
   session: AppSession,
   fields: CompoundFields,
 ) =>
-  getUserPrismaClient(session.authSession.user).compound.create({
+  getUserPrismaClient(session.appUser).compound.create({
     ...includeAllNested,
     data: {
       ingredients: {

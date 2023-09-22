@@ -1,5 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client"
-import { User as AuthUser } from "@supabase/supabase-js"
+import { User as AppUser, Prisma, PrismaClient } from "@prisma/client"
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit.
@@ -94,7 +93,7 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? createExtendedPrisma()
 
-export function getUserPrismaClient(user: AuthUser) {
+export function getUserPrismaClient(user: AppUser) {
   const client = prisma.$extends(forUser(user.id))
   client.$transaction = prisma.$extends(forUserTx(user.id)).$transaction
   return client

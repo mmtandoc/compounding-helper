@@ -60,7 +60,7 @@ const handler = withSession<ApiBody<Link[] | undefined>>(async (req, res) => {
 export default handler
 
 export const getLinks = async (session: AppSession) =>
-  getUserPrismaClient(session.authSession.user).link.findMany({
+  getUserPrismaClient(session.appUser).link.findMany({
     orderBy: { order: "asc" },
   })
 
@@ -68,7 +68,7 @@ export const setLinks = async (
   session: AppSession,
   data: Prisma.LinkCreateManyInput[],
 ) => {
-  const client = getUserPrismaClient(session.authSession.user)
+  const client = getUserPrismaClient(session.appUser)
 
   //Prisma does not provide an upsertMany command
   //TODO: Improve SQL to use INSERT INTO ... ON CONFLICT to perform an upsertMany

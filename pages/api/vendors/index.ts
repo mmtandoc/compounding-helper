@@ -18,9 +18,7 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
       let vendors
 
       try {
-        vendors = await getUserPrismaClient(
-          session.authSession.user,
-        ).vendor.findMany({
+        vendors = await getUserPrismaClient(session.appUser).vendor.findMany({
           orderBy: { id: "asc" },
           include: {
             products: true,

@@ -102,7 +102,7 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
 export default handler
 
 export const createSds = async (session: AppSession, fields: SdsFields) => {
-  return await getUserPrismaClient(session.authSession.user).sDS.create({
+  return await getUserPrismaClient(session.appUser).sDS.create({
     data: {
       healthHazards: {
         createMany: {
@@ -125,7 +125,7 @@ export const getSafetyDataSheets = async (
   session: AppSession,
   args?: Omit<Prisma.SDSFindManyArgs, "select" | "include">,
 ) =>
-  getUserPrismaClient(session.authSession.user).sDS.findMany({
+  getUserPrismaClient(session.appUser).sDS.findMany({
     ...args,
     ...sdsWithRelations,
   })

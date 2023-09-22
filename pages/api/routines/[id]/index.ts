@@ -86,7 +86,7 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
 export default handler
 
 export const getRoutineById = async (session: AppSession, id: number) =>
-  await getUserPrismaClient(session.authSession.user).routine.findUnique({
+  await getUserPrismaClient(session.appUser).routine.findUnique({
     where: { id },
     ...routineWithHistory,
   })
@@ -96,13 +96,13 @@ export const updateRoutineById = async (
   id: number,
   values: RoutineFields,
 ) =>
-  await getUserPrismaClient(session.authSession.user).routine.update({
+  await getUserPrismaClient(session.appUser).routine.update({
     where: { id },
     data: RoutineMapper.toModel(values),
     ...routineWithHistory,
   })
 
 export const deleteRoutineById = async (session: AppSession, id: number) =>
-  await getUserPrismaClient(session.authSession.user).routine.delete({
+  await getUserPrismaClient(session.appUser).routine.delete({
     where: { id },
   })

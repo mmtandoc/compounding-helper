@@ -58,7 +58,7 @@ const handler = withSession<ApiBody<PharmacyWithUsers | undefined>>(
 export default handler
 
 export const getPharmacyById = async (session: AppSession, id: number) =>
-  getUserPrismaClient(session.authSession.user).pharmacy.findUnique({
+  getUserPrismaClient(session.appUser).pharmacy.findUnique({
     where: { id },
     ...pharmacyWithUsers,
   })

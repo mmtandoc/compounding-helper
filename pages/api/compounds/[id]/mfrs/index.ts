@@ -57,9 +57,7 @@ const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
       const mfrData = MfrMapper.toModel({ version: nextVersion, ...fields })
 
       try {
-        const result = await getUserPrismaClient(
-          session.authSession.user,
-        ).mfr.create({
+        const result = await getUserPrismaClient(session.appUser).mfr.create({
           ...includeAllNested,
           data: {
             ...mfrData,
@@ -99,7 +97,7 @@ export const getMfrs = async (
   const defaultArgs: Omit<Prisma.MfrFindManyArgs, "select" | "include"> = {
     orderBy: [{ riskAssessment: { compoundId: "asc" } }, { version: "asc" }],
   }
-  return await getUserPrismaClient(session.authSession.user).mfr.findMany({
+  return await getUserPrismaClient(session.appUser).mfr.findMany({
     ...defaultArgs,
     ...args,
     ...includeAllNested,
@@ -125,7 +123,7 @@ export const getLatestMfrVersion = async (
   compoundId: number,
 ) =>
   (
-    await getUserPrismaClient(session.authSession.user).mfr.aggregate({
+    await getUserPrismaClient(session.appUser).mfr.aggregate({
       where: { compoundId },
       _max: {
         version: true,

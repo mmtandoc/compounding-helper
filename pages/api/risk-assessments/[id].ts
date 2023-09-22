@@ -144,9 +144,7 @@ export const updateRiskAssessmentById = async (
   id: number,
   data: Prisma.RiskAssessmentUpdateArgs["data"],
 ) => {
-  return await getUserPrismaClient(
-    session.authSession.user,
-  ).riskAssessment.update({
+  return await getUserPrismaClient(session.appUser).riskAssessment.update({
     where: {
       id,
     },
@@ -161,9 +159,7 @@ export const getRiskAssessmentById = async (
   session: AppSession,
   id: number,
 ) => {
-  return await getUserPrismaClient(
-    session.authSession.user,
-  ).riskAssessment.findUnique({
+  return await getUserPrismaClient(session.appUser).riskAssessment.findUnique({
     where: {
       id,
     },
@@ -177,6 +173,6 @@ export const deleteRiskAssessmentById = async (
   session: AppSession,
   id: number,
 ) =>
-  getUserPrismaClient(session.authSession.user).riskAssessment.delete({
+  getUserPrismaClient(session.appUser).riskAssessment.delete({
     where: { id },
   })

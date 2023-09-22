@@ -10,7 +10,7 @@ import { AppSession } from "./utils"
  * @returns The User with the specified ID
  */
 export const getUserById = async (session: AppSession, userId: string) =>
-  await getUserPrismaClient(session.authSession.user).user.findUniqueOrThrow({
+  await getUserPrismaClient(session.appUser).user.findUniqueOrThrow({
     where: { id: userId },
     ...userWithPharmacy,
   })

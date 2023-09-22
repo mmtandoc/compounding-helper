@@ -102,14 +102,14 @@ const handler = withSession<ApiBody<SdsWithRelations | undefined>>(
 export default handler
 
 export const getSdsById = async (session: AppSession, id: number) => {
-  return await getUserPrismaClient(session.authSession.user).sDS.findUnique({
+  return await getUserPrismaClient(session.appUser).sDS.findUnique({
     where: { id },
     ...sdsWithRelations,
   })
 }
 
 export const deleteSdsById = async (session: AppSession, id: number) => {
-  const prismaClient = getUserPrismaClient(session.authSession.user)
+  const prismaClient = getUserPrismaClient(session.appUser)
 
   await prismaClient.$transaction([
     prismaClient.hazardCategoryToSDS.deleteMany({ where: { sdsId: id } }),
@@ -156,7 +156,5 @@ export const updateSdsById = async (
 
   console.dir(updateArgs, { depth: null })
 
-  return await getUserPrismaClient(session.authSession.user).sDS.update(
-    updateArgs,
-  )
+  return await getUserPrismaClient(session.appUser).sDS.update(updateArgs)
 }

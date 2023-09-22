@@ -101,7 +101,7 @@ const handler = withSession<ApiBody<ProductAll | undefined>>(
 export default handler
 
 export const getProductById = async (session: AppSession, id: number) =>
-  getUserPrismaClient(session.authSession.user).product.findUnique({
+  getUserPrismaClient(session.appUser).product.findUnique({
     where: { id },
     ...productAll,
   })
@@ -111,13 +111,13 @@ export const updateProductById = async (
   id: number,
   values: ProductFields,
 ) =>
-  getUserPrismaClient(session.authSession.user).product.update({
+  getUserPrismaClient(session.appUser).product.update({
     where: { id },
     data: ProductMapper.toModel(values),
     ...productAll,
   })
 
 export const deleteProductById = async (session: AppSession, id: number) =>
-  getUserPrismaClient(session.authSession.user).product.delete({
+  getUserPrismaClient(session.appUser).product.delete({
     where: { id },
   })

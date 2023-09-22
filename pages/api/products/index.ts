@@ -84,7 +84,7 @@ export const getProducts = async (
   session: AppSession,
   where?: Prisma.ProductWhereInput,
 ) =>
-  await getUserPrismaClient(session.authSession.user).product.findMany({
+  await getUserPrismaClient(session.appUser).product.findMany({
     where,
     orderBy: { id: "asc" },
     ...productAll,
@@ -94,7 +94,7 @@ export const createProduct = async (
   session: AppSession,
   values: ProductFields,
 ) =>
-  await getUserPrismaClient(session.authSession.user).product.create({
+  await getUserPrismaClient(session.appUser).product.create({
     data: ProductMapper.toModel(values),
     ...productAll,
   })

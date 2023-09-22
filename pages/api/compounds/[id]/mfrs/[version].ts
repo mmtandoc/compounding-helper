@@ -99,7 +99,7 @@ export const getMfr = async (
   compoundId: number,
   version: number,
 ) =>
-  await getUserPrismaClient(session.authSession.user).mfr.findUnique({
+  await getUserPrismaClient(session.appUser).mfr.findUnique({
     where: { compoundId_version: { compoundId, version } },
     ...mfrAll,
   })
@@ -110,7 +110,7 @@ export const updateMfr = async (
   version: number,
   values: MfrFields,
 ) =>
-  await getUserPrismaClient(session.authSession.user).mfr.update({
+  await getUserPrismaClient(session.appUser).mfr.update({
     where: { compoundId_version: { compoundId, version } },
     data: MfrMapper.toModel({ version, ...values }),
     ...mfrAll,
@@ -121,6 +121,6 @@ export const deleteMfr = async (
   compoundId: number,
   version: number,
 ) =>
-  await getUserPrismaClient(session.authSession.user).mfr.delete({
+  await getUserPrismaClient(session.appUser).mfr.delete({
     where: { compoundId_version: { compoundId, version } },
   })

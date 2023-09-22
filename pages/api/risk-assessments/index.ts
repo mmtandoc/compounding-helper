@@ -91,7 +91,7 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
             ).id
           }
           const result = await getUserPrismaClient(
-            session.authSession.user,
+            session.appUser,
           ).riskAssessment.create({
             ...includeAllNested,
             data: {
@@ -132,9 +132,7 @@ export const getRiskAssessments = async (
   > = {
     orderBy: { id: "asc" },
   }
-  return await getUserPrismaClient(
-    session.authSession.user,
-  ).riskAssessment.findMany({
+  return await getUserPrismaClient(session.appUser).riskAssessment.findMany({
     ...defaultArgs,
     ...args,
     ...includeAllNested,

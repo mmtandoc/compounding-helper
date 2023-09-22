@@ -118,7 +118,7 @@ export const updateCompoundById = async (
   id: number,
   data: Prisma.CompoundUpdateArgs["data"],
 ) => {
-  return await getUserPrismaClient(session.authSession.user).compound.update({
+  return await getUserPrismaClient(session.appUser).compound.update({
     where: {
       id,
     },
@@ -154,9 +154,7 @@ export const updateCompoundById = async (
 }
 
 export const getCompoundById = async (session: AppSession, id: number) => {
-  return await getUserPrismaClient(
-    session.authSession.user,
-  ).compound.findUnique({
+  return await getUserPrismaClient(session.appUser).compound.findUnique({
     where: {
       id,
     },
@@ -191,7 +189,7 @@ export const getCompoundById = async (session: AppSession, id: number) => {
 }
 
 export const deleteCompoundById = async (session: AppSession, id: number) => {
-  const client = getUserPrismaClient(session.authSession.user)
+  const client = getUserPrismaClient(session.appUser)
 
   return await client.$transaction([
     client.ingredient.deleteMany({ where: { compoundId: id } }),

@@ -85,7 +85,7 @@ export const getRoutines = async (
     orderBy: { id: "asc" },
   }
 
-  return await getUserPrismaClient(session.authSession.user).routine.findMany({
+  return await getUserPrismaClient(session.appUser).routine.findMany({
     ...defaultArgs,
     ...args,
     ...routineWithHistory,
@@ -96,7 +96,7 @@ export const createRoutine = async (
   session: AppSession,
   values: RoutineFields,
 ) =>
-  await getUserPrismaClient(session.authSession.user).routine.create({
+  await getUserPrismaClient(session.appUser).routine.create({
     data: RoutineMapper.toModel(values),
     ...routineWithHistory,
   })

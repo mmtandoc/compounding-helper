@@ -71,6 +71,6 @@ export const createRoutineCompletion = async (
   session: AppSession,
   data: Prisma.RoutineCompletionUncheckedCreateInput,
 ) =>
-  getUserPrismaClient(session.authSession.user).routineCompletion.create({
+  getUserPrismaClient(session.appUser).routineCompletion.create({
     data,
   })
