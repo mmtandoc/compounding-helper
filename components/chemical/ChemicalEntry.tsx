@@ -47,7 +47,7 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
 
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
 
-  const pharmacyId = watch("pharmacyId")
+  const pharmacyId = watch("pharmacyId", user?.pharmacyId)
 
   const isCentralUser = useMemo(
     () => isCentralPharmacy(user?.pharmacyId ?? NaN),
