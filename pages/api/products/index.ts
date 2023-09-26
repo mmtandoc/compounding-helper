@@ -1,8 +1,10 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import * as z from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -41,6 +43,9 @@ const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
         products = await getProducts(session, filters)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -60,6 +65,9 @@ const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
         result = await createProduct(session, fields)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

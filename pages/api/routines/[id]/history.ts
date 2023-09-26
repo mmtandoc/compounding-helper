@@ -1,8 +1,10 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import { z } from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -51,6 +53,9 @@ const handler = withSession<ApiBody<undefined>>(async (req, res) => {
         await createRoutineCompletion(session, { routineId, ...data })
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

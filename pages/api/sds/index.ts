@@ -1,6 +1,12 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { SdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
 import { getUserPrismaClient } from "lib/prisma"
@@ -63,6 +69,9 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
           safetyDatasheets = await getSafetyDataSheets(session, findManyArgs)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -83,6 +92,9 @@ const handler = withSession<ApiBody<SdsWithRelations[] | SdsWithRelations>>(
           result = await createSds(session, fields)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 

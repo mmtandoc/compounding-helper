@@ -1,7 +1,13 @@
+import { ForbiddenError } from "@casl/ability"
 import { Chemical, Prisma } from "@prisma/client"
 import * as z from "zod"
 
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { ChemicalFields, chemicalSchema } from "lib/fields"
 import AdditionalChemicalInfoMapper from "lib/mappers/AdditionalChemicalInfoMapper"
 import ChemicalMapper from "lib/mappers/ChemicalMapper"
@@ -39,6 +45,9 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
           chemicals = await getChemicals(session, query)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -50,6 +59,9 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
           data = chemicalSchema.parse(req.body)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 400, "Body is invalid.")
         }
 
@@ -58,6 +70,9 @@ const handler = withSession<ApiBody<Chemical[] | Chemical>>(
           chemical = await createChemical(session, data)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 

@@ -1,7 +1,13 @@
+import { ForbiddenError } from "@casl/ability"
 import { Link, Prisma } from "@prisma/client"
 import { SetRequired, Simplify } from "type-fest"
 
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { linkDirectorySchema } from "lib/fields"
 import { getUserPrismaClient } from "lib/prisma"
 import { isCentralPharmacy } from "lib/utils"
@@ -19,6 +25,9 @@ const handler = withSession<ApiBody<Link[] | undefined>>(async (req, res) => {
         links = await getLinks(session)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -43,6 +52,9 @@ const handler = withSession<ApiBody<Link[] | undefined>>(async (req, res) => {
         )
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

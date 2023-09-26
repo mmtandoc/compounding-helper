@@ -1,3 +1,4 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma, Settings } from "@prisma/client"
 import { NextApiResponse } from "next"
 import { SetOptional } from "type-fest"
@@ -5,6 +6,7 @@ import { SetOptional } from "type-fest"
 import {
   AppSession,
   NextApiRequestWithSession,
+  sendForbiddenError,
   sendJsonError,
   withSession,
 } from "lib/api/utils"
@@ -28,6 +30,9 @@ async function handler(
         settings = await getSettings(session)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -50,6 +55,9 @@ async function handler(
             : await createSettings(session, data)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

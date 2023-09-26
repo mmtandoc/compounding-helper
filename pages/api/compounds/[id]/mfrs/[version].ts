@@ -1,7 +1,9 @@
+import { ForbiddenError } from "@casl/ability"
 import { z } from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -35,6 +37,9 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
         mfr = await getMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -68,6 +73,9 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
         updatedMfr = await updateMfr(session, compoundId, version, data)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -78,6 +86,9 @@ const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
         await deleteMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

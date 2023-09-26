@@ -1,7 +1,9 @@
+import { ForbiddenError } from "@casl/ability"
 import { z } from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -35,6 +37,9 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
           routine = await getRoutineById(session, id)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -58,6 +63,9 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
           updatedRoutine = await updateRoutineById(session, id, data)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -68,6 +76,9 @@ const handler = withSession<ApiBody<RoutineWithHistory | undefined>>(
           await deleteRoutineById(session, id)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 

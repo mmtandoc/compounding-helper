@@ -1,6 +1,12 @@
+import { ForbiddenError } from "@casl/ability"
 import { Pharmacy, Prisma } from "@prisma/client"
 
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { getUserPrismaClient } from "lib/prisma"
 
 const handler = withSession<Pharmacy[]>(async (req, res) => {
@@ -14,6 +20,9 @@ const handler = withSession<Pharmacy[]>(async (req, res) => {
         pharmacies = await getPharmacies(session)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

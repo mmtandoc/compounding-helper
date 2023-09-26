@@ -1,3 +1,4 @@
+import { AnyAbility, ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"
 import { AuthSession } from "@supabase/supabase-js"
@@ -88,6 +89,14 @@ export const sendZodError = (
     validationError.message,
     validationError.details,
   )
+}
+
+export const sendForbiddenError = <T extends AnyAbility>(
+  res: NextApiResponse,
+  error: ForbiddenError<T>,
+  message?: string,
+) => {
+  sendJsonError(res, 403, `Forbidden: ${message ?? error.message}`)
 }
 
 export type AppSession = {

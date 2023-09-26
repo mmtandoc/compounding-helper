@@ -1,7 +1,13 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import _ from "lodash"
 
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { riskAssessmentSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -54,6 +60,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
           riskAssessments = await getRiskAssessments(session, findManyArgs)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -105,6 +114,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
             .json(result)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           sendJsonError(res, 500, "Encountered error with database.")
         }
 

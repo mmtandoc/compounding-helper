@@ -1,7 +1,9 @@
+import { ForbiddenError } from "@casl/ability"
 import { NextApiResponse } from "next"
 
 import {
   NextApiRequestWithSession,
+  sendForbiddenError,
   sendJsonError,
   withSession,
 } from "lib/api/utils"
@@ -26,6 +28,9 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
         })
       } catch (error) {
         console.log(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

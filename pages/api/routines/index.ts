@@ -1,8 +1,10 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 
 import {
   AppSession,
   parseSortQuery,
+  sendForbiddenError,
   sendJsonError,
   withSession,
 } from "lib/api/utils"
@@ -37,6 +39,9 @@ const handler = withSession<ApiBody<RoutineWithHistory[] | RoutineWithHistory>>(
           routines = await getRoutines(session, { orderBy })
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -56,6 +61,9 @@ const handler = withSession<ApiBody<RoutineWithHistory[] | RoutineWithHistory>>(
           result = await createRoutine(session, fields)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 

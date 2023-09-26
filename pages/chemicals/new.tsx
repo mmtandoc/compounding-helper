@@ -2,6 +2,7 @@ import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
 import { withPageAuth } from "lib/auth"
 import { NullableChemicalFields, chemicalSchema } from "lib/fields"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { NextPageWithLayout } from "types/common"
 
 const defaultValues: NullableChemicalFields = {
@@ -15,11 +16,15 @@ const defaultValues: NullableChemicalFields = {
 }
 
 const NewChemical: NextPageWithLayout = () => {
+  const { user, error: userError } = useCurrentUser()
+
+  if (userError) console.error(userError)
+
   return (
     <CreateForm
       schema={chemicalSchema}
       dataName="chemical"
-      defaultValues={defaultValues}
+      defaultValues={{ ...defaultValues, pharmacyId: user?.pharmacyId }}
       apiEndpointPath="/api/chemicals"
       entryComponent={ChemicalEntry}
     />

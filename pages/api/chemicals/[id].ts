@@ -1,8 +1,10 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import * as z from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -37,6 +39,9 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
           chemical = await getChemicalById(session, id)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -60,6 +65,9 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
           updatedChemical = await updateChemicalById(session, id, data)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -70,6 +78,11 @@ const handler = withSession<ApiBody<ChemicalAll | undefined>>(
           await deleteChemicalById(session, id)
         } catch (error) {
           console.error(error)
+
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
+
           // Unable to delete due to existing reference
           if (
             error instanceof Prisma.PrismaClientKnownRequestError &&

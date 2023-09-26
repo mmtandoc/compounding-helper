@@ -1,9 +1,11 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import _ from "lodash"
 import { z } from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -38,6 +40,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
           riskAssessment = await getRiskAssessmentById(session, id)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -53,6 +58,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
           fields = riskAssessmentSchema.parse(body)
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 400, "Body is invalid.")
         }
 
@@ -94,6 +102,9 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
           })
         } catch (error) {
           console.error(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 
@@ -110,6 +121,11 @@ const handler = withSession<ApiBody<RiskAssessmentAll> | string>(
           await deleteCompoundById(session, compoundId)
         } catch (error) {
           console.error(error)
+
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
+
           // Unable to delete due to existing reference
           if (
             error instanceof Prisma.PrismaClientKnownRequestError &&

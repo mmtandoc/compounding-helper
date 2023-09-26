@@ -1,4 +1,11 @@
-import { AppSession, sendJsonError, withSession } from "lib/api/utils"
+import { ForbiddenError } from "@casl/ability"
+
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { CompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
@@ -23,6 +30,9 @@ const handler = withSession<
         compounds = await getCompounds(session)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -36,8 +46,18 @@ const handler = withSession<
         console.error(error)
         return sendJsonError(res, 400, "Body is invalid.")
       }
+      let result
 
-      const result = await createCompound(session, fields)
+      try {
+        result = await createCompound(session, fields)
+      } catch (error) {
+        console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
+        return sendJsonError(res, 500, "Encountered error with database.")
+      }
+
       res
         .setHeader("Location", `/compounds/${result.id}`)
         .status(201)

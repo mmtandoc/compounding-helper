@@ -1,7 +1,9 @@
+import { ForbiddenError } from "@casl/ability"
 import * as z from "zod"
 
 import {
   AppSession,
+  sendForbiddenError,
   sendJsonError,
   sendZodError,
   withSession,
@@ -33,6 +35,9 @@ const handler = withSession<ApiBody<PharmacyWithUsers | undefined>>(
           pharmacy = await getPharmacyById(session, id)
         } catch (error) {
           console.log(error)
+          if (error instanceof ForbiddenError) {
+            return sendForbiddenError(res, error)
+          }
           return sendJsonError(res, 500, "Encountered error with database.")
         }
 

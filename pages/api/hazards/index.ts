@@ -1,6 +1,7 @@
+import { ForbiddenError } from "@casl/ability"
 import { NextApiRequest, NextApiResponse } from "next"
 
-import { sendJsonError } from "lib/api/utils"
+import { sendForbiddenError, sendJsonError } from "lib/api/utils"
 import { prisma } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { HazardClassesWithCategories } from "types/models"
@@ -18,6 +19,9 @@ export default async function handler(
         hazards = await getHazards()
       } catch (error) {
         console.log(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 

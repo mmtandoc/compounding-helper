@@ -2,7 +2,7 @@ import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 import { SessionContextProvider } from "@supabase/auth-helpers-react"
 import axios from "axios"
 import { SnackbarProvider, closeSnackbar } from "notistack"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
 import { SWRConfig, mutate } from "swr"
@@ -11,6 +11,11 @@ import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
 import { AppSession } from "lib/api/utils"
+import {
+  defineAbilityForUser,
+  unauthAbility,
+} from "lib/auth/ability/appAbilities"
+import { AbilityContext } from "lib/contexts/AbilityContext"
 import { AppPropsWithLayout } from "types/common"
 
 import "styles/main.scss"
@@ -101,6 +106,14 @@ function MyApp({
   // Otherwise, signing out while on a page that gives an "initialSession" page prop causes header to not update
   const [isSignedIn, setIsSignedIn] = useState(false)
 
+  const ability = useMemo(
+    () =>
+      isSignedIn && pageProps.initialAppSession
+        ? defineAbilityForUser(pageProps.initialAppSession?.appUser)
+        : unauthAbility,
+    [isSignedIn, pageProps.initialAppSession],
+  )
+
   //TODO: Improve current user profile handling
   useEffect(() => {
     supabaseClient.auth.onAuthStateChange((e) => {
@@ -110,10 +123,12 @@ function MyApp({
         case "USER_UPDATED":
           mutate("/api/users/current")
           setIsSignedIn(true)
+          //?: Is ability.update() needed here?
           break
         case "SIGNED_OUT":
           mutate("/api/users/current", null)
           setIsSignedIn(false)
+          //?: Is ability.update() needed here?
           break
       }
     })
@@ -124,45 +139,47 @@ function MyApp({
 
   return (
     <>
-      <SessionContextProvider
-        supabaseClient={supabaseClient}
-        initialSession={
-          isSignedIn ? pageProps.initialAppSession?.authSession : null
-        }
-      >
-        <IconContext.Provider
-          value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
+      <AbilityContext.Provider value={ability}>
+        <SessionContextProvider
+          supabaseClient={supabaseClient}
+          initialSession={
+            isSignedIn ? pageProps.initialAppSession?.authSession : null
+          }
         >
-          <SWRConfig
-            value={{
-              fetcher: multiFetcher,
-              fallback: {
-                "/api/users/current": pageProps.initialAppSession?.appUser,
-              },
-            }}
+          <IconContext.Provider
+            value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
           >
-            <SnackbarProvider
-              Components={{
-                success: Alert,
-                info: Alert,
-                error: Alert,
-                default: Alert,
-                warning: Alert,
+            <SWRConfig
+              value={{
+                fetcher: multiFetcher,
+                fallback: {
+                  "/api/users/current": pageProps.initialAppSession?.appUser,
+                },
               }}
-              autoHideDuration={5000}
-              action={(snackbarId) => (
-                <IconButton
-                  onClick={() => closeSnackbar(snackbarId)}
-                  icon={MdClose}
-                  variant="text"
-                />
-              )}
             >
-              {layout}
-            </SnackbarProvider>
-          </SWRConfig>
-        </IconContext.Provider>
-      </SessionContextProvider>
+              <SnackbarProvider
+                Components={{
+                  success: Alert,
+                  info: Alert,
+                  error: Alert,
+                  default: Alert,
+                  warning: Alert,
+                }}
+                autoHideDuration={5000}
+                action={(snackbarId) => (
+                  <IconButton
+                    onClick={() => closeSnackbar(snackbarId)}
+                    icon={MdClose}
+                    variant="text"
+                  />
+                )}
+              >
+                {layout}
+              </SnackbarProvider>
+            </SWRConfig>
+          </IconContext.Provider>
+        </SessionContextProvider>
+      </AbilityContext.Provider>
       <style jsx global>{`
         #__next {
           display: flex;
