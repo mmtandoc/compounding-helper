@@ -10,6 +10,7 @@ import MfrDetails from "components/compound/mfr/MfrDetails"
 import MfrTable from "components/compound/mfr/MfrTable"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { getMfrsByCompoundId } from "pages/api/compounds/[id]/mfrs"
 import { NextPageWithLayout } from "types/common"
@@ -32,11 +33,14 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
     [],
   )
 
+  // TODO: Check if user can create MFR for this specific compound
   const actionBar = (
     <TableActionBar>
-      <Link href={`/compounds/${compoundId}/mfrs/new`}>
-        <Button>New MFR</Button>
-      </Link>
+      <Can do="create" on="Mfr">
+        <Link href={`/compounds/${compoundId}/mfrs/new`}>
+          <Button>New MFR</Button>
+        </Link>
+      </Can>
       <Link href={`/compounds/${compoundId}`}>
         <Button>Return to compound</Button>
       </Link>

@@ -1,12 +1,18 @@
 import Link from "next/link"
 
 import { withPageAuth } from "lib/auth"
+import { AppAbility } from "lib/auth/ability/appAbilities"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { NextPageWithLayout } from "types/common"
 
 type HomeGridItem = {
   id: string
   header?: string
-  links: { label: string; url: string }[]
+  links: {
+    label: string
+    url: string
+    hasPermission?: (ability: AppAbility) => boolean
+  }[]
 }
 
 const mainGridItems: HomeGridItem[] = [
@@ -23,6 +29,7 @@ const mainGridItems: HomeGridItem[] = [
       {
         label: "Create new",
         url: "/risk-assessments/new",
+        hasPermission: (ability) => ability.can("create", "RiskAssessment"),
       },
     ],
   },
@@ -34,7 +41,11 @@ const dataGridItems: HomeGridItem[] = [
     header: "SDS summaries",
     links: [
       { label: "View all", url: "/sds" },
-      { label: "Create new", url: "/sds/new" },
+      {
+        label: "Create new",
+        url: "/sds/new",
+        hasPermission: (ability) => ability.can("create", "SDS"),
+      },
     ],
   },
   {
@@ -42,7 +53,11 @@ const dataGridItems: HomeGridItem[] = [
     header: "Products",
     links: [
       { label: "View all", url: "/products" },
-      { label: "Create new", url: "/products/new" },
+      {
+        label: "Create new",
+        url: "/products/new",
+        hasPermission: (ability) => ability.can("create", "Product"),
+      },
     ],
   },
   {
@@ -50,7 +65,11 @@ const dataGridItems: HomeGridItem[] = [
     header: "Chemicals",
     links: [
       { label: "View all", url: "/chemicals" },
-      { label: "Create new", url: "/chemicals/new" },
+      {
+        label: "Create new",
+        url: "/chemicals/new",
+        hasPermission: (ability) => ability.can("create", "Chemical"),
+      },
     ],
   },
 ]
@@ -62,83 +81,93 @@ const miscGridItems: HomeGridItem[] = [
       { label: "Health hazards table", url: "/hazards" },
       { label: "Link directory", url: "/links" },
       { label: "Routines", url: "/routines" },
-      { label: "Settings", url: "/settings" },
+      {
+        label: "Settings",
+        url: "/settings",
+        hasPermission: (ability) => ability.can("update", "Settings"),
+      },
     ],
   },
 ]
 
-const HomeCell = ({ item }: { item: HomeGridItem }) => (
-  <div className={`home-cell ${item.id}`}>
-    {item.header && <div className="header">{item.header}</div>}
-    <div className="links">
-      {item.links.map((link, i) => (
-        <Link href={link.url} key={i}>
-          {link.label}
-        </Link>
-      ))}
-    </div>
-    <style jsx global>{`
-      .home-cell {
-        flex: 1;
-        border: var(--border-default);
-        display: flex;
-        flex-direction: column;
-        > .header {
-          margin-block: 0;
-          font-size: var(--font-size-lg);
-          font-weight: 600;
-          background: var(--color-canvas-subtle);
-          border-bottom: var(--border-default);
-          text-align: center;
-          padding: 0.3rem 3rem;
-          white-space: nowrap;
-        }
+const HomeCell = ({ item }: { item: HomeGridItem }) => {
+  const ability = useAbility()
 
-        > .links {
-          display: flex;
-          height: 100%;
-          > * {
-            flex: 1;
-            font-size: var(--font-size-base);
-            text-align: center;
-            padding: 0.3rem 0.6rem;
-          }
-
-          > :not(:last-child) {
-            border-right: var(--border-default);
-          }
-        }
-      }
-
-      @media (min-width: 850px) {
+  return (
+    <div className={`home-cell ${item.id}`}>
+      {item.header && <div className="header">{item.header}</div>}
+      <div className="links">
+        {item.links.map((link, i) =>
+          link.hasPermission?.(ability) ?? true ? (
+            <Link href={link.url} key={i}>
+              {link.label}
+            </Link>
+          ) : null,
+        )}
+      </div>
+      <style jsx global>{`
         .home-cell {
+          flex: 1;
+          border: var(--border-default);
+          display: flex;
+          flex-direction: column;
           > .header {
+            margin-block: 0;
             font-size: var(--font-size-lg);
+            font-weight: 600;
+            background: var(--color-canvas-subtle);
+            border-bottom: var(--border-default);
+            text-align: center;
+            padding: 0.3rem 3rem;
             white-space: nowrap;
           }
 
-          > .links > * {
-            font-size: var(--font-size-base);
-            padding: 1.5rem 1rem;
+          > .links {
+            display: flex;
+            height: 100%;
+            > * {
+              flex: 1;
+              font-size: var(--font-size-base);
+              text-align: center;
+              padding: 0.3rem 0.6rem;
+            }
+
+            > :not(:last-child) {
+              border-right: var(--border-default);
+            }
           }
         }
-      }
 
-      @media (min-width: 1000px) {
-        .home-cell {
-          > .header {
-            font-size: var(--font-size-xl);
-          }
+        @media (min-width: 850px) {
+          .home-cell {
+            > .header {
+              font-size: var(--font-size-lg);
+              white-space: nowrap;
+            }
 
-          > .links > * {
-            font-size: var(--font-size-lg);
-            padding: 1.5rem 1rem;
+            > .links > * {
+              font-size: var(--font-size-base);
+              padding: 1.5rem 1rem;
+            }
           }
         }
-      }
-    `}</style>
-  </div>
-)
+
+        @media (min-width: 1000px) {
+          .home-cell {
+            > .header {
+              font-size: var(--font-size-xl);
+            }
+
+            > .links > * {
+              font-size: var(--font-size-lg);
+              padding: 1.5rem 1rem;
+            }
+          }
+        }
+      `}</style>
+    </div>
+  )
+}
 
 const HomeSection = (props: { className?: string; items: HomeGridItem[] }) => (
   <div className={`home-grid ${props.className ?? ""}`}>

@@ -9,6 +9,7 @@ import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDeta
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { toIsoDateString } from "lib/utils"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import { NextPageWithLayout } from "types/common"
@@ -30,9 +31,11 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/risk-assessments/new">
-        <Button>New Risk Assessment</Button>
-      </Link>
+      <Can do="create" on="RiskAssessment">
+        <Link href="/risk-assessments/new">
+          <Button>New Risk Assessment</Button>
+        </Link>
+      </Can>
       <BatchTableActions visible={selectedRows.length > 0}>
         <BatchPrintButton documents={selectedRows.map(renderDocument)}>
           Print selected rows

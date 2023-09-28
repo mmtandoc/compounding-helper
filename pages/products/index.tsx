@@ -4,6 +4,7 @@ import TableActionBar from "components/common/TableActionBar"
 import ProductTable from "components/product/ProductTable"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getProducts } from "pages/api/products"
 import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"
@@ -17,9 +18,11 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/products/new">
-        <Button>New Product</Button>
-      </Link>
+      <Can do="create" on="Product">
+        <Link href="/products/new">
+          <Button>New Product</Button>
+        </Link>
+      </Can>
     </TableActionBar>
   )
 

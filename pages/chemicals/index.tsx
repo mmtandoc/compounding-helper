@@ -5,6 +5,7 @@ import ChemicalTable from "components/chemical/ChemicalTable"
 import TableActionBar from "components/common/TableActionBar"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 
@@ -19,9 +20,11 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/chemicals/new">
-        <Button>New Chemical</Button>
-      </Link>
+      <Can do="create" on="Chemical">
+        <Link href="/chemicals/new">
+          <Button>New Chemical</Button>
+        </Link>
+      </Can>
     </TableActionBar>
   )
 

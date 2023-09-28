@@ -10,6 +10,7 @@ import RoutineDetails from "components/routine/RoutineDetails"
 import RoutineTable from "components/routine/RoutineTable"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { RoutineEntity } from "lib/entities"
 import { getRoutines } from "pages/api/routines"
 import { NextPageWithLayout } from "types/common"
@@ -47,9 +48,11 @@ const Routines: NextPageWithLayout<Props> = (props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/routines/new">
-        <Button>New Routine</Button>
-      </Link>
+      <Can do="create" on="Routine">
+        <Link href="/routines/new">
+          <Button>New Routine</Button>
+        </Link>
+      </Can>
       <BatchTableActions visible={selectedRows.length > 0}>
         <BatchPrintButton documents={selectedRows.map(renderDocument)}>
           Print selected routines

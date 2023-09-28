@@ -10,6 +10,7 @@ import CompoundsTable from "components/compound/CompoundsTable"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import { Button } from "components/ui"
 import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getUserPrismaClient } from "lib/prisma"
 import { NextPageWithLayout } from "types/common"
 import {
@@ -36,9 +37,11 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/risk-assessments/new">
-        <Button>New Compound</Button>
-      </Link>
+      <Can do="create" on="RiskAssessment">
+        <Link href="/risk-assessments/new">
+          <Button>New Compound</Button>
+        </Link>
+      </Can>
       <label>
         <input
           type="checkbox"
