@@ -105,6 +105,9 @@ export const createRoutine = async (
   values: RoutineFields,
 ) =>
   await getUserPrismaClient(session.appUser).routine.create({
-    data: RoutineMapper.toModel(values),
+    data: {
+      pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+      ...RoutineMapper.toModel(values),
+    },
     ...routineWithHistory,
   })

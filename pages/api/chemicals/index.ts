@@ -126,6 +126,7 @@ export const createChemical = async (
 ) =>
   await getUserPrismaClient(session.appUser).chemical.create({
     data: {
+      pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
       ...ChemicalMapper.toModel(values),
       additionalInfo: {
         createMany: {

@@ -127,6 +127,7 @@ export const createSds = async (session: AppSession, fields: SdsFields) => {
             })),
         },
       },
+      pharmacyId: session.appUser.pharmacyId,
       ...SdsMapper.toModel(fields),
     },
     ...sdsWithRelations,

@@ -103,6 +103,9 @@ export const createProduct = async (
   values: ProductFields,
 ) =>
   await getUserPrismaClient(session.appUser).product.create({
-    data: ProductMapper.toModel(values),
+    data: {
+      pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+      ...ProductMapper.toModel(values),
+    },
     ...productAll,
   })

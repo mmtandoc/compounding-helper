@@ -59,7 +59,10 @@ const handler = withSession<ApiBody<MfrAll[] | MfrAll>>(async (req, res) => {
 
       const nextVersion = latestVersion ? latestVersion + 1 : 0
 
-      const mfrData = MfrMapper.toModel({ version: nextVersion, ...fields })
+      const mfrData = {
+        pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+        ...MfrMapper.toModel({ version: nextVersion, ...fields }),
+      }
 
       try {
         const result = await getUserPrismaClient(session.appUser).mfr.create({

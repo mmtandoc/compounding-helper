@@ -77,7 +77,10 @@ const handler = withSession<ApiBody<RiskAssessmentAll[] | RiskAssessmentAll>>(
           return sendJsonError(res, 400, "Body is invalid.")
         }
 
-        const riskAssessmentData = RiskAssessmentMapper.toModel(fields)
+        const riskAssessmentData = {
+          pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+          ...RiskAssessmentMapper.toModel(fields),
+        }
 
         const compound = CompoundMapper.toModel(fields.compound)
         const ingredients = fields.compound.ingredients.map(
