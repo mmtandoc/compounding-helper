@@ -205,7 +205,7 @@ const Header = () => {
   const AuthActions = () => {
     const supabaseClient = useSupabaseClient()
     const router = useRouter()
-    const user = useUser()
+    //const user = useUser()
 
     if (user) {
       return (
