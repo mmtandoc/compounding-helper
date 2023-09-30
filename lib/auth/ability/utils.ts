@@ -1,5 +1,6 @@
 import { ForbiddenError, subject } from "@casl/ability"
 import { Prisma, PrismaClient } from "@prisma/client"
+import _ from "lodash"
 
 import { uncapitalize } from "lib/utils"
 
@@ -157,12 +158,31 @@ export const relationAbilityChecker = async (
           throw new Error("Operation not found")
         }
 
+        const parentData = args.data
+
+        const relationData = operationValue?.data
+          ? !Array.isArray(operationValue.data)
+            ? [operationValue.data]
+            : operationValue.data
+          : !Array.isArray(operationValue)
+          ? [operationValue]
+          : operationValue
+
+        // In order for ability rules with conditions depending on related records to work when using a nested "create"/"createMany",
+        // we need to attempt to populate the relation fields with the parent's data
+        // ? Look into a better way to handle this.
+        const createDataWithRelations = relationData.map((data: any) =>
+          populateDataRelations(field, parentData, mainModel, data),
+        )
+
         // Check if operation is allowed
         const allowed = await operationChecker(
           field.type as Prisma.ModelName,
           ability,
           prisma,
-          operationValue,
+          ["create", "createMany"].includes(operationType)
+            ? createDataWithRelations
+            : operationValue,
           shouldThrow,
         )
 
@@ -189,11 +209,14 @@ export const relationAbilityChecker = async (
 
           // Loop over nested args
           for (const nestedArgs of operationValues) {
+            const nestedCreateData =
+              nestedArgs.create ?? nestedArgs.data ?? nestedArgs
+
             const nestedCreateAllowed = await relationAbilityChecker(
               field.type as Prisma.ModelName,
               ability,
               prisma,
-              nestedArgs.create ?? nestedArgs.data ?? nestedArgs,
+              nestedCreateData,
               shouldThrow,
             )
 
@@ -260,4 +283,62 @@ export const convertToWhereInput = <T>(
   }
 
   return whereInput as ExcludeUnique<T>
+}
+
+/**
+ * Populates data relations for a Prisma model based on the provided information.
+ *
+ * @param relationField - The Prisma DMMF field representing the relation.
+ * @param parentData - The data from the parent model.
+ * @param parentModel - The main Prisma model.
+ * @param createData - The data to create the model with.
+ * @returns An object containing the `createData` with populated data relations.
+ * @throws Error if the reversed relation cannot be found.
+ */
+function populateDataRelations(
+  relationField: Prisma.DMMF.Field,
+  parentData: any,
+  parentModel: Prisma.DMMF.Model,
+  createData: any,
+) {
+  // Find the reversed relation based on the provided relationField.
+  const reversedRelation = Prisma.dmmf.datamodel.models
+    .find((m) => m.name === relationField.type)
+    ?.fields.find((f) => f.relationName === relationField.relationName)
+
+  if (!reversedRelation) {
+    throw new Error("Cannot find reversed relation")
+  }
+
+  // Create a mapping of relation fields from the reversed relation.
+  const relationFieldsMap = new Map([
+    ..._.zip<string, string>(
+      reversedRelation.relationFromFields
+        ? reversedRelation.relationFromFields
+        : ([] as string[]),
+      reversedRelation.relationToFields ?? ([] as string[]),
+    ),
+  ])
+
+  const createDataWithRelation = {
+    // Add the parent data, omitting other relations, to create data
+    [reversedRelation.name]: _.omitBy(
+      parentData,
+      (_, key) =>
+        parentModel.fields.find((f) => f.name === key)?.relationName !==
+        undefined,
+    ),
+    ...createData,
+  }
+
+  // Assign additional relation field properties
+  relationFieldsMap.forEach((to, from) => {
+    if (from && to && Object.hasOwn(parentData, to)) {
+      Object.assign(createDataWithRelation, {
+        [from]: parentData[to],
+      })
+    }
+  })
+
+  return createDataWithRelation
 }
