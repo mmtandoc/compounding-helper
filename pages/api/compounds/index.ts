@@ -93,7 +93,9 @@ export const createCompound = async (
           data: fields.ingredients.map(IngredientMapper.toModel),
         },
       },
-      pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
-      ...CompoundMapper.toModel(fields),
+      ...CompoundMapper.toModel({
+        pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+        ...fields,
+      }),
     },
   })
