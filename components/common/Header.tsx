@@ -197,7 +197,7 @@ const Header = () => {
         `}</style>
       </div>
     ),
-    [ability, user],
+    [ability, ability.rules, user],
   )
 
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development"

@@ -104,7 +104,7 @@ function MyApp({
 
   // Track whether user is signed in to override initialSession to be null
   // Otherwise, signing out while on a page that gives an "initialSession" page prop causes header to not update
-  const [isSignedIn, setIsSignedIn] = useState(false)
+  const [isSignedIn, setIsSignedIn] = useState(!!pageProps.initialAppSession)
 
   const ability = useMemo(
     () =>
