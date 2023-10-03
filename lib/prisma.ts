@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ForbiddenError, subject } from "@casl/ability"
-import { accessibleBy } from "@casl/prisma"
+import { WhereInput, accessibleBy } from "@casl/prisma"
 import { User as AppUser, Prisma, PrismaClient } from "@prisma/client"
+import { Operation } from "@prisma/client/runtime/library"
 import _ from "lodash"
 
 import {
@@ -8,7 +10,10 @@ import {
   AppActions,
   defineAbilityForUser,
 } from "./auth/ability/appAbilities"
-import { relationAbilityChecker } from "./auth/ability/utils"
+import {
+  createRelationFieldMap,
+  relationAbilityChecker,
+} from "./auth/ability/utils"
 import { uncapitalize } from "./utils"
 
 // PrismaClient is attached to the `global` object in development to prevent
@@ -55,6 +60,9 @@ export function forUser(userId: string) {
   )
 }
 
+// TODO: Implement without module-scope variable (with AsyncLocalStorage?)
+let sharedTxClient: any
+
 export function forUserTx(userId: string) {
   return Prisma.defineExtension((prisma) =>
     prisma.$extends({
@@ -63,10 +71,15 @@ export function forUserTx(userId: string) {
           // トランザクション関数で
           if (typeof args === "function") {
             // Interactive transactionsの場合
-            return prisma.$transaction(async (txClient) => {
-              await txClient.$executeRaw`SELECT set_config('public.current_user_id', ${userId}, TRUE)`
-              return args(txClient)
-            })
+            return prisma
+              .$transaction(async (txClient) => {
+                sharedTxClient = txClient
+                await txClient.$executeRaw`SELECT set_config('public.current_user_id', ${userId}, TRUE)`
+                return args(txClient)
+              })
+              .finally(() => {
+                sharedTxClient = undefined
+              })
           }
           const [, ...results] = await prisma.$transaction([
             prisma.$executeRaw`SELECT set_config('public.current_user_id', ${userId}, TRUE)`,
@@ -86,6 +99,7 @@ export function withCaslAbilities(user: AppUser) {
       query: {
         $allModels: {
           async update({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Check if user has permission to update specific record
             const record = await (
               client[uncapitalize(model)] as any
@@ -110,6 +124,7 @@ export function withCaslAbilities(user: AppUser) {
             return query(args)
           },
           async create({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
               model,
@@ -119,9 +134,16 @@ export function withCaslAbilities(user: AppUser) {
               true,
             )
 
+            // In order to check for create permission, we need to replace the relation fields with actual values
+            const subjectData = await populateNestedRelations(
+              model,
+              args,
+              client as PrismaClient,
+            )
+
             ForbiddenError.from(ability).throwUnlessCan(
               "create",
-              subject(model, args.data as any),
+              subject(model, subjectData as any),
             )
             return query(args)
           },
@@ -138,6 +160,7 @@ export function withCaslAbilities(user: AppUser) {
             return query(args)
           },
           async updateMany({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
               model,
@@ -171,6 +194,7 @@ export function withCaslAbilities(user: AppUser) {
             return query(args)
           },
           async upsert({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
               model,
@@ -206,6 +230,7 @@ export function withCaslAbilities(user: AppUser) {
             return query(args)
           },
           async delete({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Check if user has permission to delete specific record
             // Must coerce to 'any' as otherwise causes TS error "Expression produces a union type that is too complex to represent"
             //TODO: Try to fix TS error "Expression produces a union type that is too complex to represent"
@@ -223,6 +248,7 @@ export function withCaslAbilities(user: AppUser) {
             return query(args)
           },
           async deleteMany({ args, model, query }) {
+            client = sharedTxClient ?? client
             // Must coerce to 'any' as otherwise causes TS error "Expression produces a union type that is too complex to represent"
             //TODO: Try to fix TS error "Expression produces a union type that is too complex to represent"
             const records = await (client[uncapitalize(model)] as any).findMany(
@@ -350,6 +376,148 @@ const getUniqueWhereKeys = (modelName: Prisma.ModelName) => {
   ]
 }
 
+/**
+ * Creates an array of entries for connecting related records in Prisma.
+ *
+ * This function takes a Prisma field and a connect value as input and generates
+ * an array of entries for connecting related records. It also considers any
+ * mapped relation fields to create additional entries.
+ *
+ * TODO: Revise TSdoc
+ *
+ * @param field - The Prisma field representing the relation to connect.
+ * @param connectValue - The value to connect related records.
+ * @returns An array of entries for connecting related records, including the main
+ * relation and any mapped relation fields.
+ */
+function createConnectSubjectEntries(
+  field: Prisma.DMMF.Field,
+  connectValue: any,
+) {
+  // Create a mapping of relation fields for the provided field.
+  const relationFieldsMap = createRelationFieldMap(field)
+
+  // Initialize an array to store the entries, starting with the main relation.
+  const entries: any[] = [[field.name, connectValue]]
+
+  relationFieldsMap.forEach((to, from) => {
+    if (from && to && Object.hasOwn(connectValue, to)) {
+      entries.push([from, connectValue[to]])
+    }
+  })
+
+  return entries
+}
+
+async function populateNestedRelations(
+  model: Prisma.ModelName,
+  args: any,
+  client: PrismaClient,
+): Promise<any> {
+  const data = args.create ?? args.data ?? args
+
+  const subjectDataEntries = []
+
+  const dmmfModel = Prisma.dmmf.datamodel.models.find(
+    (item) => item.name === model,
+  )
+
+  if (!dmmfModel) {
+    throw new Error("DMMF model not found")
+  }
+
+  for (const field of dmmfModel.fields) {
+    if (field.name in data) {
+      const fieldData = data[field.name as keyof typeof data]
+      // If field is a relation, then replace it with the nested create/connect data
+      if (field.relationName) {
+        //type ParentCreateInput = ModelArgs<typeof model, "create">["data"]
+        const fieldModelName = field.type as Prisma.ModelName
+        const operationType = Object.keys(fieldData)[0] as
+          | "create"
+          | "createMany"
+          | "connect"
+          | "connectOrCreate"
+        const operationArgs = (fieldData as any)[operationType]
+
+        switch (operationType) {
+          case "create":
+            subjectDataEntries.push([
+              field.name,
+              await populateNestedRelations(
+                fieldModelName,
+                operationArgs,
+                client,
+              ),
+            ])
+            break
+          case "createMany": {
+            const nestedCreateManyData = Array.isArray(operationArgs.data)
+              ? operationArgs.data
+              : [operationArgs.data]
+
+            subjectDataEntries.push([field.name, nestedCreateManyData])
+
+            /* for (const nestedCreateData of nestedCreateManyData) {
+              subjectDataEntries.push([field.name, nestedCreateData])
+            } */
+            break
+          }
+          case "connect": {
+            console.dir({ connectArgs: operationArgs }, { depth: null })
+
+            console.log({
+              pharmacies: await client.pharmacy.findMany(),
+            })
+
+            // Get record to connect
+            const connectValue = await (
+              client[uncapitalize(field.type as Prisma.ModelName)] as any
+            ).findUniqueOrThrow({
+              where: operationArgs as WhereInput<typeof model>,
+            })
+
+            subjectDataEntries.push(
+              ...createConnectSubjectEntries(field, connectValue),
+            )
+
+            break
+          }
+          case "connectOrCreate": {
+            // Check if record exists
+            console.dir({ connectArgs: operationArgs.where }, { depth: null })
+            const connectValue = await (
+              client[uncapitalize(field.type as Prisma.ModelName)] as any
+            ).findUnique({
+              where: operationArgs.where as WhereInput<typeof model>,
+            })
+
+            if (connectValue) {
+              subjectDataEntries.push(
+                ...createConnectSubjectEntries(field, connectValue),
+              )
+            } else {
+              subjectDataEntries.push([
+                field.name,
+                await populateNestedRelations(
+                  fieldModelName,
+                  operationArgs.create,
+                  client,
+                ),
+              ])
+            }
+            break
+          }
+        }
+      } else {
+        subjectDataEntries.push([field.name, fieldData])
+      }
+    }
+  }
+
+  return Object.fromEntries(subjectDataEntries)
+}
+
 function whereAccessibleBy(
   where: any,
   ability: AppAbility,
@@ -391,8 +559,8 @@ export const prisma = globalForPrisma.prisma ?? createExtendedPrisma()
 
 export function getUserPrismaClient(user: AppUser) {
   const client = prisma
-    .$extends(withCaslAbilities(user))
     .$extends(forUser(user.id))
+    .$extends(withCaslAbilities(user))
 
   // Forcibly override the `$transaction` function and apply the extension that sets user ID temporarily into DB config.
   client.$transaction = prisma

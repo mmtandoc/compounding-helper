@@ -51,7 +51,7 @@ const createAbilityCheck: OperationAbilityChecker = async (
   for (const item of items) {
     if (shouldThrow) {
       ForbiddenError.from(ability).throwUnlessCan(
-        "read",
+        "create",
         subject(modelName, item),
       )
     } else if (!ability.can("create", subject(modelName, item))) {
@@ -81,14 +81,49 @@ const simpleAbilityCheck: OperationAbilityChecker = async (
   // Handle all operations cases
   const operations = !Array.isArray(data) ? [data] : data
   // Handle where case
-  const normalizedOperations = operations.map((op) =>
-    op.where ? op.where : op,
+  const normalizedOperations = operations.map((op) => op.where ?? op)
+
+  // If provided operations are UniqueWhereInputs, they can contain multi-field unique attributes,
+  // which have to be flattened before performing a findMany query
+  const flattenCompoundKeys = (modelName: Prisma.ModelName, where: any) => {
+    const getCompoundFieldName = (
+      field: Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey,
+    ) => (field.name ? field.name : field.fields.join("_"))
+
+    const dmmfModel = Prisma.dmmf.datamodel.models.find(
+      (item) => item.name === modelName,
+    )
+
+    if (!dmmfModel) {
+      throw new Error("DMMF model not found")
+    }
+
+    const compoundFields: (Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey)[] =
+      dmmfModel.uniqueIndexes
+    if (dmmfModel.primaryKey) compoundFields.push(dmmfModel.primaryKey)
+
+    const flatWhere = _.cloneDeep(where)
+
+    for (const compoundField of compoundFields) {
+      const compoundName = getCompoundFieldName(compoundField)
+      if (compoundName in flatWhere) {
+        // Flatten compound field
+        Object.assign(flatWhere, flatWhere[compoundName])
+        delete flatWhere[compoundName]
+      }
+    }
+
+    return flatWhere
+  }
+
+  const flattenedOperations = normalizedOperations.map((op) =>
+    flattenCompoundKeys(modelName, op),
   )
 
   // Force entity type because of Prisma typing
   const items = await (prisma[entity] as any).findMany({
     where: {
-      OR: normalizedOperations,
+      OR: flattenedOperations,
     },
   })
 
@@ -259,7 +294,7 @@ type ExcludeUnique<T> = T extends infer U
 /**
  * Convert a where unique input to a where input prisma
  * @param args Can be a where unique input or a where input
- * @returns whare input
+ * @returns where input
  */
 export const convertToWhereInput = <T>(
   where: T | undefined,
@@ -311,14 +346,7 @@ function populateDataRelations(
   }
 
   // Create a mapping of relation fields from the reversed relation.
-  const relationFieldsMap = new Map([
-    ..._.zip<string, string>(
-      reversedRelation.relationFromFields
-        ? reversedRelation.relationFromFields
-        : ([] as string[]),
-      reversedRelation.relationToFields ?? ([] as string[]),
-    ),
-  ])
+  const relationFieldsMap = createRelationFieldMap(reversedRelation)
 
   const createDataWithRelation = {
     // Add the parent data, omitting other relations, to create data
@@ -341,4 +369,16 @@ function populateDataRelations(
   })
 
   return createDataWithRelation
+}
+
+//TODO: Move to prisma util file
+export function createRelationFieldMap(relation: Prisma.DMMF.Field) {
+  return new Map([
+    ..._.zip<string, string>(
+      relation.relationFromFields
+        ? relation.relationFromFields
+        : ([] as string[]),
+      relation.relationToFields ?? ([] as string[]),
+    ),
+  ])
 }
