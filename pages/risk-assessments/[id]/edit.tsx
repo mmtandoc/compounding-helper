@@ -1,11 +1,12 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
-import { isCentralPharmacy } from "lib/utils"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -47,12 +48,15 @@ export const getServerSideProps = withPageAuth<EditRiskAssessmentProps>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if user has permission to update this risk assessment
     if (
-      isCentralPharmacy(data.pharmacyId) &&
-      session.appUser.pharmacyId !== data.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("RiskAssessment", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

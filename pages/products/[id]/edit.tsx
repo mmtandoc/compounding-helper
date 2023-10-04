@@ -1,11 +1,12 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import ProductEntry from "components/product/ProductEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
-import { isCentralPharmacy } from "lib/utils"
 import { getProductById } from "pages/api/products/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -46,12 +47,15 @@ export const getServerSideProps = withPageAuth<EditProductProps>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to update the product
     if (
-      isCentralPharmacy(data.pharmacyId) &&
-      session.appUser.pharmacyId !== data.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Product", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

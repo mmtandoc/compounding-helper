@@ -1,11 +1,12 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RoutineEntry from "components/routine/RoutineEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableRoutineFields, RoutineFields, routineSchema } from "lib/fields"
 import RoutineMapper from "lib/mappers/RoutineMapper"
-import { isCentralPharmacy } from "lib/utils"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RoutineWithHistory } from "types/models"
@@ -49,12 +50,15 @@ export const getServerSideProps = withPageAuth({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to update this routine
     if (
-      isCentralPharmacy(data.pharmacyId) &&
-      session.appUser.pharmacyId !== data.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Routine", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

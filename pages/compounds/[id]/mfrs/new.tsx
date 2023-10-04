@@ -1,8 +1,10 @@
+import { subject } from "@casl/ability"
+
 import CreateForm from "components/common/data-pages/CreateForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableMfrFields, mfrSchema } from "lib/fields"
-import { isCentralPharmacy } from "lib/utils"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -55,12 +57,15 @@ export const getServerSideProps = withPageAuth<NewMfrProps>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to create a new MFR for this compound
     if (
-      isCentralPharmacy(compound.pharmacyId) &&
-      session.appUser.pharmacyId !== compound.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "create",
+        subject("Mfr", { compound } as any),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

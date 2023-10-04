@@ -1,11 +1,12 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import CompoundEntry from "components/compound/CompoundEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableCompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
-import { isCentralPharmacy } from "lib/utils"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -45,12 +46,15 @@ export const getServerSideProps = withPageAuth<Props>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to update the compound
     if (
-      isCentralPharmacy(data.pharmacyId) &&
-      session.appUser.pharmacyId !== data.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Compound", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

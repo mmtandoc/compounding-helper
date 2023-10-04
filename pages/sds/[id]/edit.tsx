@@ -1,11 +1,13 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import SdsEntry from "components/sds/SdsEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import SdsMapper from "lib/mappers/SdsMapper"
-import { isCentralPharmacy, toIsoDateString } from "lib/utils"
+import { toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 
@@ -46,12 +48,15 @@ export const getServerSideProps = withPageAuth<EditSdsPageProps>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to update this SDS summary
     if (
-      isCentralPharmacy(data.pharmacyId) &&
-      session.appUser.pharmacyId !== data.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("SDS", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

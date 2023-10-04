@@ -1,9 +1,11 @@
+import { subject } from "@casl/ability"
+
 import EditForm from "components/common/data-pages/EditForm"
 import MfrEntry from "components/compound/mfr/MfrEntry"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { MfrFieldsWithVersion, NullableMfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
-import { isCentralPharmacy } from "lib/utils"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
 
@@ -43,12 +45,15 @@ export const getServerSideProps = withPageAuth<EditMfrProps>({
       return { notFound: true }
     }
 
-    //Check if record is owned by central & current user is not a central user
+    // Check if current user has permission to update this MFR
     if (
-      isCentralPharmacy(data.compound.pharmacyId) &&
-      session.appUser.pharmacyId !== data.compound.pharmacyId
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Mfr", data),
+      )
     ) {
       //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 
