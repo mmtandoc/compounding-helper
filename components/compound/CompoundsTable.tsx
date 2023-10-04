@@ -1,3 +1,4 @@
+import { subject } from "@casl/ability"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { useMemo } from "react"
@@ -6,7 +7,7 @@ import { BsGlobe } from "react-icons/bs"
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { isCentralPharmacy } from "lib/utils"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
@@ -167,23 +168,28 @@ const columns = [
   columnHelper.display({
     id: "mfr-actions",
     cell: function MfrActionsCell(info) {
-      const { user, error: userError } = useCurrentUser()
-      if (userError) {
-        console.error(userError)
-      }
+      const ability = useAbility()
 
       const data = info.row.original
-      const canEdit = user?.pharmacyId === data.pharmacyId
+
+      const canRead = ability.can(
+        "read",
+        subject("Mfr", { compound: data } as any),
+      )
+      const canCreate = ability.can(
+        "create",
+        subject("Mfr", { compound: data } as any),
+      )
 
       return (
         <RowActions>
-          {data._count.mfrs > 0 ? (
+          {data._count.mfrs > 0 && canRead ? (
             <Link href={`/compounds/${data.id}/mfrs/latest`}>
               <Button size="small" theme="primary">
                 View MFR
               </Button>
             </Link>
-          ) : canEdit ? (
+          ) : canCreate ? (
             <Link href={`/compounds/${data.id}/mfrs/new`}>
               <Button size="small">Create MFR</Button>
             </Link>

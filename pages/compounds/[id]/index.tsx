@@ -1,9 +1,9 @@
-import { useMemo } from "react"
+import { subject } from "@casl/ability"
 
 import Details from "components/common/data-pages/Details"
 import CompoundDetails from "components/compound/CompoundDetails"
 import { withPageAuth } from "lib/auth"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { CompoundWithIngredients } from "types/models"
@@ -15,12 +15,9 @@ type Props = {
 const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
   const { data } = props
 
-  const { user } = useCurrentUser()
+  const ability = useAbility()
 
-  const disableEdit = useMemo(
-    () => user?.pharmacyId !== data.pharmacyId,
-    [user?.pharmacyId, data.pharmacyId],
-  )
+  const canEdit = ability.can("update", subject("Compound", data))
 
   return (
     <Details
@@ -32,11 +29,12 @@ const CompoundPage: NextPageWithLayout<Props> = (props: Props) => {
         <CompoundDetails data={data} display="all" />
       )}
       notice={
-        disableEdit && "Current record is owned by central. Unable to edit."
+        //TODO: Update notice to be dynamic based on CASL rule causes
+        !canEdit && "Current record is owned by central. Unable to edit."
       }
       actions={{
         delete: false,
-        edit: { visible: true, disabled: disableEdit },
+        edit: { visible: true, disabled: !canEdit },
       }}
     />
   )

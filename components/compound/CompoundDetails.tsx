@@ -1,12 +1,13 @@
+import { subject } from "@casl/ability"
 import Link from "next/link"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import useSWR from "swr"
 
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { Button, Spinner } from "components/ui"
 import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { SettingsFields } from "lib/fields"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
@@ -150,18 +151,14 @@ const MfrsActions = (props: { data: CompoundWithIngredients }) => {
     console.error(mfrsError)
   }
 
-  const { user, error: userError, isLoading: isUserLoading } = useCurrentUser()
+  const ability = useAbility()
 
-  if (userError) {
-    console.error(userError)
-  }
-
-  const canCreateNewMfr = useMemo(
-    () => user?.pharmacyId === data.pharmacyId,
-    [data.pharmacyId, user?.pharmacyId],
+  const canCreateNewMfr = ability.can(
+    "create",
+    subject("Mfr", { compound: data } as any),
   )
 
-  const isLoading = (!mfrs && !mfrsError) || isUserLoading
+  const isLoading = !mfrs && !mfrsError
   return (
     <FormGroup row>
       {!isLoading ? (

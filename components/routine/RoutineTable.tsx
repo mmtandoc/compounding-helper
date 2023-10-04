@@ -1,3 +1,4 @@
+import { ForbiddenError, subject } from "@casl/ability"
 import { RoutineCompletion } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
 import axios, { AxiosError, isAxiosError } from "axios"
@@ -12,6 +13,7 @@ import { HoverTooltip } from "components/common/HoverTooltip"
 import { Button, Modal, Table } from "components/ui"
 import { Form, FormGroup, Input, Select, TextArea } from "components/ui/forms"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { RoutineEntity } from "lib/entities"
 import { CompletionFields, NullableCompletionFields } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
@@ -148,31 +150,60 @@ const RoutineTable = (props: Props) => {
       }),
       columnHelper.display({
         id: "markComplete",
-        cell: (info) => (
-          <>
-            <Button
-              size="small"
-              onClick={() => {
-                setIsModalOpen(true)
-                setCurrentRoutine(info.row.original)
-              }}
-            >
-              Mark complete
-            </Button>
-          </>
-        ),
+        cell: function MarkCompleteCell(info) {
+          const ability = useAbility()
+          const data = info.row.original
+          const canMarkComplete = ability.can(
+            "create",
+            subject("RoutineCompletion", {
+              id: 0,
+              routine: data,
+              routineId: data.id,
+              comment: null,
+              name: "PLACEHOLDER NAME",
+              date: new Date("2023-01-01"),
+            }),
+          )
+
+          //TODO: If user doesn't have permission to mark complete, display reason.
+          return (
+            <>
+              <Button
+                size="small"
+                onClick={() => {
+                  setIsModalOpen(true)
+                  setCurrentRoutine(info.row.original)
+                }}
+                disabled={!canMarkComplete}
+              >
+                Mark complete
+              </Button>
+            </>
+          )
+        },
         enableSorting: false,
         enableColumnFilter: false,
       }),
       columnHelper.display({
         id: "actions",
-        cell: (info) => (
-          <DataRowActions
-            row={info.row}
-            viewButton={{ getUrl: (data) => `/routines/${data.id}` }}
-            editButton={{ getUrl: (data) => `/routines/${data.id}/edit` }}
-          />
-        ),
+        cell: function ActionsCell(info) {
+          const ability = useAbility()
+          const canEdit = ability.can(
+            "update",
+            subject("Routine", info.row.original),
+          )
+          return (
+            <DataRowActions
+              row={info.row}
+              viewButton={{ getUrl: (data) => `/routines/${data.id}` }}
+              editButton={
+                canEdit
+                  ? { getUrl: (data) => `/routines/${data.id}/edit` }
+                  : undefined
+              }
+            />
+          )
+        },
       }),
     ],
     [],

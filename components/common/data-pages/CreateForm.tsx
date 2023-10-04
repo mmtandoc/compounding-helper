@@ -116,7 +116,7 @@ const CreateForm = <
             autoComplete="off"
             noValidate
           >
-            <EntryComponent formMethods={formMethods} />
+            <EntryComponent formMethods={formMethods} action="create" />
             <div className="action-row">
               <Button theme="primary" type="submit">
                 Submit

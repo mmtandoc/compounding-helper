@@ -1,11 +1,12 @@
+import { subject } from "@casl/ability"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
 
 import Details from "components/common/data-pages/Details"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import { withPageAuth } from "lib/auth"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy } from "lib/utils"
 import { getLatestMfrVersion } from "pages/api/compounds/[id]/mfrs"
 import { getMfr } from "pages/api/compounds/[id]/mfrs/[version]"
 import { NextPageWithLayout } from "types/common"
@@ -23,12 +24,16 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
   const compoundId = parseInt(router.query.id as string)
   const version = parseInt(router.query.version as string)
 
-  const { user } = useCurrentUser()
+  const ability = useAbility()
 
-  const disableEditDelete = useMemo(
-    () => user?.pharmacyId !== data.compound.pharmacyId,
-    [user?.pharmacyId, data.compound.pharmacyId],
-  )
+  const canEdit = ability.can("update", subject("Mfr", data))
+  const canDelete = ability.can("delete", subject("Mfr", data))
+
+  let notice: string | undefined = undefined
+
+  if (isCentralPharmacy(data.compound.pharmacyId) && !canEdit && !canDelete) {
+    notice = "Current record is owned by central. Unable to edit or delete."
+  }
 
   return (
     <>
@@ -44,13 +49,10 @@ const MfrPage: NextPageWithLayout<Props> = (props: Props) => {
         apiEndpointPath={`/api/compounds/${compoundId}/mfrs/${version}`}
         urlPath={`/compounds/${compoundId}/mfrs/${version}`}
         detailsComponent={MfrDetails}
-        notice={
-          disableEditDelete &&
-          "Current record is owned by central. Unable to edit or delete."
-        }
+        notice={notice}
         actions={{
-          edit: { visible: true, disabled: disableEditDelete },
-          delete: { visible: true, disabled: disableEditDelete },
+          edit: { visible: true, disabled: !canEdit },
+          delete: { visible: true, disabled: !canDelete },
           print: true,
         }}
       />

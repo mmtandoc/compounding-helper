@@ -4,6 +4,7 @@ import { BiEdit } from "react-icons/bi"
 
 import { IconButton } from "components/ui"
 import { Fieldset } from "components/ui/forms"
+import { Can } from "lib/contexts/AbilityContext"
 
 export type LinkDirectory = {
   centralLinks: LinkModel[]
@@ -38,11 +39,13 @@ export const LinkDirectoryDetails = ({ linkDirectory }: Props) => {
         </Fieldset>
       )}
       <div className="actions">
-        <Link href="/links/edit">
-          <IconButton icon={BiEdit} size="small">
-            Edit
-          </IconButton>
-        </Link>
+        <Can do="update" on="Link">
+          <Link href="/links/edit">
+            <IconButton icon={BiEdit} size="small">
+              Edit
+            </IconButton>
+          </Link>
+        </Can>
       </div>
       <style jsx global>{`
         .link-directory .actions {

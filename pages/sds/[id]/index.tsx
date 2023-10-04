@@ -1,12 +1,13 @@
+import { subject } from "@casl/ability"
 import axios from "axios"
 import { useRouter } from "next/router"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import SdsDetails from "components/sds/SdsDetails"
 import { Button, DisableableLink, Modal } from "components/ui"
 import { withPageAuth } from "lib/auth"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
-import { toIsoDateString } from "lib/utils"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 import { getSdsById } from "pages/api/sds/[id]"
 import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"
@@ -23,12 +24,16 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const sdsId = parseInt(router.query.id as string)
 
-  const { user } = useCurrentUser()
+  const ability = useAbility()
 
-  const canEditDelete = useMemo(
-    () => user?.pharmacyId === data.pharmacyId,
-    [user?.pharmacyId, data.pharmacyId],
-  )
+  const canEdit = ability.can("update", subject("SDS", data))
+  const canDelete = ability.can("delete", subject("SDS", data))
+
+  let notice: string | undefined = undefined
+
+  if (isCentralPharmacy(data.pharmacyId) && !canEdit && !canDelete) {
+    notice = "Current record is owned by central. Unable to edit or delete."
+  }
 
   const handleDelete = () => {
     axios.delete(`/api/sds/${sdsId}`).then(
@@ -40,22 +45,16 @@ const SdsPage: NextPageWithLayout<SdsPageProps> = (props: SdsPageProps) => {
     )
   }
 
+  //TODO: Update to use EditForm component
   return (
     <div className="sds-details">
-      {!canEditDelete && (
-        <div className="notice">
-          Current record is owned by central. Unable to edit or delete.
-        </div>
-      )}
+      {notice && <div className="notice">{notice}</div>}
       <SdsDetails data={data} />
       <div className="action-row">
-        <DisableableLink
-          disabled={!canEditDelete}
-          href={`/sds/${data.id}/edit`}
-        >
-          <Button disabled={!canEditDelete}>Edit</Button>
+        <DisableableLink disabled={!canEdit} href={`/sds/${data.id}/edit`}>
+          <Button disabled={!canEdit}>Edit</Button>
         </DisableableLink>
-        <Button disabled={!canEditDelete} onClick={() => setIsModalOpen(true)}>
+        <Button disabled={!canDelete} onClick={() => setIsModalOpen(true)}>
           Delete
         </Button>
       </div>

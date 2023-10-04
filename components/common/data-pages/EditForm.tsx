@@ -108,6 +108,7 @@ const EditForm = <
         <EntryComponent
           values={values}
           formMethods={formMethods}
+          action="update"
           {...entryComponentProps}
         />
         <div>

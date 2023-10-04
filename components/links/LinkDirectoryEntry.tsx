@@ -1,3 +1,4 @@
+import { subject } from "@casl/ability"
 import { useEffect, useMemo } from "react"
 import {
   UseFieldArrayReturn,
@@ -10,6 +11,8 @@ import { Simplify } from "type-fest"
 
 import { IconButton } from "components/ui"
 import { Fieldset, Input, LabelFormGroup } from "components/ui/forms"
+import { AppActions } from "lib/auth/ability/appAbilities"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { NullableLinkDirectoryFields } from "lib/fields"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { isCentralPharmacy } from "lib/utils"
@@ -43,6 +46,24 @@ const LinkDirectoryEntry = (props: Props) => {
     console.error(userError)
   }
 
+  const ability = useAbility()
+
+  const canCreateUpdateLinks = (["create", "update"] as AppActions[]).every(
+    (action) =>
+      ability.can(
+        action,
+        subject("Link", {
+          id: NaN,
+          pharmacyId: user?.pharmacyId ?? NaN,
+          order: 1,
+          name: "PLACEHOLDER",
+          url: "https://placeholder.com",
+          updatedAt: new Date(),
+          description: null,
+        }),
+      ),
+  )
+
   return (
     <div className="link-directory-entry">
       {
@@ -59,7 +80,8 @@ const LinkDirectoryEntry = (props: Props) => {
                 formMethods={formMethods}
                 arrayMethods={centralArrayMethods}
                 disabled={
-                  isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
+                  !canCreateUpdateLinks
+                  //isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
                 }
               />
             ))}
@@ -77,7 +99,8 @@ const LinkDirectoryEntry = (props: Props) => {
                 formMethods={formMethods}
                 arrayMethods={localArrayMethods}
                 disabled={
-                  isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
+                  !canCreateUpdateLinks
+                  //isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
                 }
               />
             ))}
@@ -85,21 +108,23 @@ const LinkDirectoryEntry = (props: Props) => {
         </Fieldset>
       )}
       <div className="actions">
-        <IconButton
-          icon={BiPlus}
-          title="Add link"
-          onClick={() =>
-            (isCentralUser ? centralArrayMethods : localArrayMethods).append({
-              name: null,
-              url: null,
-              description: null,
-              order: (isCentralUser ? centralArrayMethods : localArrayMethods)
-                .fields.length,
-            })
-          }
-        >
-          Add link
-        </IconButton>
+        {canCreateUpdateLinks && (
+          <IconButton
+            icon={BiPlus}
+            title="Add link"
+            onClick={() =>
+              (isCentralUser ? centralArrayMethods : localArrayMethods).append({
+                name: null,
+                url: null,
+                description: null,
+                order: (isCentralUser ? centralArrayMethods : localArrayMethods)
+                  .fields.length,
+              })
+            }
+          >
+            Add link
+          </IconButton>
+        )}
       </div>
       <style jsx>{`
         .link-directory-entry :global(ul) {

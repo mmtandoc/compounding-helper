@@ -1,8 +1,10 @@
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
 import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import {
   ChemicalFields,
   NullableChemicalFields,
@@ -46,6 +48,26 @@ export const getServerSideProps = withPageAuth<EditChemicalProps>({
     const data = await getChemicalById(session, id)
 
     if (data === null) {
+      return { notFound: true }
+    }
+
+    const ability = defineAbilityForUser(session.appUser)
+
+    if (
+      ability.cannot("update", subject("Chemical", data)) &&
+      ability.cannot(
+        "manage",
+        subject("AdditionalChemicalInfo", {
+          id: 0,
+          chemical: data,
+          chemicalId: data.id,
+          value: "PLACEHOLDER",
+          pharmacyId: session.appUser.pharmacyId,
+        }),
+      )
+    ) {
+      //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
       return { notFound: true }
     }
 

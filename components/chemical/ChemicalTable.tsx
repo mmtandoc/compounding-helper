@@ -1,9 +1,12 @@
+import { subject } from "@casl/ability"
 import { Chemical } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
 import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 
 type Props = {
@@ -46,13 +49,33 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/chemicals/${data.id}` }}
-        editButton={{ getUrl: (data) => `/chemicals/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const { user } = useCurrentUser()
+      const ability = useAbility()
+      const data = info.row.original
+      const canEditChemical = ability.can("update", subject("Chemical", data))
+      const canManageAdditionalInfo = ability.can(
+        "manage",
+        subject("AdditionalChemicalInfo", {
+          id: 0,
+          chemical: data,
+          chemicalId: data.id,
+          value: "PLACEHOLDER",
+          pharmacyId: user?.pharmacyId ?? NaN,
+        }),
+      )
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/chemicals/${data.id}` }}
+          editButton={
+            canEditChemical || canManageAdditionalInfo
+              ? { getUrl: (data) => `/chemicals/${data.id}/edit` }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

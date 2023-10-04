@@ -1,9 +1,10 @@
-import { useMemo } from "react"
+import { subject } from "@casl/ability"
 
 import Details from "components/common/data-pages/Details"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import { withPageAuth } from "lib/auth"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy } from "lib/utils"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RiskAssessmentAll } from "types/models"
@@ -17,12 +18,16 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
 ) => {
   const { data } = props
 
-  const { user } = useCurrentUser()
+  const ability = useAbility()
 
-  const disableEditDelete = useMemo(
-    () => user?.pharmacyId !== data.pharmacyId,
-    [user?.pharmacyId, data.pharmacyId],
-  )
+  const canEdit = ability.can("update", subject("RiskAssessment", data))
+  const canDelete = ability.can("delete", subject("RiskAssessment", data))
+
+  let notice: string | undefined = undefined
+
+  if (isCentralPharmacy(data.pharmacyId) && !canEdit && !canDelete) {
+    notice = "Current record is owned by central. Unable to edit or delete."
+  }
 
   return (
     <Details
@@ -31,13 +36,10 @@ const RiskAssessment: NextPageWithLayout<RiskAssessmentProps> = (
       apiEndpointPath={`/api/risk-assessments/${data.id}`}
       urlPath={`/risk-assessments/${data.id}`}
       detailsComponent={RiskAssessmentDetails}
-      notice={
-        disableEditDelete &&
-        "Current record is owned by central. Unable to edit or delete."
-      }
+      notice={notice}
       actions={{
-        edit: { visible: true, disabled: disableEditDelete },
-        delete: { visible: true, disabled: disableEditDelete },
+        edit: { visible: true, disabled: !canEdit },
+        delete: { visible: true, disabled: !canDelete },
         print: true,
       }}
     />

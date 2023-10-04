@@ -1,7 +1,7 @@
-import { useUser } from "@supabase/auth-helpers-react"
+import { subject } from "@casl/ability"
+import _ from "lodash"
 import { useEffect, useMemo } from "react"
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form"
-import { preload } from "swr"
 
 import { Button } from "components/ui"
 import {
@@ -12,11 +12,12 @@ import {
   RhfRadioGroup,
   TextArea,
 } from "components/ui/forms"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { NullableChemicalFields } from "lib/fields"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import useUpdateFieldConditionally from "lib/hooks/useUpdateFieldConditionally"
+import ChemicalMapper from "lib/mappers/ChemicalMapper"
 import { isCentralPharmacy } from "lib/utils"
-import { multiFetcher } from "pages/_app"
 import { DataEntryComponent } from "types/common"
 
 type Props = {
@@ -26,9 +27,9 @@ type Props = {
 //preload("/api/users/current", multiFetcher)
 
 const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
-  props: Props,
+  props,
 ) => {
-  const { formMethods } = props
+  const { formMethods, action = "create" } = props
 
   const { user, error: userError } = useCurrentUser()
 
@@ -37,12 +38,20 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
     console.error(userError)
   }
 
-  const { register, control, watch, setValue, getFieldState, trigger } =
-    formMethods
+  const {
+    register,
+    control,
+    watch,
+    setValue,
+    getFieldState,
+    trigger,
+    getValues,
+  } = formMethods
 
   const additionalInfoArrayMethods = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
     name: "additionalInfo", // unique name for your Field Array
+    keyName: "key",
   })
 
   const hasNoCasNumber = watch("hasNoCasNumber") as boolean
@@ -54,10 +63,27 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
     [user?.pharmacyId],
   )
 
+  const ability = useAbility()
+
   const canFullEdit = useMemo(
+    () =>
+      ability.can(
+        action,
+        subject(
+          "Chemical",
+          ChemicalMapper.toModel({
+            pharmacyId: user?.pharmacyId,
+            ...getValues(),
+          } as any) as any,
+        ),
+      ),
+    [ability.rules, getValues, user?.pharmacyId],
+  )
+
+  /* const canFullEdit = useMemo(
     () => (user ? pharmacyId === user.pharmacyId : false),
     [user, pharmacyId],
-  )
+  ) */
 
   useUpdateFieldConditionally({
     updateCondition: hasNoCasNumber === true,
@@ -82,6 +108,8 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
       ),
     [additionalInfo, user?.pharmacyId],
   )
+
+  const chemicalId = watch("id")
 
   register("id")
   return (
@@ -156,14 +184,23 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
       <Fieldset legend="Additional Info">
         {additionalInfoArrayMethods.fields.map((item, index) => (
           <Fieldset
-            key={item.id}
+            key={item.key}
             legend={
               // If add. info's pharmacyId is undefined, use user's pharmacyId
               isCentralPharmacy(item.pharmacyId ?? user?.pharmacyId ?? NaN)
                 ? "Central"
                 : "Local"
             }
-            disabled={isCentralPharmacy(item.pharmacyId ?? NaN) && !canFullEdit}
+            disabled={ability.cannot(
+              action,
+              subject(
+                "AdditionalChemicalInfo",
+                _.defaults(item, {
+                  chemicalId,
+                  pharmacyId: user?.pharmacyId,
+                }) as any,
+              ),
+            )}
           >
             <TextArea
               {...register(`additionalInfo.${index}.value`)}
@@ -172,19 +209,20 @@ const ChemicalEntry: DataEntryComponent<NullableChemicalFields, Props> = (
             />
           </Fieldset>
         ))}
-        {!hasLocalAdditionalInfo && (
-          <Button
-            onClick={() =>
-              additionalInfoArrayMethods.append({
-                value: "",
-                pharmacyId: undefined,
-              })
-            }
-            size="small"
-          >
-            Add {isCentralUser ? "central" : "local"} additional info
-          </Button>
-        )}
+        {!hasLocalAdditionalInfo &&
+          ability.can("create", "AdditionalChemicalInfo") && (
+            <Button
+              onClick={() =>
+                additionalInfoArrayMethods.append({
+                  value: "",
+                  pharmacyId: undefined,
+                })
+              }
+              size="small"
+            >
+              Add {isCentralUser ? "central" : "local"} additional info
+            </Button>
+          )}
       </Fieldset>
       <style jsx>{`
         .chemical-entry .info {

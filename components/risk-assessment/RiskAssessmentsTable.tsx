@@ -1,10 +1,11 @@
+import { subject } from "@casl/ability"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { isCentralPharmacy } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
@@ -90,11 +91,12 @@ const columns = [
   columnHelper.display({
     id: "actions",
     cell: function ActionsCell(info) {
-      const { user, error: userError } = useCurrentUser()
-      if (userError) {
-        console.error(userError)
-      }
-      const canEdit = info.row.original.pharmacyId === user?.pharmacyId
+      const ability = useAbility()
+
+      const canEdit = ability.can(
+        "update",
+        subject("RiskAssessment", info.row.original),
+      )
       return (
         <DataRowActions
           row={info.row}
