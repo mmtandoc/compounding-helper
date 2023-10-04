@@ -58,146 +58,6 @@ export type AppAbility = PureAbility<[AppActions, AppSubjects], PrismaQuery>
 
 export const createAppAbility = createPrismaAbility as CreateAbility<AppAbility>
 
-/* 
-type DefinePermissions = (
-  user: User,
-  builder: AbilityBuilder<AppAbility>,
-) => void
-
-const rolePermissions: Record<Role, DefinePermissions> = {
-  [Role.user](user, { can, cannot }) {
-    // NOTE: CASL rules do not confirm whether all models in an array have the properties specified in the condition
-    // i.e., where type ModelWithA is {a: number} and type ModelWithB = {b: number},
-    // `can("read", ["ModelWithA", "ModelWithB"], undefined, { A: { equals: 1 }})`
-    // won't cause a typescript error, but will throw a PrismaClientValidationError at runtime since
-
-    can("manage", "Chemical", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "Chemical", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("manage", "AdditionalChemicalInfo", {
-      pharmacyId: user.pharmacyId,
-    })
-
-    can("manage", "Product", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "Product", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("manage", "Vendor", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "Vendor", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("manage", "SDS", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "SDS", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("read", ["HazardClass", "HazardCategory"])
-
-    can("manage", "HazardCategoryToSDS", {
-      sds: { pharmacyId: user.pharmacyId },
-    })
-    can("read", "HazardCategoryToSDS", {
-      sds: { pharmacyId: { in: getCentralPharmacyIds() } },
-    })
-
-    can("manage", "RiskAssessment", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "RiskAssessment", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("manage", "Compound", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "Compound", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("manage", "Ingredient", {
-      compound: { pharmacyId: user.pharmacyId },
-    })
-    can("read", "Ingredient", {
-      compound: { pharmacyId: { in: getCentralPharmacyIds() } },
-    })
-
-    can("manage", "Mfr", {
-      compound: { pharmacyId: user.pharmacyId },
-    })
-    can("read", "Mfr", {
-      compound: { pharmacyId: { in: getCentralPharmacyIds() } },
-    })
-
-    can("manage", "Link", {
-      pharmacyId: user.pharmacyId,
-    })
-    can("read", "Link", {
-      pharmacyId: { in: getCentralPharmacyIds() },
-    })
-
-    can("read", "Settings", {
-      pharmacyId: user.pharmacyId,
-    })
-
-    can("manage", "Routine", {
-      pharmacyId: user.pharmacyId,
-    })
-
-    can("manage", "RoutineCompletion", {
-      routine: { pharmacyId: user.pharmacyId },
-    })
-
-    can("read", "Pharmacy", {
-      id: { equals: user.pharmacyId },
-    })
-
-    can("read", "User", {
-      pharmacyId: user.pharmacyId,
-    })
-
-    can("manage", "User", { id: { equals: user.id } })
-  },
-  [Role.admin](user, { can, cannot }) {
-    can("manage", "all")
-    cannot(["create", "update", "delete"], "User", {
-      role: { equals: "superadmin" },
-    })
-    cannot(["create", "update", "delete"], "Pharmacy", {
-      id: { equals: user.pharmacyId },
-    })
-  },
-  [Role.superadmin](user, { can, cannot }) {
-    can("manage", "all")
-  },
-}
-
-export function defineAbilityFor(user: User): AppAbility {
-  const builder = new AbilityBuilder(createAppAbility)
-
-  if (user.role === Role.superadmin) {
-  }
-
-  if (typeof rolePermissions[user.role] === "function") {
-    rolePermissions[user.role](user, builder)
-  } else {
-    throw new Error(`Trying to use unknown role "${user.role}"`)
-  }
-
-  return builder.build()
-} */
-
 export function defineAbilityForUser(user: User): AppAbility {
   const { can, cannot, build } = new AbilityBuilder<AppAbility>(
     createPrismaAbility,
@@ -210,14 +70,22 @@ export function defineAbilityForUser(user: User): AppAbility {
     won't cause a typescript error, but will throw a PrismaClientValidationError at runtime since
   */
 
+  const otherCentralPharmacyIds = getCentralPharmacyIds().filter(
+    (id) => id !== user.pharmacyId,
+  )
+
   // Chemicals
   can("manage", "Chemical", {
     pharmacyId: user.pharmacyId,
   })
 
   can("read", "Chemical", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+
+  cannot(["create", "update", "delete"], "Chemical", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   can("manage", "AdditionalChemicalInfo", {
     pharmacyId: user.pharmacyId,
@@ -228,31 +96,43 @@ export function defineAbilityForUser(user: User): AppAbility {
     pharmacyId: user.pharmacyId,
   })
   can("read", "Product", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "Product", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   // Vendors
   can("manage", "Vendor", {
     pharmacyId: user.pharmacyId,
   })
   can("read", "Vendor", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "Vendor", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   // SDS Summaries
   can("manage", "SDS", {
     pharmacyId: user.pharmacyId,
   })
   can("read", "SDS", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "SDS", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   can("manage", "HazardCategoryToSDS", {
     sds: { is: { pharmacyId: user.pharmacyId } },
   })
   can("read", "HazardCategoryToSDS", {
-    sds: { is: { pharmacyId: { in: getCentralPharmacyIds() } } },
+    sds: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
+  cannot(["create", "update", "delete"], "HazardCategoryToSDS", {
+    sds: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
+  }).because("User is not allow to create/update/delete central records")
 
   // Hazard Classes & Categories
   can("read", ["HazardClass", "HazardCategory"])
@@ -262,40 +142,55 @@ export function defineAbilityForUser(user: User): AppAbility {
     pharmacyId: user.pharmacyId,
   })
   can("read", "RiskAssessment", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "RiskAssessment", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   // Compounds
   can("manage", "Compound", {
     pharmacyId: user.pharmacyId,
   })
   can("read", "Compound", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "Compound", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   // Ingredients
   can("manage", "Ingredient", {
     compound: { is: { pharmacyId: user.pharmacyId } },
   })
   can("read", "Ingredient", {
-    compound: { is: { pharmacyId: { in: getCentralPharmacyIds() } } },
+    compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
+  cannot(["create", "update", "delete"], "Ingredient", {
+    compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
+  }).because("User is not allow to create/update/delete central records")
 
   // MFRs
   can("manage", "Mfr", {
     compound: { is: { pharmacyId: user.pharmacyId } },
   })
   can("read", "Mfr", {
-    compound: { is: { pharmacyId: { in: getCentralPharmacyIds() } } },
+    compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
+  cannot(["create", "update", "delete"], "Mfr", {
+    compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
+  }).because("User is not allow to create/update/delete central records")
 
   // Links
   can("manage", "Link", {
     pharmacyId: user.pharmacyId,
   })
   can("read", "Link", {
-    pharmacyId: { in: getCentralPharmacyIds() },
+    pharmacyId: { in: otherCentralPharmacyIds },
   })
+  cannot(["create", "update", "delete"], "Link", {
+    pharmacyId: { in: otherCentralPharmacyIds },
+  }).because("User is not allow to create/update/delete central records")
 
   // Settings
   can("read", "Settings", {
@@ -306,6 +201,12 @@ export function defineAbilityForUser(user: User): AppAbility {
     can("update", "Settings", {
       pharmacyId: user.pharmacyId,
     })
+  } else {
+    cannot("update", "Settings", {
+      pharmacyId: user.pharmacyId,
+    }).because(
+      "Current user does not have permission to edit pharmacy settings.",
+    )
   }
 
   // Routines
@@ -328,7 +229,7 @@ export function defineAbilityForUser(user: User): AppAbility {
     })
   }
 
-  if (user.role === Role.admin) {
+  if (user.role === Role.superadmin) {
     can("delete", "Pharmacy", {
       id: { equals: user.pharmacyId },
     })
@@ -348,7 +249,15 @@ export function defineAbilityForUser(user: User): AppAbility {
         { role: { notIn: [Role.admin, Role.superadmin] } },
       ],
     })
+    cannot("manage", "User", {
+      AND: [
+        { pharmacyId: user.pharmacyId },
+        { role: { in: [Role.admin, Role.superadmin] } },
+      ],
+    }).because("Admins are unable to modify other Admin/SuperAdmin users.")
   }
+
+  can("manage", "User", { id: { equals: user.id } })
 
   // SuperAdmins can manage all users
   if (user.role === Role.superadmin) {
