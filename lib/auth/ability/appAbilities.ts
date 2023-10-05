@@ -223,7 +223,7 @@ export function defineAbilityForUser(user: User): AppAbility {
     id: { equals: user.pharmacyId },
   })
 
-  if (user.role === Role.admin) {
+  if (user.role === Role.admin || user.role === Role.superadmin) {
     can("update", "Pharmacy", {
       id: { equals: user.pharmacyId },
     })
@@ -256,8 +256,6 @@ export function defineAbilityForUser(user: User): AppAbility {
       ],
     }).because("Admins are unable to modify other Admin/SuperAdmin users.")
   }
-
-  can("manage", "User", { id: { equals: user.id } })
 
   // SuperAdmins can manage all users
   if (user.role === Role.superadmin) {
