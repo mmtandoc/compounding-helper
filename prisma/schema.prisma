@@ -402,6 +402,7 @@ enum Role {
   superadmin @map("SuperAdmin")
   admin      @map("Admin")
   user       @map("User")
+  guest      @map("Guest")
 }
 
 model User {
