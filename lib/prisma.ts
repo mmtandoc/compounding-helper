@@ -26,24 +26,6 @@ import { uncapitalize } from "./utils"
   Based on https://zenn.dev/sawachon/articles/c1c7fe658fe2c6
   and https://github.com/prisma/prisma-client-extensions/tree/main/row-level-security
 */
-export function bypassRLS() {
-  return Prisma.defineExtension((prisma) =>
-    prisma.$extends({
-      query: {
-        $allModels: {
-          async $allOperations({ args, query }) {
-            const [, result] = await prisma.$transaction([
-              prisma.$executeRaw`SELECT set_config('public.bypass_rls', 'on', TRUE)`,
-              query(args),
-            ])
-            return result
-          },
-        },
-      },
-    }),
-  )
-}
-
 export function forUser(userId: string) {
   return Prisma.defineExtension((prisma) =>
     prisma.$extends({
@@ -532,8 +514,11 @@ function whereAccessibleBy(
   return accessibleBy(ability, action)[model]
 }
 
-function createExtendedPrisma() {
+function createExtendedPrisma<
+  TOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
+>(options?: TOptions) {
   const basePrisma = new PrismaClient({
+    errorFormat: "pretty",
     log: [
       { emit: "stdout", level: "query" },
       { emit: "stdout", level: "info" },
@@ -541,6 +526,7 @@ function createExtendedPrisma() {
       { emit: "stdout", level: "error" },
       //{ emit: "event", level: "query" },
     ],
+    ...options,
   })
 
   /* basePrisma.$on("query", (e) => {
@@ -551,11 +537,20 @@ function createExtendedPrisma() {
   return basePrisma
 }
 
+type ExtendedPrismaClient = ReturnType<typeof createExtendedPrisma>
+
 const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof createExtendedPrisma>
+  prisma: ExtendedPrismaClient
+  bypassPrisma: ExtendedPrismaClient
 }
 
 export const prisma = globalForPrisma.prisma ?? createExtendedPrisma()
+export const bypassPrisma =
+  globalForPrisma.bypassPrisma ??
+  createExtendedPrisma({
+    //TODO: Upgrade to prisma 5.2.0, and use "datasourceUrl" instead
+    datasources: { db: { url: process.env?.DATABASE_URL } },
+  })
 
 export function getUserPrismaClient(user: AppUser) {
   const client = prisma
@@ -571,7 +566,7 @@ export function getUserPrismaClient(user: AppUser) {
 }
 
 export function getBypassPrismaClient() {
-  return prisma.$extends(bypassRLS())
+  return bypassPrisma
 }
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
