@@ -75,9 +75,18 @@ export function defineAbilityForUser(user: User): AppAbility {
   )
 
   // Chemicals
-  can("manage", "Chemical", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "Chemical", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "Chemical", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Chemical", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
 
   can("read", "Chemical", {
     pharmacyId: { in: otherCentralPharmacyIds },
@@ -87,14 +96,34 @@ export function defineAbilityForUser(user: User): AppAbility {
     pharmacyId: { in: otherCentralPharmacyIds },
   }).because("User is not allow to create/update/delete central records")
 
-  can("manage", "AdditionalChemicalInfo", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "AdditionalChemicalInfo", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "AdditionalChemicalInfo", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "AdditionalChemicalInfo", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
 
   // Products
-  can("manage", "Product", {
-    pharmacyId: user.pharmacyId,
-  })
+
+  if (user.role === Role.guest) {
+    can("read", "Product", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "Product", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Product", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "Product", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
@@ -103,9 +132,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // Vendors
-  can("manage", "Vendor", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "Vendor", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "Vendor", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Vendor", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "Vendor", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
@@ -114,9 +153,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // SDS Summaries
-  can("manage", "SDS", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "SDS", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "SDS", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "SDS", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "SDS", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
@@ -124,9 +173,19 @@ export function defineAbilityForUser(user: User): AppAbility {
     pharmacyId: { in: otherCentralPharmacyIds },
   }).because("User is not allow to create/update/delete central records")
 
-  can("manage", "HazardCategoryToSDS", {
-    sds: { is: { pharmacyId: user.pharmacyId } },
-  })
+  if (user.role === Role.guest) {
+    can("read", "HazardCategoryToSDS", {
+      sds: { is: { pharmacyId: user.pharmacyId } },
+    })
+    cannot(["create", "update", "delete"], "HazardCategoryToSDS", {
+      sds: { is: { pharmacyId: user.pharmacyId } },
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "HazardCategoryToSDS", {
+      sds: { is: { pharmacyId: user.pharmacyId } },
+    })
+  }
+
   can("read", "HazardCategoryToSDS", {
     sds: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
@@ -138,9 +197,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   can("read", ["HazardClass", "HazardCategory"])
 
   // Risk Assessments
-  can("manage", "RiskAssessment", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "RiskAssessment", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "RiskAssessment", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "RiskAssessment", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "RiskAssessment", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
@@ -149,9 +218,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // Compounds
-  can("manage", "Compound", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "Compound", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "Compound", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Compound", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "Compound", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
@@ -160,9 +239,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // Ingredients
-  can("manage", "Ingredient", {
-    compound: { is: { pharmacyId: user.pharmacyId } },
-  })
+  if (user.role === Role.guest) {
+    can("read", "Ingredient", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    })
+    cannot(["create", "update", "delete"], "Ingredient", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Ingredient", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    })
+  }
+
   can("read", "Ingredient", {
     compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
@@ -171,9 +260,19 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // MFRs
-  can("manage", "Mfr", {
-    compound: { is: { pharmacyId: user.pharmacyId } },
-  })
+  if (user.role === Role.guest) {
+    can("read", "Mfr", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    })
+    cannot(["create", "update", "delete"], "Mfr", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Mfr", {
+      compound: { is: { pharmacyId: user.pharmacyId } },
+    })
+  }
+
   can("read", "Mfr", {
     compound: { is: { pharmacyId: { in: otherCentralPharmacyIds } } },
   })
@@ -182,12 +281,23 @@ export function defineAbilityForUser(user: User): AppAbility {
   }).because("User is not allow to create/update/delete central records")
 
   // Links
-  can("manage", "Link", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "Link", {
+      pharmacyId: user.pharmacyId,
+    })
+    cannot(["create", "update", "delete"], "Link", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Link", {
+      pharmacyId: user.pharmacyId,
+    })
+  }
+
   can("read", "Link", {
     pharmacyId: { in: otherCentralPharmacyIds },
   })
+
   cannot(["create", "update", "delete"], "Link", {
     pharmacyId: { in: otherCentralPharmacyIds },
   }).because("User is not allow to create/update/delete central records")
@@ -210,13 +320,31 @@ export function defineAbilityForUser(user: User): AppAbility {
   }
 
   // Routines
-  can("manage", "Routine", {
-    pharmacyId: user.pharmacyId,
-  })
+  if (user.role === Role.guest) {
+    can("read", "Routine", {
+      pharmacyId: user.pharmacyId,
+    })
 
-  can(["create", "read", "update"], "RoutineCompletion", {
-    routine: { is: { pharmacyId: user.pharmacyId } },
-  })
+    cannot(["create", "update", "delete"], "Routine", {
+      pharmacyId: user.pharmacyId,
+    }).because("Guests are not allowed to modify records.")
+
+    can("read", "RoutineCompletion", {
+      routine: { is: { pharmacyId: user.pharmacyId } },
+    })
+
+    cannot(["create", "update", "delete"], "RoutineCompletion", {
+      routine: { is: { pharmacyId: user.pharmacyId } },
+    }).because("Guests are not allowed to modify records.")
+  } else {
+    can("manage", "Routine", {
+      pharmacyId: user.pharmacyId,
+    })
+
+    can(["create", "read", "update"], "RoutineCompletion", {
+      routine: { is: { pharmacyId: user.pharmacyId } },
+    })
+  }
 
   // Pharmacies
   can("read", "Pharmacy", {
