@@ -364,10 +364,6 @@ export function defineAbilityForUser(user: User): AppAbility {
   }
 
   // Users
-  can("read", "User", {
-    pharmacyId: user.pharmacyId,
-  })
-  can("manage", "User", { id: { equals: user.id } })
 
   // Admins can only manage users that aren't admins or superadmins
   if (user.role === Role.admin) {
@@ -389,6 +385,11 @@ export function defineAbilityForUser(user: User): AppAbility {
   if (user.role === Role.superadmin) {
     can("manage", "User", { pharmacyId: user.pharmacyId })
   }
+
+  can("read", "User", {
+    pharmacyId: user.pharmacyId,
+  })
+  can("update", "User", { id: { equals: user.id } })
 
   return build()
 }
