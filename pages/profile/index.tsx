@@ -12,6 +12,7 @@ const roleMapper = new Map<Role, string>([
   [Role.admin, "Admin"],
   [Role.superadmin, "SuperAdmin"],
   [Role.user, "User"],
+  [Role.guest, "Guest"],
 ])
 
 const Profile: NextPage<Props> = ({ user }) => {
@@ -27,7 +28,7 @@ const Profile: NextPage<Props> = ({ user }) => {
       </FormGroup>
       <FormGroup row>
         <span className="label">Role:</span>
-        {roleMapper.get(user.role)}
+        {roleMapper.get(user.role) ?? user.role}
       </FormGroup>
     </div>
   )
