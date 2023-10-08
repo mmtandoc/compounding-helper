@@ -397,6 +397,11 @@ export function defineRulesForUser(user: User) {
   })
   can("update", "User", { id: { equals: user.id } })
 
+  // Guests and regular users cannot change their roles
+  if (user.role === Role.guest || user.role === Role.user) {
+    cannot("update", "User", "role", { id: { equals: user.id } })
+  }
+
   return rules
 }
 
