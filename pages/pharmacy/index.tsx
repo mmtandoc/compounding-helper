@@ -1,42 +1,38 @@
-import { Role } from "@prisma/client"
-import type { NextPage } from "next"
-
-import { FormGroup } from "components/ui/forms"
+import Details from "components/common/data-pages/Details"
+import PharmacyDetails from "components/pharmacy/PharmacyDetails"
 import { withPageAuth } from "lib/auth"
 import { getPharmacyById } from "pages/api/pharmacies/[id]"
+import { NextPageWithLayout } from "types/common"
 import { PharmacyWithUsers } from "types/models"
 
-type Props = { pharmacy: PharmacyWithUsers }
+type Props = { data: PharmacyWithUsers }
 
-const roleMapper = new Map<Role, string>([
-  [Role.admin, "Admin"],
-  [Role.superadmin, "SuperAdmin"],
-  [Role.user, "User"],
-])
+const PharmacyPage: NextPageWithLayout<Props> = (props) => {
+  const { data } = props
 
-const Pharmacy: NextPage<Props> = ({ pharmacy }) => {
+  /*
+  const ability = useAbility()
+
+  const canEdit = ability.can("update", subject("Pharmacy", data))
+  */
+
+  /*
+  TODO: Implement deleting pharmacy
+  const canDelete = ability.can("delete", subject("Pharmacy", data))
+  */
+
   return (
-    <div className="profile-page">
-      <FormGroup row>
-        <span className="label">Pharmacy name:</span>
-        {pharmacy.name}
-      </FormGroup>
-      <FormGroup>
-        <span className="label">Users:</span>
-        <ul>
-          {pharmacy.users.map((user) => (
-            <li key={user.id}>
-              {user.email} (Role: {roleMapper.get(user.role)})
-            </li>
-          ))}
-        </ul>
-      </FormGroup>
-      <style jsx global>{`
-        .profile-page ul {
-          margin-block: 0;
-        }
-      `}</style>
-    </div>
+    <Details
+      data={data}
+      dataLabel="pharmacy"
+      apiEndpointPath={`/api/pharmacies/${data.id}`}
+      urlPath={`/pharmacy`}
+      detailsComponent={PharmacyDetails}
+      actions={{
+        edit: { visible: false },
+        delete: { visible: false },
+      }}
+    />
   )
 }
 
@@ -51,11 +47,11 @@ export const getServerSideProps = withPageAuth<Props>({
     return {
       props: {
         title: `Pharmacy: ${pharmacy.name}`,
-        pharmacy,
+        data: pharmacy,
       },
     }
   },
   requireAuth: true,
 })
 
-export default Pharmacy
+export default PharmacyPage
