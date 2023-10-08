@@ -1,8 +1,10 @@
+import { User } from "@prisma/client"
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 import { SessionContextProvider } from "@supabase/auth-helpers-react"
-import axios from "axios"
+import axios, { isCancel } from "axios"
+import App, { AppContext } from "next/app"
 import { SnackbarProvider, closeSnackbar } from "notistack"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
 import { SWRConfig, mutate } from "swr"
@@ -10,8 +12,9 @@ import { SWRConfig, mutate } from "swr"
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
-import { AppSession } from "lib/api/utils"
+import { AppSession, getSession } from "lib/api/utils"
 import {
+  AppAbility,
   defineAbilityForUser,
   unauthAbility,
 } from "lib/auth/ability/appAbilities"
@@ -97,64 +100,99 @@ export const multiFetcher = (
 function MyApp({
   Component,
   pageProps,
+  initialAppSession,
 }: AppPropsWithLayout<{
   initialAppSession?: AppSession
-}>) {
+}> & {
+  initialAppSession?: AppSession
+}) {
+  initialAppSession ??= pageProps.initialAppSession
   const [supabaseClient] = useState(() => createPagesBrowserClient())
 
   // Track whether user is signed in to override initialSession to be null
   // Otherwise, signing out while on a page that gives an "initialSession" page prop causes header to not update
-  const [isSignedIn, setIsSignedIn] = useState(!!pageProps.initialAppSession)
+  const [isSignedIn, setIsSignedIn] = useState(!!initialAppSession)
 
-  const ability = useMemo(
-    () =>
-      isSignedIn && pageProps.initialAppSession
-        ? defineAbilityForUser(pageProps.initialAppSession?.appUser)
-        : unauthAbility,
-    [isSignedIn, pageProps.initialAppSession],
+  const [currentUser, setCurrentUser] = useState<User | undefined>()
+
+  const [ability, setAbility] = useState<AppAbility>(
+    initialAppSession
+      ? defineAbilityForUser(initialAppSession.appUser)
+      : unauthAbility,
   )
+
+  useEffect(() => {
+    console.log({ ability })
+  }, [ability])
+
+  useEffect(() => {
+    if (currentUser) {
+      setAbility(defineAbilityForUser(currentUser))
+    }
+    console.log({ currentUser: currentUser })
+  }, [currentUser])
 
   //TODO: Improve current user profile handling
   useEffect(() => {
-    supabaseClient.auth.onAuthStateChange((e) => {
+    const controller = new AbortController()
+    async function getCurrentUser() {
+      return axios
+        .get<User>("/api/users/current", { signal: controller.signal })
+        .then((res) => res.data)
+        .catch((e) => {
+          if (isCancel(e)) {
+            return undefined
+          }
+        })
+    }
+    supabaseClient.auth.onAuthStateChange(async (e) => {
       switch (e) {
+        case "INITIAL_SESSION":
+          setIsSignedIn(true)
+          break
         case "SIGNED_IN":
         case "TOKEN_REFRESHED":
         case "USER_UPDATED":
           mutate("/api/users/current")
           setIsSignedIn(true)
-          //?: Is ability.update() needed here?
+          getCurrentUser().then((currentUser) => setCurrentUser(currentUser))
           break
         case "SIGNED_OUT":
           mutate("/api/users/current", null)
           setIsSignedIn(false)
-          //?: Is ability.update() needed here?
+          ability.update([])
           break
       }
     })
-  }, [supabaseClient.auth])
+
+    return () => {
+      controller.abort()
+    }
+  }, [ability, supabaseClient.auth])
 
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
 
   return (
     <>
-      <AbilityContext.Provider value={ability}>
+      <SWRConfig
+        value={{
+          fetcher: multiFetcher,
+          fallback: {
+            "/api/users/current": initialAppSession?.appUser,
+          },
+        }}
+      >
         <SessionContextProvider
           supabaseClient={supabaseClient}
           initialSession={
-            isSignedIn ? pageProps.initialAppSession?.authSession : null
+            isSignedIn ? initialAppSession?.authSession : undefined
           }
         >
-          <IconContext.Provider
-            value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
-          >
-            <SWRConfig
+          <AbilityContext.Provider value={ability}>
+            <IconContext.Provider
               value={{
-                fetcher: multiFetcher,
-                fallback: {
-                  "/api/users/current": pageProps.initialAppSession?.appUser,
-                },
+                style: { verticalAlign: "middle", overflow: "visible" },
               }}
             >
               <SnackbarProvider
@@ -176,10 +214,11 @@ function MyApp({
               >
                 {layout}
               </SnackbarProvider>
-            </SWRConfig>
-          </IconContext.Provider>
+            </IconContext.Provider>
+          </AbilityContext.Provider>
         </SessionContextProvider>
-      </AbilityContext.Provider>
+      </SWRConfig>
+
       <style jsx global>{`
         #__next {
           display: flex;
@@ -189,6 +228,26 @@ function MyApp({
       `}</style>
     </>
   )
+}
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await App.getInitialProps(appContext)
+
+  if ("initialAppSession" in appProps.pageProps) {
+    return appProps
+  }
+
+  let session: AppSession | null = null
+
+  // Check if server-side
+  if (typeof window === "undefined") {
+    session = await getSession({
+      req: appContext.ctx.req as any,
+      res: appContext.ctx.res as any,
+    })
+  }
+
+  return { ...appProps, initialAppSession: session ?? undefined }
 }
 
 export default MyApp

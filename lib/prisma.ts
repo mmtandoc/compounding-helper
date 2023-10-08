@@ -544,13 +544,23 @@ const globalForPrisma = globalThis as unknown as {
   bypassPrisma: ExtendedPrismaClient
 }
 
-export const prisma = globalForPrisma.prisma ?? createExtendedPrisma()
-export const bypassPrisma =
-  globalForPrisma.bypassPrisma ??
-  createExtendedPrisma({
-    //TODO: Upgrade to prisma 5.2.0, and use "datasourceUrl" instead
-    datasources: { db: { url: process.env?.DATABASE_URL } },
-  })
+export let prisma: ExtendedPrismaClient
+export let bypassPrisma: ExtendedPrismaClient
+
+if (typeof window === "undefined") {
+  prisma = globalForPrisma.prisma ?? createExtendedPrisma()
+  bypassPrisma =
+    globalForPrisma.bypassPrisma ??
+    createExtendedPrisma({
+      //TODO: Upgrade to prisma 5.2.0, and use "datasourceUrl" instead
+      datasources: { db: { url: process.env?.DATABASE_URL } },
+    })
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = prisma
+    globalForPrisma.bypassPrisma = bypassPrisma
+  }
+}
 
 export function getUserPrismaClient(user: AppUser) {
   const client = prisma
@@ -568,5 +578,3 @@ export function getUserPrismaClient(user: AppUser) {
 export function getBypassPrismaClient() {
   return bypassPrisma
 }
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma

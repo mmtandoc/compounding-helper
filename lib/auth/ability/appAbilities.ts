@@ -58,8 +58,8 @@ export type AppAbility = PureAbility<[AppActions, AppSubjects], PrismaQuery>
 
 export const createAppAbility = createPrismaAbility as CreateAbility<AppAbility>
 
-export function defineAbilityForUser(user: User): AppAbility {
-  const { can, cannot, build } = new AbilityBuilder<AppAbility>(
+export function defineRulesForUser(user: User) {
+  const { can, cannot, rules } = new AbilityBuilder<AppAbility>(
     createPrismaAbility,
   )
 
@@ -391,7 +391,13 @@ export function defineAbilityForUser(user: User): AppAbility {
   })
   can("update", "User", { id: { equals: user.id } })
 
-  return build()
+  return rules
+}
+
+export function defineAbilityForUser(user: User): AppAbility {
+  const rules = defineRulesForUser(user)
+
+  return createPrismaAbility(rules)
 }
 
 export const unauthAbility = createAppAbility()
