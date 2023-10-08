@@ -365,16 +365,22 @@ export function defineRulesForUser(user: User) {
 
   // Users
 
-  // Admins can only manage users that aren't admins or superadmins
+  // Admins can only manage other users that aren't admins or superadmins
   if (user.role === Role.admin) {
     can("manage", "User", {
       AND: [
+        {
+          id: { not: { equals: user.id } },
+        },
         { pharmacyId: user.pharmacyId },
         { role: { notIn: [Role.admin, Role.superadmin] } },
       ],
     })
     cannot("manage", "User", {
       AND: [
+        {
+          id: { not: { equals: user.id } },
+        },
         { pharmacyId: user.pharmacyId },
         { role: { in: [Role.admin, Role.superadmin] } },
       ],
