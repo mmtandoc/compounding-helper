@@ -240,7 +240,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   let session: AppSession | null = null
 
   // Check if server-side
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" && (appContext.ctx.req as any)?.cookies) {
     session = await getSession({
       req: appContext.ctx.req as any,
       res: appContext.ctx.res as any,
