@@ -1,6 +1,9 @@
+import { subject } from "@casl/ability"
+
 import Details from "components/common/data-pages/Details"
 import RoutineDetails from "components/routine/RoutineDetails"
 import { withPageAuth } from "lib/auth"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { getRoutineById } from "pages/api/routines/[id]"
 import { NextPageWithLayout } from "types/common"
 import { RoutineWithHistory } from "types/models"
@@ -14,6 +17,11 @@ const ViewRoutine: NextPageWithLayout<ViewRoutineProps> = (
 ) => {
   const { data } = props
 
+  const ability = useAbility()
+
+  const canEdit = ability.can("update", subject("Routine", data))
+  const canDelete = ability.can("delete", subject("Routine", data))
+
   return (
     <Details
       data={data}
@@ -21,7 +29,11 @@ const ViewRoutine: NextPageWithLayout<ViewRoutineProps> = (
       apiEndpointPath={`/api/routines/${data.id}`}
       urlPath={`/routines/${data.id}`}
       detailsComponent={RoutineDetails}
-      actions={{ print: true }}
+      actions={{
+        print: true,
+        edit: { visible: true, disabled: !canEdit },
+        delete: { visible: true, disabled: !canDelete },
+      }}
     />
   )
 }
