@@ -2,7 +2,7 @@
 
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import Link from "next/link"
-import { useRouter } from "next/router"
+import { NextRouter, useRouter } from "next/router"
 import { useMemo } from "react"
 
 import {
@@ -28,25 +28,28 @@ type NavMenuProps = {
   items: NavItem[]
 }
 
+const isActive: (router: NextRouter, currentPathname: string) => boolean = (
+  router,
+  currentPathname,
+) => router.pathname === currentPathname
+
+//TODO: Handle submenus in dropdown
+const NavLink = ({ item }: { item: NavItem }) => {
+  const router = useRouter()
+
+  if (item.hidden) return null
+
+  return item.url ? (
+    <Link href={item.url} data-active={isActive(router, item.url)}>
+      {item.label}
+    </Link>
+  ) : (
+    <a>{item.label}</a>
+  )
+}
+
 const NavMenu = (props: NavMenuProps) => {
   const { items } = props
-
-  const router = useRouter()
-  const isActive: (pathname: string) => boolean = (pathname) =>
-    router.pathname === pathname
-
-  //TODO: Handle submenus in dropdown
-  const NavLink = ({ item }: { item: NavItem }) => {
-    if (item.hidden) return null
-
-    return item.url ? (
-      <Link href={item.url} data-active={isActive(item.url)}>
-        {item.label}
-      </Link>
-    ) : (
-      <a>{item.label}</a>
-    )
-  }
 
   return (
     <>
@@ -209,20 +212,28 @@ const Header = () => {
 
     if (user) {
       return (
-        <>
-          <Link href="/profile">
-            <Button variant="text">{user.email}</Button>
-          </Link>
-          <Button
-            variant="text"
-            onClick={async () => {
-              await supabaseClient.auth.signOut()
-              router.push("/")
-            }}
+        <Dropdown>
+          <DropdownToggle>
+            <Link href="/profile">
+              <Button variant="text">{user.email}</Button>
+            </Link>
+          </DropdownToggle>
+          <DropdownMenu
+            style={{ width: "100%", fontWeight: "bold", textAlign: "center" }}
           >
-            Sign out
-          </Button>
-        </>
+            <NavLink item={{ label: "Pharmacy", url: "/pharmacy" }} />
+            <Button
+              variant="text"
+              onClick={async () => {
+                await supabaseClient.auth.signOut()
+                router.push("/")
+              }}
+              style={{ fontWeight: "bold" }}
+            >
+              Sign out
+            </Button>
+          </DropdownMenu>
+        </Dropdown>
       )
     }
     return (
@@ -246,6 +257,20 @@ const Header = () => {
           column-gap: 1.5rem;
           flex-grow: 1;
           margin-right: 2rem;
+        }
+
+        .right :global(a) {
+          text-decoration: none;
+          display: inline-block;
+          font-weight: bold;
+          color: var(--color-nav-fg);
+          &:hover {
+            color: var(--color-nav-link-hover-fg);
+          }
+        }
+
+        .right :global(a[data-active="true"]) {
+          color: var(--color-nav-link-current-fg);
         }
 
         .env {
