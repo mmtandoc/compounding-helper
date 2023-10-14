@@ -1,4 +1,9 @@
+import Link from "next/link"
+
+import TableActionBar from "components/common/TableActionBar"
+import { Button } from "components/ui"
 import { Fieldset, FormGroup } from "components/ui/forms"
+import { Can } from "lib/contexts/AbilityContext"
 import { PharmacyWithUsers } from "types/models"
 
 import PharmacyUsersTable from "./PharmacyUsersTable"
@@ -17,13 +22,13 @@ const PharmacyDetails = (props: Props) => {
         {data.name}
       </FormGroup>
       <Fieldset legend="Users:">
-        {/* <TableActionBar>
+        <TableActionBar>
           <Can do="create" on="User">
             <Link href="/pharmacy/users/new">
               <Button>Add New User</Button>
             </Link>
           </Can>
-        </TableActionBar> */}
+        </TableActionBar>
         <PharmacyUsersTable data={data.users} />
       </Fieldset>
       <style jsx global>{`

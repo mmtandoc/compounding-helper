@@ -1,7 +1,8 @@
 import { AnyAbility, ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"
-import { AuthSession } from "@supabase/supabase-js"
+import { AuthApiError, AuthSession, createClient } from "@supabase/supabase-js"
+import { SupabaseAuthClientOptions } from "@supabase/supabase-js/dist/module/lib/types"
 import { NextApiRequest, NextApiResponse } from "next"
 import { ConditionalKeys } from "type-fest"
 import { z } from "zod"
@@ -99,6 +100,35 @@ export const sendForbiddenError = <T extends AnyAbility>(
   sendJsonError(res, 403, `Forbidden: ${message ?? error.message}`)
 }
 
+const getSupabaseAuthApiErrorMessage = (error: AuthApiError) => {
+  // TODO: Cover more error messages
+  const userMessageMap = new Map<RegExp | string, string>([
+    [
+      'duplicate key value violates unique constraint "users_email_partial_key"',
+      "User with the provided email already exists",
+    ],
+  ])
+
+  for (const [pattern, message] of Array.from(userMessageMap)) {
+    if (error.message.match(pattern)) {
+      return message
+    }
+  }
+
+  return error.message
+}
+
+export const sendSupabaseAuthApiError = (
+  res: NextApiResponse,
+  error: AuthApiError,
+  message?: string,
+) =>
+  sendJsonError(
+    res,
+    error.status,
+    message ?? getSupabaseAuthApiErrorMessage(error),
+  )
+
 export type AppSession = {
   authSession: AuthSession
   appUser: UserWithPharmacy
@@ -190,3 +220,10 @@ export const getSession: (
 
   return { authSession, appUser }
 }
+
+export const createAdminSupabase = (options?: SupabaseAuthClientOptions) =>
+  createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+    { auth: { persistSession: false }, ...options },
+  )

@@ -1,7 +1,8 @@
 import { subject } from "@casl/ability"
 
 import Details from "components/common/data-pages/Details"
-import { ProfileDetails } from "components/profile/ProfileDetails"
+import { UserDetails } from "components/user/UserDetails"
+import { getUser } from "lib/api/users"
 import { withPageAuth } from "lib/auth"
 import { useAbility } from "lib/contexts/AbilityContext"
 import { NextPageWithLayout } from "types/common"
@@ -9,7 +10,7 @@ import { UserWithPharmacy } from "types/models"
 
 type Props = { data: UserWithPharmacy }
 
-const Profile: NextPageWithLayout<Props> = ({ data }) => {
+const ViewUser: NextPageWithLayout<Props> = ({ data }) => {
   const ability = useAbility()
 
   const canEdit = ability.can("update", subject("User", data))
@@ -21,9 +22,9 @@ const Profile: NextPageWithLayout<Props> = ({ data }) => {
     <Details
       data={data}
       dataLabel="user"
-      apiEndpointPath={`/api/profile`}
-      urlPath={`/profile`}
-      detailsComponent={ProfileDetails}
+      apiEndpointPath={`/api/pharmacies/${data.pharmacyId}/users/${data.id}`}
+      urlPath={`/pharmacy/users/${data.id}`}
+      detailsComponent={UserDetails}
       actions={{
         edit: { visible: canEdit },
         delete: false,
@@ -33,13 +34,23 @@ const Profile: NextPageWithLayout<Props> = ({ data }) => {
 }
 
 export const getServerSideProps = withPageAuth<Props>({
-  getServerSideProps: async (_, session) => ({
-    props: {
-      title: "Profile",
-      data: session.appUser,
-    },
-  }),
+  getServerSideProps: async (context, session) => {
+    const id = context.query.id as string
+
+    const data = await getUser(session, { id })
+
+    if (data === null) {
+      return { notFound: true }
+    }
+
+    return {
+      props: {
+        title: `View User - ${data.email}`,
+        data,
+      },
+    }
+  },
   requireAuth: true,
 })
 
-export default Profile
+export default ViewUser

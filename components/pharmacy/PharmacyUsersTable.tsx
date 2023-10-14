@@ -1,22 +1,17 @@
+import { subject } from "@casl/ability"
 import { Role, User } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
 
 import { Table } from "components/ui"
+import DataRowActions from "components/ui/Table/DataRowActions"
+import { getRoleName } from "components/user/utils"
+import { useAbility } from "lib/contexts/AbilityContext"
 
 type Props = {
   data: User[]
 }
 
 const columnHelper = createColumnHelper<User>()
-
-const roleMapper = new Map<Role, string>([
-  [Role.admin, "Admin"],
-  [Role.superadmin, "SuperAdmin"],
-  [Role.user, "User"],
-  [Role.guest, "Guest"],
-])
-
-const getRoleName = (role: Role) => roleMapper.get(role) ?? role
 
 const columns = [
   columnHelper.accessor("email", {
@@ -26,9 +21,19 @@ const columns = [
   columnHelper.accessor("role", {
     header: "Role",
     cell: (info) => getRoleName(info.getValue()),
+    sortingFn: (rowA, rowB) => {
+      const roleOrder = [Role.superadmin, Role.admin, Role.user, Role.guest]
+
+      const roleA = rowA.original.role
+      const roleB = rowB.original.role
+
+      if (roleA === roleB) {
+        return rowA.original.email.localeCompare(rowB.original.email)
+      }
+
+      return roleOrder.indexOf(roleA) - roleOrder.indexOf(roleB)
+    },
   }),
-  /*
-  TODO: Implement user details and edit pages
   columnHelper.display({
     id: "actions",
     cell: function ActionsCell(info) {
@@ -51,7 +56,6 @@ const columns = [
       headerStyle: { width: 0 },
     },
   }),
-  */
 ]
 
 const PharmacyUsersTable = (props: Props) => {

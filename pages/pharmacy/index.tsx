@@ -1,6 +1,9 @@
+import { subject } from "@casl/ability"
+
 import Details from "components/common/data-pages/Details"
 import PharmacyDetails from "components/pharmacy/PharmacyDetails"
 import { withPageAuth } from "lib/auth"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { getPharmacyById } from "pages/api/pharmacies/[id]"
 import { NextPageWithLayout } from "types/common"
 import { PharmacyWithUsers } from "types/models"
@@ -10,11 +13,9 @@ type Props = { data: PharmacyWithUsers }
 const PharmacyPage: NextPageWithLayout<Props> = (props) => {
   const { data } = props
 
-  /*
   const ability = useAbility()
 
   const canEdit = ability.can("update", subject("Pharmacy", data))
-  */
 
   /*
   TODO: Implement deleting pharmacy
@@ -29,7 +30,7 @@ const PharmacyPage: NextPageWithLayout<Props> = (props) => {
       urlPath={`/pharmacy`}
       detailsComponent={PharmacyDetails}
       actions={{
-        edit: { visible: false },
+        edit: { visible: canEdit },
         delete: { visible: false },
       }}
     />
