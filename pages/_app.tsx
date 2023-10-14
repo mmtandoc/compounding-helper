@@ -1,24 +1,15 @@
-import { User } from "@prisma/client"
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
-import { SessionContextProvider } from "@supabase/auth-helpers-react"
-import axios, { isCancel } from "axios"
+import axios from "axios"
 import App, { AppContext } from "next/app"
 import { SnackbarProvider, closeSnackbar } from "notistack"
-import { useEffect, useState } from "react"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
-import { SWRConfig, mutate } from "swr"
+import { SWRConfig } from "swr"
 
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
 import { AppSession, getSession } from "lib/api/utils"
-import {
-  AppAbility,
-  defineAbilityForUser,
-  unauthAbility,
-} from "lib/auth/ability/appAbilities"
-import { AbilityContext } from "lib/contexts/AbilityContext"
+import AuthProvider from "lib/auth/AuthProvider"
 import { AppPropsWithLayout } from "types/common"
 
 import "styles/main.scss"
@@ -107,68 +98,6 @@ function MyApp({
   initialAppSession?: AppSession
 }) {
   initialAppSession ??= pageProps.initialAppSession
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
-
-  // Track whether user is signed in to override initialSession to be null
-  // Otherwise, signing out while on a page that gives an "initialSession" page prop causes header to not update
-  const [isSignedIn, setIsSignedIn] = useState(!!initialAppSession)
-
-  const [currentUser, setCurrentUser] = useState<User | undefined>()
-
-  const [ability, setAbility] = useState<AppAbility>(
-    initialAppSession
-      ? defineAbilityForUser(initialAppSession.appUser)
-      : unauthAbility,
-  )
-
-  useEffect(() => {
-    console.log({ ability })
-  }, [ability])
-
-  useEffect(() => {
-    if (currentUser) {
-      setAbility(defineAbilityForUser(currentUser))
-    }
-    console.log({ currentUser: currentUser })
-  }, [currentUser])
-
-  //TODO: Improve current user profile handling
-  useEffect(() => {
-    const controller = new AbortController()
-    async function getCurrentUser() {
-      return axios
-        .get<User>("/api/users/current", { signal: controller.signal })
-        .then((res) => res.data)
-        .catch((e) => {
-          if (isCancel(e)) {
-            return undefined
-          }
-        })
-    }
-    supabaseClient.auth.onAuthStateChange(async (e) => {
-      switch (e) {
-        case "INITIAL_SESSION":
-          setIsSignedIn(true)
-          break
-        case "SIGNED_IN":
-        case "TOKEN_REFRESHED":
-        case "USER_UPDATED":
-          mutate("/api/users/current")
-          setIsSignedIn(true)
-          getCurrentUser().then((currentUser) => setCurrentUser(currentUser))
-          break
-        case "SIGNED_OUT":
-          mutate("/api/users/current", null)
-          setIsSignedIn(false)
-          ability.update([])
-          break
-      }
-    })
-
-    return () => {
-      controller.abort()
-    }
-  }, [ability, supabaseClient.auth])
 
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
@@ -183,40 +112,33 @@ function MyApp({
           },
         }}
       >
-        <SessionContextProvider
-          supabaseClient={supabaseClient}
-          initialSession={
-            isSignedIn ? initialAppSession?.authSession : undefined
-          }
-        >
-          <AbilityContext.Provider value={ability}>
-            <IconContext.Provider
-              value={{
-                style: { verticalAlign: "middle", overflow: "visible" },
+        <AuthProvider initialAppSession={initialAppSession}>
+          <IconContext.Provider
+            value={{
+              style: { verticalAlign: "middle", overflow: "visible" },
+            }}
+          >
+            <SnackbarProvider
+              Components={{
+                success: Alert,
+                info: Alert,
+                error: Alert,
+                default: Alert,
+                warning: Alert,
               }}
+              autoHideDuration={5000}
+              action={(snackbarId) => (
+                <IconButton
+                  onClick={() => closeSnackbar(snackbarId)}
+                  icon={MdClose}
+                  variant="text"
+                />
+              )}
             >
-              <SnackbarProvider
-                Components={{
-                  success: Alert,
-                  info: Alert,
-                  error: Alert,
-                  default: Alert,
-                  warning: Alert,
-                }}
-                autoHideDuration={5000}
-                action={(snackbarId) => (
-                  <IconButton
-                    onClick={() => closeSnackbar(snackbarId)}
-                    icon={MdClose}
-                    variant="text"
-                  />
-                )}
-              >
-                {layout}
-              </SnackbarProvider>
-            </IconContext.Provider>
-          </AbilityContext.Provider>
-        </SessionContextProvider>
+              {layout}
+            </SnackbarProvider>
+          </IconContext.Provider>
+        </AuthProvider>
       </SWRConfig>
 
       <style jsx global>{`
