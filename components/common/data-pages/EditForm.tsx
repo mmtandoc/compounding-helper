@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import axios, { AxiosError, isAxiosError } from "axios"
+import axios, { AxiosError, AxiosResponse, isAxiosError } from "axios"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { enqueueSnackbar } from "notistack"
@@ -27,6 +27,8 @@ type EditFormProps<
   urlPath: string
   entryComponent: DataEntryComponent<TFieldValues>
   entryComponentProps?: Record<string, unknown>
+  onSuccessfulSubmit?: (value: TFieldValues, res: AxiosResponse) => void
+  onFailedSubmit?: (reason: any) => void
 }
 
 const EditForm = <
@@ -42,6 +44,8 @@ const EditForm = <
     entryComponent: EntryComponent,
     entryComponentProps,
     schema,
+    onSuccessfulSubmit,
+    onFailedSubmit,
   } = props
 
   const router = useRouter()
@@ -75,12 +79,16 @@ const EditForm = <
   const onSubmit: SubmitHandler<TFieldValues> = async (data) => {
     await axios
       .put(`${apiEndpointPath}`, data)
-      .then(() => {
+      .then((res) => {
+        onSuccessfulSubmit?.(data, res)
+
         enqueueSnackbar("Save successful.", { variant: "success" })
         setSaveSuccessful(true)
         router.push(`${urlPath}`)
       })
       .catch((error: Error | AxiosError<JsonError>) => {
+        onFailedSubmit?.(error)
+
         if (isAxiosError<JsonError>(error)) {
           if (error.code === "409") {
           }
