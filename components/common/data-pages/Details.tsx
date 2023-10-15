@@ -80,8 +80,6 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
     )
   }
 
-  console.log({ actions })
-
   return (
     <div className="details">
       {notice && <div className="notice">{notice}</div>}

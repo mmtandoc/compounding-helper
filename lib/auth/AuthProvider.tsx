@@ -37,14 +37,6 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
   )
 
   useEffect(() => {
-    console.log({ initialAppSession: initialAppSession })
-  }, [initialAppSession])
-
-  useEffect(() => console.log({ ability }), [ability])
-
-  useEffect(() => console.log({ isSignedIn }), [isSignedIn])
-
-  useEffect(() => {
     if (user) {
       setAbility(defineAbilityForUser(user))
     }
@@ -52,7 +44,6 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
 
   //TODO: Improve current user profile handling
   useEffect(() => {
-    console.log("supabaseClient change")
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (e) => {
         console.log(e)
