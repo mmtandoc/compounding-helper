@@ -1,3 +1,5 @@
+import { useSWRConfig } from "swr"
+
 import EditForm from "components/common/data-pages/EditForm"
 import ProfileEntry from "components/profile/ProfileEntry"
 import { withPageAuth } from "lib/auth"
@@ -10,6 +12,7 @@ type Props = {
 
 const EditProfile: NextPageWithLayout<Props> = (props) => {
   const { values } = props
+  const { mutate } = useSWRConfig()
 
   return (
     <EditForm
@@ -18,6 +21,14 @@ const EditProfile: NextPageWithLayout<Props> = (props) => {
       apiEndpointPath={`/api/profile`}
       urlPath={`/profile`}
       entryComponent={ProfileEntry}
+      onSuccessfulSubmit={(_, res) =>
+        mutate(
+          (key) =>
+            typeof key === "string" &&
+            ["/api/profile", "/api/users/current"].includes(key),
+          res.data,
+        )
+      }
     />
   )
 }
