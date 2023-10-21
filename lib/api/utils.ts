@@ -1,5 +1,6 @@
 import { AnyAbility, ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs"
 import { AuthApiError, AuthSession, createClient } from "@supabase/supabase-js"
 import { SupabaseAuthClientOptions } from "@supabase/supabase-js/dist/module/lib/types"
@@ -186,16 +187,28 @@ export function withSession<
       }
 
       if (authSession) {
-        const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
+        const appUser = await getBypassPrismaClient().user.findUnique({
           where: { id: authSession.user.id },
           ...userWithPharmacy,
         })
 
-        req.session = { authSession, appUser }
+        if (!appUser) {
+          // Sign out of session if the session user does not exist in database
+          console.log("SESSION USER DOES NOT EXIST")
+          await supabase.auth.signOut()
+          if (requireAuth) {
+            throw new Error(
+              "The profile for the session's user does not exist.",
+            )
+          }
+        } else {
+          req.session = { authSession, appUser }
+        }
       }
 
       return handler(req, res)
     } catch (error) {
+      console.error(error)
       return sendJsonError(res, 401, "Authentication required")
     }
   }
@@ -213,10 +226,16 @@ export const getSession: (
     return null
   }
 
-  const appUser = await getBypassPrismaClient().user.findUniqueOrThrow({
+  const appUser = await getBypassPrismaClient().user.findUnique({
     where: { id: authSession.user.id },
     ...userWithPharmacy,
   })
+
+  // Sign out of session if the session user does not exist in database
+  if (!appUser) {
+    await supabase.auth.signOut()
+    return null
+  }
 
   return { authSession, appUser }
 }

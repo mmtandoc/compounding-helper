@@ -1,11 +1,13 @@
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 
 import { JsonError } from "types/common"
 import { UserWithPharmacy } from "types/models"
 
-export const useCurrentUser = () => {
-  const { data, ...response } = useSWR<UserWithPharmacy, JsonError>(
+export const useCurrentUser = (options?: SWRConfiguration) => {
+  const { data, ...response } = useSWR<UserWithPharmacy | null, JsonError>(
     "/api/users/current",
+    null,
+    options,
   )
 
   return {

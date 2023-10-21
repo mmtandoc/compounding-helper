@@ -1,8 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
-import { useUser } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -18,7 +17,6 @@ const loginSchema = z.object({
 })
 
 const LoginPage = () => {
-  const user = useUser()
   const router = useRouter()
 
   type LoginFields = z.input<typeof loginSchema>
@@ -43,12 +41,6 @@ const LoginPage = () => {
 
   const [error, setError] = useState<Error | undefined>()
 
-  useEffect(() => {
-    if (user) {
-      router.push("/")
-    }
-  }, [user, router])
-
   const handleSignIn: SubmitHandler<LoginFields> = async (data) => {
     setError(undefined)
     const response = await supabaseClient.auth.signInWithPassword(data)
@@ -57,6 +49,7 @@ const LoginPage = () => {
       return
     }
     invalidateNextRouterCache()
+    router.push("/")
   }
 
   return (

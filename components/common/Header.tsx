@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import Link from "next/link"
 import { NextRouter, useRouter } from "next/router"
 import { useMemo } from "react"
@@ -12,6 +11,7 @@ import {
   DropdownMenu,
   DropdownToggle,
 } from "components/ui"
+import { useSupabaseClient } from "lib/auth/AuthProvider"
 import { useAbility } from "lib/contexts/AbilityContext"
 import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { isCentralPharmacy } from "lib/utils"
@@ -226,7 +226,6 @@ const Header = () => {
               variant="text"
               onClick={async () => {
                 await supabaseClient.auth.signOut()
-                router.push("/")
               }}
               style={{ fontWeight: "bold" }}
             >
