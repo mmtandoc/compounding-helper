@@ -376,15 +376,17 @@ export function defineRulesForUser(user: User) {
         { role: { notIn: [Role.admin, Role.superadmin] } },
       ],
     })
-    cannot("manage", "User", {
-      AND: [
-        {
-          id: { not: { equals: user.id } },
-        },
-        { pharmacyId: user.pharmacyId },
-        { role: { in: [Role.admin, Role.superadmin] } },
-      ],
-    }).because("Admins are unable to modify other Admin/SuperAdmin users.")
+    ;["update", "delete"].forEach((action) => {
+      cannot(action as AppActions, "User", {
+        AND: [
+          {
+            id: { not: { equals: user.id } },
+          },
+          { pharmacyId: user.pharmacyId },
+          { role: { in: [Role.admin, Role.superadmin] } },
+        ],
+      }).because("Admins are unable to modify other Admin/SuperAdmin users.")
+    })
   }
 
   // SuperAdmins can manage all users
@@ -396,6 +398,10 @@ export function defineRulesForUser(user: User) {
     pharmacyId: user.pharmacyId,
   })
   can("update", "User", { id: { equals: user.id } })
+
+  cannot("delete", "User", { id: { equals: user.id } }).because(
+    "User is unable to delete their own account.",
+  )
 
   // Guests and regular users cannot change their roles
   if (user.role === Role.guest || user.role === Role.user) {

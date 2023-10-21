@@ -14,9 +14,7 @@ const ViewUser: NextPageWithLayout<Props> = ({ data }) => {
   const ability = useAbility()
 
   const canEdit = ability.can("update", subject("User", data))
-
-  // TODO: Implement deleting users
-  //const canDelete = ability.can("delete", subject("User", data))
+  const canDelete = ability.can("delete", subject("User", data))
 
   return (
     <Details
@@ -27,7 +25,7 @@ const ViewUser: NextPageWithLayout<Props> = ({ data }) => {
       detailsComponent={UserDetails}
       actions={{
         edit: { visible: canEdit },
-        delete: false,
+        delete: { visible: canDelete },
       }}
     />
   )

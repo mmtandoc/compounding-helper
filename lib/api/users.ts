@@ -1,5 +1,5 @@
 import { ForbiddenError, subject } from "@casl/ability"
-import { Prisma, User } from "@prisma/client"
+import { Prisma, Role, User } from "@prisma/client"
 import { SetRequired } from "type-fest"
 
 import { getRoleName } from "components/user/utils"
@@ -113,4 +113,47 @@ export const createUser = async (
     pharmacyId: authUserResponse.data.user.app_metadata.pharmacy_id,
     ...values,
   } as User
+}
+
+export const deleteUser = async (
+  session: AppSession,
+  where: SetRequired<Prisma.UserWhereUniqueInput, "id">,
+) => {
+  //TODO: Support soft deletion
+  const supabaseAdmin = createAdminSupabase()
+  const prismaClient = getUserPrismaClient(session.appUser)
+
+  const userToDelete = await prismaClient.user.findUnique({ where })
+
+  const isLastSuperAdmin =
+    userToDelete?.role === Role.superadmin &&
+    (await prismaClient.user.count({
+      where: { pharmacyId: userToDelete.pharmacyId, role: Role.superadmin },
+    })) === 1
+
+  if (isLastSuperAdmin) {
+    throw new Error(
+      "Unable to delete user as they are the only superadmin in their pharmacy.",
+    )
+  }
+
+  const deletedUser = await prismaClient.user.delete({
+    where,
+  })
+
+  // Need to check if user was able to be deleted, as if it failed due to a PostgreSQL policy, it won't throw an exception
+  if ((await prismaClient.user.findUnique({ where })) !== null) {
+    throw new Error("User was unable to be deleted.")
+  }
+
+  // Need to use auth admin client to allow users to be deleted
+  const authUserResponse = await supabaseAdmin.auth.admin.deleteUser(where.id)
+
+  if (authUserResponse.error) {
+    throw authUserResponse.error
+  }
+
+  supabaseAdmin.auth.admin.signOut(session.authSession.access_token, "global")
+
+  return deletedUser
 }
