@@ -254,19 +254,28 @@ export function useSupabaseClient<
   return context.supabaseClient as SupabaseClient<Database, SchemaName>
 }
 
-export const useAuthSession = () => {
+export const useAppSession = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error(`useAuthSession must be used within a AuthProvider.`)
+    throw new Error("useAppSession must be used within a AuthProvider.")
   }
 
   return context.session?.authSession
 }
 
-export const useUser = () => {
+export const useAuthSession = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error(`useUser must be used within a AuthProvider.`)
+    throw new Error("useAuthSession must be used within a AuthProvider.")
+  }
+
+  return context.session?.authSession
+}
+
+export const useAppUser = () => {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAppUser must be used within a AuthProvider.")
   }
 
   return context.session?.appUser ?? null

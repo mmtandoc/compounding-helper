@@ -11,9 +11,8 @@ import {
   DropdownMenu,
   DropdownToggle,
 } from "components/ui"
-import { useSupabaseClient } from "lib/auth/AuthProvider"
+import { useAppUser, useSupabaseClient } from "lib/auth/AuthProvider"
 import { useAbility } from "lib/contexts/AbilityContext"
-import { useCurrentUser } from "lib/hooks/useCurrentUser"
 import { isCentralPharmacy } from "lib/utils"
 import Logo from "public/logo.svg"
 
@@ -82,7 +81,7 @@ const NavMenu = (props: NavMenuProps) => {
 }
 
 const Header = () => {
-  const { user } = useCurrentUser()
+  const user = useAppUser()
 
   const ability = useAbility()
 
@@ -207,8 +206,6 @@ const Header = () => {
 
   const AuthActions = () => {
     const supabaseClient = useSupabaseClient()
-    const router = useRouter()
-    //const user = useUser()
 
     if (user) {
       return (
