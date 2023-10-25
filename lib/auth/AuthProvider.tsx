@@ -133,6 +133,7 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
           return
         }
         setAuthSession(session)
+        setIsLoading(false)
       }
     }
 
