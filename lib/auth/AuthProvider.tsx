@@ -77,6 +77,7 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
     initialAppSession?.authSession ?? null,
   )
 
+  // TODO: Make `isLoading` depend on `isUserLoading` as well
   const [isLoading, setIsLoading] = useState<boolean>(!initialAppSession)
   const [error, setError] = useState<Error>()
 
@@ -101,25 +102,10 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
     console.log({ user })
   }, [user])
 
-  /* useEffect(() => {
-    async function getActiveSession() {
-      console.log("getActiveSession()")
-      const {
-        data: { session: activeSession },
-      } = await supabaseClient.auth.getSession()
-      setAuthSession(activeSession ?? null)
-      //setIsSignedIn(!!activeSession)
-    }
-
-    getActiveSession()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) */
-
   useEffect(() => {
     let mounted = true
 
     async function getSession() {
-      console.log("getSession()")
       const {
         data: { session },
         error,
@@ -208,16 +194,6 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
       supabaseClient,
     }
   }, [isLoading, error, authSession, user, supabaseClient])
-
-  /* if (userError) {
-    console.error(userError)
-    return (
-      <ErrorPage
-        statusCode={userError?.code ?? 500}
-        title="Unable to retrieve current user."
-      />
-    )
-  } */
 
   return (
     <AuthContext.Provider value={value}>
