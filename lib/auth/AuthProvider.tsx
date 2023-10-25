@@ -70,7 +70,7 @@ const AuthProvider = ({ initialAppSession, children }: Props) => {
     mutate: mutateUser,
     isLoading: isUserLoading,
   } = useCurrentUser({
-    fallbackData: initialAppSession?.appUser,
+    fallbackData: initialAppSession?.appUser ?? null,
   })
 
   const [authSession, setAuthSession] = useState<AuthSession | null>(
