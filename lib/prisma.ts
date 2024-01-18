@@ -149,9 +149,15 @@ export function withCaslAbilities(user: AppUser) {
 
             // Check if user try to create an element that is not allowed to create
             for (const item of items) {
+              const subjectData = await populateRequiredRelations(
+                model,
+                item,
+                requiredIncludes,
+                client as PrismaClient,
+              )
               ForbiddenError.from(ability).throwUnlessCan(
                 "create",
-                subject(model, item as any),
+                subject(model, subjectData),
               )
             }
             return query(args)
