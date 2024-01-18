@@ -1,10 +1,16 @@
 import { ForbiddenError, subject } from "@casl/ability"
+import {
+  ModelName,
+  WhereInput, // eslint-disable-next-line import/no-unresolved
+} from "@casl/prisma/dist/types/prismaClientBoundTypes"
 import { Prisma, PrismaClient } from "@prisma/client"
+import { DMMF } from "@prisma/client/runtime/library"
 import _ from "lodash"
 
+import { populateNestedRelations } from "lib/prisma"
 import { uncapitalize } from "lib/utils"
 
-import { AppAbility } from "./appAbilities"
+import { AppAbility, IncludesMap } from "./appAbilities"
 
 // Based on https://github.com/twentyhq/twenty/blob/96865b0fec71d0a9f657f9b7f37d1946e83cf4fc/server/src/ability/ability.util.ts
 
@@ -28,14 +34,22 @@ type OperationAbilityChecker = (
   ability: AppAbility,
   prisma: PrismaClient,
   data: any,
+  operationType: OperationType,
+  parentWhere: any,
+  requiredIncludes?: IncludesMap, // Include clauses for each model required for permission checks
+  isNested?: boolean,
   shouldThrow?: boolean,
 ) => Promise<boolean>
 
 const createAbilityCheck: OperationAbilityChecker = async (
   modelName,
   ability,
-  _,
+  prisma,
   data,
+  operationType,
+  _parentWhere,
+  requiredIncludes,
+  isNested = false,
   shouldThrow = false,
 ) => {
   // Handle all operations cases
@@ -49,12 +63,18 @@ const createAbilityCheck: OperationAbilityChecker = async (
 
   // Check if user try to create an element that is not allowed to create
   for (const item of items) {
+    const itemWithRelations = await populateNestedRelations(
+      modelName,
+      item,
+      prisma,
+    )
+
     if (shouldThrow) {
       ForbiddenError.from(ability).throwUnlessCan(
         "create",
-        subject(modelName, item),
+        subject(modelName, itemWithRelations),
       )
-    } else if (!ability.can("create", subject(modelName, item))) {
+    } else if (!ability.can("create", subject(modelName, itemWithRelations))) {
       return false
     }
   }
@@ -66,65 +86,52 @@ const simpleAbilityCheck: OperationAbilityChecker = async (
   modelName,
   ability,
   prisma,
-  data,
+  arg,
+  operationType,
+  parentWhere,
+  requiredIncludes,
+  isNested = false,
   shouldThrow = false,
 ) => {
-  if (typeof data === "boolean") {
+  //TODO: Fix boolean data types so that disconnects are possible
+  if (typeof arg === "boolean") {
     return true
   }
   // Extract entity name from model name
   const entity = uncapitalize(modelName)
-  //TODO: Fix boolean data types so that disconnects are possible
-  if (typeof data === "boolean") {
-    return true
-  }
+
   // Handle all operations cases
-  const operations = !Array.isArray(data) ? [data] : data
-  // Handle where case
-  const normalizedOperations = operations.map((op) => op.where ?? op)
+  const operations = !Array.isArray(arg) ? [arg] : arg
 
-  // If provided operations are UniqueWhereInputs, they can contain multi-field unique attributes,
-  // which have to be flattened before performing a findMany query
-  const flattenCompoundKeys = (modelName: Prisma.ModelName, where: any) => {
-    const getCompoundFieldName = (
-      field: Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey,
-    ) => (field.name ? field.name : field.fields.join("_"))
-
-    const dmmfModel = Prisma.dmmf.datamodel.models.find(
-      (item) => item.name === modelName,
-    )
-
-    if (!dmmfModel) {
-      throw new Error("DMMF model not found")
-    }
-
-    const compoundFields: (Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey)[] =
-      dmmfModel.uniqueIndexes
-    if (dmmfModel.primaryKey) compoundFields.push(dmmfModel.primaryKey)
-
-    const flatWhere = _.cloneDeep(where)
-
-    for (const compoundField of compoundFields) {
-      const compoundName = getCompoundFieldName(compoundField)
-      if (compoundName in flatWhere) {
-        // Flatten compound field
-        Object.assign(flatWhere, flatWhere[compoundName])
-        delete flatWhere[compoundName]
+  // Handle where clause
+  const normalizedOperations = operations.map((op) => {
+    //TODO: Fix retrieval of the where clause
+    if (isNested) {
+      if (operationType === "delete") {
+        return op
       }
+      return op?.where
     }
-
-    return flatWhere
-  }
+    return op.where ?? op
+  })
 
   const flattenedOperations = normalizedOperations.map((op) =>
     flattenCompoundKeys(modelName, op),
   )
 
+  const where = {
+    AND: [
+      {
+        OR: flattenedOperations,
+      },
+      flattenCompoundKeys(modelName, parentWhere),
+    ],
+  }
+
   // Force entity type because of Prisma typing
   const items = await (prisma[entity] as any).findMany({
-    where: {
-      OR: flattenedOperations,
-    },
+    include: requiredIncludes?.[modelName],
+    where,
   })
 
   // Check if user try to connect an element that is not allowed to read
@@ -146,7 +153,7 @@ const operationAbilityCheckers: Record<OperationType, OperationAbilityChecker> =
   {
     create: createAbilityCheck,
     createMany: createAbilityCheck,
-    upsert: simpleAbilityCheck,
+    upsert: simpleAbilityCheck, //async () => true,
     update: simpleAbilityCheck,
     updateMany: simpleAbilityCheck,
     delete: simpleAbilityCheck,
@@ -163,37 +170,40 @@ export const relationAbilityChecker = async (
   ability: AppAbility,
   prisma: PrismaClient,
   args: any,
+  operationType: OperationType,
+  nestedPath: { field?: DMMF.Field; model: Prisma.ModelName; where: any }[],
+  requiredIncludes?: IncludesMap, // Include clauses for each model required for permission checks
   shouldThrow = false,
 ) => {
-  // Extract models from Prisma
-  const models = Prisma.dmmf.datamodel.models
-  // Find main model from options
-  const mainModel = models.find((item) => item.name === modelName)
+  // Get main Prisma DMMF model
+  const mainModel = getDmmfModel(modelName)
 
   if (!mainModel) {
     throw new Error("Main model not found")
   }
 
-  // Loop over fields
+  // Loop over fields of the model
   for (const field of mainModel.fields) {
     // Check if field is a relation
     if (field.relationName) {
       // Check if field is in args
-      const operation = args.data?.[field.name] ?? args?.[field.name]
+      const nestedOperation = args.data?.[field.name] ?? args?.[field.name]
 
-      if (operation) {
+      if (nestedOperation) {
         // Extract operation name and value
-        const operationType = Object.keys(operation)[0] as OperationType
-        const operationValue = operation[operationType]
+        const nestedOperationType = Object.keys(
+          nestedOperation,
+        )[0] as OperationType
+        const operationValue = nestedOperation[nestedOperationType]
 
         // Get operation checker for the operation type
-        const operationChecker = operationAbilityCheckers[operationType]
+        const operationChecker = operationAbilityCheckers[nestedOperationType]
 
         if (!operationChecker) {
           throw new Error("Operation not found")
         }
 
-        const parentData = args.data
+        let parentData = args.data ?? args
 
         const relationData = operationValue?.data
           ? !Array.isArray(operationValue.data)
@@ -203,21 +213,46 @@ export const relationAbilityChecker = async (
           ? [operationValue]
           : operationValue
 
-        // In order for ability rules with conditions depending on related records to work when using a nested "create"/"createMany",
-        // we need to attempt to populate the relation fields with the parent's data
-        // ? Look into a better way to handle this.
-        const createDataWithRelations = relationData.map((data: any) =>
-          populateDataRelations(field, parentData, mainModel, data),
-        )
+        let operationData = operationValue
+
+        if (["create", "createMany"].includes(nestedOperationType)) {
+          // In order for ability rules with conditions depending on related records to work when using a nested "create"/"createMany",
+          // we need to attempt to populate the relation fields with the parent's data
+
+          // If a where clause is given, this means that the new record should be linked to an existing record, so we can get the "parentData" directly from the DB
+          if (args.where) {
+            parentData = await (
+              prisma[uncapitalize(modelName)] as any
+            ).findUnique({
+              include: requiredIncludes?.[modelName],
+              where: args.where,
+            })
+          }
+
+          // ? Look into a better way to handle this.
+          const createDataWithRelations = relationData.map((data: any) =>
+            populateDataRelations(field, parentData, mainModel, data),
+          )
+          operationData = createDataWithRelations
+        }
 
         // Check if operation is allowed
         const allowed = await operationChecker(
           field.type as Prisma.ModelName,
           ability,
           prisma,
-          ["create", "createMany"].includes(operationType)
-            ? createDataWithRelations
-            : operationValue,
+          operationData,
+          nestedOperationType,
+          createParentWhere([
+            ...nestedPath,
+            {
+              field,
+              model: field.type as ModelName,
+              where: operationData?.where, //! Won't work with some nested operations where the "where" is at the top-level
+            },
+          ]),
+          requiredIncludes,
+          true,
           shouldThrow,
         )
 
@@ -234,7 +269,7 @@ export const relationAbilityChecker = async (
             "upsert",
             "update",
             "updateMany",
-          ].includes(operationType)
+          ].includes(nestedOperationType)
         ) {
           // Handle nested operations all cases
 
@@ -252,6 +287,16 @@ export const relationAbilityChecker = async (
               ability,
               prisma,
               nestedCreateData,
+              nestedOperationType,
+              [
+                ...nestedPath,
+                {
+                  field,
+                  model: field.type as ModelName,
+                  where: nestedCreateData?.where,
+                },
+              ],
+              requiredIncludes,
               shouldThrow,
             )
 
@@ -265,6 +310,16 @@ export const relationAbilityChecker = async (
                 ability,
                 prisma,
                 nestedArgs.update,
+                nestedOperationType,
+                [
+                  ...nestedPath,
+                  {
+                    field,
+                    model: field.type as ModelName,
+                    where: nestedArgs.update?.where,
+                  },
+                ],
+                requiredIncludes,
                 shouldThrow,
               )
 
@@ -330,20 +385,14 @@ export const convertToWhereInput = <T>(
  * @returns An object containing the `createData` with populated data relations.
  * @throws Error if the reversed relation cannot be found.
  */
-function populateDataRelations(
+export function populateDataRelations(
   relationField: Prisma.DMMF.Field,
   parentData: any,
   parentModel: Prisma.DMMF.Model,
   createData: any,
 ) {
   // Find the reversed relation based on the provided relationField.
-  const reversedRelation = Prisma.dmmf.datamodel.models
-    .find((m) => m.name === relationField.type)
-    ?.fields.find((f) => f.relationName === relationField.relationName)
-
-  if (!reversedRelation) {
-    throw new Error("Cannot find reversed relation")
-  }
+  const reversedRelation = getReversedRelation(relationField)
 
   // Create a mapping of relation fields from the reversed relation.
   const relationFieldsMap = createRelationFieldMap(reversedRelation)
@@ -371,6 +420,18 @@ function populateDataRelations(
   return createDataWithRelation
 }
 
+function getReversedRelation(relationField: Prisma.DMMF.Field) {
+  const reversedRelation = getDmmfModel(
+    relationField.type as Prisma.ModelName, // Due to being a relation field, the type should be a data model.
+  )?.fields.find((f) => f.relationName === relationField.relationName)
+
+  if (!reversedRelation) {
+    throw new Error("Cannot find reversed relation")
+  }
+
+  return reversedRelation
+}
+
 //TODO: Move to prisma util file
 export function createRelationFieldMap(relation: Prisma.DMMF.Field) {
   return new Map([
@@ -381,4 +442,133 @@ export function createRelationFieldMap(relation: Prisma.DMMF.Field) {
       relation.relationToFields ?? ([] as string[]),
     ),
   ])
+}
+
+// If provided operations are UniqueWhereInputs, they can contain multi-field unique attributes,
+// which have to be flattened before performing a findMany query
+export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
+  modelName: TModel,
+  where: WhereInput<TModel>,
+) {
+  const getCompoundFieldName = (
+    field: Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey,
+  ) => (field.name ? field.name : field.fields.join("_"))
+
+  const dmmfModel = getDmmfModel(modelName)
+
+  if (!dmmfModel) {
+    throw new Error("DMMF model not found")
+  }
+
+  const compoundFields: (Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey)[] =
+    dmmfModel.uniqueIndexes
+
+  if (dmmfModel.primaryKey) compoundFields.push(dmmfModel.primaryKey)
+
+  const compoundFieldNames = compoundFields.map(getCompoundFieldName)
+
+  const flatWhere = _.cloneDeep(where)
+
+  if (!flatWhere) {
+    return flatWhere
+  }
+
+  for (const [fieldName, value] of Object.entries(where ?? {})) {
+    if (compoundFieldNames.includes(fieldName)) {
+      // Flatten compound field
+      Object.assign(flatWhere, value)
+      delete (flatWhere as any)[fieldName]
+    } else {
+      const field = dmmfModel.fields.find((f) => f.name === fieldName)
+      if (field && field.relationName) {
+        ;(flatWhere as any)[fieldName] = flattenCompoundKeys(
+          field.type as Prisma.ModelName,
+          value,
+        )
+      }
+    }
+  }
+
+  return flatWhere
+}
+
+export function getDmmfModel(modelName: Prisma.ModelName) {
+  return Prisma.dmmf.datamodel.models.find((item) => item.name === modelName)
+}
+
+export function getIdFields(
+  modelName: Prisma.ModelName,
+  throwIfNotFound = false,
+) {
+  const dmmfModel = getDmmfModel(modelName)
+
+  if (!dmmfModel) {
+    throw new Error(`DMMF model for ${modelName} not found`)
+  }
+
+  let fields = dmmfModel.fields
+  if (!fields) {
+    if (throwIfNotFound) {
+      throw new Error(`Unable to load fields for ${modelName}`)
+    } else {
+      fields = []
+    }
+  }
+  const result = fields.filter((f) => f.isId)
+  if (result.length === 0 && throwIfNotFound) {
+    throw new Error(`model ${modelName} does not have an id field`)
+  }
+  return result
+}
+
+/**
+ * Generates a parent where clause by merging the where properties of each item in the nestedPath array.
+ *
+ * @param nestedPath - An array of objects containing information about the nested path.
+ * @return The parentWhere object.
+ */
+function createParentWhere(
+  nestedPath: {
+    field?: Prisma.DMMF.Field | undefined
+    model: Prisma.ModelName
+    where: any
+  }[],
+) {
+  const parentWhere: any = {}
+
+  let path: string[] = []
+
+  // Iterate over each item in the nestedPath array in reverse order
+  for (const item of nestedPath.toReversed()) {
+    if (path.length > 0) {
+      // Merge the where property of the item into the parentWhere object at the corresponding path
+      _.set(
+        parentWhere,
+        path,
+        Object.assign(_.get(parentWhere, path), item.where ?? {}),
+      )
+    } else {
+      // If it's the first item, assign the where property directly to the parentWhere object
+      Object.assign(parentWhere, item.where ?? {})
+    }
+
+    const reversedRelation = item.field
+      ? getReversedRelation(item.field)
+      : undefined
+
+    if (reversedRelation) {
+      const key = reversedRelation.name
+      path = [...path, key]
+
+      if (reversedRelation.isList) {
+        // Use the "some" operator to filter the nested list
+        _.set(parentWhere, path, { some: {} })
+        path = [...path, "some"]
+      } else {
+        _.set(parentWhere, path, {})
+      }
+    }
+  }
+
+  return parentWhere
 }

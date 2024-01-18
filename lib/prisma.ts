@@ -2,16 +2,18 @@
 import { ForbiddenError, subject } from "@casl/ability"
 import { WhereInput, accessibleBy } from "@casl/prisma"
 import { User as AppUser, Prisma, PrismaClient } from "@prisma/client"
-import { Operation } from "@prisma/client/runtime/library"
 import _ from "lodash"
 
 import {
   AppAbility,
   AppActions,
+  IncludesMap,
   defineAbilityForUser,
+  getRequiredIncludes,
 } from "./auth/ability/appAbilities"
 import {
   createRelationFieldMap,
+  getDmmfModel,
   relationAbilityChecker,
 } from "./auth/ability/utils"
 import { uncapitalize } from "./utils"
@@ -76,16 +78,18 @@ export function forUserTx(userId: string) {
 
 export function withCaslAbilities(user: AppUser) {
   const ability = defineAbilityForUser(user)
+  const requiredIncludes = getRequiredIncludes()
   return Prisma.defineExtension((client) =>
     client.$extends({
       query: {
         $allModels: {
-          async update({ args, model, query }) {
+          async update({ args, model, query, operation }) {
             client = sharedTxClient ?? client
             // Check if user has permission to update specific record
             const record = await (
               client[uncapitalize(model)] as any
             ).findUniqueOrThrow({
+              include: requiredIncludes?.[model],
               where: args.where,
             })
 
@@ -100,12 +104,15 @@ export function withCaslAbilities(user: AppUser) {
               ability,
               client as PrismaClient,
               args,
+              operation,
+              [{ model, where: args.where }],
+              requiredIncludes,
               true,
             )
 
             return query(args)
           },
-          async create({ args, model, query }) {
+          async create({ args, model, query, operation }) {
             client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
@@ -113,13 +120,21 @@ export function withCaslAbilities(user: AppUser) {
               ability,
               client as PrismaClient,
               args,
+              operation,
+              [{ model, where: args }],
+              requiredIncludes,
               true,
             )
 
             // In order to check for create permission, we need to replace the relation fields with actual values
-            const subjectData = await populateNestedRelations(
+            const subjectData = await populateRequiredRelations(
               model,
-              args,
+              await populateNestedRelations(
+                model,
+                args,
+                client as PrismaClient,
+              ),
+              requiredIncludes,
               client as PrismaClient,
             )
 
@@ -141,7 +156,7 @@ export function withCaslAbilities(user: AppUser) {
             }
             return query(args)
           },
-          async updateMany({ args, model, query }) {
+          async updateMany({ args, model, query, operation }) {
             client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
@@ -149,6 +164,9 @@ export function withCaslAbilities(user: AppUser) {
               ability,
               client as PrismaClient,
               args,
+              operation,
+              [{ model, where: args.where }],
+              requiredIncludes,
               true,
             )
 
@@ -156,7 +174,8 @@ export function withCaslAbilities(user: AppUser) {
             //TODO: Try to fix TS error "Expression produces a union type that is too complex to represent"
             const records = await (client[uncapitalize(model)] as any).findMany(
               {
-                ...args,
+                //...args,
+                include: requiredIncludes?.[model],
                 where: {
                   AND: [
                     accessibleBy(ability, "update")[model] as any,
@@ -175,7 +194,7 @@ export function withCaslAbilities(user: AppUser) {
 
             return query(args)
           },
-          async upsert({ args, model, query }) {
+          async upsert({ args, model, query, operation }) {
             client = sharedTxClient ?? client
             // Check if user has ability to act on nested relations
             await relationAbilityChecker(
@@ -183,25 +202,23 @@ export function withCaslAbilities(user: AppUser) {
               ability,
               client as PrismaClient,
               args,
+              operation,
+              [{ model, where: args.where }],
+              requiredIncludes,
               true,
             )
 
             // Must coerce to 'any' as otherwise causes TS error "Expression produces a union type that is too complex to represent"
             //TODO: Try to fix TS error "Expression produces a union type that is too complex to represent"
-            const records = await (client[uncapitalize(model)] as any).findMany(
-              {
-                ...args,
-                where: {
-                  AND: [
-                    accessibleBy(ability, "update")[model] as any,
-                    args.where,
-                  ],
-                },
-              },
-            )
 
-            // Check if user has permission to update existing records
-            for (const record of records) {
+            const record = await (
+              client[uncapitalize(model)] as any
+            ).findUnique({
+              include: requiredIncludes?.[model],
+              where: args.where,
+            })
+
+            if (record) {
               ForbiddenError.from(ability).throwUnlessCan(
                 "update",
                 subject(model, record),
@@ -219,6 +236,7 @@ export function withCaslAbilities(user: AppUser) {
             const record = await (
               client[uncapitalize(model)] as any
             ).findUniqueOrThrow({
+              include: requiredIncludes?.[model],
               where: args.where,
             })
 
@@ -235,7 +253,7 @@ export function withCaslAbilities(user: AppUser) {
             //TODO: Try to fix TS error "Expression produces a union type that is too complex to represent"
             const records = await (client[uncapitalize(model)] as any).findMany(
               {
-                ...args,
+                //...args,
                 where: {
                   AND: [
                     accessibleBy(ability, "delete")[model] as any,
@@ -261,7 +279,7 @@ export function withCaslAbilities(user: AppUser) {
             const nonUniqueWhere = _.omit(args.where, uniqueKeys)
 
             const findUniqueArgs = {
-              ...args,
+              ..._.merge({ include: requiredIncludes?.[model] }, args),
               where: {
                 ...uniqueWhere,
                 AND: nonUniqueWhere
@@ -278,7 +296,7 @@ export function withCaslAbilities(user: AppUser) {
             const nonUniqueWhere = _.omit(args.where, uniqueKeys)
 
             const findUniqueArgs = {
-              ...args,
+              ..._.merge({ include: requiredIncludes?.[model] }, args),
               where: {
                 ...uniqueWhere,
                 AND: nonUniqueWhere
@@ -325,9 +343,7 @@ export function withCaslAbilities(user: AppUser) {
 }
 
 const getUniqueWhereKeys = (modelName: Prisma.ModelName) => {
-  const dmmfModel = Prisma.dmmf.datamodel.models.find(
-    (m) => m.name === modelName,
-  )
+  const dmmfModel = getDmmfModel(modelName)
 
   if (!dmmfModel) {
     throw new Error("Invalid model name")
@@ -391,7 +407,7 @@ function createConnectSubjectEntries(
   return entries
 }
 
-async function populateNestedRelations(
+export async function populateNestedRelations(
   model: Prisma.ModelName,
   args: any,
   client: PrismaClient,
@@ -400,9 +416,7 @@ async function populateNestedRelations(
 
   const subjectDataEntries = []
 
-  const dmmfModel = Prisma.dmmf.datamodel.models.find(
-    (item) => item.name === model,
-  )
+  const dmmfModel = getDmmfModel(model)
 
   if (!dmmfModel) {
     throw new Error("DMMF model not found")
@@ -490,6 +504,8 @@ async function populateNestedRelations(
             }
             break
           }
+          default:
+            subjectDataEntries.push([field.name, fieldData])
         }
       } else {
         subjectDataEntries.push([field.name, fieldData])
@@ -498,6 +514,50 @@ async function populateNestedRelations(
   }
 
   return Object.fromEntries(subjectDataEntries)
+}
+
+async function populateRequiredRelations(
+  model: Prisma.ModelName,
+  createData: any,
+  requiredIncludes: IncludesMap,
+  client: PrismaClient,
+) {
+  const dmmfModel = getDmmfModel(model)
+
+  const requiredInclude = requiredIncludes[model]
+
+  const result = _.cloneDeep(createData)
+
+  for (const fieldName of Object.keys(requiredInclude ?? {})) {
+    const relationField = dmmfModel?.fields.find((f) => f.name === fieldName)
+    if (!relationField) {
+      continue
+    }
+    const relationModel = relationField.type as Prisma.ModelName
+
+    const scalarFieldNameMapper = new Map(
+      _.zip(
+        relationField.relationFromFields,
+        relationField.relationToFields,
+      ) as any,
+    )
+
+    const relationWhere = _.mapKeys(
+      _.pick(createData, relationField.relationFromFields ?? []),
+      (_, key) => scalarFieldNameMapper.get(key),
+    )
+
+    const relationData = await (
+      client[uncapitalize(relationModel)] as any
+    ).findUniqueOrThrow({
+      include: requiredIncludes?.[relationModel],
+      where: relationWhere,
+    })
+
+    result[fieldName] = relationData
+  }
+
+  return result
 }
 
 function whereAccessibleBy(
@@ -520,8 +580,8 @@ function createExtendedPrisma<
   const basePrisma = new PrismaClient({
     errorFormat: "pretty",
     log: [
-      { emit: "stdout", level: "query" },
-      { emit: "stdout", level: "info" },
+      /* { emit: "stdout", level: "query" },
+      { emit: "stdout", level: "info" }, */
       { emit: "stdout", level: "warn" },
       { emit: "stdout", level: "error" },
       //{ emit: "event", level: "query" },

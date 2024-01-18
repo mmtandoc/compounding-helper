@@ -11,6 +11,8 @@ import {
   Link,
   Mfr,
   Pharmacy,
+  Prisma,
+  PrismaClient,
   Product,
   RiskAssessment,
   Role,
@@ -415,6 +417,40 @@ export function defineAbilityForUser(user: User): AppAbility {
   const rules = defineRulesForUser(user)
 
   return createPrismaAbility(rules)
+}
+
+type ModelIncludeInput = {
+  [K in Prisma.ModelName]: Uncapitalize<K> extends keyof PrismaClient
+    ? Extract<
+        Parameters<PrismaClient[Uncapitalize<K>]["findFirst"]>[0],
+        {
+          include?: any
+        }
+      >["include"]
+    : never
+}
+type IncludeInput<TModelName extends Prisma.ModelName> = Extract<
+  ModelIncludeInput[TModelName],
+  Record<any, any>
+>
+
+export type IncludesMap = Partial<{
+  [K in Prisma.ModelName]: IncludeInput<K>
+}>
+
+/**
+ * Retrieves the required includes for performing permission checks.
+ *
+ * @returns An object representing the required includes for permission checking, where each key corresponds to a model
+ *          and its associated includes. The values are objects with boolean properties indicating the inclusion status.
+ */
+export function getRequiredIncludes(): IncludesMap {
+  return {
+    Ingredient: { compound: true },
+    Mfr: { compound: true },
+    RoutineCompletion: { routine: true },
+    HazardCategoryToSDS: { sds: true },
+  }
 }
 
 export const unauthAbility = createAppAbility()
