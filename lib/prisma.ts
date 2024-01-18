@@ -266,6 +266,7 @@ export function withCaslAbilities(user: AppUser) {
                     args.where,
                   ],
                 },
+                include: requiredIncludes?.[model],
               },
             )
 
