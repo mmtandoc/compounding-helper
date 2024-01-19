@@ -452,7 +452,7 @@ export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
 ) {
   const getCompoundFieldName = (
     field: Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey,
-  ) => (field.name ? field.name : field.fields.join("_"))
+  ) => field.name ?? field.fields.join("_")
 
   const dmmfModel = getDmmfModel(modelName)
 
@@ -460,12 +460,12 @@ export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
     throw new Error("DMMF model not found")
   }
 
-  const compoundFields: (Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey)[] =
-    dmmfModel.uniqueIndexes
-
-  if (dmmfModel.primaryKey) compoundFields.push(dmmfModel.primaryKey)
-
-  const compoundFieldNames = compoundFields.map(getCompoundFieldName)
+  // Get the names of the compound fields from the DMMF model
+  const compoundFieldNames = [...dmmfModel.uniqueIndexes, dmmfModel.primaryKey]
+    .filter(
+      (f): f is Prisma.DMMF.uniqueIndex | Prisma.DMMF.PrimaryKey => f !== null,
+    )
+    .map(getCompoundFieldName)
 
   const flatWhere = _.cloneDeep(where)
 
@@ -474,13 +474,14 @@ export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
   }
 
   for (const [fieldName, value] of Object.entries(where ?? {})) {
+    // If the field is a compound field, flatten it
     if (compoundFieldNames.includes(fieldName)) {
-      // Flatten compound field
       Object.assign(flatWhere, value)
       delete (flatWhere as any)[fieldName]
     } else {
+      // If the field is a relation field, recursively flatten it
       const field = dmmfModel.fields.find((f) => f.name === fieldName)
-      if (field && field.relationName) {
+      if (field?.relationName) {
         ;(flatWhere as any)[fieldName] = flattenCompoundKeys(
           field.type as Prisma.ModelName,
           value,
