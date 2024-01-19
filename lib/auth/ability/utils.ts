@@ -457,6 +457,10 @@ export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
     throw new Error("DMMF model not found")
   }
 
+  if (!where) {
+    return where
+  }
+
   // Get the names of the compound fields from the DMMF model
   const compoundFieldNames = [...dmmfModel.uniqueIndexes, dmmfModel.primaryKey]
     .filter(
@@ -466,24 +470,11 @@ export function flattenCompoundKeys<TModel extends Prisma.ModelName>(
 
   const flatWhere = _.cloneDeep(where)
 
-  if (!flatWhere) {
-    return flatWhere
-  }
-
-  for (const [fieldName, value] of Object.entries(where ?? {})) {
+  for (const [fieldName, value] of Object.entries(where)) {
     // If the field is a compound field, flatten it
     if (compoundFieldNames.includes(fieldName)) {
       Object.assign(flatWhere, value)
       delete (flatWhere as any)[fieldName]
-    } else {
-      // If the field is a relation field, recursively flatten it
-      const field = dmmfModel.fields.find((f) => f.name === fieldName)
-      if (field?.relationName) {
-        ;(flatWhere as any)[fieldName] = flattenCompoundKeys(
-          field.type as Prisma.ModelName,
-          value,
-        )
-      }
     }
   }
 
@@ -543,7 +534,10 @@ function createParentWhere(
       _.set(
         parentWhere,
         path,
-        Object.assign(_.get(parentWhere, path), item.where ?? {}),
+        Object.assign(
+          _.get(parentWhere, path),
+          flattenCompoundKeys(item.model, item.where ?? {}),
+        ),
       )
     } else {
       // If it's the first item, assign the where property directly to the parentWhere object
