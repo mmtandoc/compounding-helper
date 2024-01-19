@@ -528,7 +528,7 @@ function createParentWhere(
   let path: string[] = []
 
   // Iterate over each item in the nestedPath array in reverse order
-  for (const item of nestedPath.toReversed()) {
+  for (const item of Array.from(nestedPath).reverse()) {
     if (path.length > 0) {
       // Merge the where property of the item into the parentWhere object at the corresponding path
       _.set(
