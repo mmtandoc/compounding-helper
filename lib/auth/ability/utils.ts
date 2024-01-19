@@ -432,14 +432,11 @@ function getReversedRelation(relationField: Prisma.DMMF.Field) {
   return reversedRelation
 }
 
-//TODO: Move to prisma util file
 export function createRelationFieldMap(relation: Prisma.DMMF.Field) {
   return new Map([
     ..._.zip<string, string>(
-      relation.relationFromFields
-        ? relation.relationFromFields
-        : ([] as string[]),
-      relation.relationToFields ?? ([] as string[]),
+      relation.relationFromFields ?? [],
+      relation.relationToFields ?? [],
     ),
   ])
 }
