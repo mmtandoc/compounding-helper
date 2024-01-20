@@ -1,8 +1,12 @@
+import { subject } from "@casl/ability"
 import { Chemical } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
+import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy } from "lib/utils"
 import { ProductAll } from "types/models"
 
 type Props = {
@@ -12,6 +16,12 @@ type Props = {
 const columnHelper = createColumnHelper<ProductAll>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     enableSorting: true,
@@ -46,13 +56,26 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/products/${data.id}` }}
-        editButton={{ getUrl: (data) => `/products/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const ability = useAbility()
+
+      const canEdit = ability.can(
+        "update",
+        subject("Product", info.row.original),
+      )
+
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/products/${data.id}` }}
+          editButton={
+            canEdit
+              ? { getUrl: (data) => `/products/${data.id}/edit` }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

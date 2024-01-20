@@ -1,23 +1,25 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { ForbiddenError } from "@casl/ability"
 
-import { sendJsonError } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
 import { CompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import IngredientMapper from "lib/mappers/IngredientMapper"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 import {
   CompoundWithIngredients,
   compoundWithIngredients as includeAllNested,
 } from "types/models"
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<
-    ApiBody<CompoundWithIngredients[] | CompoundWithIngredients>
-  >,
-) {
-  const { method } = req
+const handler = withSession<
+  ApiBody<CompoundWithIngredients[] | CompoundWithIngredients>
+>(async (req, res) => {
+  const { method, session } = req
 
   //TODO: Implement filtering
   switch (method) {
@@ -25,9 +27,12 @@ export default async function handler(
       let compounds
 
       try {
-        compounds = await getCompounds()
+        compounds = await getCompounds(session)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -41,8 +46,18 @@ export default async function handler(
         console.error(error)
         return sendJsonError(res, 400, "Body is invalid.")
       }
+      let result
 
-      const result = await createCompound(fields)
+      try {
+        result = await createCompound(session, fields)
+      } catch (error) {
+        console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
+        return sendJsonError(res, 500, "Encountered error with database.")
+      }
+
       res
         .setHeader("Location", `/compounds/${result.id}`)
         .status(201)
@@ -56,16 +71,21 @@ export default async function handler(
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
 
-export const getCompounds = async () =>
-  prisma.compound.findMany({
+export default handler
+
+export const getCompounds = async (session: AppSession) =>
+  getUserPrismaClient(session.appUser).compound.findMany({
     orderBy: { id: "asc" },
     ...includeAllNested,
   })
 
-export const createCompound = async (fields: CompoundFields) =>
-  prisma.compound.create({
+export const createCompound = async (
+  session: AppSession,
+  fields: CompoundFields,
+) =>
+  getUserPrismaClient(session.appUser).compound.create({
     ...includeAllNested,
     data: {
       ingredients: {
@@ -73,6 +93,9 @@ export const createCompound = async (fields: CompoundFields) =>
           data: fields.ingredients.map(IngredientMapper.toModel),
         },
       },
-      ...CompoundMapper.toModel(fields),
+      ...CompoundMapper.toModel({
+        pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions
+        ...fields,
+      }),
     },
   })

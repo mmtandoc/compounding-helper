@@ -1,6 +1,7 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("RLS_DATABASE_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 generator client {
@@ -8,22 +9,45 @@ generator client {
 }
 
 model Chemical {
-  id                Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   name              String
-  casNumber         String?   @unique
+  casNumber         String?                  @unique
   synonyms          String[]
   products          Product[]
-  nioshTable        Int       @default(-1)
-  nioshRevisionDate DateTime? @db.Date
-  additionalInfo    String?
-  updatedAt         DateTime  @default(now()) @updatedAt
+  nioshTable        Int                      @default(-1)
+  nioshRevisionDate DateTime?                @db.Date
+  updatedAt         DateTime                 @default(now()) @updatedAt
+  additionalInfo    AdditionalChemicalInfo[]
 
   //@@index([synonyms(ops: ArrayOps)], type: Gin)
   @@map("chemicals")
 }
 
+model AdditionalChemicalInfo {
+  id Int @id @default(autoincrement())
+
+  chemical   Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  chemicalId Int
+
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+
+  value String
+
+  @@unique([chemicalId, pharmacyId])
+  @@map("additional_chemical_info")
+}
+
 model Product {
-  id         Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   name       String
   chemical   Chemical @relation(fields: [chemicalId], references: [id])
   chemicalId Int
@@ -37,7 +61,11 @@ model Product {
 }
 
 model Vendor {
-  id       Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   name     String
   products Product[]
 
@@ -45,7 +73,11 @@ model Vendor {
 }
 
 model SDS {
-  id                 Int                   @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   product            Product               @relation(fields: [productId], references: [id])
   productId          Int
   revisionDate       DateTime              @db.Date
@@ -97,9 +129,14 @@ model HazardCategoryToSDS {
 }
 
 model RiskAssessment {
-  id                     Int                  @id @default(autoincrement())
-  compound               Compound             @relation(fields: [compoundId], references: [id])
-  compoundId             Int
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  compound   Compound @relation(fields: [compoundId], references: [id])
+  compoundId Int
+
   complexity             Complexity
   isPreparedOccasionally Boolean
   preparationFrequency   PreparationFrequency
@@ -199,7 +236,11 @@ enum PreparationFrequency {
 }
 
 model Compound {
-  id                 Int              @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   name               String
   ingredients        Ingredient[]
   riskAssessments    RiskAssessment[]
@@ -213,8 +254,9 @@ model Compound {
 }
 
 model Ingredient {
-  compound                    Compound     @relation(fields: [compoundId], references: [id])
-  compoundId                  Int
+  compound   Compound @relation(fields: [compoundId], references: [id])
+  compoundId Int
+
   order                       Int
   safetyDataSheet             SDS?         @relation(fields: [safetyDataSheetId], references: [id])
   safetyDataSheetId           Int?
@@ -286,26 +328,35 @@ enum Storage {
 }
 
 model Link {
-  id          Int      @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   url         String
   name        String
   description String?
-  order       Int      @default(autoincrement())
+  order       Int
   updatedAt   DateTime @updatedAt
 
+  @@unique([pharmacyId, order])
   @@map("directory")
 }
 
 model Settings {
-  id               Int  @id @default(autoincrement())
-  mfrFieldPresets  Json //{[fieldName]: {label?: String, value: any}|{label?: String, value: any}[]}
-  shortcutSuffixes Json @default("[]") //{code: String, description: String}[]
+  pharmacy         Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  pharmacyId       Int      @id @default(dbgenerated("get_current_pharmacy_id()"))
+  mfrFieldPresets  Json     @default("{\"labelling\": [{\"value\": \"External use only\"}, {\"value\": \"Shake well\"}, {\"value\": \"Store at room temperature\"}, {\"value\": \"Store in fridge\"}, {\"value\": \"Expiry date\"}], \"packaging\": [{\"value\": \"Ointment jar\"}, {\"value\": \"Amber plastic bottle\"}], \"references\": [{\"label\": \"Based on historical use/pharmacist experience\", \"value\": \"This formulation is not based on literature but based on historical use or pharmacist experience\"}, {\"label\": \"USP795 - solid formulations, no stability data\", \"value\": \"USP795 guidelines - solid formulations since no stability data available\"}, {\"label\": \"Vigilance\", \"value\": \"Vigilance Reference #: ________ Date: YYYY-MM-DD\"}], \"qualityControls\": [{\"label\": \"White smooth cream\", \"value\": [{\"name\": \"Final product appearance\", \"expectedSpecification\": \"White smooth homogenous cream\"}]}, {\"label\": \"Yellow smooth cream\", \"value\": [{\"name\": \"Final product appearance\", \"expectedSpecification\": \"Yellow smooth homogenous cream\"}]}, {\"label\": \"White smooth ointment\", \"value\": [{\"name\": \"Final product appearance\", \"expectedSpecification\": \"White smooth homogenous ointment\"}]}, {\"label\": \"Yellow smooth ointment\", \"value\": [{\"name\": \"Final product appearance\", \"expectedSpecification\": \"Yellow smooth homogenous ointment\"}]}], \"compoundingMethod\": [{\"label\": \"Creams template\", \"value\": \"1. Levigate creams together until uniform mixture is obtained.\\n2. Transfer to ointment jar and label\"}, {\"label\": \"Ointments template\", \"value\": \"1. Levigate ointments together until uniform mixture is obtained.\\n2. Transfer to ointment jar and label\"}], \"requiredEquipment\": [{\"value\": \"scale\"}, {\"value\": \"weight paper/boat\"}, {\"value\": \"spatula\"}, {\"value\": \"ointment pad/slab\"}, {\"value\": \"graduated cylinder\"}, {\"value\": \"mortar and pestle\"}, {\"value\": \"ointment jar\"}, {\"value\": \"amber plastic bottle\"}]}") //{[fieldName]: {label?: String, value: any}|{label?: String, value: any}[]}
+  shortcutSuffixes Json     @default("[]") //{code: String, description: String}[]
 
   @@map("settings")
 }
 
 model Routine {
-  id                Int                 @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  pharmacyId Int      @default(dbgenerated("get_current_pharmacy_id()"))
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
   category          String?
   name              String
   description       String?
@@ -326,4 +377,44 @@ model RoutineCompletion {
 
   @@id([routineId, date])
   @@map("routine_completions")
+}
+
+model Pharmacy {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  users                  User[]
+  chemicals              Chemical[]
+  additionalChemicalInfo AdditionalChemicalInfo[]
+  products               Product[]
+  vendors                Vendor[]
+  sdsSummaries           SDS[]
+  riskAssessments        RiskAssessment[]
+  compounds              Compound[]
+  links                  Link[]
+  routines               Routine[]
+  settings               Settings?
+
+  @@map("pharmacies")
+}
+
+enum Role {
+  superadmin @map("SuperAdmin")
+  admin      @map("Admin")
+  user       @map("User")
+  guest      @map("Guest")
+}
+
+model User {
+  id String @id @db.Uuid
+
+  pharmacyId Int
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  role Role
+
+  email     String   @unique
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("users")
 }

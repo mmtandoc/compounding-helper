@@ -1,9 +1,12 @@
+import { subject } from "@casl/ability"
 import { Chemical } from "@prisma/client"
 import { createColumnHelper } from "@tanstack/react-table"
+import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
-import { toIsoDateString } from "lib/utils"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 import { SdsWithRelations } from "types/models"
 
 type Props = {
@@ -13,6 +16,12 @@ type Props = {
 const columnHelper = createColumnHelper<SdsWithRelations>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", { header: "ID", enableColumnFilter: false }),
   columnHelper.accessor("product.chemical", {
     header: "Chemical",
@@ -44,13 +53,20 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/sds/${data.id}` }}
-        editButton={{ getUrl: (data) => `/sds/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const ability = useAbility()
+
+      const canEdit = ability.can("update", subject("SDS", info.row.original))
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/sds/${data.id}` }}
+          editButton={
+            canEdit ? { getUrl: (data) => `/sds/${data.id}/edit` } : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

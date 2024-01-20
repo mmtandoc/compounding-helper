@@ -1,10 +1,11 @@
 import { Chemical } from "@prisma/client"
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import ChemicalTable from "components/chemical/ChemicalTable"
 import TableActionBar from "components/common/TableActionBar"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getChemicals } from "pages/api/chemicals"
 import { NextPageWithLayout } from "types/common"
 
@@ -19,9 +20,11 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/chemicals/new">
-        <Button>New Chemical</Button>
-      </Link>
+      <Can do="create" on="Chemical">
+        <Link href="/chemicals/new">
+          <Button>New Chemical</Button>
+        </Link>
+      </Can>
     </TableActionBar>
   )
 
@@ -39,12 +42,17 @@ const Chemicals: NextPageWithLayout<ChemicalsProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<
-  ChemicalsProps
-> = async () => {
-  const data: Chemical[] = (await getChemicals()) ?? []
+export const getServerSideProps = withPageAuth<ChemicalsProps>({
+  getServerSideProps: async (_, session) => {
+    const data: Chemical[] = (await getChemicals(session)) ?? []
 
-  return { props: { title: "Chemicals", data } }
-}
+    return {
+      props: {
+        title: "Chemicals",
+        data,
+      },
+    }
+  },
+})
 
 export default Chemicals

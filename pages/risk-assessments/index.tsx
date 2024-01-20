@@ -1,6 +1,5 @@
-import { RiskAssessment } from "@prisma/client"
 import Link from "next/link"
-import React, { useCallback, useState } from "react"
+import { useCallback, useState } from "react"
 
 import { BatchPrintButton } from "components/common/BatchPrintButton"
 import BatchTableActions from "components/common/BatchTableActions"
@@ -9,6 +8,8 @@ import TableActionBar from "components/common/TableActionBar"
 import RiskAssessmentDetails from "components/risk-assessment/RiskAssessmentDetails"
 import RiskAssessmentsTable from "components/risk-assessment/RiskAssessmentsTable"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { toIsoDateString } from "lib/utils"
 import { getRiskAssessments } from "pages/api/risk-assessments"
 import { NextPageWithLayout } from "types/common"
@@ -30,9 +31,11 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/risk-assessments/new">
-        <Button>New Risk Assessment</Button>
-      </Link>
+      <Can do="create" on="RiskAssessment">
+        <Link href="/risk-assessments/new">
+          <Button>New Risk Assessment</Button>
+        </Link>
+      </Can>
       <BatchTableActions visible={selectedRows.length > 0}>
         <BatchPrintButton documents={selectedRows.map(renderDocument)}>
           Print selected rows
@@ -58,11 +61,16 @@ const RiskAssessments: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export async function getServerSideProps() {
-  const data: RiskAssessment[] = (await getRiskAssessments()) ?? []
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data: RiskAssessmentAll[] = (await getRiskAssessments(session)) ?? []
 
-  return { props: { title: "Risk Assessments", data } }
-}
+    return {
+      props: { title: "Risk Assessments", data },
+    }
+  },
+  requireAuth: true,
+})
 
 const renderDocument = (data: RiskAssessmentAll) => (
   <div className="details">

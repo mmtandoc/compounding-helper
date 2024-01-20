@@ -1,7 +1,6 @@
-import { GetStaticProps } from "next"
-
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import CreateForm from "components/common/data-pages/CreateForm"
+import { withPageAuth } from "lib/auth"
 import { NullableChemicalFields, chemicalSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -12,6 +11,7 @@ const defaultValues: NullableChemicalFields = {
   synonyms: null,
   nioshTable: null,
   nioshRevisionDate: null,
+  additionalInfo: [],
 }
 
 const NewChemical: NextPageWithLayout = () => {
@@ -26,8 +26,15 @@ const NewChemical: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "New Chemical" },
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "New Chemical",
+      },
+    }
+  },
+  requireAuth: true,
 })
 
 export default NewChemical

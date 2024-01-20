@@ -1,8 +1,8 @@
-import { GetStaticProps } from "next"
 import { Frequency } from "rrule"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import RoutineEntry from "components/routine/RoutineEntry"
+import { withPageAuth } from "lib/auth"
 import { NullableRoutineFields, routineSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { NextPageWithLayout } from "types/common"
@@ -29,8 +29,15 @@ const NewRoutine: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "New Routine" },
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "New Routine",
+      },
+    }
+  },
+  requireAuth: true,
 })
 
 export default NewRoutine

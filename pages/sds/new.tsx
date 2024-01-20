@@ -1,7 +1,6 @@
-import { GetStaticProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import SdsEntry from "components/sds/SdsEntry"
+import { withPageAuth } from "lib/auth"
 import { NullableSdsFields, sdsSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -26,10 +25,15 @@ const NewSafetyDataSheet: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => ({
-  props: {
-    title: "New SDS summary",
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "New SDS summary",
+      },
+    }
   },
+  requireAuth: true,
 })
 
 export default NewSafetyDataSheet

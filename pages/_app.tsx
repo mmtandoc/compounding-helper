@@ -1,4 +1,5 @@
 import axios from "axios"
+import App, { AppContext } from "next/app"
 import { SnackbarProvider, closeSnackbar } from "notistack"
 import { IconContext } from "react-icons"
 import { MdClose } from "react-icons/md"
@@ -7,6 +8,8 @@ import { SWRConfig } from "swr"
 import { getDefaultLayout } from "components/common/layouts/DefaultLayout"
 import { IconButton } from "components/ui"
 import { Alert } from "components/ui/Alert"
+import { AppSession, getSession } from "lib/api/utils"
+import AuthProvider from "lib/auth/AuthProvider"
 import { AppPropsWithLayout } from "types/common"
 
 import "styles/main.scss"
@@ -45,7 +48,9 @@ axios.interceptors.response.use((originalResponse) => {
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data)
 
-const multiFetcher = (urls: Record<string, string> | string[] | string) => {
+export const multiFetcher = (
+  urls: Record<string, string> | string[] | string,
+) => {
   if (typeof urls === "string") {
     return fetcher(urls)
   }
@@ -83,37 +88,58 @@ const multiFetcher = (urls: Record<string, string> | string[] | string) => {
   })
 }
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function MyApp({
+  Component,
+  pageProps,
+  initialAppSession,
+}: AppPropsWithLayout<{
+  initialAppSession?: AppSession
+}> & {
+  initialAppSession?: AppSession
+}) {
+  initialAppSession ??= pageProps.initialAppSession
+
   const getLayout = Component.getLayout ?? getDefaultLayout
   const layout = getLayout(<Component {...pageProps} />, pageProps)
 
   return (
     <>
-      <IconContext.Provider
-        value={{ style: { verticalAlign: "middle", overflow: "visible" } }}
+      <SWRConfig
+        value={{
+          fetcher: multiFetcher,
+          fallback: {
+            "/api/users/current": initialAppSession?.appUser,
+          },
+        }}
       >
-        <SWRConfig value={{ fetcher: multiFetcher }}>
-          <SnackbarProvider
-            Components={{
-              success: Alert,
-              info: Alert,
-              error: Alert,
-              default: Alert,
-              warning: Alert,
+        <AuthProvider initialAppSession={initialAppSession}>
+          <IconContext.Provider
+            value={{
+              style: { verticalAlign: "middle", overflow: "visible" },
             }}
-            autoHideDuration={5000}
-            action={(snackbarId) => (
-              <IconButton
-                onClick={() => closeSnackbar(snackbarId)}
-                icon={MdClose}
-                variant="text"
-              />
-            )}
           >
-            {layout}
-          </SnackbarProvider>
-        </SWRConfig>
-      </IconContext.Provider>
+            <SnackbarProvider
+              Components={{
+                success: Alert,
+                info: Alert,
+                error: Alert,
+                default: Alert,
+                warning: Alert,
+              }}
+              autoHideDuration={5000}
+              action={(snackbarId) => (
+                <IconButton
+                  onClick={() => closeSnackbar(snackbarId)}
+                  icon={MdClose}
+                  variant="text"
+                />
+              )}
+            >
+              {layout}
+            </SnackbarProvider>
+          </IconContext.Provider>
+        </AuthProvider>
+      </SWRConfig>
 
       <style jsx global>{`
         #__next {
@@ -124,6 +150,26 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       `}</style>
     </>
   )
+}
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await App.getInitialProps(appContext)
+
+  if ("initialAppSession" in appProps.pageProps) {
+    return appProps
+  }
+
+  let session: AppSession | null = null
+
+  // Check if server-side
+  if (typeof window === "undefined" && (appContext.ctx.req as any)?.cookies) {
+    session = await getSession({
+      req: appContext.ctx.req as any,
+      res: appContext.ctx.res as any,
+    })
+  }
+
+  return { ...appProps, initialAppSession: session ?? undefined }
 }
 
 export default MyApp

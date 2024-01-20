@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { subject } from "@casl/ability"
+import { useEffect, useMemo } from "react"
 import {
   UseFieldArrayReturn,
   UseFormReturn,
@@ -9,8 +10,12 @@ import { MdClose } from "react-icons/md"
 import { Simplify } from "type-fest"
 
 import { IconButton } from "components/ui"
-import { Input, LabelFormGroup } from "components/ui/forms"
+import { Fieldset, Input, LabelFormGroup } from "components/ui/forms"
+import { AppActions } from "lib/auth/ability/appAbilities"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { NullableLinkDirectoryFields } from "lib/fields"
+import { useCurrentUser } from "lib/hooks/useCurrentUser"
+import { isCentralPharmacy } from "lib/utils"
 
 type Props = {
   formMethods: UseFormReturn<NullableLinkDirectoryFields>
@@ -18,47 +23,117 @@ type Props = {
 
 const LinkDirectoryEntry = (props: Props) => {
   const { formMethods } = props
-  const arrayMethods = useFieldArray({
+
+  //TODO: Change to only use single fieldArray (central or local)?
+  const centralArrayMethods = useFieldArray({
     control: formMethods.control,
-    name: "links",
+    name: "centralLinks",
   })
 
+  const localArrayMethods = useFieldArray({
+    control: formMethods.control,
+    name: "localLinks",
+  })
+
+  const { user, error: userError } = useCurrentUser()
+
+  const isCentralUser = useMemo(
+    () => isCentralPharmacy(user?.pharmacyId ?? NaN),
+    [user?.pharmacyId],
+  )
+
+  if (userError) {
+    console.error(userError)
+  }
+
+  const ability = useAbility()
+
+  const canCreateUpdateLinks = (["create", "update"] as AppActions[]).every(
+    (action) =>
+      ability.can(
+        action,
+        subject("Link", {
+          id: NaN,
+          pharmacyId: user?.pharmacyId ?? NaN,
+          order: 1,
+          name: "PLACEHOLDER",
+          url: "https://placeholder.com",
+          updatedAt: new Date(),
+          description: null,
+        }),
+      ),
+  )
+
   return (
-    <div>
-      <ul>
-        {arrayMethods.fields.map((field, index) => (
-          <li key={field.id}>
-            <LinkInput
-              index={index}
-              formMethods={formMethods}
-              arrayMethods={arrayMethods}
-            />
-          </li>
-        ))}
-      </ul>
+    <div className="link-directory-entry">
+      {
+        //TODO: Support re-ordering & hiding central links
+      }
+      {isCentralUser && centralArrayMethods.fields.length > 0 && (
+        <Fieldset legend="Central" disabled={!isCentralUser}>
+          <ul>
+            {centralArrayMethods.fields.map((field, index) => (
+              <LinkInput
+                key={index}
+                name="centralLinks"
+                index={index}
+                formMethods={formMethods}
+                arrayMethods={centralArrayMethods}
+                disabled={
+                  !canCreateUpdateLinks
+                  //isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
+                }
+              />
+            ))}
+          </ul>
+        </Fieldset>
+      )}
+      {!isCentralUser && localArrayMethods.fields.length > 0 && (
+        <Fieldset legend="Local">
+          <ul>
+            {localArrayMethods.fields.map((field, index) => (
+              <LinkInput
+                key={index}
+                name="localLinks"
+                index={index}
+                formMethods={formMethods}
+                arrayMethods={localArrayMethods}
+                disabled={
+                  !canCreateUpdateLinks
+                  //isCentralPharmacy(field.pharmacyId ?? NaN) && !isCentralUser
+                }
+              />
+            ))}
+          </ul>
+        </Fieldset>
+      )}
       <div className="actions">
-        <IconButton
-          icon={BiPlus}
-          title="Add link"
-          onClick={() =>
-            arrayMethods.append({
-              name: null,
-              url: null,
-              description: null,
-            })
-          }
-        >
-          Add link
-        </IconButton>
+        {canCreateUpdateLinks && (
+          <IconButton
+            icon={BiPlus}
+            title="Add link"
+            onClick={() =>
+              (isCentralUser ? centralArrayMethods : localArrayMethods).append({
+                name: null,
+                url: null,
+                description: null,
+                order: (isCentralUser ? centralArrayMethods : localArrayMethods)
+                  .fields.length,
+              })
+            }
+          >
+            Add link
+          </IconButton>
+        )}
       </div>
       <style jsx>{`
-        ul {
+        .link-directory-entry :global(ul) {
           list-style: none;
           background-color: var(--color-canvas-inset);
           padding: 2rem 2rem 2rem 4rem;
         }
 
-        li {
+        .link-directory-entry :global(li) {
           display: flex;
           align-items: center;
           border-bottom: var(--border-default);
@@ -81,37 +156,49 @@ const LinkDirectoryEntry = (props: Props) => {
   )
 }
 
-type LinkInputProps = Simplify<{
-  formMethods: UseFormReturn<NullableLinkDirectoryFields>
-  arrayMethods: UseFieldArrayReturn<NullableLinkDirectoryFields, "links">
-  index: number
-}>
+type LinkInputProps<ArrayName extends "centralLinks" | "localLinks"> =
+  Simplify<{
+    formMethods: UseFormReturn<NullableLinkDirectoryFields>
+    name: ArrayName
+    arrayMethods: UseFieldArrayReturn<NullableLinkDirectoryFields, ArrayName>
+    index: number
+    disabled?: boolean // TODO: Rename disabled to readOnly or canEdit?
+  }>
 
-const LinkInput = (props: LinkInputProps) => {
-  const { formMethods, arrayMethods, index } = props
+const LinkInput = <ArrayName extends "centralLinks" | "localLinks">(
+  props: LinkInputProps<ArrayName>,
+) => {
+  const { name, formMethods, arrayMethods, index, disabled = false } = props
   const { register, setValue, watch } = formMethods
   const { remove, swap, fields } = arrayMethods
-  const order = watch(`links.${index}.order`)
+  const order = watch(`${name}.${index}.order`)
 
   useEffect(() => {
     if (order !== index + 1) {
-      register(`links.${index}.order`)
-      setValue(`links.${index}.order`, index + 1)
+      register(`${name}.${index}.order`)
+      setValue(`${name}.${index}.order`, (index + 1) as any)
     }
-  }, [index, register, setValue, order])
+  }, [index, register, setValue, order, name])
 
   return (
     <div className="link-input">
+      {/* <Fieldset
+        className="inputs"
+        style={{ border: "none", padding: "0" }}
+        disabled={disabled}
+      > */}
       <div className="inputs">
-        <LabelFormGroup>
+        <LabelFormGroup className={disabled ? "disabled" : ""}>
           <span>Name:</span>
-          <Input {...register(`links.${index}.name`)} fullWidth />
+          <Input {...register(`${name}.${index}.name`)} fullWidth />
         </LabelFormGroup>
-        <LabelFormGroup>
+        <LabelFormGroup className={disabled ? "disabled" : ""}>
           <span>URL:</span>
-          <Input {...register(`links.${index}.url`)} fullWidth />
+          <Input {...register(`${name}.${index}.url`)} fullWidth />
         </LabelFormGroup>
       </div>
+      {/* </Fieldset> */}
+
       <div className="actions">
         <IconButton
           title="Move down"
@@ -127,13 +214,16 @@ const LinkInput = (props: LinkInputProps) => {
           onClick={() => swap(index, index - 1)}
           size="small"
         />
-        <IconButton
-          title="Delete"
-          icon={MdClose}
-          onClick={() => remove(index)}
-          size="small"
-        />
+        {!disabled && (
+          <IconButton
+            title="Delete"
+            icon={MdClose}
+            onClick={() => remove(index)}
+            size="small"
+          />
+        )}
       </div>
+
       <style jsx global>{`
         .link-input {
           display: flex;

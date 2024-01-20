@@ -80,6 +80,7 @@ const mapExposureRisksFieldsToModel = (
 const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
   const fieldValues: Zod.input<typeof riskAssessmentSchema> = {
     id: data.id,
+    pharmacyId: data.pharmacyId,
     compound: CompoundMapper.toFieldValues(data.compound),
     complexity: data.complexity,
     preparationFrequency: data.preparationFrequency,
@@ -147,8 +148,11 @@ const toFieldValues = (data: RiskAssessmentAll): RiskAssessmentFields => {
 //TODO: Refactor
 const toModel = (
   fields: RiskAssessmentFields,
-): SetOptional<RiskAssessment, "id" | "compoundId"> => {
-  let data = {} as SetOptional<RiskAssessment, "id" | "compoundId">
+): SetOptional<RiskAssessment, "id" | "compoundId" | "pharmacyId"> => {
+  let data = {} as SetOptional<
+    RiskAssessment,
+    "id" | "compoundId" | "pharmacyId"
+  >
   console.log({ fields })
   for (const key in fields) {
     if (Object.hasOwn(fields, key)) {

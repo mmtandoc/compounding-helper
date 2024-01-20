@@ -1,13 +1,16 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { ForbiddenError } from "@casl/ability"
+import { NextApiResponse } from "next"
 
-import { sendJsonError } from "lib/api/utils"
-import { prisma } from "lib/prisma"
+import {
+  NextApiRequestWithSession,
+  sendForbiddenError,
+  sendJsonError,
+  withSession,
+} from "lib/api/utils"
+import { getUserPrismaClient } from "lib/prisma"
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const { method } = req
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const { method, session } = req
 
   //console.log(req)
 
@@ -17,7 +20,7 @@ export default async function handler(
       let vendors
 
       try {
-        vendors = await prisma.vendor.findMany({
+        vendors = await getUserPrismaClient(session.appUser).vendor.findMany({
           orderBy: { id: "asc" },
           include: {
             products: true,
@@ -25,6 +28,9 @@ export default async function handler(
         })
       } catch (error) {
         console.log(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -38,3 +44,5 @@ export default async function handler(
       )
   }
 }
+
+export default withSession(handler)

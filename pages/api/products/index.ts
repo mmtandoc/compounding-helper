@@ -1,23 +1,25 @@
+import { ForbiddenError } from "@casl/ability"
 import { Prisma } from "@prisma/client"
-import { NextApiRequest, NextApiResponse } from "next"
 import * as z from "zod"
 
-import { sendJsonError, sendZodError } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
-import { prisma } from "lib/prisma"
-import { ApiBody } from "types/common"
+import { getUserPrismaClient } from "lib/prisma"
 import { ProductAll, productAll } from "types/models"
 
 const querySchema = z.object({
   chemicalId: z.string().pipe(z.coerce.number()).optional(),
 })
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiBody<ProductAll[] | ProductAll>>,
-) {
-  const { query, method } = req
+const handler = withSession<ProductAll[] | ProductAll>(async (req, res) => {
+  const { query, method, session } = req
 
   switch (method) {
     case "GET": {
@@ -38,9 +40,12 @@ export default async function handler(
       let products
 
       try {
-        products = await getProducts(filters)
+        products = await getProducts(session, filters)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -57,9 +62,12 @@ export default async function handler(
 
       let result
       try {
-        result = await createProduct(fields)
+        result = await createProduct(session, fields)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -76,17 +84,28 @@ export default async function handler(
       )
       break
   }
-}
+})
 
-export const getProducts = async (where?: Prisma.ProductWhereInput) =>
-  await prisma.product.findMany({
+export default handler
+
+export const getProducts = async (
+  session: AppSession,
+  where?: Prisma.ProductWhereInput,
+) =>
+  await getUserPrismaClient(session.appUser).product.findMany({
     where,
     orderBy: { id: "asc" },
     ...productAll,
   })
 
-export const createProduct = async (values: ProductFields) =>
-  await prisma.product.create({
-    data: ProductMapper.toModel(values),
+export const createProduct = async (
+  session: AppSession,
+  values: ProductFields,
+) =>
+  await getUserPrismaClient(session.appUser).product.create({
+    data: ProductMapper.toModel({
+      pharmacyId: session.appUser.pharmacyId, // pharmacyId can't be undefined for checking permissions,
+      ...values,
+    }),
     ...productAll,
   })

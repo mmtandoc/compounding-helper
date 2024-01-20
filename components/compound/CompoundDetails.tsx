@@ -1,10 +1,12 @@
+import { subject } from "@casl/ability"
 import Link from "next/link"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import useSWR from "swr"
 
 import { IngredientDetails } from "components/compound/ingredient/IngredientDetails"
 import { Button, Spinner } from "components/ui"
 import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { SettingsFields } from "lib/fields"
 import { CompoundWithIngredients, MfrAll } from "types/models"
 
@@ -149,28 +151,35 @@ const MfrsActions = (props: { data: CompoundWithIngredients }) => {
     console.error(mfrsError)
   }
 
+  const ability = useAbility()
+
+  const canCreateNewMfr = ability.can(
+    "create",
+    subject("Mfr", { compound: data } as any),
+  )
+
   const isLoading = !mfrs && !mfrsError
   return (
     <FormGroup row>
       {!isLoading ? (
-        <>
-          {mfrs && mfrs.length > 0 ? (
-            <>
-              <Link href={`/compounds/${data.id}/mfrs/latest`}>
-                <Button size="small" theme="primary">
-                  View latest MFR
-                </Button>
-              </Link>
-              <Link href={`/compounds/${data.id}/mfrs`}>
-                <Button size="small">View all MFRs</Button>
-              </Link>
-            </>
-          ) : (
+        mfrs && mfrs.length > 0 ? (
+          <>
+            <Link href={`/compounds/${data.id}/mfrs/latest`}>
+              <Button size="small" theme="primary">
+                View latest MFR
+              </Button>
+            </Link>
+            <Link href={`/compounds/${data.id}/mfrs`}>
+              <Button size="small">View all MFRs</Button>
+            </Link>
+          </>
+        ) : (
+          canCreateNewMfr && (
             <Link href={`/compounds/${data.id}/mfrs/new`}>
               <Button size="small">Create MFR</Button>
             </Link>
-          )}
-        </>
+          )
+        )
       ) : (
         <Spinner />
       )}

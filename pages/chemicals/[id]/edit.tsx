@@ -1,8 +1,10 @@
-import { GetServerSideProps } from "next"
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import ChemicalEntry from "components/chemical/ChemicalEntry"
 import EditForm from "components/common/data-pages/EditForm"
+import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import {
   ChemicalFields,
   NullableChemicalFields,
@@ -35,27 +37,49 @@ const EditChemical: NextPageWithLayout<EditChemicalProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = parseInt(context.query.id as string)
+export const getServerSideProps = withPageAuth<EditChemicalProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (isNaN(id)) {
+      return { notFound: true }
+    }
 
-  const data = await getChemicalById(id)
+    const data = await getChemicalById(session, id)
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const values = ChemicalMapper.toFieldValues(data)
+    const ability = defineAbilityForUser(session.appUser)
 
-  return {
-    props: {
-      title: `Edit Chemical - ${values?.name}`,
-      values,
-    },
-  }
-}
+    if (
+      ability.cannot("update", subject("Chemical", data)) &&
+      ability.cannot(
+        "manage",
+        subject("AdditionalChemicalInfo", {
+          id: 0,
+          chemical: data,
+          chemicalId: data.id,
+          value: "PLACEHOLDER",
+          pharmacyId: session.appUser.pharmacyId,
+        }),
+      )
+    ) {
+      //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
+      return { notFound: true }
+    }
+
+    const values = ChemicalMapper.toFieldValues(data)
+
+    return {
+      props: {
+        title: `Edit Chemical - ${values?.name}`,
+        values,
+      },
+    }
+  },
+})
 
 export default EditChemical

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import axios, { AxiosError, isAxiosError } from "axios"
+import axios, { AxiosError, AxiosResponse, isAxiosError } from "axios"
 import Link from "next/link"
 import { enqueueSnackbar } from "notistack"
 import { useEffect, useState } from "react"
@@ -30,6 +30,9 @@ type CreateFormProps<
     dataName: string
     resourceUrl: string
   }) => JSX.Element
+
+  onSuccessfulSubmit?: (value: TFieldValues, res: AxiosResponse) => void
+  onFailedSubmit?: (reason: any) => void
 }
 
 const CreateForm = <
@@ -45,6 +48,8 @@ const CreateForm = <
     dataName,
     schema,
     renderCustomAfterSaveActions,
+    onSuccessfulSubmit,
+    onFailedSubmit,
   } = props
 
   const [saveSuccessful, setSaveSuccessful] = useState<boolean | undefined>()
@@ -85,11 +90,15 @@ const CreateForm = <
         data,
       )
       .then((res) => {
+        onSuccessfulSubmit?.(data, res)
+
         setSaveSuccessful(true)
         setSavedPayload(data)
         setResourceUrl(res.headers["location"])
       })
       .catch((error: Error | AxiosError<JsonError>) => {
+        onFailedSubmit?.(error)
+
         if (isAxiosError<JsonError>(error)) {
           if (error.code === "409") {
           }
@@ -116,7 +125,7 @@ const CreateForm = <
             autoComplete="off"
             noValidate
           >
-            <EntryComponent formMethods={formMethods} />
+            <EntryComponent formMethods={formMethods} action="create" />
             <div className="action-row">
               <Button theme="primary" type="submit">
                 Submit

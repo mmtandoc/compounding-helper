@@ -1,9 +1,10 @@
-import { GetServerSideProps } from "next"
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
-import React from "react"
 
 import EditForm from "components/common/data-pages/EditForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
+import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import RiskAssessmentMapper from "lib/mappers/RiskAssessmentMapper"
 import { getRiskAssessmentById } from "pages/api/risk-assessments/[id]"
@@ -33,29 +34,44 @@ const EditRiskAssessment: NextPageWithLayout<EditRiskAssessmentProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const riskAssessmentId = parseInt(context.query.id as string)
+export const getServerSideProps = withPageAuth<EditRiskAssessmentProps>({
+  getServerSideProps: async (context, session) => {
+    const riskAssessmentId = parseInt(context.query.id as string)
 
-  if (isNaN(riskAssessmentId)) {
-    return { notFound: true }
-  }
+    if (isNaN(riskAssessmentId)) {
+      return { notFound: true }
+    }
 
-  const data = await getRiskAssessmentById(riskAssessmentId)
+    const data = await getRiskAssessmentById(session, riskAssessmentId)
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  console.dir(data, { depth: 3 })
+    // Check if user has permission to update this risk assessment
+    if (
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("RiskAssessment", data),
+      )
+    ) {
+      //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
+      return { notFound: true }
+    }
 
-  const values = RiskAssessmentMapper.toFieldValues(data)
+    console.dir(data, { depth: 3 })
 
-  return {
-    props: {
-      title: `Edit Risk Assessment - ${values?.compound?.name}`,
-      values,
-    },
-  }
-}
+    const values = RiskAssessmentMapper.toFieldValues(data)
+
+    return {
+      props: {
+        title: `Edit Risk Assessment - ${values?.compound?.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditRiskAssessment

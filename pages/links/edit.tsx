@@ -1,12 +1,15 @@
-import type { GetServerSideProps } from "next"
+import { Link } from "@prisma/client"
 
 import EditForm from "components/common/data-pages/EditForm"
 import LinkDirectoryEntry from "components/links/LinkDirectoryEntry"
+import { withPageAuth } from "lib/auth"
 import {
   LinkDirectoryFields,
+  LinkDirectoryFieldsInput,
   NullableLinkDirectoryFields,
   linkDirectorySchema,
 } from "lib/fields"
+import { isCentralPharmacy } from "lib/utils"
 import { getLinks } from "pages/api/links"
 import { NextPageWithLayout } from "types/common"
 
@@ -26,17 +29,34 @@ const EditLinks: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = (await getLinks()) ?? []
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = (await getLinks(session)) ?? []
 
-  const values = linkDirectorySchema.parse({ links: data })
+    // TODO: Refactor into separate data mapper?
 
-  return {
-    props: {
-      title: "Edit Link Directory",
-      values,
-    },
-  }
-}
+    const values = linkDirectorySchema.parse(
+      data.reduce(
+        (result, link) => {
+          if (isCentralPharmacy(link.pharmacyId)) {
+            result.centralLinks.push(link)
+          } else {
+            result.localLinks.push(link)
+          }
+          return result
+        },
+        { centralLinks: [] as Link[], localLinks: [] as Link[] },
+      ) as LinkDirectoryFieldsInput,
+    )
+
+    return {
+      props: {
+        title: "Edit Link Directory",
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditLinks

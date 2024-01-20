@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback, useState } from "react"
@@ -10,6 +9,8 @@ import TableActionBar from "components/common/TableActionBar"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import MfrTable from "components/compound/mfr/MfrTable"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getCompoundById } from "pages/api/compounds/[id]"
 import { getMfrsByCompoundId } from "pages/api/compounds/[id]/mfrs"
 import { NextPageWithLayout } from "types/common"
@@ -32,11 +33,14 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
     [],
   )
 
+  // TODO: Check if user can create MFR for this specific compound
   const actionBar = (
     <TableActionBar>
-      <Link href={`/compounds/${compoundId}/mfrs/new`}>
-        <Button>New MFR</Button>
-      </Link>
+      <Can do="create" on="Mfr">
+        <Link href={`/compounds/${compoundId}/mfrs/new`}>
+          <Button>New MFR</Button>
+        </Link>
+      </Can>
       <Link href={`/compounds/${compoundId}`}>
         <Button>Return to compound</Button>
       </Link>
@@ -62,30 +66,31 @@ const CompoundMfrs: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  const compoundId = parseInt(context.query.id as string)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const compoundId = parseInt(context.query.id as string)
 
-  if (isNaN(compoundId)) {
-    return { notFound: true }
-  }
+    if (isNaN(compoundId)) {
+      return { notFound: true }
+    }
 
-  const compound = await getCompoundById(compoundId)
+    const compound = await getCompoundById(session, compoundId)
 
-  if (compound === null) {
-    return { notFound: true }
-  }
+    if (compound === null) {
+      return { notFound: true }
+    }
 
-  const mfrs = (await getMfrsByCompoundId(compoundId)) ?? []
+    const mfrs = (await getMfrsByCompoundId(session, compoundId)) ?? []
 
-  return {
-    props: {
-      title: `MFRs for ${compound.name}`,
-      mfrs,
-    },
-  }
-}
+    return {
+      props: {
+        title: `MFRs for ${compound.name}`,
+        mfrs,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 const renderDocument = (data: MfrAll) => (
   <div className="details">

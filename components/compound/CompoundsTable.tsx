@@ -1,10 +1,14 @@
+import { subject } from "@casl/ability"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
 import { useMemo } from "react"
+import { BsGlobe } from "react-icons/bs"
 
 import { Button, Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
 import RowActions from "components/ui/Table/RowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy } from "lib/utils"
 import { CompoundWithMfrCount, IngredientAll } from "types/models"
 
 import { getHwngShortcutString } from "./helpers"
@@ -18,6 +22,12 @@ type Props = {
 const columnHelper = createColumnHelper<CompoundWithMfrCount>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     enableColumnFilter: false,
@@ -157,21 +167,33 @@ const columns = [
   }),
   columnHelper.display({
     id: "mfr-actions",
-    cell: (info) => {
+    cell: function MfrActionsCell(info) {
+      const ability = useAbility()
+
       const data = info.row.original
+
+      const canRead = ability.can(
+        "read",
+        subject("Mfr", { compound: data } as any),
+      )
+      const canCreate = ability.can(
+        "create",
+        subject("Mfr", { compound: data } as any),
+      )
+
       return (
         <RowActions>
-          {data._count.mfrs > 0 ? (
+          {data._count.mfrs > 0 && canRead ? (
             <Link href={`/compounds/${data.id}/mfrs/latest`}>
               <Button size="small" theme="primary">
                 View MFR
               </Button>
             </Link>
-          ) : (
+          ) : canCreate ? (
             <Link href={`/compounds/${data.id}/mfrs/new`}>
               <Button size="small">Create MFR</Button>
             </Link>
-          )}
+          ) : null}
         </RowActions>
       )
     },

@@ -132,6 +132,7 @@ const shortcutSchema = z
 
 export const compoundSchema = z.object({
   id: z.number().int().optional(),
+  pharmacyId: z.number().int().optional(),
   name: z.string().trim().min(1),
   ingredients: z.array(ingredientSchema).min(1),
   shortcut: shortcutSchema,

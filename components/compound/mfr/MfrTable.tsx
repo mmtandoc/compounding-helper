@@ -1,7 +1,9 @@
+import { subject } from "@casl/ability"
 import { createColumnHelper } from "@tanstack/react-table"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
 import { toIsoDateString } from "lib/utils"
 import { MfrAll } from "types/models"
 
@@ -33,19 +35,29 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{
-          getUrl: (data) =>
-            `/compounds/${data.compoundId}/mfrs/${data.version}`,
-        }}
-        editButton={{
-          getUrl: (data) =>
-            `/compounds/${data.compoundId}/mfrs/${data.version}/edit`,
-        }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const ability = useAbility()
+
+      const canEdit = ability.can("update", subject("Mfr", info.row.original))
+
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{
+            getUrl: (data) =>
+              `/compounds/${data.compoundId}/mfrs/${data.version}`,
+          }}
+          editButton={
+            canEdit
+              ? {
+                  getUrl: (data) =>
+                    `/compounds/${data.compoundId}/mfrs/${data.version}/edit`,
+                }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

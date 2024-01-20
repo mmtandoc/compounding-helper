@@ -1,8 +1,10 @@
-import { GetServerSideProps } from "next"
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import ProductEntry from "components/product/ProductEntry"
+import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableProductFields, ProductFields, productSchema } from "lib/fields"
 import ProductMapper from "lib/mappers/ProductMapper"
 import { getProductById } from "pages/api/products/[id]"
@@ -31,29 +33,42 @@ const EditProduct: NextPageWithLayout<EditProductProps> = (
   )
 }
 
-export const getServerSideProps: GetServerSideProps<EditProductProps> = async (
-  context,
-) => {
-  const id = parseInt(context.query.id as string)
+export const getServerSideProps = withPageAuth<EditProductProps>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (isNaN(id)) {
+      return { notFound: true }
+    }
 
-  const data = await getProductById(id)
+    const data = await getProductById(session, id)
 
-  if (data === null) {
-    return { notFound: true }
-  }
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  const values = ProductMapper.toFieldValues(data)
+    // Check if current user has permission to update the product
+    if (
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Product", data),
+      )
+    ) {
+      //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
+      return { notFound: true }
+    }
 
-  return {
-    props: {
-      title: `Edit Product - ${values?.name}`,
-      values,
-    },
-  }
-}
+    const values = ProductMapper.toFieldValues(data)
+
+    return {
+      props: {
+        title: `Edit Product - ${values?.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditProduct

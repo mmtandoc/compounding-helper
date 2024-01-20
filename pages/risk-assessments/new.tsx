@@ -1,8 +1,8 @@
-import { GetStaticProps } from "next"
 import Link from "next/link"
 
 import CreateForm from "components/common/data-pages/CreateForm"
 import RiskAssessmentEntry from "components/risk-assessment/RiskAssessmentEntry"
+import { withPageAuth } from "lib/auth"
 import { NullableRiskAssessmentFields, riskAssessmentSchema } from "lib/fields"
 import { toIsoDateString } from "lib/utils"
 import { NextPageWithLayout } from "types/common"
@@ -91,10 +91,15 @@ const NewRiskAssessment: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => {
-  return {
-    props: { title: "New Risk Assessment" },
-  }
-}
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "New Risk Assessment",
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default NewRiskAssessment

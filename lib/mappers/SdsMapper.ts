@@ -10,6 +10,7 @@ const SdsMapper = {
   toFieldValues: (data: SdsWithRelations): SdsFields => {
     return sdsSchema.parse({
       id: data.id,
+      pharmacyId: data.pharmacyId,
       productId: data.productId,
       chemicalId: data.product.chemicalId,
       hmisHazardLevel: data.hmisHealthHazard,
@@ -22,7 +23,8 @@ const SdsMapper = {
     values: SdsFields,
   ): Omit<Prisma.SDSUncheckedCreateInput, "healthHazards" | "ingredients"> => {
     return {
-      id: values.id ?? undefined,
+      id: values.id,
+      pharmacyId: values.pharmacyId,
       productId: values.productId,
       hmisHealthHazard: values.hmisHazardLevel,
       requireVentilation: values.requireVentilation,

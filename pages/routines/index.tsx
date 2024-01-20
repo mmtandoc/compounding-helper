@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { useCallback, useState } from "react"
 import useSWR from "swr"
@@ -10,6 +9,8 @@ import TableActionBar from "components/common/TableActionBar"
 import RoutineDetails from "components/routine/RoutineDetails"
 import RoutineTable from "components/routine/RoutineTable"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { RoutineEntity } from "lib/entities"
 import { getRoutines } from "pages/api/routines"
 import { NextPageWithLayout } from "types/common"
@@ -47,9 +48,11 @@ const Routines: NextPageWithLayout<Props> = (props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/routines/new">
-        <Button>New Routine</Button>
-      </Link>
+      <Can do="create" on="Routine">
+        <Link href="/routines/new">
+          <Button>New Routine</Button>
+        </Link>
+      </Can>
       <BatchTableActions visible={selectedRows.length > 0}>
         <BatchPrintButton documents={selectedRows.map(renderDocument)}>
           Print selected routines
@@ -83,17 +86,20 @@ const renderDocument = (data: RoutineEntity) => (
   </div>
 )
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = await getRoutines({
-    orderBy: [{ category: "asc" }, { name: "asc" }],
-  })
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = await getRoutines(session, {
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+    })
 
-  return {
-    props: {
-      title: "Routines",
-      initialData: data,
-    },
-  }
-}
+    return {
+      props: {
+        title: "Routines",
+        initialData: data,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default Routines

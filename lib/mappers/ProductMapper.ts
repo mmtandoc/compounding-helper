@@ -7,6 +7,7 @@ const ProductMapper = {
   toFieldValues: (data: ProductAll): ProductFields => {
     return productSchema.parse({
       id: data.id,
+      pharmacyId: data.pharmacyId,
       name: data.name,
       chemicalId: data.chemicalId,
       vendorId: data.vendorId,
@@ -15,7 +16,8 @@ const ProductMapper = {
 
   toModel: (values: ProductFields): Prisma.ProductUncheckedCreateInput => {
     return {
-      id: values.id ?? undefined,
+      id: values.id,
+      pharmacyId: values.pharmacyId,
       name: values.name,
       chemicalId: values.chemicalId,
       vendorId: values.vendorId,

@@ -1,11 +1,16 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { ForbiddenError } from "@casl/ability"
 import { z } from "zod"
-import { fromZodError } from "zod-validation-error"
 
-import { sendJsonError, sendZodError } from "lib/api/utils"
+import {
+  AppSession,
+  sendForbiddenError,
+  sendJsonError,
+  sendZodError,
+  withSession,
+} from "lib/api/utils"
 import { MfrFields, mfrSchema } from "lib/fields"
 import MfrMapper from "lib/mappers/MfrMapper"
-import { prisma } from "lib/prisma"
+import { getUserPrismaClient } from "lib/prisma"
 import { ApiBody } from "types/common"
 import { MfrAll, mfrAll } from "types/models"
 
@@ -14,11 +19,8 @@ const querySchema = z.object({
   version: z.string().pipe(z.coerce.number()),
 })
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiBody<MfrAll | undefined>>,
-) {
-  const { method } = req
+const handler = withSession<ApiBody<MfrAll | undefined>>(async (req, res) => {
+  const { method, session } = req
 
   const results = querySchema.safeParse(req.query)
 
@@ -32,9 +34,12 @@ export default async function handler(
     case "GET": {
       let mfr
       try {
-        mfr = await getMfr(compoundId, version)
+        mfr = await getMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -65,9 +70,12 @@ export default async function handler(
 
       let updatedMfr
       try {
-        updatedMfr = await updateMfr(compoundId, version, data)
+        updatedMfr = await updateMfr(session, compoundId, version, data)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -75,9 +83,12 @@ export default async function handler(
     }
     case "DELETE": {
       try {
-        await deleteMfr(compoundId, version)
+        await deleteMfr(session, compoundId, version)
       } catch (error) {
         console.error(error)
+        if (error instanceof ForbiddenError) {
+          return sendForbiddenError(res, error)
+        }
         return sendJsonError(res, 500, "Encountered error with database.")
       }
 
@@ -90,26 +101,37 @@ export default async function handler(
         `Method ${method} Not Allowed`,
       )
   }
-}
+})
 
-export const getMfr = async (compoundId: number, version: number) =>
-  await prisma.mfr.findUnique({
+export default handler
+
+export const getMfr = async (
+  session: AppSession,
+  compoundId: number,
+  version: number,
+) =>
+  await getUserPrismaClient(session.appUser).mfr.findUnique({
     where: { compoundId_version: { compoundId, version } },
     ...mfrAll,
   })
 
 export const updateMfr = async (
+  session: AppSession,
   compoundId: number,
   version: number,
   values: MfrFields,
 ) =>
-  await prisma.mfr.update({
+  await getUserPrismaClient(session.appUser).mfr.update({
     where: { compoundId_version: { compoundId, version } },
     data: MfrMapper.toModel({ version, ...values }),
     ...mfrAll,
   })
 
-export const deleteMfr = async (compoundId: number, version: number) =>
-  await prisma.mfr.delete({
+export const deleteMfr = async (
+  session: AppSession,
+  compoundId: number,
+  version: number,
+) =>
+  await getUserPrismaClient(session.appUser).mfr.delete({
     where: { compoundId_version: { compoundId, version } },
   })

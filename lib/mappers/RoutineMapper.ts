@@ -11,6 +11,7 @@ const RoutineMapper = {
 
     const values = {
       id: data.id,
+      pharmacyId: data.pharmacyId,
       name: data.name,
       category: data.category,
       description: data.description,
@@ -32,6 +33,7 @@ const RoutineMapper = {
   toModel: (values: RoutineFields): Prisma.RoutineUncheckedCreateInput => {
     return {
       id: values.id,
+      pharmacyId: values.pharmacyId,
       name: values.name,
       category: values.category,
       description: values.description,

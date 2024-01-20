@@ -89,6 +89,7 @@ export type SdsWithRelations = Prisma.SDSGetPayload<typeof sdsWithRelations>
 
 export const chemicalAll = Prisma.validator<Prisma.ChemicalArgs>()({
   include: {
+    additionalInfo: { orderBy: { pharmacyId: "asc" } },
     products: {
       include: {
         vendor: true,
@@ -208,4 +209,24 @@ export const sdsHealthHazard =
 
 export type SdsHealthHazard = Prisma.HazardCategoryToSDSGetPayload<
   typeof sdsHealthHazard
+>
+
+export const userWithPharmacy = Prisma.validator<Prisma.UserDefaultArgs>()({
+  include: {
+    pharmacy: true,
+  },
+})
+
+export type UserWithPharmacy = Prisma.UserGetPayload<typeof userWithPharmacy>
+
+export const pharmacyWithUsers = Prisma.validator<Prisma.PharmacyDefaultArgs>()(
+  {
+    include: {
+      users: true,
+    },
+  },
+)
+
+export type PharmacyWithUsers = Prisma.PharmacyGetPayload<
+  typeof pharmacyWithUsers
 >

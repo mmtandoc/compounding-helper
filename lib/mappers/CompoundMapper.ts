@@ -9,6 +9,7 @@ const CompoundMapper = {
   toFieldValues: (data: CompoundWithIngredients): CompoundFields => {
     return compoundSchema.parse({
       id: data.id,
+      pharmacyId: data.pharmacyId,
       name: data.name,
       ingredients: data.ingredients
         .map(IngredientMapper.toFieldValues)
@@ -30,6 +31,7 @@ const CompoundMapper = {
   > => {
     return {
       id: values.id,
+      pharmacyId: values.pharmacyId,
       name: values.name,
       notes: values.notes,
       hasShortcut: values.shortcut?.hasShortcut,

@@ -47,6 +47,7 @@ const refinePPE = (arg: any, ctx: any) =>
 
 export const riskAssessmentSchema = z.object({
   id: z.number().int().optional(),
+  pharmacyId: z.number().int().optional(),
   compound: compoundSchema,
   complexity: z.nativeEnum(Complexity),
   isPreparedOccasionally: z.boolean(),

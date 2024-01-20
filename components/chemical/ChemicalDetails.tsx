@@ -1,7 +1,7 @@
 import React from "react"
 
-import { FormGroup, TextArea } from "components/ui/forms"
-import { toIsoDateString } from "lib/utils"
+import { Fieldset, FormGroup, TextArea } from "components/ui/forms"
+import { isCentralPharmacy, toIsoDateString } from "lib/utils"
 import { ChemicalAll } from "types/models"
 
 type Props = {
@@ -36,14 +36,20 @@ const ChemicalDetails = (props: Props) => {
           ? toIsoDateString(data.nioshRevisionDate)
           : "N/A"}
       </FormGroup>
-      <FormGroup>
-        <span className="label">Additional info:</span>
-        {data.additionalInfo ? (
-          <TextArea value={data.additionalInfo} cols={20} readOnly autoResize />
+      <Fieldset legend="Additional Info">
+        {data.additionalInfo.length ? (
+          data.additionalInfo.map((v, i) => (
+            <FormGroup key={i}>
+              <span className="label">
+                {isCentralPharmacy(v.pharmacyId) ? "Central" : "Local"}
+              </span>
+              <TextArea value={v.value} cols={20} readOnly autoResize />
+            </FormGroup>
+          ))
         ) : (
           <span>None</span>
         )}
-      </FormGroup>
+      </Fieldset>
       <style jsx>{`
         .health-hazard-list {
           margin-top: 0;

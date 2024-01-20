@@ -1,7 +1,6 @@
-import { GetStaticProps } from "next"
-
 import CreateForm from "components/common/data-pages/CreateForm"
 import ProductEntry from "components/product/ProductEntry"
+import { withPageAuth } from "lib/auth"
 import { NullableProductFields, productSchema } from "lib/fields"
 import { NextPageWithLayout } from "types/common"
 
@@ -23,8 +22,15 @@ const NewProduct: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "New Product" },
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "New Product",
+      },
+    }
+  },
+  requireAuth: true,
 })
 
 export default NewProduct

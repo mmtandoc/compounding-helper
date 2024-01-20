@@ -1,9 +1,10 @@
-import { GetServerSideProps } from "next"
 import Link from "next/link"
 
 import TableActionBar from "components/common/TableActionBar"
 import ProductTable from "components/product/ProductTable"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getProducts } from "pages/api/products"
 import { NextPageWithLayout } from "types/common"
 import { ProductAll } from "types/models"
@@ -17,9 +18,11 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/products/new">
-        <Button>New Product</Button>
-      </Link>
+      <Can do="create" on="Product">
+        <Link href="/products/new">
+          <Button>New Product</Button>
+        </Link>
+      </Can>
     </TableActionBar>
   )
 
@@ -37,10 +40,13 @@ const Products: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data: ProductAll[] = (await getProducts()) ?? []
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data: ProductAll[] = (await getProducts(session)) ?? []
 
-  return { props: { title: "Products", data } }
-}
+    return { props: { title: "Products", data } }
+  },
+  requireAuth: true,
+})
 
 export default Products

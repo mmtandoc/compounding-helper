@@ -9,6 +9,7 @@ import { isoDateZodString } from "./utils"
 
 export const chemicalSchema = z.object({
   id: z.number().int().optional(),
+  pharmacyId: z.number().int().optional(),
   name: z.string().trim().min(1),
   casNumber: z
     .string()
@@ -48,11 +49,13 @@ export const chemicalSchema = z.object({
   nioshTable: z.number().int().min(1).max(3).or(z.literal(-1)),
   nioshRevisionDate: isoDateZodString().nullable(), //TODO: Check that date is not in the future
   additionalInfo: z
-    .string()
-    .trim()
-    .transform((arg) => (arg === "" ? null : arg))
-    .nullable()
-    .default(null),
+    .array(
+      z.object({
+        pharmacyId: z.number().int().optional(),
+        value: z.string().trim(),
+      }),
+    )
+    .transform((arg) => arg.filter((e) => e.value !== "")),
 })
 
 export type ChemicalFields = z.output<typeof chemicalSchema>

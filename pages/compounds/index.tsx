@@ -9,7 +9,9 @@ import TableActionBar from "components/common/TableActionBar"
 import CompoundsTable from "components/compound/CompoundsTable"
 import MfrDetails from "components/compound/mfr/MfrDetails"
 import { Button } from "components/ui"
-import { prisma } from "lib/prisma"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
+import { getUserPrismaClient } from "lib/prisma"
 import { NextPageWithLayout } from "types/common"
 import {
   CompoundWithMfrCount,
@@ -35,9 +37,11 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/risk-assessments/new">
-        <Button>New Compound</Button>
-      </Link>
+      <Can do="create" on="RiskAssessment">
+        <Link href="/risk-assessments/new">
+          <Button>New Compound</Button>
+        </Link>
+      </Can>
       <label>
         <input
           type="checkbox"
@@ -72,12 +76,17 @@ const Compounds: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export async function getServerSideProps() {
-  const data: CompoundWithMfrCount[] =
-    (await prisma.compound.findMany(compoundWithMfrCount)) ?? []
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data: CompoundWithMfrCount[] =
+      (await getUserPrismaClient(session.appUser).compound.findMany(
+        compoundWithMfrCount,
+      )) ?? []
 
-  return { props: { title: "Compounds", data } }
-}
+    return { props: { title: "Compounds", data } }
+  },
+  requireAuth: true,
+})
 
 const MfrPrintDoc = ({
   data,

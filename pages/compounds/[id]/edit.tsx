@@ -1,8 +1,10 @@
-import { GetServerSideProps } from "next"
+import { subject } from "@casl/ability"
 import { useRouter } from "next/router"
 
 import EditForm from "components/common/data-pages/EditForm"
 import CompoundEntry from "components/compound/CompoundEntry"
+import { withPageAuth } from "lib/auth"
+import { defineAbilityForUser } from "lib/auth/ability/appAbilities"
 import { NullableCompoundFields, compoundSchema } from "lib/fields"
 import CompoundMapper from "lib/mappers/CompoundMapper"
 import { getCompoundById } from "pages/api/compounds/[id]"
@@ -30,26 +32,42 @@ const EditCompound: NextPageWithLayout<Props> = (props: Props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = parseInt(context.query.id as string)
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (context, session) => {
+    const id = parseInt(context.query.id as string)
 
-  if (isNaN(id)) {
-    return { notFound: true }
-  }
+    if (isNaN(id)) {
+      return { notFound: true }
+    }
 
-  const data = await getCompoundById(id)
+    const data = await getCompoundById(session, id)
 
-  if (data === null) {
-    return { notFound: true }
-  }
-  const values = CompoundMapper.toFieldValues(data)
+    if (data === null) {
+      return { notFound: true }
+    }
 
-  return {
-    props: {
-      title: `Edit Compound - ${values.name}`,
-      values,
-    },
-  }
-}
+    // Check if current user has permission to update the compound
+    if (
+      defineAbilityForUser(session.appUser).cannot(
+        "update",
+        subject("Compound", data),
+      )
+    ) {
+      //TODO: Return 403 status code instead?
+      //TODO: Return cause message from CASL
+      return { notFound: true }
+    }
+
+    const values = CompoundMapper.toFieldValues(data)
+
+    return {
+      props: {
+        title: `Edit Compound - ${values.name}`,
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default EditCompound

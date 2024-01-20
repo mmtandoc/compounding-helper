@@ -3,6 +3,8 @@ import Link from "next/link"
 import TableActionBar from "components/common/TableActionBar"
 import SdsTable from "components/sds/SdsTable"
 import { Button } from "components/ui"
+import { withPageAuth } from "lib/auth"
+import { Can } from "lib/contexts/AbilityContext"
 import { getSafetyDataSheets } from "pages/api/sds"
 import { NextPageWithLayout } from "types/common"
 import { SdsWithRelations } from "types/models"
@@ -18,9 +20,11 @@ const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
 
   const actionBar = (
     <TableActionBar>
-      <Link href="/sds/new">
-        <Button>New SDS summary</Button>
-      </Link>
+      <Can do="create" on="SDS">
+        <Link href="/sds/new">
+          <Button>New SDS summary</Button>
+        </Link>
+      </Can>
     </TableActionBar>
   )
 
@@ -38,11 +42,16 @@ const SafetyDataSheets: NextPageWithLayout<SafetyDataSheetsProps> = (
   )
 }
 
-export async function getServerSideProps() {
-  const data: SdsWithRelations[] =
-    (await getSafetyDataSheets({ orderBy: { id: "asc" } })) ?? []
+export const getServerSideProps = withPageAuth<SafetyDataSheetsProps>({
+  getServerSideProps: async (_, session) => {
+    const data: SdsWithRelations[] =
+      (await getSafetyDataSheets(session, { orderBy: { id: "asc" } })) ?? []
 
-  return { props: { title: "SDS Summaries", data } }
-}
+    return {
+      props: { title: "SDS Summaries", data },
+    }
+  },
+  requireAuth: true,
+})
 
 export default SafetyDataSheets

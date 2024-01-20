@@ -1,8 +1,12 @@
+import { subject } from "@casl/ability"
 import { createColumnHelper } from "@tanstack/react-table"
 import Link from "next/link"
+import { BsGlobe } from "react-icons/bs"
 
 import { Table } from "components/ui"
 import DataRowActions from "components/ui/Table/DataRowActions"
+import { useAbility } from "lib/contexts/AbilityContext"
+import { isCentralPharmacy } from "lib/utils"
 import { IngredientAll, RiskAssessmentAll } from "types/models"
 
 type Props = {
@@ -13,6 +17,12 @@ type Props = {
 const columnHelper = createColumnHelper<RiskAssessmentAll>()
 
 const columns = [
+  columnHelper.accessor((row) => isCentralPharmacy(row.pharmacyId), {
+    id: "isCentral",
+    header: "",
+    cell: (info) => (info.getValue() ? <BsGlobe title="Central" /> : null),
+    enableColumnFilter: false,
+  }),
   columnHelper.accessor("id", {
     header: "ID",
     enableColumnFilter: false,
@@ -80,13 +90,25 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    cell: (info) => (
-      <DataRowActions
-        row={info.row}
-        viewButton={{ getUrl: (data) => `/risk-assessments/${data.id}` }}
-        editButton={{ getUrl: (data) => `/risk-assessments/${data.id}/edit` }}
-      />
-    ),
+    cell: function ActionsCell(info) {
+      const ability = useAbility()
+
+      const canEdit = ability.can(
+        "update",
+        subject("RiskAssessment", info.row.original),
+      )
+      return (
+        <DataRowActions
+          row={info.row}
+          viewButton={{ getUrl: (data) => `/risk-assessments/${data.id}` }}
+          editButton={
+            canEdit
+              ? { getUrl: (data) => `/risk-assessments/${data.id}/edit` }
+              : undefined
+          }
+        />
+      )
+    },
   }),
 ]
 

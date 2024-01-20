@@ -1,7 +1,6 @@
-import type { GetServerSideProps } from "next"
-
 import EditForm from "components/common/data-pages/EditForm"
 import SettingsEntry from "components/settings/SettingsEntry"
+import { withPageAuth } from "lib/auth"
 import {
   NullableSettingsFields,
   SettingsFields,
@@ -25,17 +24,20 @@ const Settings: NextPageWithLayout<Props> = (props) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const data = (await getSettings()) ?? []
+export const getServerSideProps = withPageAuth<Props>({
+  getServerSideProps: async (_, session) => {
+    const data = (await getSettings(session)) ?? []
 
-  const values = settingsSchema.parse(data)
+    const values = settingsSchema.parse(data)
 
-  return {
-    props: {
-      title: "Settings",
-      values,
-    },
-  }
-}
+    return {
+      props: {
+        title: "Settings",
+        values,
+      },
+    }
+  },
+  requireAuth: true,
+})
 
 export default Settings
