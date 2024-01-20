@@ -114,7 +114,7 @@ const SdsEntry = (props: Props) => {
                 index={index}
                 formMethods={formMethods}
                 arrayMethods={hazardsArrayMethods}
-                key={index}
+                key={field.id}
               />
             ))}
           </ul>
