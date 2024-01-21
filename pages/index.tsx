@@ -1,6 +1,6 @@
-import { GetStaticProps } from "next"
 import Link from "next/link"
 
+import { withPageAuth } from "lib/auth"
 import { AppAbility } from "lib/auth/ability/appAbilities"
 import { useAbility } from "lib/contexts/AbilityContext"
 import { NextPageWithLayout } from "types/common"
@@ -239,8 +239,15 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-export const getStaticProps: GetStaticProps = () => ({
-  props: { title: "Compounding Helper - Home" },
+export const getServerSideProps = withPageAuth({
+  getServerSideProps: async () => {
+    return {
+      props: {
+        title: "Compounding Helper - Home",
+      },
+    }
+  },
+  requireAuth: false,
 })
 
 export default Home
