@@ -1,3 +1,5 @@
+import path from "path"
+
 import axios, { AxiosError, isAxiosError } from "axios"
 import { useRouter } from "next/dist/client/router"
 import { enqueueSnackbar } from "notistack"
@@ -62,7 +64,7 @@ const Details = <TModel,>(props: DetailsProps<TModel>) => {
         enqueueSnackbar(`The ${dataLabel} has been deleted.`, {
           variant: "success",
         })
-        router.push(urlPath)
+        router.push(path.dirname(urlPath))
       },
       (error: Error | AxiosError<JsonError>) => {
         if (isAxiosError<JsonError>(error)) {
