@@ -202,9 +202,16 @@ export const getCompoundById = async (session: AppSession, id: number) => {
 
 export const deleteCompoundById = async (session: AppSession, id: number) => {
   const client = getUserPrismaClient(session.appUser)
+  // RLS extension does not current support sequential transactions
+  return await client.$transaction(async (tx) => {
+    await tx.ingredient.deleteMany({ where: { compoundId: id } })
+    return tx.compound.delete({ where: { id } })
+  })
 
+  /*
   return await client.$transaction([
     client.ingredient.deleteMany({ where: { compoundId: id } }),
     client.compound.delete({ where: { id } }),
   ])
+  */
 }

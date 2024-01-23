@@ -65,11 +65,18 @@ export function forUserTx(userId: string) {
                 sharedTxClient = undefined
               })
           }
+          //TODO: Support sequential operations transactions (issue #89)
+          // Sequential operation transactions run out of order and can't be rolled back
+          throw new Error(
+            "Sequential operations transactions are not supported.",
+          )
+          /*
           const [, ...results] = await prisma.$transaction([
             prisma.$executeRaw`SELECT set_config('public.current_user_id', ${userId}, TRUE)`,
             ...args,
           ]) // Sequential　operationsの場合
           return results
+          */
         },
       },
     }),

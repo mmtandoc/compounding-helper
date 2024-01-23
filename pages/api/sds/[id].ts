@@ -124,12 +124,22 @@ export const getSdsById = async (session: AppSession, id: number) => {
 export const deleteSdsById = async (session: AppSession, id: number) => {
   const prismaClient = getUserPrismaClient(session.appUser)
 
+  // RLS extension does not current support sequential transactions
+  await prismaClient.$transaction(async (tx) => {
+    await tx.hazardCategoryToSDS.deleteMany({ where: { sdsId: id } })
+    await tx.sDS.delete({
+      where: { id },
+    })
+  })
+
+  /*
   await prismaClient.$transaction([
     prismaClient.hazardCategoryToSDS.deleteMany({ where: { sdsId: id } }),
     prismaClient.sDS.delete({
       where: { id },
     }),
   ])
+  */
 }
 
 export const updateSdsById = async (
