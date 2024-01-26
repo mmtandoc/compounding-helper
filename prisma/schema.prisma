@@ -258,7 +258,7 @@ model Ingredient {
   compoundId Int
 
   order                       Int
-  safetyDataSheet             SDS?         @relation(fields: [safetyDataSheetId], references: [id])
+  safetyDataSheet             SDS?         @relation(fields: [safetyDataSheetId], references: [id], onDelete: Restrict)
   safetyDataSheetId           Int?
   physicalForm                PhysicalForm
   commercialProductName       String?
