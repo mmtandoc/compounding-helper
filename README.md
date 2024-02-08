@@ -2,6 +2,8 @@
 
 Compounding Helper is a web app in development meant to assist with the creation and maintenance of risk assessments for non-sterile compounding in Canadian pharmacies.
 
+DEBUG BRANCH
+
 ## Diagrams
 
 ### ER diagram
