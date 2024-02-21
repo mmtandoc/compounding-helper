@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BiSolidFirstAid } from "react-icons/bi"
 
 import { withPageAuth } from "lib/auth"
 import { AppAbility } from "lib/auth/ability/appAbilities"
@@ -208,6 +209,19 @@ const Home: NextPageWithLayout = () => {
         <summary>Misc.</summary>
         <HomeSection className="misc-section" items={miscGridItems} />
       </details>
+      <div className="emergency-sds">
+        <div className="icon">
+          <BiSolidFirstAid size="2em" />
+        </div>
+        <div className="content">
+          <p>
+            For emergencies, see the{" "}
+            <a href="https://www.medisca.ca/en">Medisca website</a> to find the
+            relevant safety datasheet and reference Section 4 on the SDS for
+            First-Aid Measures.
+          </p>
+        </div>
+      </div>
 
       <style jsx global>{`
         .data-collapsible {
@@ -220,6 +234,25 @@ const Home: NextPageWithLayout = () => {
             cursor: pointer;
             //width: fit-content;
             user-select: none;
+          }
+        }
+
+        .emergency-sds {
+          margin-top: 9rem;
+          border: var(--border-default);
+          padding: 0.5rem 1rem;
+          display: flex;
+          align-items: center;
+
+          > .icon {
+            margin-right: 10px;
+            > svg {
+              vertical-align: middle;
+            }
+          }
+
+          > .content > p {
+            margin: 0;
           }
         }
 
