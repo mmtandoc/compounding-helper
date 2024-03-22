@@ -13,7 +13,7 @@ jobs:
           SUPABASE_DB_PROD_API_KEY: ${{ secrets.SUPABASE_DB_PROD_API_KEY }}
         run: |
           curl --request GET \
-          --url 'https://grymjstlzdtkyqfygjtq.supabase.co/rest/v1/chemicals?select=name' \
+          --url 'https://gwfdyzuxiejynfbguode.supabase.co/rest/v1/chemicals?select=name' \
           --header "apikey: $SUPABASE_DB_PROD_API_KEY" \
           --header "Authorization: Bearer $SUPABASE_DB_PROD_API_KEY"
       - name: Call Supabase (Dev)
