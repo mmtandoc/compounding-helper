@@ -89,12 +89,6 @@ erDiagram
     Mfr }o--|| Compound : documents
 ```
 
-## Project Status
-
-The core workflows, authentication, pharmacy-level data separation, and role-based authorization are implemented.
-
-The project is not currently under active development. Automated test coverage is limited.
-
 ## Development
 
 The application uses Supabase for PostgreSQL hosting and authentication, with Prisma for database access and migrations.
